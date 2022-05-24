@@ -1,2 +1,3 @@
-# Working-Title-Project-Manager
-The Project Manager Project
+# Working title: Project Manager
+
+The Project Manager project.
