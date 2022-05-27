@@ -12,16 +12,16 @@
         TODO: Comment out before the production.
 */
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS scopes;
-DROP TABLE IF EXISTS images;
+DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS users_yandex_mappings;
-DROP TABLE IF EXISTS scope_organization_mappings;
+DROP TABLE IF EXISTS project_organization_mappings;
 DROP TABLE IF EXISTS team_organization_mappings;
-DROP TABLE IF EXISTS repository_scope_mappings;
-DROP TABLE IF EXISTS image_scope_mappings;
+DROP TABLE IF EXISTS repository_project_mappings;
+DROP TABLE IF EXISTS asset_project_mappings;
 
 /*
     The system entities:
@@ -37,27 +37,29 @@ DROP TABLE IF EXISTS image_scope_mappings;
 CREATE TABLE users
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE
+    id VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE
 );
 
 /*
     The basic project definition.
  */
-CREATE TABLE scopes
+CREATE TABLE projects
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL,
+    description VARCHAR     NOT NULL
 );
 
 /*
-    Images, defined by identifier and the resource url.
+    Images, attachments, etc.
+    Defined by the identifier and the resource url.
  */
-CREATE TABLE images
+CREATE TABLE assets
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    image VARCHAR     NOT NULL UNIQUE
+    id  VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    url VARCHAR     NOT NULL UNIQUE
 );
 
 /*
@@ -74,23 +76,23 @@ CREATE TABLE repositories
 );
 
 /*
-    The organization definition. Organization is the owner of the scope.
+    The organization definition. Organization is the owner of the project.
  */
 CREATE TABLE organizations
 (
 
-    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    organizations VARCHAR     NOT NULL UNIQUE
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR     NOT NULL UNIQUE
 );
 
 /*
-    The team definition. Organization is the owner of the scope.
+    The team definition. Organization is the owner of the team.
  */
 CREATE TABLE teams
 (
 
-    id   VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    team VARCHAR     NOT NULL UNIQUE
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR     NOT NULL UNIQUE
 );
 
 /*
@@ -113,15 +115,15 @@ CREATE TABLE users_yandex_mappings
 );
 
 /*
-    Scope belongs to the organization. Multiple scopes can belong to one organization.
+    Project belongs to the organization. Multiple projects can belong to one organization.
  */
-CREATE TABLE scope_organization_mappings
+CREATE TABLE project_organization_mappings
 (
 
     id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     organization_id VARCHAR(36) NOT NULL,
-    scope_id        VARCHAR(36) NOT NULL,
-    UNIQUE (organization_id, scope_id) ON CONFLICT ABORT
+    project_id      VARCHAR(36) NOT NULL,
+    UNIQUE (organization_id, project_id) ON CONFLICT ABORT
 );
 
 /*
@@ -137,27 +139,55 @@ CREATE TABLE team_organization_mappings
 );
 
 /*
-     Repository belongs to scope. Multiple repositories can belong to multiple scopes.
+     Repository belongs to project. Multiple repositories can belong to multiple projects.
      So, two projects can actually have the same repository.
  */
-CREATE TABLE repository_scope_mappings
+CREATE TABLE repository_project_mappings
 (
 
     id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     repository_id VARCHAR(36) NOT NULL,
-    scope_id      VARCHAR(36) NOT NULL,
-    UNIQUE (repository_id, scope_id) ON CONFLICT ABORT
+    project_id    VARCHAR(36) NOT NULL,
+    UNIQUE (repository_id, project_id) ON CONFLICT ABORT
 );
 
 /*
-    Image can belong to multiple scopes.
-    The image used in the context of the scope is the scope's avatar.
+    Image (asset) can belong to multiple projects.
+    The image used in the context of the project is the project's avatar.
 */
-CREATE TABLE image_scope_mappings
+CREATE TABLE asset_project_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    image_id VARCHAR(36) NOT NULL,
-    scope_id VARCHAR(36) NOT NULL,
-    UNIQUE (image_id, scope_id) ON CONFLICT ABORT /* TODO: Create the conflict unit test. */
+    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    asset_id   VARCHAR(36) NOT NULL,
+    project_id VARCHAR(36) NOT NULL,
+    UNIQUE (asset_id, project_id) ON CONFLICT ABORT /* TODO: Create the conflict(s) unit test(s). */
+);
+
+/*
+    User access rights:
+*/
+
+/*
+    User belongs to organizations:
+*/
+CREATE TABLE user_organization_mappings
+(
+
+    id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    user_id         VARCHAR(36) NOT NULL,
+    organization_id VARCHAR(36) NOT NULL,
+    UNIQUE (user_id, organization_id) ON CONFLICT ABORT
+);
+
+/*
+    User belongs to the organization's teams:
+*/
+CREATE TABLE user_team_mappings
+(
+
+    id      VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    user_id VARCHAR(36) NOT NULL,
+    team_id VARCHAR(36) NOT NULL,
+    UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
