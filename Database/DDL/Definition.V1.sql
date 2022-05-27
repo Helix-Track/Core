@@ -18,6 +18,8 @@ DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS users_yandex_mappings;
+DROP TABLE IF EXISTS user_organization_mappings;
+DROP TABLE IF EXISTS user_team_mappings;
 DROP TABLE IF EXISTS project_organization_mappings;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
@@ -100,21 +102,6 @@ CREATE TABLE teams
  */
 
 /*
-    OAuth2 mappings:
-*/
-
-/*
-    Users can be Yandex OAuth2 account users:
- */
-CREATE TABLE users_yandex_mappings
-(
-
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    user_id  VARCHAR(36) NOT NULL UNIQUE,
-    username VARCHAR(36) NOT NULL UNIQUE
-);
-
-/*
     Project belongs to the organization. Multiple projects can belong to one organization.
  */
 CREATE TABLE project_organization_mappings
@@ -162,6 +149,21 @@ CREATE TABLE asset_project_mappings
     asset_id   VARCHAR(36) NOT NULL,
     project_id VARCHAR(36) NOT NULL,
     UNIQUE (asset_id, project_id) ON CONFLICT ABORT /* TODO: Create the conflict(s) unit test(s). */
+);
+
+/*
+    OAuth2 mappings:
+*/
+
+/*
+    Users can be Yandex OAuth2 account users:
+ */
+CREATE TABLE users_yandex_mappings
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    user_id  VARCHAR(36) NOT NULL UNIQUE,
+    username VARCHAR(36) NOT NULL UNIQUE
 );
 
 /*
