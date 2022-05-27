@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS user_organization_mappings;
 DROP TABLE IF EXISTS user_team_mappings;
 DROP TABLE IF EXISTS project_organization_mappings;
 DROP TABLE IF EXISTS team_organization_mappings;
+DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS asset_project_mappings;
 
@@ -123,6 +124,18 @@ CREATE TABLE team_organization_mappings
     team_id         VARCHAR(36) NOT NULL,
     organization_id VARCHAR(36) NOT NULL,
     UNIQUE (team_id, organization_id) ON CONFLICT ABORT
+);
+
+/*
+    Team belongs to one or more projects. Multiple teams can work on multiple projects.
+ */
+CREATE TABLE team_project_mappings
+(
+
+    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    team_id    VARCHAR(36) NOT NULL,
+    project_id VARCHAR(36) NOT NULL,
+    UNIQUE (team_id, project_id) ON CONFLICT ABORT
 );
 
 /*
