@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
 DROP TABLE IF EXISTS user_team_mappings;
+DROP TABLE IF EXISTS permission_user_mappings;
 DROP TABLE IF EXISTS project_organization_mappings;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
@@ -106,7 +107,7 @@ CREATE TABLE permissions
 (
 
     id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    permission VARCHAR     NOT NULL UNIQUE
+    title VARCHAR     NOT NULL UNIQUE
 );
 
 /*
@@ -217,3 +218,25 @@ CREATE TABLE user_team_mappings
     team_id VARCHAR(36) NOT NULL,
     UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
+
+/*
+    User has the permissions.
+    Each permission has be associated to the proper context.
+    For example:
+
+        organization.project
+        organization.team
+*/
+CREATE TABLE permission_user_mappings
+(
+
+    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    permission_id VARCHAR(36) NOT NULL,
+    user_id       VARCHAR(36) NOT NULL,
+    context       VARCHAR     NOT NULL,
+    UNIQUE (user_id, permission_id, context) ON CONFLICT ABORT
+);
+
+/*
+    TODO: Map permissions to teams.
+ */
