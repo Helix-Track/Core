@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
+DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
 DROP TABLE IF EXISTS user_team_mappings;
@@ -96,6 +97,16 @@ CREATE TABLE teams
 
     id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     title VARCHAR     NOT NULL UNIQUE
+);
+
+/*
+    Permission definitions.
+ */
+CREATE TABLE permissions
+(
+
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    permission VARCHAR     NOT NULL UNIQUE
 );
 
 /*
