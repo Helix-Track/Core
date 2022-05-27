@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS images;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
+DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS scope_organization_mappings;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS repository_scope_mappings;
@@ -28,15 +29,15 @@ DROP TABLE IF EXISTS image_scope_mappings;
 
 /*
      System's users.
-     User is identified by the unique identifier (id) and its username.
+     User is identified by the unique identifier (id).
      Since there may be different types of users, different kinds of data
      can be mapped (associated) with the user ID.
+     For that purpose there are other mappings to the user ID such as Yandex OAuth2 mappings for example.
  */
 CREATE TABLE users
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    username VARCHAR     NOT NULL
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE
 );
 
 /*
@@ -95,6 +96,21 @@ CREATE TABLE teams
 /*
     Mappings:
  */
+
+/*
+    OAuth2 mappings:
+*/
+
+/*
+    Users can be Yandex OAuth2 account users:
+ */
+CREATE TABLE users_yandex_mappings
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    user_id  VARCHAR(36) NOT NULL UNIQUE,
+    username VARCHAR(36) NOT NULL UNIQUE
+);
 
 /*
     Scope belongs to the organization. Multiple scopes can belong to one organization.
