@@ -4,7 +4,7 @@
 
 /*
     Notes:
-    - Identifiers in the system are UUID strings (VARCHAR).
+    - Identifiers in the system are UUID strings (VARCHAR with the size of 36).
 */
 
 /*
