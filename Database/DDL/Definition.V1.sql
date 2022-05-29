@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS asset_project_mappings;
+DROP TABLE IF EXISTS asset_team_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 
 /*
@@ -57,6 +58,10 @@ CREATE TABLE projects
     title       VARCHAR     NOT NULL,
     description VARCHAR     NOT NULL
 );
+
+/*
+    TODO: Ticket definitions and its mappings - assets, etc.
+*/
 
 /*
     Images, attachments, etc.
@@ -187,8 +192,10 @@ CREATE TABLE repository_project_mappings
 );
 
 /*
-    Image (asset) can belong to multiple projects.
-    The image used in the context of the project is the project's avatar.
+    Assets can belong to the multiple projects.
+    One example of the image used in the context of the project is the project's avatar.
+    Projects may have various other assets associated to itself.
+    Various documentation for example.
 */
 CREATE TABLE asset_project_mappings
 (
@@ -197,6 +204,20 @@ CREATE TABLE asset_project_mappings
     asset_id   VARCHAR(36) NOT NULL,
     project_id VARCHAR(36) NOT NULL,
     UNIQUE (asset_id, project_id) ON CONFLICT ABORT /* TODO: Create the conflict(s) unit test(s). */
+);
+
+/*
+    Assets can belong to the multiple teams.
+    The image used in the context of the team is the team's avatar, for example.
+    Teams may have other additions associated to itself. Various documents for example,
+*/
+CREATE TABLE asset_team_mappings
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    asset_id VARCHAR(36) NOT NULL,
+    team_id  VARCHAR(36) NOT NULL,
+    UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
 
 /*
