@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS asset_project_mappings;
+DROP TABLE IF EXISTS permission_team_mappings;
 
 /*
     The system entities:
@@ -237,6 +238,22 @@ CREATE TABLE permission_user_mappings
     UNIQUE (user_id, permission_id, context) ON CONFLICT ABORT
 );
 
+
 /*
-    TODO: Map permissions to teams.
+    Tem has the permissions.
+    Each team permission has be associated to the proper context.
+    All team members (users) will inherit team's permissions.
+    For example:
+
+        organization.project
+        organization.team
 */
+CREATE TABLE permission_team_mappings
+(
+
+    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    permission_id VARCHAR(36) NOT NULL,
+    team_id       VARCHAR(36) NOT NULL,
+    context       VARCHAR     NOT NULL,
+    UNIQUE (team_id, permission_id, context) ON CONFLICT ABORT
+);
