@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS permissions;
+DROP TABLE IF EXISTS permission_contexts;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
 DROP TABLE IF EXISTS user_team_mappings;
@@ -103,8 +104,29 @@ CREATE TABLE teams
 
 /*
     Permission definitions.
+    Permissions are (for example):
+
+        CREATE
+        UPDATE
+        DELETE
+        etc.
  */
 CREATE TABLE permissions
+(
+
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR     NOT NULL UNIQUE
+);
+
+/*
+    Permission contexts.
+    Each permission must assigned to the permission owner must have a valid context.
+    Permission contexts are (for example):
+
+        organization.project
+        organization.team
+ */
+CREATE TABLE permission_contexts
 (
 
     id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
@@ -222,38 +244,30 @@ CREATE TABLE user_team_mappings
 
 /*
     User has the permissions.
-    Each permission has be associated to the proper context.
-    For example:
-
-        organization.project
-        organization.team
+    Each permission has be associated to the proper permission context.
 */
 CREATE TABLE permission_user_mappings
 (
 
-    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    permission_id VARCHAR(36) NOT NULL,
-    user_id       VARCHAR(36) NOT NULL,
-    context       VARCHAR     NOT NULL,
-    UNIQUE (user_id, permission_id, context) ON CONFLICT ABORT
+    id                    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    permission_id         VARCHAR(36) NOT NULL,
+    user_id               VARCHAR(36) NOT NULL,
+    permission_context_id VARCHAR(36) NOT NULL,
+    UNIQUE (user_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
 
 /*
-    Tem has the permissions.
-    Each team permission has be associated to the proper context.
+    Team has the permissions.
+    Each team permission has be associated to the proper permission context.
     All team members (users) will inherit team's permissions.
-    For example:
-
-        organization.project
-        organization.team
 */
 CREATE TABLE permission_team_mappings
 (
 
-    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    permission_id VARCHAR(36) NOT NULL,
-    team_id       VARCHAR(36) NOT NULL,
-    context       VARCHAR     NOT NULL,
-    UNIQUE (team_id, permission_id, context) ON CONFLICT ABORT
+    id                    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    permission_id         VARCHAR(36) NOT NULL,
+    team_id               VARCHAR(36) NOT NULL,
+    permission_context_id VARCHAR(36) NOT NULL,
+    UNIQUE (team_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
