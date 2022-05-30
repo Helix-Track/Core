@@ -13,6 +13,7 @@
 */
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS ticket_types;
 DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
@@ -60,7 +61,17 @@ CREATE TABLE projects
 );
 
 /*
-    TODO: Ticket definitions and its mappings - assets, etc.
+    Ticket type definitions.
+ */
+CREATE TABLE ticket_types
+(
+
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR     NOT NULL UNIQUE
+);
+
+/*
+    TODO: Ticket definitions (the ticket types relationships) and its mappings - assets, etc.
 */
 
 /*
