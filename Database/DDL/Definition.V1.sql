@@ -12,6 +12,7 @@
         TODO: Comment out before the production.
             Shell scripts should execute eachSQl with TO-DO check. If TO-DO found -> fail.
 */
+DROP TABLE IF EXISTS system_info;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS ticket_types;
@@ -33,6 +34,18 @@ DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS asset_project_mappings;
 DROP TABLE IF EXISTS asset_team_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
+
+/*
+  Identifies the version of the database (system).
+  After each SQL script execution the version will be increased and execution description provided.
+  TODO: To be connected to shell script runners
+ */
+CREATE TABLE system_info
+(
+
+    id          INTEGER PRIMARY KEY UNIQUE,
+    description VARCHAR NOT NULL UNIQUE
+);
 
 /*
     The system entities:
