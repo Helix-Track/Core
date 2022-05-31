@@ -10,6 +10,7 @@
 /*
     Cleaning up:
         TODO: Comment out before the production.
+            Shell scripts should execute eachSQl with TO-DO check. If TO-DO found -> fail.
 */
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
