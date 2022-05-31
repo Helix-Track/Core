@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS user_organization_mappings;
 DROP TABLE IF EXISTS user_team_mappings;
 DROP TABLE IF EXISTS permission_user_mappings;
 DROP TABLE IF EXISTS project_organization_mappings;
+DROP TABLE IF EXISTS ticket_type_project_mappings;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
@@ -163,6 +164,18 @@ CREATE TABLE project_organization_mappings
     organization_id VARCHAR(36) NOT NULL,
     project_id      VARCHAR(36) NOT NULL,
     UNIQUE (organization_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Each project has the ticket types that it supports.
+ */
+CREATE TABLE ticket_type_project_mappings
+(
+
+    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    ticket_type_id VARCHAR(36) NOT NULL,
+    project_id     VARCHAR(36) NOT NULL,
+    UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
 );
 
 /*
