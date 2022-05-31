@@ -8,6 +8,11 @@
 */
 
 /*
+    Various TODOs:
+    - TODO: API generator - generate models and API from the definition SQL.
+*/
+
+/*
     Cleaning up:
         TODO: Comment out before the production.
             Shell scripts should execute eachSQl with TO-DO check. If TO-DO found -> fail.
