@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS system_info;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS ticket_types;
+DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
@@ -38,6 +39,7 @@ DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS asset_project_mappings;
 DROP TABLE IF EXISTS asset_team_mappings;
+DROP TABLE IF EXISTS asset_ticket_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 
 /*
@@ -91,7 +93,23 @@ CREATE TABLE ticket_types
 );
 
 /*
-    TODO: Ticket definitions (the ticket types relationships) and its mappings - assets, etc.
+    Tickets.
+    Tickets belong to the project.
+    Each ticket has its ticket type anf children if supported.
+ */
+CREATE TABLE tickets
+(
+
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR,
+    description VARCHAR,
+    ticket_type_id VARCHAR(36) NOT NULL
+);
+
+/*
+    TODO:
+        - Ticket definitions (the ticket types relationships) and its mappings
+        - Asset mappings, etc.
 */
 
 /*
@@ -261,6 +279,18 @@ CREATE TABLE asset_team_mappings
     asset_id VARCHAR(36) NOT NULL,
     team_id  VARCHAR(36) NOT NULL,
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
+);
+
+/*
+    Assets (attachments for example) can belong to the multiple tickets.
+*/
+CREATE TABLE asset_ticket_mappings
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    asset_id  VARCHAR(36) NOT NULL,
+    ticket_id VARCHAR(36) NOT NULL,
+    UNIQUE (asset_id, ticket_id) ON CONFLICT ABORT
 );
 
 /*
