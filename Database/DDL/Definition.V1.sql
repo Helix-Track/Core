@@ -241,7 +241,7 @@ CREATE TABLE ticket_relationships
 
     id                          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     ticket_relationship_type_id VARCHAR(36) NOT NULL,
-    ticket_id            VARCHAR(36) NOT NULL,
+    ticket_id                   VARCHAR(36) NOT NULL,
     child_ticket_id             VARCHAR(36) NOT NULL
 );
 
