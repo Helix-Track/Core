@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS ticket_types;
 DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS ticket_relationship_types;
 DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
@@ -33,6 +34,7 @@ DROP TABLE IF EXISTS user_organization_mappings;
 DROP TABLE IF EXISTS user_team_mappings;
 DROP TABLE IF EXISTS permission_user_mappings;
 DROP TABLE IF EXISTS project_organization_mappings;
+DROP TABLE IF EXISTS ticket_relationships;
 DROP TABLE IF EXISTS ticket_type_project_mappings;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
@@ -108,10 +110,24 @@ CREATE TABLE tickets
 );
 
 /*
+    Ticket relationship types.
+    For example:
+        - Blocked by
+        - Blocks
+        - Cloned by
+        - Clones, etc.
+ */
+CREATE TABLE ticket_relationship_types
+(
+
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR
+);
+
+/*
     TODO:
         - Ticket definitions (the ticket types relationships) and its mappings
         - Asset mappings, etc.
-        - ticket_children table.
 */
 
 /*
@@ -215,6 +231,18 @@ CREATE TABLE ticket_type_project_mappings
     ticket_type_id VARCHAR(36) NOT NULL,
     project_id     VARCHAR(36) NOT NULL,
     UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    All relationships between the tickets.
+ */
+CREATE TABLE ticket_relationships
+(
+
+    id                          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    ticket_relationship_type_id VARCHAR(36) NOT NULL,
+    ticket_id            VARCHAR(36) NOT NULL,
+    child_ticket_id             VARCHAR(36) NOT NULL
 );
 
 /*
