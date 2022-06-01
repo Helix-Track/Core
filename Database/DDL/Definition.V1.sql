@@ -100,16 +100,18 @@ CREATE TABLE ticket_types
 CREATE TABLE tickets
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR,
-    description VARCHAR,
-    ticket_type_id VARCHAR(36) NOT NULL
+    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title          VARCHAR,
+    description    VARCHAR,
+    ticket_type_id VARCHAR(36) NOT NULL,
+    project_id     VARCHAR(36) NOT NULL
 );
 
 /*
     TODO:
         - Ticket definitions (the ticket types relationships) and its mappings
         - Asset mappings, etc.
+        - ticket_children table.
 */
 
 /*
