@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS permission_contexts;
 DROP TABLE IF EXISTS users_yandex_mappings;
+DROP TABLE IF EXISTS users_google_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
 DROP TABLE IF EXISTS user_team_mappings;
 DROP TABLE IF EXISTS permission_user_mappings;
@@ -331,6 +332,17 @@ CREATE TABLE asset_ticket_mappings
     Users can be Yandex OAuth2 account users:
  */
 CREATE TABLE users_yandex_mappings
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    user_id  VARCHAR(36) NOT NULL UNIQUE,
+    username VARCHAR(36) NOT NULL UNIQUE /* TODO: Populate user mappings with additional meta-data */
+);
+
+/*
+    Users can be Google OAuth2 account users:
+ */
+CREATE TABLE users_google_mappings
 (
 
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
