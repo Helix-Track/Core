@@ -146,14 +146,20 @@ CREATE TABLE assets
 /*
       The code repositories - Identified by the identifier and the repository URL.
       Default repository type is Git repository.
-      TODO:
-        For supporting multiple repository types the 'type' column to be introduced.
  */
 CREATE TABLE repositories
 (
 
     id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    repository VARCHAR     NOT NULL UNIQUE
+    repository VARCHAR     NOT NULL UNIQUE,
+    type       VARCHAR CHECK ( type IN
+                               ('Git', 'CVS', 'SVN', 'Mercurial',
+                                'Perforce', 'Monotone', 'Bazaar',
+                                'TFS', 'VSTS', 'IBM Rational ClearCase',
+                                'Revision Control System', 'VSS',
+                                'CA Harvest Software Change Manager',
+                                'PVCS', 'darcs')
+        )                  NOT NULL DEFAULT 'Git'
 );
 
 /*
