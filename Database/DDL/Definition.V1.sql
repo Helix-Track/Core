@@ -113,7 +113,7 @@ CREATE TABLE tickets
 );
 
 /*
-    TODO: Change history for all entities
+    TODO: Change history for all entities - audit
 */
 
 /*
