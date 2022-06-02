@@ -106,9 +106,15 @@ CREATE TABLE tickets
     id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     title          VARCHAR,
     description    VARCHAR,
+    created        INTEGER     NOT NULL,
+    modified       INTEGER     NOT NULL,
     ticket_type_id VARCHAR(36) NOT NULL,
     project_id     VARCHAR(36) NOT NULL
 );
+
+/*
+    TODO: Change history for all entities
+*/
 
 /*
     Ticket relationship types.
@@ -124,12 +130,6 @@ CREATE TABLE ticket_relationship_types
     id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     title VARCHAR
 );
-
-/*
-    TODO:
-        - Ticket definitions (the ticket types relationships) and its mappings
-        - Asset mappings, etc.
-*/
 
 /*
     Images, attachments, etc.
