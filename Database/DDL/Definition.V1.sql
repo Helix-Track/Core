@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS permission_contexts;
+DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS users_google_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
@@ -37,6 +38,7 @@ DROP TABLE IF EXISTS permission_user_mappings;
 DROP TABLE IF EXISTS project_organization_mappings;
 DROP TABLE IF EXISTS ticket_relationships;
 DROP TABLE IF EXISTS ticket_type_project_mappings;
+DROP TABLE IF EXISTS audit_meta_data;
 DROP TABLE IF EXISTS tickets_meta_data;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
@@ -112,10 +114,6 @@ CREATE TABLE tickets
     ticket_type_id VARCHAR(36) NOT NULL,
     project_id     VARCHAR(36) NOT NULL
 );
-
-/*
-    TODO: Change history for all entities - audit
-*/
 
 /*
     Ticket relationship types.
@@ -214,6 +212,18 @@ CREATE TABLE permission_contexts
 );
 
 /*
+    Audit trail.
+ */
+CREATE TABLE audit
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    timestamp INTEGER     NOT NULL,
+    entity    VARCHAR,
+    operation VARCHAR
+);
+
+/*
     Mappings:
  */
 
@@ -239,6 +249,18 @@ CREATE TABLE ticket_type_project_mappings
     ticket_type_id VARCHAR(36) NOT NULL,
     project_id     VARCHAR(36) NOT NULL,
     UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Audit trail meta-data.
+ */
+CREATE TABLE audit_meta_data
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    audit_id VARCHAR(36) NOT NULL,
+    property VARCHAR     NOT NULL,
+    value    VARCHAR
 );
 
 /*
