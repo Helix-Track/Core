@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS permission_user_mappings;
 DROP TABLE IF EXISTS project_organization_mappings;
 DROP TABLE IF EXISTS ticket_relationships;
 DROP TABLE IF EXISTS ticket_type_project_mappings;
+DROP TABLE IF EXISTS tickets_meta_data;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
@@ -232,6 +233,18 @@ CREATE TABLE ticket_type_project_mappings
     ticket_type_id VARCHAR(36) NOT NULL,
     project_id     VARCHAR(36) NOT NULL,
     UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Tickets meta-data.
+ */
+CREATE TABLE tickets_meta_data
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id VARCHAR(36) NOT NULL,
+    property  VARCHAR     NOT NULL,
+    value     VARCHAR
 );
 
 /*
