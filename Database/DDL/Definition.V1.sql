@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS permissions;
+DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS permission_contexts;
 DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS users_yandex_mappings;
@@ -46,6 +47,8 @@ DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS asset_project_mappings;
 DROP TABLE IF EXISTS asset_team_mappings;
 DROP TABLE IF EXISTS asset_ticket_mappings;
+DROP TABLE IF EXISTS asset_comment_mappings;
+DROP TABLE IF EXISTS comment_ticket_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 
 /*
@@ -194,6 +197,22 @@ CREATE TABLE permissions
 
     id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     title VARCHAR     NOT NULL UNIQUE
+);
+
+
+/*
+    Comments.
+    Users can comment on:
+        - Tickets
+        - Tbd.
+ */
+CREATE TABLE comments
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    comment  VARCHAR     NOT NULL,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -365,6 +384,30 @@ CREATE TABLE asset_ticket_mappings
     asset_id  VARCHAR(36) NOT NULL,
     ticket_id VARCHAR(36) NOT NULL,
     UNIQUE (asset_id, ticket_id) ON CONFLICT ABORT
+);
+
+/*
+    Assets (attachments for example) can belong to the multiple comments.
+*/
+CREATE TABLE asset_comment_mappings
+(
+
+    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    asset_id   VARCHAR(36) NOT NULL,
+    comment_id VARCHAR(36) NOT NULL,
+    UNIQUE (asset_id, comment_id) ON CONFLICT ABORT
+);
+
+/*
+    Comments are usually associated with project tickets:
+*/
+CREATE TABLE comment_ticket_mappings
+(
+
+    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    comment_id VARCHAR(36) NOT NULL,
+    ticket_id  VARCHAR(36) NOT NULL,
+    UNIQUE (comment_id, ticket_id) ON CONFLICT ABORT
 );
 
 /*
