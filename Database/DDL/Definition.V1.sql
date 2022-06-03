@@ -253,6 +253,8 @@ CREATE TABLE ticket_type_project_mappings
 
 /*
     Audit trail meta-data.
+
+    TODO: All meta data to be instantiated in SQL from the JSON definition and processed by shell script.
  */
 CREATE TABLE audit_meta_data
 (
