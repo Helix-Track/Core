@@ -8,12 +8,21 @@
 */
 
 /*
-    Various TODOs:
+    Various TODOs   :
     - TODO: API generator - generate models and API from the definition SQL.
         SQL -> OpenApi definition -> Generated code
     - TODO: Feature to define -> Sprint, Milestone, Release (version associated)
     - TODO: Feature to define -> Labels
     - TODO: Feature to define -> Components
+    - TODO: Feature to define -> Scrum vs Kanban
+        - Planning
+        - Grooming
+        - Retrospective
+    - TODO: Feature to define -> Roadmaps
+    - TODO: Feature to define -> Reports
+    - TODO: Feature to define -> Connecting with other systems (products)
+        - Repository connection and intelligence
+        - Connecting with other products
 */
 
 /*
