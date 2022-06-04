@@ -11,6 +11,7 @@
     Various TODOs   :
     - TODO: API generator - generate models and API from the definition SQL.
         SQL -> OpenApi definition -> Generated code
+    - TODO: Feature to define -> Backlog and boards
     - TODO: Feature to define -> Sprint, Milestone, Release (version associated)
     - TODO: Feature to define -> Labels
     - TODO: Feature to define -> Components
