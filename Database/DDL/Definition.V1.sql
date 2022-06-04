@@ -21,10 +21,12 @@
         - Retrospective
     - TODO: Feature to define -> Roadmaps
     - TODO: Feature to define -> Reports
-    - TODO: Feature to define -> Connecting with other systems (products)
+    - TODO: Feature to define -> Connecting with other systems (products) (Integrations)
         - Repository connection and intelligence
         - Connecting with other products
             - Connect chats with entities (for example) (addition to the comments feature)
+    - TODO: Feature to define -> Workflows
+    - TODO: Feature to define -> Time tracking
 */
 
 /*
