@@ -423,7 +423,10 @@ CREATE TABLE users_yandex_mappings
 
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     user_id  VARCHAR(36) NOT NULL UNIQUE,
-    username VARCHAR(36) NOT NULL UNIQUE /* TODO: Populate user mappings with additional meta-data */
+    username VARCHAR(36) NOT NULL UNIQUE /* TODO: Populate user mappings with additional meta-data/
+                                                The proper JSON file per users mapping/
+                                                For example: yandex_users.json
+                                        */
 );
 
 /*
