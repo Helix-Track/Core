@@ -10,6 +10,7 @@
 /*
     Various TODOs:
     - TODO: API generator - generate models and API from the definition SQL.
+        SQL -> OpenApi definition -> Generated code
 */
 
 /*
