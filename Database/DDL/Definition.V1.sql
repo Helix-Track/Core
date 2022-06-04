@@ -23,6 +23,7 @@
     - TODO: Feature to define -> Connecting with other systems (products)
         - Repository connection and intelligence
         - Connecting with other products
+            - Connect chats with entities (for example) (addition to the comments feature)
 */
 
 /*
