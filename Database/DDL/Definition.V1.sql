@@ -85,6 +85,10 @@ DROP TABLE IF EXISTS asset_team_mappings;
 DROP TABLE IF EXISTS asset_ticket_mappings;
 DROP TABLE IF EXISTS asset_comment_mappings;
 DROP TABLE IF EXISTS label_label_category_mappings;
+DROP TABLE IF EXISTS label_project_mappings;
+DROP TABLE IF EXISTS label_team_mappings;
+DROP TABLE IF EXISTS label_ticket_mappings;
+DROP TABLE IF EXISTS label_asset_mappings;
 DROP TABLE IF EXISTS comment_ticket_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 
@@ -472,6 +476,54 @@ CREATE TABLE label_label_category_mappings
     label_id          VARCHAR(36) NOT NULL,
     label_category_id VARCHAR(36) NOT NULL,
     UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
+);
+
+/*
+    Label can be associated with one or more projects.
+*/
+CREATE TABLE label_project_mappings
+(
+
+    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    label_id   VARCHAR(36) NOT NULL,
+    project_id VARCHAR(36) NOT NULL,
+    UNIQUE (label_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Label can be associated with one or more teams.
+*/
+CREATE TABLE label_team_mappings
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    label_id VARCHAR(36) NOT NULL,
+    team_id  VARCHAR(36) NOT NULL,
+    UNIQUE (label_id, team_id) ON CONFLICT ABORT
+);
+
+/*
+    Label can be associated with one or more tickets.
+*/
+CREATE TABLE label_ticket_mappings
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    label_id  VARCHAR(36) NOT NULL,
+    ticket_id VARCHAR(36) NOT NULL,
+    UNIQUE (label_id, ticket_id) ON CONFLICT ABORT
+);
+
+/*
+    Label can be associated with one or more assets.
+*/
+CREATE TABLE label_asset_mappings
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    label_id VARCHAR(36) NOT NULL,
+    asset_id VARCHAR(36) NOT NULL,
+    UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
 
 /*
