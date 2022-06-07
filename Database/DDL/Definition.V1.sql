@@ -13,26 +13,34 @@
 /*
     TODOs:
 
-        Features:
+      Features:
+
+      Cluster I:
+
+    - TODO: Feature to define -> Labels
+    - TODO: Feature to define -> Components
+    - TODO: Feature to define -> Time tracking
+    - TODO: Feature to define -> Reports (Time tracking reports, current status(es), etc.)
+
+      Cluster II:
 
     - TODO: Feature to define -> Backlog and boards
     - TODO: Feature to define -> Sprint, Milestone, Release (version associated)
-    - TODO: Feature to define -> Labels
-    - TODO: Feature to define -> Components
     - TODO: Feature to define -> Scrum vs Kanban
         - Planning
         - Grooming
         - Retrospective
     - TODO: Feature to define -> Roadmaps
-    - TODO: Feature to define -> Reports
+    - TODO: Feature to define -> Workflows
+
+      Cluster III:
+
     - TODO: Feature to define -> Connecting with other systems (products) (Integrations)
         - Repository connection and intelligence
         - Connecting with other products
             - Connect chats with entities (for example) (addition to the comments feature)
-    - TODO: Feature to define -> Workflows
-    - TODO: Feature to define -> Time tracking
 
-        Other items:
+      Other:
 
     - TODO: API generator - generate models and API from the definition SQL.
         SQL -> OpenApi definition -> Generated code
