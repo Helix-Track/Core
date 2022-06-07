@@ -17,7 +17,6 @@
 
       Cluster I:
 
-    - TODO: Feature to define -> Labels
     - TODO: Feature to define -> Components
     - TODO: Feature to define -> Time tracking
     - TODO: Feature to define -> Reports (Time tracking reports, current status(es), etc.)
