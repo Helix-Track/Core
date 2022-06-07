@@ -58,6 +58,8 @@ DROP TABLE IF EXISTS ticket_types;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS ticket_relationship_types;
 DROP TABLE IF EXISTS assets;
+DROP TABLE IF EXISTS labels;
+DROP TABLE IF EXISTS label_categories;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
@@ -82,6 +84,7 @@ DROP TABLE IF EXISTS asset_project_mappings;
 DROP TABLE IF EXISTS asset_team_mappings;
 DROP TABLE IF EXISTS asset_ticket_mappings;
 DROP TABLE IF EXISTS asset_comment_mappings;
+DROP TABLE IF EXISTS label_label_category_mappings;
 DROP TABLE IF EXISTS comment_ticket_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 
@@ -176,6 +179,32 @@ CREATE TABLE assets
 
     id  VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     url VARCHAR     NOT NULL UNIQUE
+);
+
+/*
+    Labels.
+    Label can be associated with the almost everything:
+        - Project
+        - Team
+        - Ticket
+        - Asset
+ */
+CREATE TABLE labels
+(
+
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR     NOT NULL UNIQUE
+);
+
+/*
+    Labels can be divided into categories (which is optional).
+    TODO: Populate from the initialization JSON by the proper shell script.
+ */
+CREATE TABLE label_categories
+(
+
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR     NOT NULL UNIQUE
 );
 
 /*
@@ -430,6 +459,19 @@ CREATE TABLE asset_comment_mappings
     asset_id   VARCHAR(36) NOT NULL,
     comment_id VARCHAR(36) NOT NULL,
     UNIQUE (asset_id, comment_id) ON CONFLICT ABORT
+);
+
+/*
+    Labels can belong to the label category.
+    One single asset can belong to multiple categories.
+*/
+CREATE TABLE label_label_category_mappings
+(
+
+    id                VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    label_id          VARCHAR(36) NOT NULL,
+    label_category_id VARCHAR(36) NOT NULL,
+    UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
 );
 
 /*
