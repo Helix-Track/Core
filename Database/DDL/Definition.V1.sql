@@ -4,13 +4,17 @@
 
 /*
     Notes:
+
     - Identifiers in the system are UUID strings (VARCHAR with the size of 36).
+    - Mapping tables are used for binding entities and defining relationships.
+        Mapping tables are used as well to append properties to the entities.
 */
 
 /*
-    Various TODOs   :
-    - TODO: API generator - generate models and API from the definition SQL.
-        SQL -> OpenApi definition -> Generated code
+    TODOs:
+
+        Features:
+
     - TODO: Feature to define -> Backlog and boards
     - TODO: Feature to define -> Sprint, Milestone, Release (version associated)
     - TODO: Feature to define -> Labels
@@ -27,6 +31,11 @@
             - Connect chats with entities (for example) (addition to the comments feature)
     - TODO: Feature to define -> Workflows
     - TODO: Feature to define -> Time tracking
+
+        Other items:
+
+    - TODO: API generator - generate models and API from the definition SQL.
+        SQL -> OpenApi definition -> Generated code
 */
 
 /*
