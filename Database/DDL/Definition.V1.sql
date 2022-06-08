@@ -13,11 +13,12 @@
 /*
     TODOs:
 
+    - TODO: Indexes
+
       Features:
 
       Cluster I:
 
-    - TODO: Feature to define -> Components
     - TODO: Feature to define -> Time tracking
     - TODO: Feature to define -> Reports (Time tracking reports, current status(es), etc.)
 
@@ -60,6 +61,7 @@ DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS labels;
 DROP TABLE IF EXISTS label_categories;
 DROP TABLE IF EXISTS repositories;
+DROP TABLE IF EXISTS components;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS permissions;
@@ -79,6 +81,8 @@ DROP TABLE IF EXISTS tickets_meta_data;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
+DROP TABLE IF EXISTS component_ticket_mappings;
+DROP TABLE IF EXISTS components_meta_data;
 DROP TABLE IF EXISTS asset_project_mappings;
 DROP TABLE IF EXISTS asset_team_mappings;
 DROP TABLE IF EXISTS asset_ticket_mappings;
@@ -227,6 +231,22 @@ CREATE TABLE repositories
                                 'CA Harvest Software Change Manager',
                                 'PVCS', 'darcs')
         )                  NOT NULL DEFAULT 'Git'
+);
+
+/*
+    Components.
+    Components are associated with the tickets.
+    For example:
+        - Backend
+        - Android Client
+        - Core Engine
+        - Webapp, etc.
+ */
+CREATE TABLE components
+(
+
+    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title VARCHAR     NOT NULL UNIQUE
 );
 
 /*
@@ -409,6 +429,32 @@ CREATE TABLE repository_project_mappings
     repository_id VARCHAR(36) NOT NULL,
     project_id    VARCHAR(36) NOT NULL,
     UNIQUE (repository_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Components to the tickets mappings.
+    Component can be mapped to the multiple tickets.
+*/
+CREATE TABLE component_ticket_mappings
+(
+
+    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    component_id VARCHAR(36) NOT NULL,
+    ticket_id    VARCHAR(36) NOT NULL,
+    UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
+);
+
+/*
+    Components meta-data:
+    Associate the various information with different components.
+*/
+CREATE TABLE components_meta_data
+(
+
+    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    component_id VARCHAR(36) NOT NULL,
+    property     VARCHAR     NOT NULL,
+    value        VARCHAR
 );
 
 /*
