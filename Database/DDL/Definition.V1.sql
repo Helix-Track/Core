@@ -20,7 +20,6 @@
 
       Cluster I:
 
-    - TODO: Feature to define -> Time tracking
     - TODO: Feature to define -> Reports (Time tracking reports, current status(es), etc.)
 
       Cluster II:
@@ -69,6 +68,7 @@ DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS permission_contexts;
 DROP TABLE IF EXISTS audit;
+DROP TABLE IF EXISTS times;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS users_google_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
@@ -327,6 +327,32 @@ CREATE TABLE audit
     timestamp INTEGER     NOT NULL,
     entity    VARCHAR,
     operation VARCHAR
+);
+
+/*
+    Time tracking.
+    Time is tracked against the tickets.
+    One entry is associated with the parent ticket and it contains the information:
+        - How much time
+        - Unit (time unit)
+        - The title for the performed work (optional)
+        - The description for the performed work (optional)
+ */
+CREATE TABLE times
+(
+
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    timestamp   INTEGER     NOT NULL,
+    how_mush    INTEGER     NOT NULL,
+
+    unit        VARCHAR CHECK (
+            unit IN (
+                     'Minute', 'Hour', 'Day', 'Week', 'Month'
+            )
+        )                   NOT NULL DEFAULT 'Hour',
+
+    title       VARCHAR,
+    description VARCHAR
 );
 
 /*
