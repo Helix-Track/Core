@@ -83,6 +83,7 @@ DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS component_ticket_mappings;
+DROP TABLE IF EXISTS time_ticket_mappings;
 DROP TABLE IF EXISTS components_meta_data;
 DROP TABLE IF EXISTS asset_project_mappings;
 DROP TABLE IF EXISTS asset_team_mappings;
@@ -469,6 +470,18 @@ CREATE TABLE component_ticket_mappings
     component_id VARCHAR(36) NOT NULL,
     ticket_id    VARCHAR(36) NOT NULL,
     UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
+);
+
+/*
+    Time is associated with the tickets.
+*/
+CREATE TABLE time_ticket_mappings
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    time_id   VARCHAR(36) NOT NULL,
+    ticket_id VARCHAR(36) NOT NULL,
+    UNIQUE (time_id, ticket_id) ON CONFLICT ABORT
 );
 
 /*
