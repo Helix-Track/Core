@@ -14,7 +14,6 @@
     TODOs:
 
     - TODO: Descriptions
-    - TODO: Remove data vs. mark it as removed
     - TODO: Indexes
 
       Features:
@@ -127,7 +126,8 @@ CREATE TABLE users
 
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL
+    modified INTEGER     NOT NULL,
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
