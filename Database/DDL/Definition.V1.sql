@@ -756,7 +756,7 @@ CREATE TABLE users_yandex_mappings
     username VARCHAR(36) NOT NULL UNIQUE, /* TODO: Populate user mappings with additional meta-data/
                                                 The proper JSON file per users mapping/
                                                 For example: yandex_users.json
-                                        */
+                                          */
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
     deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
