@@ -127,7 +127,7 @@ CREATE TABLE users
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -154,7 +154,7 @@ CREATE TABLE ticket_types
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -190,7 +190,7 @@ CREATE TABLE ticket_relationship_types
     title    VARCHAR,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -204,7 +204,7 @@ CREATE TABLE assets
     url      VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -222,7 +222,7 @@ CREATE TABLE labels
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -236,7 +236,7 @@ CREATE TABLE label_categories
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -279,7 +279,7 @@ CREATE TABLE components
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -292,7 +292,7 @@ CREATE TABLE organizations
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -305,7 +305,7 @@ CREATE TABLE teams
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -324,7 +324,7 @@ CREATE TABLE permissions
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 
@@ -341,7 +341,7 @@ CREATE TABLE comments
     comment  VARCHAR     NOT NULL,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -359,7 +359,7 @@ CREATE TABLE permission_contexts
     title    VARCHAR     NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -605,7 +605,7 @@ CREATE TABLE asset_team_mappings
     team_id  VARCHAR(36) NOT NULL,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
 
@@ -681,7 +681,7 @@ CREATE TABLE label_team_mappings
     team_id  VARCHAR(36) NOT NULL,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (label_id, team_id) ON CONFLICT ABORT
 );
 
@@ -711,7 +711,7 @@ CREATE TABLE label_asset_mappings
     asset_id VARCHAR(36) NOT NULL,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
 
@@ -748,7 +748,7 @@ CREATE TABLE users_yandex_mappings
                                         */
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -762,7 +762,7 @@ CREATE TABLE users_google_mappings
     username VARCHAR(36) NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -795,7 +795,7 @@ CREATE TABLE user_team_mappings
     team_id  VARCHAR(36) NOT NULL,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
 
