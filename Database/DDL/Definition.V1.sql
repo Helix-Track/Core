@@ -13,8 +13,9 @@
 /*
     TODOs:
 
+    - TODO: Descriptions
+    - TODO: Remove data vs. mark it as removed
     - TODO: Indexes
-    - TODO: Timestamps
 
       Features:
 
@@ -106,7 +107,8 @@ CREATE TABLE system_info
 (
 
     id          INTEGER PRIMARY KEY UNIQUE,
-    description VARCHAR NOT NULL UNIQUE
+    description VARCHAR NOT NULL UNIQUE,
+    created     INTEGER NOT NULL
 );
 
 /*
@@ -123,7 +125,9 @@ CREATE TABLE system_info
 CREATE TABLE users
 (
 
-    id VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -134,7 +138,9 @@ CREATE TABLE projects
 
     id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     title       VARCHAR     NOT NULL,
-    description VARCHAR     NOT NULL
+    description VARCHAR     NOT NULL,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL
 );
 
 /*
@@ -143,8 +149,10 @@ CREATE TABLE projects
 CREATE TABLE ticket_types
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -175,8 +183,10 @@ CREATE TABLE tickets
 CREATE TABLE ticket_relationship_types
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -186,8 +196,10 @@ CREATE TABLE ticket_relationship_types
 CREATE TABLE assets
 (
 
-    id  VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    url VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    url      VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -201,8 +213,10 @@ CREATE TABLE assets
 CREATE TABLE labels
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -212,8 +226,10 @@ CREATE TABLE labels
 CREATE TABLE label_categories
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -225,6 +241,7 @@ CREATE TABLE repositories
 
     id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     repository VARCHAR     NOT NULL UNIQUE,
+
     type       VARCHAR CHECK ( type IN
                                ('Git', 'CVS', 'SVN', 'Mercurial',
                                 'Perforce', 'Monotone', 'Bazaar',
@@ -232,7 +249,10 @@ CREATE TABLE repositories
                                 'Revision Control System', 'VSS',
                                 'CA Harvest Software Change Manager',
                                 'PVCS', 'darcs')
-        )                  NOT NULL DEFAULT 'Git'
+        )                  NOT NULL DEFAULT 'Git',
+
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL
 );
 
 /*
@@ -247,8 +267,10 @@ CREATE TABLE repositories
 CREATE TABLE components
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -257,8 +279,10 @@ CREATE TABLE components
 CREATE TABLE organizations
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -267,8 +291,10 @@ CREATE TABLE organizations
 CREATE TABLE teams
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -283,8 +309,10 @@ CREATE TABLE teams
 CREATE TABLE permissions
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 
@@ -314,30 +342,14 @@ CREATE TABLE comments
 CREATE TABLE permission_contexts
 (
 
-    id    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title VARCHAR     NOT NULL UNIQUE
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title    VARCHAR     NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
     Audit trail.
- */
-CREATE TABLE audit
-(
-
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    timestamp INTEGER     NOT NULL,
-    entity    VARCHAR,
-    operation VARCHAR
-);
-
-/*
-    Time tracking.
-    Time is tracked against the tickets.
-    One entry is associated with the parent ticket and it contains the information:
-        - How much time
-        - Unit (time unit)
-        - The title for the performed work (optional)
-        - The description for the performed work (optional)
  */
 CREATE TABLE times
 (
@@ -357,6 +369,24 @@ CREATE TABLE times
 );
 
 /*
+    Time tracking.
+    Time is tracked against the tickets.
+    One entry is associated with the parent ticket and it contains the information:
+        - How much time
+        - Unit (time unit)
+        - The title for the performed work (optional)
+        - The description for the performed work (optional)
+ */
+CREATE TABLE audit
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    created   INTEGER     NOT NULL,
+    entity    VARCHAR,
+    operation VARCHAR
+);
+
+/*
     Mappings:
  */
 
@@ -369,6 +399,8 @@ CREATE TABLE project_organization_mappings
     id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     organization_id VARCHAR(36) NOT NULL,
     project_id      VARCHAR(36) NOT NULL,
+    created         INTEGER     NOT NULL,
+    modified        INTEGER     NOT NULL,
     UNIQUE (organization_id, project_id) ON CONFLICT ABORT
 );
 
@@ -381,6 +413,8 @@ CREATE TABLE ticket_type_project_mappings
     id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     ticket_type_id VARCHAR(36) NOT NULL,
     project_id     VARCHAR(36) NOT NULL,
+    created        INTEGER     NOT NULL,
+    modified       INTEGER     NOT NULL,
     UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
 );
 
@@ -395,7 +429,9 @@ CREATE TABLE audit_meta_data
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     audit_id VARCHAR(36) NOT NULL,
     property VARCHAR     NOT NULL,
-    value    VARCHAR
+    value    VARCHAR,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -407,7 +443,9 @@ CREATE TABLE tickets_meta_data
     id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     ticket_id VARCHAR(36) NOT NULL,
     property  VARCHAR     NOT NULL,
-    value     VARCHAR
+    value     VARCHAR,
+    created   INTEGER     NOT NULL,
+    modified  INTEGER     NOT NULL
 );
 
 /*
@@ -419,7 +457,9 @@ CREATE TABLE ticket_relationships
     id                          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     ticket_relationship_type_id VARCHAR(36) NOT NULL,
     ticket_id                   VARCHAR(36) NOT NULL,
-    child_ticket_id             VARCHAR(36) NOT NULL
+    child_ticket_id             VARCHAR(36) NOT NULL,
+    created                     INTEGER     NOT NULL,
+    modified                    INTEGER     NOT NULL
 );
 
 /*
@@ -431,6 +471,8 @@ CREATE TABLE team_organization_mappings
     id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     team_id         VARCHAR(36) NOT NULL,
     organization_id VARCHAR(36) NOT NULL,
+    created         INTEGER     NOT NULL,
+    modified        INTEGER     NOT NULL,
     UNIQUE (team_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -443,6 +485,8 @@ CREATE TABLE team_project_mappings
     id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     team_id    VARCHAR(36) NOT NULL,
     project_id VARCHAR(36) NOT NULL,
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL,
     UNIQUE (team_id, project_id) ON CONFLICT ABORT
 );
 
@@ -456,6 +500,8 @@ CREATE TABLE repository_project_mappings
     id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     repository_id VARCHAR(36) NOT NULL,
     project_id    VARCHAR(36) NOT NULL,
+    created       INTEGER     NOT NULL,
+    modified      INTEGER     NOT NULL,
     UNIQUE (repository_id, project_id) ON CONFLICT ABORT
 );
 
@@ -469,6 +515,8 @@ CREATE TABLE component_ticket_mappings
     id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     component_id VARCHAR(36) NOT NULL,
     ticket_id    VARCHAR(36) NOT NULL,
+    created      INTEGER     NOT NULL,
+    modified     INTEGER     NOT NULL,
     UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -481,6 +529,8 @@ CREATE TABLE time_ticket_mappings
     id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     time_id   VARCHAR(36) NOT NULL,
     ticket_id VARCHAR(36) NOT NULL,
+    created   INTEGER     NOT NULL,
+    modified  INTEGER     NOT NULL,
     UNIQUE (time_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -494,7 +544,9 @@ CREATE TABLE components_meta_data
     id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     component_id VARCHAR(36) NOT NULL,
     property     VARCHAR     NOT NULL,
-    value        VARCHAR
+    value        VARCHAR,
+    created      INTEGER     NOT NULL,
+    modified     INTEGER     NOT NULL
 );
 
 /*
@@ -509,6 +561,8 @@ CREATE TABLE asset_project_mappings
     id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     asset_id   VARCHAR(36) NOT NULL,
     project_id VARCHAR(36) NOT NULL,
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL,
     UNIQUE (asset_id, project_id) ON CONFLICT ABORT /* TODO: Create the conflict(s) unit test(s). */
 );
 
@@ -523,6 +577,8 @@ CREATE TABLE asset_team_mappings
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     asset_id VARCHAR(36) NOT NULL,
     team_id  VARCHAR(36) NOT NULL,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL,
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
 
@@ -535,6 +591,8 @@ CREATE TABLE asset_ticket_mappings
     id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     asset_id  VARCHAR(36) NOT NULL,
     ticket_id VARCHAR(36) NOT NULL,
+    created   INTEGER     NOT NULL,
+    modified  INTEGER     NOT NULL,
     UNIQUE (asset_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -547,6 +605,8 @@ CREATE TABLE asset_comment_mappings
     id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     asset_id   VARCHAR(36) NOT NULL,
     comment_id VARCHAR(36) NOT NULL,
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL,
     UNIQUE (asset_id, comment_id) ON CONFLICT ABORT
 );
 
@@ -560,6 +620,8 @@ CREATE TABLE label_label_category_mappings
     id                VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     label_id          VARCHAR(36) NOT NULL,
     label_category_id VARCHAR(36) NOT NULL,
+    created           INTEGER     NOT NULL,
+    modified          INTEGER     NOT NULL,
     UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
 );
 
@@ -572,6 +634,8 @@ CREATE TABLE label_project_mappings
     id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     label_id   VARCHAR(36) NOT NULL,
     project_id VARCHAR(36) NOT NULL,
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL,
     UNIQUE (label_id, project_id) ON CONFLICT ABORT
 );
 
@@ -584,6 +648,8 @@ CREATE TABLE label_team_mappings
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     label_id VARCHAR(36) NOT NULL,
     team_id  VARCHAR(36) NOT NULL,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL,
     UNIQUE (label_id, team_id) ON CONFLICT ABORT
 );
 
@@ -596,6 +662,8 @@ CREATE TABLE label_ticket_mappings
     id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     label_id  VARCHAR(36) NOT NULL,
     ticket_id VARCHAR(36) NOT NULL,
+    created   INTEGER     NOT NULL,
+    modified  INTEGER     NOT NULL,
     UNIQUE (label_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -608,6 +676,8 @@ CREATE TABLE label_asset_mappings
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     label_id VARCHAR(36) NOT NULL,
     asset_id VARCHAR(36) NOT NULL,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL,
     UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
 
@@ -620,6 +690,8 @@ CREATE TABLE comment_ticket_mappings
     id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     comment_id VARCHAR(36) NOT NULL,
     ticket_id  VARCHAR(36) NOT NULL,
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL,
     UNIQUE (comment_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -635,10 +707,12 @@ CREATE TABLE users_yandex_mappings
 
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     user_id  VARCHAR(36) NOT NULL UNIQUE,
-    username VARCHAR(36) NOT NULL UNIQUE /* TODO: Populate user mappings with additional meta-data/
+    username VARCHAR(36) NOT NULL UNIQUE, /* TODO: Populate user mappings with additional meta-data/
                                                 The proper JSON file per users mapping/
                                                 For example: yandex_users.json
                                         */
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -649,7 +723,9 @@ CREATE TABLE users_google_mappings
 
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     user_id  VARCHAR(36) NOT NULL UNIQUE,
-    username VARCHAR(36) NOT NULL UNIQUE
+    username VARCHAR(36) NOT NULL UNIQUE,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
 );
 
 /*
@@ -665,6 +741,8 @@ CREATE TABLE user_organization_mappings
     id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     user_id         VARCHAR(36) NOT NULL,
     organization_id VARCHAR(36) NOT NULL,
+    created         INTEGER     NOT NULL,
+    modified        INTEGER     NOT NULL,
     UNIQUE (user_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -674,9 +752,11 @@ CREATE TABLE user_organization_mappings
 CREATE TABLE user_team_mappings
 (
 
-    id      VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    user_id VARCHAR(36) NOT NULL,
-    team_id VARCHAR(36) NOT NULL,
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    user_id  VARCHAR(36) NOT NULL,
+    team_id  VARCHAR(36) NOT NULL,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL,
     UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
 
@@ -691,6 +771,8 @@ CREATE TABLE permission_user_mappings
     permission_id         VARCHAR(36) NOT NULL,
     user_id               VARCHAR(36) NOT NULL,
     permission_context_id VARCHAR(36) NOT NULL,
+    created               INTEGER     NOT NULL,
+    modified              INTEGER     NOT NULL,
     UNIQUE (user_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
@@ -707,5 +789,7 @@ CREATE TABLE permission_team_mappings
     permission_id         VARCHAR(36) NOT NULL,
     team_id               VARCHAR(36) NOT NULL,
     permission_context_id VARCHAR(36) NOT NULL,
+    created               INTEGER     NOT NULL,
+    modified              INTEGER     NOT NULL,
     UNIQUE (team_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
