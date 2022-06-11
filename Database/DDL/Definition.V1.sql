@@ -13,7 +13,6 @@
 /*
     TODOs:
 
-    - TODO: Descriptions
     - TODO: Indexes
 
       Features:
@@ -106,7 +105,7 @@ CREATE TABLE system_info
 (
 
     id          INTEGER PRIMARY KEY UNIQUE,
-    description VARCHAR NOT NULL UNIQUE,
+    description VARCHAR NOT NULL,
     created     INTEGER NOT NULL
 );
 
@@ -127,7 +126,7 @@ CREATE TABLE users
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
-    deleted BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -138,7 +137,7 @@ CREATE TABLE projects
 
     id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     title       VARCHAR     NOT NULL,
-    description VARCHAR     NOT NULL,
+    description VARCHAR,
     created     INTEGER     NOT NULL,
     modified    INTEGER     NOT NULL,
     deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
@@ -150,11 +149,12 @@ CREATE TABLE projects
 CREATE TABLE ticket_types
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -186,11 +186,12 @@ CREATE TABLE tickets
 CREATE TABLE ticket_relationship_types
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -200,11 +201,12 @@ CREATE TABLE ticket_relationship_types
 CREATE TABLE assets
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    url      VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    url         VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -218,11 +220,12 @@ CREATE TABLE assets
 CREATE TABLE labels
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -232,11 +235,12 @@ CREATE TABLE labels
 CREATE TABLE label_categories
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -246,21 +250,22 @@ CREATE TABLE label_categories
 CREATE TABLE repositories
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    repository VARCHAR     NOT NULL UNIQUE,
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    repository  VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
 
-    type       VARCHAR CHECK ( type IN
-                               ('Git', 'CVS', 'SVN', 'Mercurial',
-                                'Perforce', 'Monotone', 'Bazaar',
-                                'TFS', 'VSTS', 'IBM Rational ClearCase',
-                                'Revision Control System', 'VSS',
-                                'CA Harvest Software Change Manager',
-                                'PVCS', 'darcs')
-        )                  NOT NULL DEFAULT 'Git',
+    type        VARCHAR CHECK ( type IN
+                                ('Git', 'CVS', 'SVN', 'Mercurial',
+                                 'Perforce', 'Monotone', 'Bazaar',
+                                 'TFS', 'VSTS', 'IBM Rational ClearCase',
+                                 'Revision Control System', 'VSS',
+                                 'CA Harvest Software Change Manager',
+                                 'PVCS', 'darcs')
+        )                   NOT NULL DEFAULT 'Git',
 
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -275,11 +280,12 @@ CREATE TABLE repositories
 CREATE TABLE components
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -288,11 +294,12 @@ CREATE TABLE components
 CREATE TABLE organizations
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -301,11 +308,12 @@ CREATE TABLE organizations
 CREATE TABLE teams
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -320,11 +328,12 @@ CREATE TABLE teams
 CREATE TABLE permissions
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 
@@ -355,11 +364,12 @@ CREATE TABLE comments
 CREATE TABLE permission_contexts
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title    VARCHAR     NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -369,8 +379,9 @@ CREATE TABLE times
 (
 
     id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    timestamp   INTEGER     NOT NULL,
-    how_mush    INTEGER     NOT NULL,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    amount      INTEGER     NOT NULL,
 
     unit        VARCHAR CHECK (
             unit IN (
