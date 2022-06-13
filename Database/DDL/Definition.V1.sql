@@ -203,7 +203,9 @@ CREATE TABLE ticket_relationship_types
 
     Boards examples:
         - Backlog
-        - Main board
+        - Main board.
+
+    TODO: Populate the default boards from JSON data (additional meta-data as well).
  */
 CREATE TABLE boards
 (
