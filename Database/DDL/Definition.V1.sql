@@ -17,10 +17,6 @@
 
       Features:
 
-      Cluster I:
-
-    - TODO: Feature to define -> Reports (Time tracking reports, current status(es), etc.)
-
       Cluster II:
 
     - TODO: Feature to define -> Backlog and boards
@@ -37,6 +33,7 @@
     - TODO: Feature to define -> Connecting with other systems (products) (Integrations)
         - Repository connection and intelligence
         - Connecting with other products
+            - Documents
             - Connect chats with entities (for example) (addition to the comments feature)
 
       Other:
@@ -68,6 +65,7 @@ DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS permission_contexts;
 DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS times;
+DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS users_google_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
@@ -77,6 +75,7 @@ DROP TABLE IF EXISTS project_organization_mappings;
 DROP TABLE IF EXISTS ticket_relationships;
 DROP TABLE IF EXISTS ticket_type_project_mappings;
 DROP TABLE IF EXISTS audit_meta_data;
+DROP TABLE IF EXISTS reports_meta_data;
 DROP TABLE IF EXISTS tickets_meta_data;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
@@ -395,6 +394,22 @@ CREATE TABLE times
 );
 
 /*
+    Reports, such as:
+        - Time tracking reports
+        - Progress status(es), etc.
+ */
+CREATE TABLE reports
+(
+
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    title       VARCHAR,
+    description VARCHAR,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+);
+
+/*
     Time tracking.
     Time is tracked against the tickets.
     One entry is associated with the parent ticket and it contains the information:
@@ -460,6 +475,20 @@ CREATE TABLE audit_meta_data
     value    VARCHAR,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL
+);
+
+/*
+   Reports met-data: used to populate reports with the information.
+ */
+CREATE TABLE reports_meta_data
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    report_id VARCHAR(36) NOT NULL,
+    property  VARCHAR     NOT NULL,
+    value     VARCHAR,
+    created   INTEGER     NOT NULL,
+    modified  INTEGER     NOT NULL
 );
 
 /*
