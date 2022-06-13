@@ -19,7 +19,6 @@
 
       Cluster II:
 
-    - TODO: Feature to define -> Backlog and boards
     - TODO: Feature to define -> Sprint, Milestone, Release (version associated)
     - TODO: Feature to define -> Scrum vs Kanban
         - Planning
@@ -53,6 +52,7 @@ DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS ticket_types;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS ticket_relationship_types;
+DROP TABLE IF EXISTS boards;
 DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS labels;
 DROP TABLE IF EXISTS label_categories;
@@ -76,6 +76,7 @@ DROP TABLE IF EXISTS ticket_relationships;
 DROP TABLE IF EXISTS ticket_type_project_mappings;
 DROP TABLE IF EXISTS audit_meta_data;
 DROP TABLE IF EXISTS reports_meta_data;
+DROP TABLE IF EXISTS boards_meta_data;
 DROP TABLE IF EXISTS tickets_meta_data;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
@@ -93,6 +94,8 @@ DROP TABLE IF EXISTS label_team_mappings;
 DROP TABLE IF EXISTS label_ticket_mappings;
 DROP TABLE IF EXISTS label_asset_mappings;
 DROP TABLE IF EXISTS comment_ticket_mappings;
+DROP TABLE IF EXISTS ticket_project_mappings;
+DROP TABLE IF EXISTS ticket_board_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 
 /*
@@ -191,6 +194,26 @@ CREATE TABLE ticket_relationship_types
     created     INTEGER     NOT NULL,
     modified    INTEGER     NOT NULL,
     deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+);
+
+/*
+    Ticket boards.
+    Tickets belong to the board.
+    Ticket may belong or may not belong to certain board. It is not mandatory.
+
+    Boards examples:
+        - Backlog
+        - Main board
+ */
+CREATE TABLE boards
+(
+
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -492,6 +515,20 @@ CREATE TABLE reports_meta_data
 );
 
 /*
+   Boards meta-data: additional data that can be associated with certain board.
+ */
+CREATE TABLE boards_meta_data
+(
+
+    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    board_id VARCHAR(36) NOT NULL,
+    property VARCHAR     NOT NULL,
+    value    VARCHAR,
+    created  INTEGER     NOT NULL,
+    modified INTEGER     NOT NULL
+);
+
+/*
     Tickets meta-data.
  */
 CREATE TABLE tickets_meta_data
@@ -768,6 +805,36 @@ CREATE TABLE comment_ticket_mappings
     modified   INTEGER     NOT NULL,
     deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (comment_id, ticket_id) ON CONFLICT ABORT
+);
+
+/*
+    Tickets belong to the project:
+*/
+CREATE TABLE ticket_project_mappings
+(
+
+    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id  VARCHAR(36) NOT NULL,
+    project_id VARCHAR(36) NOT NULL,
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL,
+    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    UNIQUE (ticket_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Tickets can belong to one or more boards:
+*/
+CREATE TABLE ticket_board_mappings
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id VARCHAR(36) NOT NULL,
+    board_id  VARCHAR(36) NOT NULL,
+    created   INTEGER     NOT NULL,
+    modified  INTEGER     NOT NULL,
+    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    UNIQUE (ticket_id, board_id) ON CONFLICT ABORT
 );
 
 /*
