@@ -19,7 +19,6 @@
 
       Cluster II:
 
-    - TODO: Feature to define -> Sprint, Milestone, Release (version associated)
     - TODO: Feature to define -> Scrum vs Kanban
         - Planning
         - Grooming
@@ -66,6 +65,7 @@ DROP TABLE IF EXISTS permission_contexts;
 DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS times;
 DROP TABLE IF EXISTS reports;
+DROP TABLE IF EXISTS cycles;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS users_google_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
@@ -95,6 +95,8 @@ DROP TABLE IF EXISTS label_ticket_mappings;
 DROP TABLE IF EXISTS label_asset_mappings;
 DROP TABLE IF EXISTS comment_ticket_mappings;
 DROP TABLE IF EXISTS ticket_project_mappings;
+DROP TABLE IF EXISTS cycle_project_mappings;
+DROP TABLE IF EXISTS ticket_cycle_mappings;
 DROP TABLE IF EXISTS ticket_board_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 
@@ -432,6 +434,49 @@ CREATE TABLE reports
     title       VARCHAR,
     description VARCHAR,
     deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+);
+
+
+/**
+    Contains the information about all work cycles in the system.
+    Cycle belongs to the project. To only one project.
+    Ticket belongs to the cycle. Ticket can belong to the multiple cycles.
+
+    Work cycle types:
+        - Release (top cycle category, not mandatory)
+        - Milestone (middle cycle category, not mandatory)
+        - Sprint (smaller cycle category, not mandatory)
+
+    Milestones may or may not belong to the release.
+    Sprints may or may not belong to milestones or releases.
+    Releases may or may not have the version associated.
+    Each cycle may have different meta data associated.
+
+    Each cycle has the value:
+        - Release       = 1000
+        - Milestone     = 100
+        - Sprint        = 10
+
+    To illustrate its relationship.
+    Based on this future custom cycle types could be supported.
+
+    Cycle can belong to only one parent.
+    Parent's type integer value mus be > than the type integer value of current cycle (this).
+*/
+CREATE TABLE cycles
+(
+
+    id          VARCHAR(36)                              NOT NULL PRIMARY KEY UNIQUE,
+    created     INTEGER                                  NOT NULL,
+    modified    INTEGER                                  NOT NULL,
+    title       VARCHAR,
+    description VARCHAR,
+    /**
+      Prent cycle id.
+     */
+    cycle_id    VARCHAR(36)                              NOT NULL UNIQUE,
+    type        INTEGER CHECK ( type IN (1000, 100, 10)) NOT NULL,
+    deleted     BOOLEAN                                  NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -822,6 +867,37 @@ CREATE TABLE ticket_project_mappings
     modified   INTEGER     NOT NULL,
     deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Cycles belong to the projects.
+    Cycle can belong to exactly one project.
+*/
+CREATE TABLE cycle_project_mappings
+(
+
+    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    cycle_id   VARCHAR(36) NOT NULL UNIQUE,
+    project_id VARCHAR(36) NOT NULL,
+    created    INTEGER     NOT NULL,
+    modified   INTEGER     NOT NULL,
+    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    UNIQUE (cycle_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+    Tickets can belong to cycles:
+*/
+CREATE TABLE ticket_cycle_mappings
+(
+
+    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id VARCHAR(36) NOT NULL,
+    cycle_id  VARCHAR(36) NOT NULL,
+    created   INTEGER     NOT NULL,
+    modified  INTEGER     NOT NULL,
+    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    UNIQUE (ticket_id, cycle_id) ON CONFLICT ABORT
 );
 
 /*
