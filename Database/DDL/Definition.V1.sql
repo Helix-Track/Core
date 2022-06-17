@@ -37,6 +37,7 @@
       Cluster IV:
 
     - TODO: Feature to define -> Roadmaps
+        Roadmaps can be an extension to the existing system that relies on the Integrations support.
 
       Other:
 
