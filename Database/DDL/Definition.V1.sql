@@ -19,10 +19,6 @@
 
       Cluster II:
 
-    - TODO: Feature to define -> Scrum vs Kanban
-        - Planning
-        - Grooming
-        - Retrospective
     - TODO: Feature to define -> Roadmaps
     - TODO: Feature to define -> Workflows
 
