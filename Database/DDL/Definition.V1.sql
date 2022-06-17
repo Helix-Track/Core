@@ -19,8 +19,11 @@
 
       Cluster II:
 
-    - TODO: Feature to define -> Roadmaps
     - TODO: Feature to define -> Workflows
+        - Defining the ticket status
+        - Defining the assignments of the tasks
+            - Could it be multi-user assignment? Assignment to a group?
+        - Defining the workflow - statuses, its orders and auto-assignment to the indivifual user or to a group
 
       Cluster III:
 
@@ -29,6 +32,10 @@
         - Connecting with other products
             - Documents
             - Connect chats with entities (for example) (addition to the comments feature)
+
+      Cluster IV:
+
+    - TODO: Feature to define -> Roadmaps
 
       Other:
 
