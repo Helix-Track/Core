@@ -23,7 +23,8 @@
         - Defining the ticket status
         - Defining the assignments of the tasks
             - Could it be multi-user assignment? Assignment to a group?
-        - Defining the workflow - statuses, its orders and auto-assignment to the indivifual user or to a group
+        - Defining the workflow - statuses, its orders and auto-assignment to the individual user or to a group
+        - Affecting the development cycle by the proper workflow state - entering the proper status with the conditions.
 
       Cluster III:
 
