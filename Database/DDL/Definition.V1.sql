@@ -57,6 +57,7 @@ DROP TABLE IF EXISTS ticket_statuses;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS ticket_relationship_types;
 DROP TABLE IF EXISTS boards;
+DROP TABLE IF EXISTS workflows;
 DROP TABLE IF EXISTS assets;
 DROP TABLE IF EXISTS labels;
 DROP TABLE IF EXISTS label_categories;
@@ -67,6 +68,7 @@ DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS permission_contexts;
+DROP TABLE IF EXISTS workflow_steps;
 DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS times;
 DROP TABLE IF EXISTS reports;
@@ -140,6 +142,9 @@ CREATE TABLE users
 
 /*
     The basic project definition.
+
+    Notes:
+        - The 'workflow_id' represents the assigned workflow. Workflow is mandatory for the project.
  */
 CREATE TABLE projects
 (
@@ -147,6 +152,7 @@ CREATE TABLE projects
     id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     title       VARCHAR     NOT NULL,
     description VARCHAR,
+    workflow_id VARCHAR(36) NOT NULL,
     created     INTEGER     NOT NULL,
     modified    INTEGER     NOT NULL,
     deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
@@ -237,6 +243,23 @@ CREATE TABLE ticket_relationship_types
     TODO: Populate the default boards from JSON data (additional meta-data as well).
  */
 CREATE TABLE boards
+(
+
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+);
+
+/*
+    Workflows.
+    The workflow represents a ordered set of steps (statuses) for the tickets that are connected to each other.
+
+    TODO: Default workflows should be pre-populated from the defaults JSONs.
+ */
+CREATE TABLE workflows
 (
 
     id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
@@ -423,6 +446,29 @@ CREATE TABLE permission_contexts
     created     INTEGER     NOT NULL,
     modified    INTEGER     NOT NULL,
     deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+);
+
+/*
+    Workflow steps.
+    Steps for the workflow that are linked to each other.
+
+    Notes:
+        - The 'workflow_step_id' is the parent step. The root steps (for example: 'to-do') have no parents.
+        - The 'ticket_status_id' represents the status (connection with it) that will be assigned to the ticket once
+            the ticket gets to the workflow step.
+ */
+CREATE TABLE workflow_steps
+(
+
+    id               VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title            VARCHAR     NOT NULL UNIQUE,
+    description      VARCHAR,
+    workflow_id      VARCHAR(36) NOT NULL,
+    workflow_step_id VARCHAR(36),
+    ticket_status_id VARCHAR(36) NOT NULL,
+    created          INTEGER     NOT NULL,
+    modified         INTEGER     NOT NULL,
+    deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
