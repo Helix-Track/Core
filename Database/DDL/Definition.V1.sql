@@ -19,10 +19,9 @@
 
       Cluster II:
 
-    - TODO: Feature to define -> Workflows
+    - TODO:
         - Defining the assignments of the tasks
             - Could it be multi-user assignment? Assignment to a group?
-        - Defining the workflow - statuses, its orders and auto-assignment to the individual user or to a group
         - Affecting the development cycle by the proper workflow state - entering the proper status with the conditions.
 
       Cluster III:
