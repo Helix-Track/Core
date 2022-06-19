@@ -20,7 +20,6 @@
       Cluster II:
 
     - TODO: Feature to define -> Workflows
-        - Defining the ticket status
         - Defining the assignments of the tasks
             - Could it be multi-user assignment? Assignment to a group?
         - Defining the workflow - statuses, its orders and auto-assignment to the individual user or to a group
@@ -54,6 +53,7 @@ DROP TABLE IF EXISTS system_info;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS ticket_types;
+DROP TABLE IF EXISTS ticket_statuses;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS ticket_relationship_types;
 DROP TABLE IF EXISTS boards;
@@ -167,6 +167,27 @@ CREATE TABLE ticket_types
 );
 
 /*
+    Ticket statuses.
+    For example:
+        - To-do
+        - Selected for development
+        - In progress
+        - Completed, etc.
+
+    TODO: Default ticket statuses to be populated from defaults JSONs.
+ */
+CREATE TABLE ticket_statuses
+(
+
+    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title       VARCHAR     NOT NULL UNIQUE,
+    description VARCHAR,
+    created     INTEGER     NOT NULL,
+    modified    INTEGER     NOT NULL,
+    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+);
+
+/*
     Tickets.
     Tickets belong to the project.
     Each ticket has its ticket type anf children if supported.
@@ -174,14 +195,15 @@ CREATE TABLE ticket_types
 CREATE TABLE tickets
 (
 
-    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title          VARCHAR,
-    description    VARCHAR,
-    created        INTEGER     NOT NULL,
-    modified       INTEGER     NOT NULL,
-    ticket_type_id VARCHAR(36) NOT NULL,
-    project_id     VARCHAR(36) NOT NULL,
-    deleted        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id               VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    title            VARCHAR,
+    description      VARCHAR,
+    created          INTEGER     NOT NULL,
+    modified         INTEGER     NOT NULL,
+    ticket_type_id   VARCHAR(36) NOT NULL,
+    ticket_status_id VARCHAR(36) NOT NULL,
+    project_id       VARCHAR(36) NOT NULL,
+    deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
