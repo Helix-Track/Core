@@ -20,8 +20,6 @@
       Cluster II:
 
     - TODO:
-        - Defining the assignments of the tasks
-            - Could it be multi-user assignment? Assignment to a group?
         - Affecting the development cycle by the proper workflow state - entering the proper status with the conditions.
 
       Cluster III:
@@ -196,6 +194,11 @@ CREATE TABLE ticket_statuses
     Tickets.
     Tickets belong to the project.
     Each ticket has its ticket type anf children if supported.
+
+    Notes:
+        - The 'user_id' is the current owner of the ticket.
+            It can be bull - the ticket is unassigned.
+        - The 'creator' is the user id of the ticket creator.
  */
 CREATE TABLE tickets
 (
@@ -208,6 +211,8 @@ CREATE TABLE tickets
     ticket_type_id   VARCHAR(36) NOT NULL,
     ticket_status_id VARCHAR(36) NOT NULL,
     project_id       VARCHAR(36) NOT NULL,
+    user_id          VARCHAR(36),
+    creator          VARCHAR(36) NOT NULL,
     deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
