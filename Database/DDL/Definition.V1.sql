@@ -19,11 +19,6 @@
 
       Features:
 
-      Cluster II:
-
-    - TODO:
-        - Affecting the development cycle by the proper workflow state - entering the proper status with the conditions.
-
       Cluster III:
 
     - TODO: Feature to define -> Integrations (Connecting with other systems - products)
