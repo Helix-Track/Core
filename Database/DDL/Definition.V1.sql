@@ -19,17 +19,14 @@
 
       Features:
 
-      Cluster III:
-
-    - TODO: Feature to define -> Integrations (Connecting with other systems - products) (In progress)
-        - Connecting with other products
-            - Documents
-            - Connect chats with entities (for example) (addition to the comments feature)
-
       Cluster IV:
 
     - TODO: Feature to define -> Roadmaps
         Roadmaps can be an extension to the existing system that relies on the Integrations support.
+
+    - TODO: Integrations (Connecting with other systems - products), scoping the base for:
+            - Documents
+            - Chats and connect the chats with various entities (for example) (addition to the comments feature)
 
       Other:
 
