@@ -21,7 +21,7 @@
 
       Cluster III:
 
-    - TODO: Feature to define -> Integrations (Connecting with other systems - products)
+    - TODO: Feature to define -> Integrations (Connecting with other systems - products) (In progress)
         - Repository connection and intelligence
         - Connecting with other products
             - Documents
