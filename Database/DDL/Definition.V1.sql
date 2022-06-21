@@ -102,6 +102,7 @@ DROP TABLE IF EXISTS ticket_cycle_mappings;
 DROP TABLE IF EXISTS ticket_board_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
 DROP TABLE IF EXISTS configuration_data_integration_mappings;
+DROP TABLE IF EXISTS integrations_meta_data;
 
 /*
   Identifies the version of the database (system).
@@ -1129,5 +1130,22 @@ CREATE TABLE configuration_data_integration_mappings
     property       VARCHAR     NOT NULL,
     value          VARCHAR,
     enabled        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+);
+
+/*
+    Integrations meta-data:
+    Associate the various information with different integration.
+    Meta-data information are the integration specific.
+*/
+CREATE TABLE integrations_meta_data
+(
+
+    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    integration_id VARCHAR(36) NOT NULL,
+    property       VARCHAR     NOT NULL,
+    value          VARCHAR,
+    created        INTEGER     NOT NULL,
+    modified       INTEGER     NOT NULL,
     deleted        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
