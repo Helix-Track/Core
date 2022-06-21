@@ -101,6 +101,7 @@ DROP TABLE IF EXISTS cycle_project_mappings;
 DROP TABLE IF EXISTS ticket_cycle_mappings;
 DROP TABLE IF EXISTS ticket_board_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
+DROP TABLE IF EXISTS configuration_data_integration_mappings;
 
 /*
   Identifies the version of the database (system).
@@ -1111,4 +1112,22 @@ CREATE TABLE permission_team_mappings
     modified              INTEGER     NOT NULL,
     deleted               BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (team_id, permission_id, permission_context_id) ON CONFLICT ABORT
+);
+
+/*
+    The configuration data for the integrations.
+    Basically it represents the meta-data associated with each integration.
+    Each configuration property can be enabled or disabled.
+*/
+CREATE TABLE configuration_data_integration_mappings
+(
+
+    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    integration_id VARCHAR(36) NOT NULL,
+    created        INTEGER     NOT NULL,
+    modified       INTEGER     NOT NULL,
+    property       VARCHAR     NOT NULL,
+    value          VARCHAR,
+    enabled        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
