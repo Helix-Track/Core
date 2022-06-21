@@ -67,6 +67,7 @@ DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS times;
 DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS cycles;
+DROP TABLE IF EXISTS integrations;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS users_google_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
@@ -551,6 +552,24 @@ CREATE TABLE cycles
     cycle_id    VARCHAR(36)                              NOT NULL UNIQUE,
     type        INTEGER CHECK ( type IN (1000, 100, 10)) NOT NULL,
     deleted     BOOLEAN                                  NOT NULL CHECK (deleted IN (0, 1))
+);
+
+/**
+  The 3rd party integrations.
+  Each integration is identified by the 'integration_key' which is properly verified by the system.
+  Integration can be enabled or disabled - the 'enabled' field.
+ */
+CREATE TABLE integrations
+(
+
+    id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    created         INTEGER     NOT NULL,
+    modified        INTEGER     NOT NULL,
+    title           VARCHAR,
+    description     VARCHAR,
+    integration_key VARCHAR(36) NOT NULL UNIQUE,
+    enabled         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
