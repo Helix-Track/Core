@@ -22,7 +22,6 @@
       Cluster III:
 
     - TODO: Feature to define -> Integrations (Connecting with other systems - products) (In progress)
-        - Repository connection and intelligence
         - Connecting with other products
             - Documents
             - Connect chats with entities (for example) (addition to the comments feature)
@@ -83,6 +82,7 @@ DROP TABLE IF EXISTS tickets_meta_data;
 DROP TABLE IF EXISTS team_organization_mappings;
 DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
+DROP TABLE IF EXISTS repository_commit_ticket_mappings;
 DROP TABLE IF EXISTS component_ticket_mappings;
 DROP TABLE IF EXISTS time_ticket_mappings;
 DROP TABLE IF EXISTS components_meta_data;
@@ -744,6 +744,21 @@ CREATE TABLE repository_project_mappings
     modified      INTEGER     NOT NULL,
     deleted       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (repository_id, project_id) ON CONFLICT ABORT
+);
+
+/*
+     Mapping all commits to the corresponding tickets
+ */
+CREATE TABLE repository_commit_ticket_mappings
+(
+
+    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    repository_id VARCHAR(36) NOT NULL,
+    ticket_id     VARCHAR(36) NOT NULL,
+    commit_hash   VARCHAR     NOT NULL UNIQUE,
+    created       INTEGER     NOT NULL,
+    modified      INTEGER     NOT NULL,
+    deleted       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
