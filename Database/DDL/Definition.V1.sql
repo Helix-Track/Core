@@ -22,8 +22,8 @@
 
       Cluster IV:
 
-    - TODO: Integrations (Connecting with other systems - products), scoping the base for:
-            - Documents
+    - TODO: Extensions (Connecting with other systems - products), scoping the base for:
+            - Documents (in progress)
             - Roadmaps
             - Chats and connect the chats with various entities (for example) (addition to the comments feature)
 
@@ -62,7 +62,7 @@ DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS times;
 DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS cycles;
-DROP TABLE IF EXISTS integrations;
+DROP TABLE IF EXISTS extensions;
 DROP TABLE IF EXISTS users_yandex_mappings;
 DROP TABLE IF EXISTS users_google_mappings;
 DROP TABLE IF EXISTS user_organization_mappings;
@@ -97,8 +97,8 @@ DROP TABLE IF EXISTS cycle_project_mappings;
 DROP TABLE IF EXISTS ticket_cycle_mappings;
 DROP TABLE IF EXISTS ticket_board_mappings;
 DROP TABLE IF EXISTS permission_team_mappings;
-DROP TABLE IF EXISTS configuration_data_integration_mappings;
-DROP TABLE IF EXISTS integrations_meta_data;
+DROP TABLE IF EXISTS configuration_data_extension_mappings;
+DROP TABLE IF EXISTS extensions_meta_data;
 
 /*
   Identifies the version of the database (system).
@@ -553,21 +553,24 @@ CREATE TABLE cycles
 );
 
 /**
-  The 3rd party integrations.
-  Each integration is identified by the 'integration_key' which is properly verified by the system.
-  Integration can be enabled or disabled - the 'enabled' field.
+  The 3rd party extensions.
+  Each extension is identified by the 'extension_key' which is properly verified by the system.
+  Extension can be enabled or disabled - the 'enabled' field.
+
+  TODO: The extension installation script first installs the extension into the 'extensions' table if the key is valid.
+    Then, the extension's SQL scripts are executed.
  */
-CREATE TABLE integrations
+CREATE TABLE extensions
 (
 
-    id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    created         INTEGER     NOT NULL,
-    modified        INTEGER     NOT NULL,
-    title           VARCHAR,
-    description     VARCHAR,
-    integration_key VARCHAR(36) NOT NULL UNIQUE,
-    enabled         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
-    deleted         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    created       INTEGER     NOT NULL,
+    modified      INTEGER     NOT NULL,
+    title         VARCHAR,
+    description   VARCHAR,
+    extension_key VARCHAR(36) NOT NULL UNIQUE,
+    enabled       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -1127,36 +1130,36 @@ CREATE TABLE permission_team_mappings
 );
 
 /*
-    The configuration data for the integrations.
-    Basically it represents the meta-data associated with each integration.
+    The configuration data for the extension.
+    Basically it represents the meta-data associated with each extension.
     Each configuration property can be enabled or disabled.
 */
-CREATE TABLE configuration_data_integration_mappings
+CREATE TABLE configuration_data_extension_mappings
 (
 
-    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    integration_id VARCHAR(36) NOT NULL,
-    created        INTEGER     NOT NULL,
-    modified       INTEGER     NOT NULL,
-    property       VARCHAR     NOT NULL,
-    value          VARCHAR,
-    enabled        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
-    deleted        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    extension_id VARCHAR(36) NOT NULL,
+    created      INTEGER     NOT NULL,
+    modified     INTEGER     NOT NULL,
+    property     VARCHAR     NOT NULL,
+    value        VARCHAR,
+    enabled      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    deleted      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
-    Integrations meta-data:
-    Associate the various information with different integration.
-    Meta-data information are the integration specific.
+    Extensions meta-data:
+    Associate the various information with different extension.
+    Meta-data information are the extension specific.
 */
-CREATE TABLE integrations_meta_data
+CREATE TABLE extensions_meta_data
 (
 
-    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    integration_id VARCHAR(36) NOT NULL,
-    property       VARCHAR     NOT NULL,
-    value          VARCHAR,
-    created        INTEGER     NOT NULL,
-    modified       INTEGER     NOT NULL,
-    deleted        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    extension_id VARCHAR(36) NOT NULL,
+    property     VARCHAR     NOT NULL,
+    value        VARCHAR,
+    created      INTEGER     NOT NULL,
+    modified     INTEGER     NOT NULL,
+    deleted      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
