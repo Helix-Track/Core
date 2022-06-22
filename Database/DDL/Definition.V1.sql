@@ -16,6 +16,7 @@
       Main:
 
     - TODO: Indexes
+    - TODO: Limit the varchar lengths
 
       Features:
 
