@@ -23,7 +23,6 @@
       Cluster IV:
 
     - TODO: Extensions (Connecting with other systems - products), scoping the base for:
-            - Documents (in progress)
             - Roadmaps
             - Chats and connect the chats with various entities (for example) (addition to the comments feature)
 
