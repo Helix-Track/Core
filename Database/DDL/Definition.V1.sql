@@ -25,6 +25,7 @@
     - TODO: Extensions (Connecting with other systems - products), scoping the base for:
             - Roadmaps
             - Chats and connect the chats with various entities (for example) (addition to the comments feature)
+                (In progress)
 
       Other:
 
