@@ -17,13 +17,13 @@
 
     - TODO: Indexes
     - TODO: Limit the varchar lengths
+    - TODO: Re-check and rethink the mappings tables.
 
       Features:
 
       Cluster IV:
 
     - TODO: Extensions (Connecting with other systems - products), scoping the base for:
-        - Time tracking (extract into the extension)
         - Roadmaps
 
       Other:
@@ -58,7 +58,6 @@ DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS permission_contexts;
 DROP TABLE IF EXISTS workflow_steps;
 DROP TABLE IF EXISTS audit;
-DROP TABLE IF EXISTS times;
 DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS cycles;
 DROP TABLE IF EXISTS extensions;
@@ -79,7 +78,6 @@ DROP TABLE IF EXISTS team_project_mappings;
 DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS repository_commit_ticket_mappings;
 DROP TABLE IF EXISTS component_ticket_mappings;
-DROP TABLE IF EXISTS time_ticket_mappings;
 DROP TABLE IF EXISTS components_meta_data;
 DROP TABLE IF EXISTS asset_project_mappings;
 DROP TABLE IF EXISTS asset_team_mappings;
@@ -471,28 +469,6 @@ CREATE TABLE workflow_steps
 );
 
 /*
-    Audit trail.
- */
-CREATE TABLE times
-(
-
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    amount      INTEGER     NOT NULL,
-
-    unit        VARCHAR CHECK (
-            unit IN (
-                     'Minute', 'Hour', 'Day', 'Week', 'Month'
-            )
-        )                   NOT NULL DEFAULT 'Hour',
-
-    title       VARCHAR,
-    description VARCHAR,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
-);
-
-/*
     Reports, such as:
         - Time tracking reports
         - Progress status(es), etc.
@@ -573,13 +549,7 @@ CREATE TABLE extensions
 );
 
 /*
-    Time tracking.
-    Time is tracked against the tickets.
-    One entry is associated with the parent ticket and it contains the information:
-        - How much time
-        - Unit (time unit)
-        - The title for the performed work (optional)
-        - The description for the performed work (optional)
+    Audit trail.
  */
 CREATE TABLE audit
 (
@@ -773,21 +743,6 @@ CREATE TABLE component_ticket_mappings
     modified     INTEGER     NOT NULL,
     deleted      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
-);
-
-/*
-    Time is associated with the tickets.
-*/
-CREATE TABLE time_ticket_mappings
-(
-
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    time_id   VARCHAR(36) NOT NULL,
-    ticket_id VARCHAR(36) NOT NULL,
-    created   INTEGER     NOT NULL,
-    modified  INTEGER     NOT NULL,
-    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
-    UNIQUE (time_id, ticket_id) ON CONFLICT ABORT
 );
 
 /*
