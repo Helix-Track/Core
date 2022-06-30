@@ -187,6 +187,8 @@ CREATE TABLE ticket_statuses
     Tickets.
     Tickets belong to the project.
     Each ticket has its ticket type anf children if supported.
+    The 'estimation' is the estimation value in man days.
+    The 'story_points' represent the complexity of the ticket in story points (for example: 1, 3, 5, 8, 13).
 
     Notes:
         - The 'user_id' is the current owner of the ticket.
@@ -205,6 +207,8 @@ CREATE TABLE tickets
     ticket_status_id VARCHAR(36) NOT NULL,
     project_id       VARCHAR(36) NOT NULL,
     user_id          VARCHAR(36),
+    estimation       REAL        NOT NULL DEFAULT 0,
+    story_points     INTEGER     NOT NULL DEFAULT 0,
     creator          VARCHAR(36) NOT NULL,
     deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
