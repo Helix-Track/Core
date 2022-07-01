@@ -21,6 +21,7 @@
 
       Other:
 
+    - TODO: Scripts flow definition - order of the execution, what and when it is called and by who!
     - TODO: API generator - generate models and API from the definition SQL.
         SQL -> OpenApi definition -> Generated code
 */
