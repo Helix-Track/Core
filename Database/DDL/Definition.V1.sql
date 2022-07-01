@@ -5,25 +5,10 @@
 /*
     Notes:
 
+    - TODOs: https://github.com/orgs/red-elf/projects/2/views/1
     - Identifiers in the system are UUID strings (VARCHAR with the size of 36).
     - Mapping tables are used for binding entities and defining relationships.
         Mapping tables are used as well to append properties to the entities.
-*/
-
-/*
-    TODOs:
-
-      Main:
-
-    - TODO: Indexes
-    - TODO: Limit the varchar lengths
-    - TODO: Re-check and rethink the mappings tables.
-
-      Other:
-
-    - TODO: Scripts flow definition - order of the execution, what and when it is called and by who!
-    - TODO: API generator - generate models and API from the definition SQL.
-        SQL -> OpenApi definition -> Generated code
 */
 
 /*
