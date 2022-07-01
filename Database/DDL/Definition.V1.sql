@@ -19,13 +19,6 @@
     - TODO: Limit the varchar lengths
     - TODO: Re-check and rethink the mappings tables.
 
-      Features:
-
-      Cluster IV:
-
-    - TODO: Extensions (Connecting with other systems - products), scoping the base for:
-        - Roadmaps
-
       Other:
 
     - TODO: API generator - generate models and API from the definition SQL.
