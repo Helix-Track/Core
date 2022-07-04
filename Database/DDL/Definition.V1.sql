@@ -74,7 +74,6 @@ DROP TABLE IF EXISTS extensions_meta_data;
 /*
   Identifies the version of the database (system).
   After each SQL script execution the version will be increased and execution description provided.
-  TODO: To be connected to shell script runners
  */
 CREATE TABLE system_info
 (
@@ -143,9 +142,7 @@ CREATE TABLE ticket_types
         - Selected for development
         - In progress
         - Completed, etc.
-
-    TODO: Default ticket statuses to be populated from defaults JSONs.
- */
+*/
 CREATE TABLE ticket_statuses
 (
 
@@ -213,9 +210,7 @@ CREATE TABLE ticket_relationship_types
 
     Boards examples:
         - Backlog
-        - Main board.
-
-    TODO: Populate the default boards from JSON data (additional meta-data as well).
+        - Main board
  */
 CREATE TABLE boards
 (
