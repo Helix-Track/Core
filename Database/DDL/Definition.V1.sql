@@ -226,8 +226,6 @@ CREATE TABLE boards
 /*
     Workflows.
     The workflow represents a ordered set of steps (statuses) for the tickets that are connected to each other.
-
-    TODO: Default workflows should be pre-populated from the defaults JSONs.
  */
 CREATE TABLE workflows
 (
@@ -276,7 +274,6 @@ CREATE TABLE labels
 
 /*
     Labels can be divided into categories (which is optional).
-    TODO: Populate from the initialization JSON by the proper shell script.
  */
 CREATE TABLE label_categories
 (
