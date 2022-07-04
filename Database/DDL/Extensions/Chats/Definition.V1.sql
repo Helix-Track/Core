@@ -11,11 +11,6 @@
         Mapping tables are used as well to append properties to the entities.
 */
 
-/*
-    Cleaning up:
-        TODO: Comment out before the production.
-            Shell scripts should execute each SQl with TO-DO check. If TO-DO found -> fail.
-*/
 DROP TABLE IF EXISTS chats;
 DROP TABLE IF EXISTS chats_yandex_mappings;
 DROP TABLE IF EXISTS chats_google_mappings;
