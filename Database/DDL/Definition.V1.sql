@@ -741,7 +741,7 @@ CREATE TABLE asset_project_mappings
     created    INTEGER     NOT NULL,
     modified   INTEGER     NOT NULL,
     deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
-    UNIQUE (asset_id, project_id) ON CONFLICT ABORT /* TODO: Create the conflict(s) unit test(s). */
+    UNIQUE (asset_id, project_id) ON CONFLICT ABORT
 );
 
 /*
@@ -955,10 +955,7 @@ CREATE TABLE users_yandex_mappings
 
     id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
     user_id  VARCHAR(36) NOT NULL UNIQUE,
-    username VARCHAR(36) NOT NULL UNIQUE, /* TODO: Populate user mappings with additional meta-data/
-                                                The proper JSON file per users mapping/
-                                                For example: yandex_users.json
-                                          */
+    username VARCHAR(36) NOT NULL UNIQUE,
     created  INTEGER     NOT NULL,
     modified INTEGER     NOT NULL,
     deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
