@@ -501,9 +501,6 @@ CREATE TABLE cycles
   The 3rd party extensions.
   Each extension is identified by the 'extension_key' which is properly verified by the system.
   Extension can be enabled or disabled - the 'enabled' field.
-
-  TODO: The extension installation script first installs the extension into the 'extensions' table if the key is valid.
-    Then, the extension's SQL scripts are executed.
  */
 CREATE TABLE extensions
 (
@@ -566,8 +563,6 @@ CREATE TABLE ticket_type_project_mappings
 
 /*
     Audit trail meta-data.
-
-    TODO: All meta data to be instantiated in SQL from the JSON definition and processed by shell script.
  */
 CREATE TABLE audit_meta_data
 (
