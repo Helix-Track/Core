@@ -34,6 +34,7 @@ CREATE TABLE documents
 /*
     Each document is associated with its content.
     The content field can contain the raw content or the 'identifier' of the content asset of some kind.
+    Other content type extensions can create additional document mappings tables.
  */
 CREATE TABLE content_document_mappings
 (
