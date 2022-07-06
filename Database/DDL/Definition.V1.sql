@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS extensions_meta_data;
 /*
   Identifies the version of the database (system).
   After each SQL script execution the version will be increased and execution description provided.
- */
+*/
 CREATE TABLE system_info
 (
 
