@@ -18,7 +18,7 @@ DROP TABLE IF EXISTS content_document_mappings;
     Documents.
     Users can create the project documentation.
     Each document (the root) belongs to the project. It can also belong to the the parent document.
- */
+*/
 CREATE TABLE documents
 (
 
@@ -35,7 +35,7 @@ CREATE TABLE documents
     Each document is associated with its content.
     The content field can contain the raw content or the 'identifier' of the content asset of some kind.
     Other content type extensions can create additional document mappings tables.
- */
+*/
 CREATE TABLE content_document_mappings
 (
 

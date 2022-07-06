@@ -34,7 +34,7 @@ DROP TABLE IF EXISTS chats_whatsapp_mappings;
         - Google
         - Telegram
         - WhatsApp, etc.
- */
+*/
 CREATE TABLE chats
 (
 
@@ -52,7 +52,7 @@ CREATE TABLE chats
 /*
     Chats can be provided by the Yandex Messenger.
     The table contains all the meta-data associated with it.
- */
+*/
 CREATE TABLE chats_yandex_mappings
 (
 
@@ -69,7 +69,7 @@ CREATE TABLE chats_yandex_mappings
 /*
     Chats can be provided by the Slack.
     The table contains all the meta-data associated with it.
- */
+*/
 CREATE TABLE chats_slack_mappings
 (
 
@@ -86,7 +86,7 @@ CREATE TABLE chats_slack_mappings
 /*
     Chats can be provided by the Telegram.
     The table contains all the meta-data associated with it.
- */
+*/
 CREATE TABLE chats_telegram_mappings
 (
 
@@ -103,7 +103,7 @@ CREATE TABLE chats_telegram_mappings
 /*
     Chats can be provided by the Google.
     The table contains all the meta-data associated with it.
- */
+*/
 CREATE TABLE chats_google_mappings
 (
 
@@ -120,7 +120,7 @@ CREATE TABLE chats_google_mappings
 /*
     Chats can be provided by the WhatsApp.
     The table contains all the meta-data associated with it.
- */
+*/
 CREATE TABLE chats_whatsapp_mappings
 (
 

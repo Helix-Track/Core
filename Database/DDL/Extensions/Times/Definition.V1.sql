@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS times;
         - The title for the performed work (optional)
         - The description for the performed work (optional)
         - The identifier of the work ticket.
- */
+*/
 CREATE TABLE times
 (
 

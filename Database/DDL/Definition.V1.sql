@@ -85,7 +85,7 @@ CREATE TABLE system_info
 
 /*
     The system entities:
- */
+*/
 
 /*
      System's users.
@@ -93,7 +93,7 @@ CREATE TABLE system_info
      Since there may be different types of users, different kinds of data
      can be mapped (associated) with the user ID.
      For that purpose there are other mappings to the user ID such as Yandex OAuth2 mappings for example.
- */
+*/
 CREATE TABLE users
 (
 
@@ -108,7 +108,7 @@ CREATE TABLE users
 
     Notes:
         - The 'workflow_id' represents the assigned workflow. Workflow is mandatory for the project.
- */
+*/
 CREATE TABLE projects
 (
 
@@ -123,7 +123,7 @@ CREATE TABLE projects
 
 /*
     Ticket type definitions.
- */
+*/
 CREATE TABLE ticket_types
 (
 
@@ -165,7 +165,7 @@ CREATE TABLE ticket_statuses
         - The 'user_id' is the current owner of the ticket.
             It can be bull - the ticket is unassigned.
         - The 'creator' is the user id of the ticket creator.
- */
+*/
 CREATE TABLE tickets
 (
 
@@ -191,7 +191,7 @@ CREATE TABLE tickets
         - Blocks
         - Cloned by
         - Clones, etc.
- */
+*/
 CREATE TABLE ticket_relationship_types
 (
 
@@ -211,7 +211,7 @@ CREATE TABLE ticket_relationship_types
     Boards examples:
         - Backlog
         - Main board
- */
+*/
 CREATE TABLE boards
 (
 
@@ -226,7 +226,7 @@ CREATE TABLE boards
 /*
     Workflows.
     The workflow represents a ordered set of steps (statuses) for the tickets that are connected to each other.
- */
+*/
 CREATE TABLE workflows
 (
 
@@ -241,7 +241,7 @@ CREATE TABLE workflows
 /*
     Images, attachments, etc.
     Defined by the identifier and the resource url.
- */
+*/
 CREATE TABLE assets
 (
 
@@ -260,7 +260,7 @@ CREATE TABLE assets
         - Team
         - Ticket
         - Asset
- */
+*/
 CREATE TABLE labels
 (
 
@@ -274,7 +274,7 @@ CREATE TABLE labels
 
 /*
     Labels can be divided into categories (which is optional).
- */
+*/
 CREATE TABLE label_categories
 (
 
@@ -289,7 +289,7 @@ CREATE TABLE label_categories
 /*
       The code repositories - Identified by the identifier and the repository URL.
       Default repository type is Git repository.
- */
+*/
 CREATE TABLE repositories
 (
 
@@ -319,7 +319,7 @@ CREATE TABLE repositories
         - Android Client
         - Core Engine
         - Webapp, etc.
- */
+*/
 CREATE TABLE components
 (
 
@@ -333,7 +333,7 @@ CREATE TABLE components
 
 /*
     The organization definition. Organization is the owner of the project.
- */
+*/
 CREATE TABLE organizations
 (
 
@@ -347,7 +347,7 @@ CREATE TABLE organizations
 
 /*
     The team definition. Organization is the owner of the team.
- */
+*/
 CREATE TABLE teams
 (
 
@@ -367,7 +367,7 @@ CREATE TABLE teams
         UPDATE
         DELETE
         etc.
- */
+*/
 CREATE TABLE permissions
 (
 
@@ -385,7 +385,7 @@ CREATE TABLE permissions
     Users can comment on:
         - Tickets
         - Tbd.
- */
+*/
 CREATE TABLE comments
 (
 
@@ -403,7 +403,7 @@ CREATE TABLE comments
 
         organization.project
         organization.team
- */
+*/
 CREATE TABLE permission_contexts
 (
 
@@ -423,7 +423,7 @@ CREATE TABLE permission_contexts
         - The 'workflow_step_id' is the parent step. The root steps (for example: 'to-do') have no parents.
         - The 'ticket_status_id' represents the status (connection with it) that will be assigned to the ticket once
             the ticket gets to the workflow step.
- */
+*/
 CREATE TABLE workflow_steps
 (
 
@@ -442,7 +442,7 @@ CREATE TABLE workflow_steps
     Reports, such as:
         - Time tracking reports
         - Progress status(es), etc.
- */
+*/
 CREATE TABLE reports
 (
 
@@ -455,7 +455,7 @@ CREATE TABLE reports
 );
 
 
-/**
+/*
     Contains the information about all work cycles in the system.
     Cycle belongs to the project. To only one project.
     Ticket belongs to the cycle. Ticket can belong to the multiple cycles.
@@ -497,11 +497,11 @@ CREATE TABLE cycles
     deleted     BOOLEAN                                  NOT NULL CHECK (deleted IN (0, 1))
 );
 
-/**
+/*
   The 3rd party extensions.
   Each extension is identified by the 'extension_key' which is properly verified by the system.
   Extension can be enabled or disabled - the 'enabled' field.
- */
+*/
 CREATE TABLE extensions
 (
 
@@ -517,7 +517,7 @@ CREATE TABLE extensions
 
 /*
     Audit trail.
- */
+*/
 CREATE TABLE audit
 (
 
@@ -529,11 +529,11 @@ CREATE TABLE audit
 
 /*
     Mappings:
- */
+*/
 
 /*
     Project belongs to the organization. Multiple projects can belong to one organization.
- */
+*/
 CREATE TABLE project_organization_mappings
 (
 
@@ -548,7 +548,7 @@ CREATE TABLE project_organization_mappings
 
 /*
     Each project has the ticket types that it supports.
- */
+*/
 CREATE TABLE ticket_type_project_mappings
 (
 
@@ -563,7 +563,7 @@ CREATE TABLE ticket_type_project_mappings
 
 /*
     Audit trail meta-data.
- */
+*/
 CREATE TABLE audit_meta_data
 (
 
@@ -577,7 +577,7 @@ CREATE TABLE audit_meta_data
 
 /*
    Reports met-data: used to populate reports with the information.
- */
+*/
 CREATE TABLE reports_meta_data
 (
 
@@ -591,7 +591,7 @@ CREATE TABLE reports_meta_data
 
 /*
    Boards meta-data: additional data that can be associated with certain board.
- */
+*/
 CREATE TABLE boards_meta_data
 (
 
@@ -605,7 +605,7 @@ CREATE TABLE boards_meta_data
 
 /*
     Tickets meta-data.
- */
+*/
 CREATE TABLE tickets_meta_data
 (
 
@@ -620,7 +620,7 @@ CREATE TABLE tickets_meta_data
 
 /*
     All relationships between the tickets.
- */
+*/
 CREATE TABLE ticket_relationships
 (
 
@@ -635,7 +635,7 @@ CREATE TABLE ticket_relationships
 
 /*
     Team belongs to the organization. Multiple teams can belong to one organization.
- */
+*/
 CREATE TABLE team_organization_mappings
 (
 
@@ -650,7 +650,7 @@ CREATE TABLE team_organization_mappings
 
 /*
     Team belongs to one or more projects. Multiple teams can work on multiple projects.
- */
+*/
 CREATE TABLE team_project_mappings
 (
 
@@ -666,7 +666,7 @@ CREATE TABLE team_project_mappings
 /*
      Repository belongs to project. Multiple repositories can belong to multiple projects.
      So, two projects can actually have the same repository.
- */
+*/
 CREATE TABLE repository_project_mappings
 (
 
@@ -681,7 +681,7 @@ CREATE TABLE repository_project_mappings
 
 /*
      Mapping all commits to the corresponding tickets
- */
+*/
 CREATE TABLE repository_commit_ticket_mappings
 (
 
@@ -949,7 +949,7 @@ CREATE TABLE ticket_board_mappings
 
 /*
     Users can be Yandex OAuth2 account users:
- */
+*/
 CREATE TABLE users_yandex_mappings
 (
 
@@ -963,7 +963,7 @@ CREATE TABLE users_yandex_mappings
 
 /*
     Users can be Google OAuth2 account users:
- */
+*/
 CREATE TABLE users_google_mappings
 (
 
