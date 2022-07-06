@@ -108,11 +108,14 @@ CREATE TABLE users
 
     Notes:
         - The 'workflow_id' represents the assigned workflow. Workflow is mandatory for the project.
+        - The 'identifier' represents the human readable identifier for the project up to 4 characters,
+            for example: MSF, KSS, etc.
 */
 CREATE TABLE projects
 (
 
     id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    identifier  VARCHAR(4)  NOT NULL UNIQUE,
     title       VARCHAR     NOT NULL,
     description VARCHAR,
     workflow_id VARCHAR(36) NOT NULL,
@@ -165,11 +168,16 @@ CREATE TABLE ticket_statuses
         - The 'user_id' is the current owner of the ticket.
             It can be bull - the ticket is unassigned.
         - The 'creator' is the user id of the ticket creator.
+        - The ticket number is human readable identifier of the ticket - the whole number.
+            The ticket number is unique per project.
+            In combination with 'project's 'identifier' field it can give the whole ticket numbers (identifiers),
+            for example: MSF-112, BBP-222, etc.
 */
 CREATE TABLE tickets
 (
 
     id               VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
+    ticket_number    INTEGER     NOT NULL DEFAULT 1,
     title            VARCHAR,
     description      VARCHAR,
     created          INTEGER     NOT NULL,
@@ -181,7 +189,8 @@ CREATE TABLE tickets
     estimation       REAL        NOT NULL DEFAULT 0,
     story_points     INTEGER     NOT NULL DEFAULT 0,
     creator          VARCHAR(36) NOT NULL,
-    deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    UNIQUE (ticket_number, project_id) ON CONFLICT ABORT
 );
 
 /*
