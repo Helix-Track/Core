@@ -547,12 +547,12 @@ CREATE TABLE project_organization_mappings
 (
 
     id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    organization_id VARCHAR(36) NOT NULL,
     project_id      VARCHAR(36) NOT NULL,
+    organization_id VARCHAR(36) NOT NULL,
     created         INTEGER     NOT NULL,
     modified        INTEGER     NOT NULL,
     deleted         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
-    UNIQUE (organization_id, project_id) ON CONFLICT ABORT
+    UNIQUE (project_id, organization_id) ON CONFLICT ABORT
 );
 
 /*
@@ -639,7 +639,8 @@ CREATE TABLE ticket_relationships
     child_ticket_id             VARCHAR(36) NOT NULL,
     created                     INTEGER     NOT NULL,
     modified                    INTEGER     NOT NULL,
-    deleted                     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    deleted                     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    UNIQUE (ticket_id, child_ticket_id) ON CONFLICT ABORT
 );
 
 /*
