@@ -6,7 +6,7 @@
     Notes:
 
     - TODOs: https://github.com/orgs/red-elf/projects/2/views/1
-    - Identifiers in the system are UUID strings (VARCHAR with the size of 36).
+    - Identifiers in the system are UUID strings.
     - Mapping tables are used for binding entities and defining relationships.
         Mapping tables are used as well to append properties to the entities.
 */
@@ -38,15 +38,15 @@ DROP TABLE IF EXISTS chats_whatsapp_mappings;
 CREATE TABLE chats
 (
 
-    id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title           VARCHAR     NOT NULL,
-    organization_id VARCHAR(36) UNIQUE,
-    team_id         VARCHAR(36) UNIQUE,
-    project_id      VARCHAR(36) UNIQUE,
-    ticket_id       VARCHAR(36) UNIQUE,
-    created         INTEGER     NOT NULL,
-    modified        INTEGER     NOT NULL,
-    deleted         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title           TEXT    NOT NULL,
+    organization_id TEXT UNIQUE,
+    team_id         TEXT UNIQUE,
+    project_id      TEXT UNIQUE,
+    ticket_id       TEXT UNIQUE,
+    created         INTEGER NOT NULL,
+    modified        INTEGER NOT NULL,
+    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -56,13 +56,13 @@ CREATE TABLE chats
 CREATE TABLE chats_yandex_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    chat_id  VARCHAR(36) NOT NULL UNIQUE,
-    property VARCHAR     NOT NULL,
-    value    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    chat_id  TEXT    NOT NULL UNIQUE,
+    property TEXT    NOT NULL,
+    value    TEXT,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 
@@ -73,13 +73,13 @@ CREATE TABLE chats_yandex_mappings
 CREATE TABLE chats_slack_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    chat_id  VARCHAR(36) NOT NULL UNIQUE,
-    property VARCHAR     NOT NULL,
-    value    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    chat_id  TEXT    NOT NULL UNIQUE,
+    property TEXT    NOT NULL,
+    value    TEXT,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 
@@ -90,13 +90,13 @@ CREATE TABLE chats_slack_mappings
 CREATE TABLE chats_telegram_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    chat_id  VARCHAR(36) NOT NULL UNIQUE,
-    property VARCHAR     NOT NULL,
-    value    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    chat_id  TEXT    NOT NULL UNIQUE,
+    property TEXT    NOT NULL,
+    value    TEXT,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 
@@ -107,13 +107,13 @@ CREATE TABLE chats_telegram_mappings
 CREATE TABLE chats_google_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    chat_id  VARCHAR(36) NOT NULL UNIQUE,
-    property VARCHAR     NOT NULL,
-    value    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    chat_id  TEXT    NOT NULL UNIQUE,
+    property TEXT    NOT NULL,
+    value    TEXT,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 
@@ -124,11 +124,11 @@ CREATE TABLE chats_google_mappings
 CREATE TABLE chats_whatsapp_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    chat_id  VARCHAR(36) NOT NULL UNIQUE,
-    property VARCHAR     NOT NULL,
-    value    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    chat_id  TEXT    NOT NULL UNIQUE,
+    property TEXT    NOT NULL,
+    value    TEXT,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );

@@ -6,7 +6,7 @@
     Notes:
 
     - TODOs: https://github.com/orgs/red-elf/projects/2/views/1
-    - Identifiers in the system are UUID strings (VARCHAR with the size of 36).
+    - Identifiers in the system are UUID strings.
     - Mapping tables are used for binding entities and defining relationships.
         Mapping tables are used as well to append properties to the entities.
 */
@@ -79,7 +79,7 @@ CREATE TABLE system_info
 (
 
     id          INTEGER PRIMARY KEY UNIQUE,
-    description VARCHAR NOT NULL,
+    description TEXT    NOT NULL,
     created     INTEGER NOT NULL
 );
 
@@ -97,10 +97,10 @@ CREATE TABLE system_info
 CREATE TABLE users
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -114,14 +114,14 @@ CREATE TABLE users
 CREATE TABLE projects
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    identifier  VARCHAR(4)  NOT NULL UNIQUE,
-    title       VARCHAR     NOT NULL,
-    description VARCHAR,
-    workflow_id VARCHAR(36) NOT NULL,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    identifier  TEXT    NOT NULL UNIQUE,
+    title       TEXT    NOT NULL,
+    description TEXT,
+    workflow_id TEXT    NOT NULL,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -130,12 +130,12 @@ CREATE TABLE projects
 CREATE TABLE ticket_types
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -149,12 +149,12 @@ CREATE TABLE ticket_types
 CREATE TABLE ticket_statuses
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -176,20 +176,20 @@ CREATE TABLE ticket_statuses
 CREATE TABLE tickets
 (
 
-    id               VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    ticket_number    INTEGER     NOT NULL DEFAULT 1,
-    title            VARCHAR,
-    description      VARCHAR,
-    created          INTEGER     NOT NULL,
-    modified         INTEGER     NOT NULL,
-    ticket_type_id   VARCHAR(36) NOT NULL,
-    ticket_status_id VARCHAR(36) NOT NULL,
-    project_id       VARCHAR(36) NOT NULL,
-    user_id          VARCHAR(36),
-    estimation       REAL        NOT NULL DEFAULT 0,
-    story_points     INTEGER     NOT NULL DEFAULT 0,
-    creator          VARCHAR(36) NOT NULL,
-    deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    ticket_number    INTEGER NOT NULL DEFAULT 1,
+    title            TEXT,
+    description      TEXT,
+    created          INTEGER NOT NULL,
+    modified         INTEGER NOT NULL,
+    ticket_type_id   TEXT    NOT NULL,
+    ticket_status_id TEXT    NOT NULL,
+    project_id       TEXT    NOT NULL,
+    user_id          TEXT,
+    estimation       REAL    NOT NULL DEFAULT 0,
+    story_points     INTEGER NOT NULL DEFAULT 0,
+    creator          TEXT    NOT NULL,
+    deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_number, project_id) ON CONFLICT ABORT
 );
 
@@ -204,12 +204,12 @@ CREATE TABLE tickets
 CREATE TABLE ticket_relationship_types
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -224,12 +224,12 @@ CREATE TABLE ticket_relationship_types
 CREATE TABLE boards
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -239,12 +239,12 @@ CREATE TABLE boards
 CREATE TABLE workflows
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -254,12 +254,12 @@ CREATE TABLE workflows
 CREATE TABLE assets
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    url         VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    url         TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -273,12 +273,12 @@ CREATE TABLE assets
 CREATE TABLE labels
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -287,12 +287,12 @@ CREATE TABLE labels
 CREATE TABLE label_categories
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -302,22 +302,22 @@ CREATE TABLE label_categories
 CREATE TABLE repositories
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    repository  VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    repository  TEXT    NOT NULL UNIQUE,
+    description TEXT,
 
-    type        VARCHAR CHECK ( type IN
-                                ('Git', 'CVS', 'SVN', 'Mercurial',
-                                 'Perforce', 'Monotone', 'Bazaar',
-                                 'TFS', 'VSTS', 'IBM Rational ClearCase',
-                                 'Revision Control System', 'VSS',
-                                 'CA Harvest Software Change Manager',
-                                 'PVCS', 'darcs')
-        )                   NOT NULL DEFAULT 'Git',
+    type        TEXT CHECK ( type IN
+                             ('Git', 'CVS', 'SVN', 'Mercurial',
+                              'Perforce', 'Monotone', 'Bazaar',
+                              'TFS', 'VSTS', 'IBM Rational ClearCase',
+                              'Revision Control System', 'VSS',
+                              'CA Harvest Software Change Manager',
+                              'PVCS', 'darcs')
+        )               NOT NULL DEFAULT 'Git',
 
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -332,12 +332,12 @@ CREATE TABLE repositories
 CREATE TABLE components
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -346,12 +346,12 @@ CREATE TABLE components
 CREATE TABLE organizations
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -360,12 +360,12 @@ CREATE TABLE organizations
 CREATE TABLE teams
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -380,12 +380,12 @@ CREATE TABLE teams
 CREATE TABLE permissions
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 
@@ -398,11 +398,11 @@ CREATE TABLE permissions
 CREATE TABLE comments
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    comment  VARCHAR     NOT NULL,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    comment  TEXT    NOT NULL,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -416,12 +416,12 @@ CREATE TABLE comments
 CREATE TABLE permission_contexts
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title       VARCHAR     NOT NULL UNIQUE,
-    description VARCHAR,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -436,15 +436,15 @@ CREATE TABLE permission_contexts
 CREATE TABLE workflow_steps
 (
 
-    id               VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    title            VARCHAR     NOT NULL UNIQUE,
-    description      VARCHAR,
-    workflow_id      VARCHAR(36) NOT NULL,
-    workflow_step_id VARCHAR(36),
-    ticket_status_id VARCHAR(36) NOT NULL,
-    created          INTEGER     NOT NULL,
-    modified         INTEGER     NOT NULL,
-    deleted          BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title            TEXT    NOT NULL UNIQUE,
+    description      TEXT,
+    workflow_id      TEXT    NOT NULL,
+    workflow_step_id TEXT,
+    ticket_status_id TEXT    NOT NULL,
+    created          INTEGER NOT NULL,
+    modified         INTEGER NOT NULL,
+    deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -455,12 +455,12 @@ CREATE TABLE workflow_steps
 CREATE TABLE reports
 (
 
-    id          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    title       VARCHAR,
-    description VARCHAR,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    title       TEXT,
+    description TEXT,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 
@@ -493,15 +493,15 @@ CREATE TABLE reports
 CREATE TABLE cycles
 (
 
-    id          VARCHAR(36)                              NOT NULL PRIMARY KEY UNIQUE,
+    id          TEXT                                     NOT NULL PRIMARY KEY UNIQUE,
     created     INTEGER                                  NOT NULL,
     modified    INTEGER                                  NOT NULL,
-    title       VARCHAR,
-    description VARCHAR,
+    title       TEXT,
+    description TEXT,
     /**
       Prent cycle id.
      */
-    cycle_id    VARCHAR(36)                              NOT NULL UNIQUE,
+    cycle_id    TEXT                                     NOT NULL UNIQUE,
     type        INTEGER CHECK ( type IN (1000, 100, 10)) NOT NULL,
     deleted     BOOLEAN                                  NOT NULL CHECK (deleted IN (0, 1))
 );
@@ -514,14 +514,14 @@ CREATE TABLE cycles
 CREATE TABLE extensions
 (
 
-    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    created       INTEGER     NOT NULL,
-    modified      INTEGER     NOT NULL,
-    title         VARCHAR,
-    description   VARCHAR,
-    extension_key VARCHAR(36) NOT NULL UNIQUE,
-    enabled       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
-    deleted       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id            TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    created       INTEGER NOT NULL,
+    modified      INTEGER NOT NULL,
+    title         TEXT,
+    description   TEXT,
+    extension_key TEXT    NOT NULL UNIQUE,
+    enabled       BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -530,10 +530,10 @@ CREATE TABLE extensions
 CREATE TABLE audit
 (
 
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    created   INTEGER     NOT NULL,
-    entity    VARCHAR,
-    operation VARCHAR
+    id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    created   INTEGER NOT NULL,
+    entity    TEXT,
+    operation TEXT
 );
 
 /*
@@ -546,12 +546,12 @@ CREATE TABLE audit
 CREATE TABLE project_organization_mappings
 (
 
-    id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    project_id      VARCHAR(36) NOT NULL,
-    organization_id VARCHAR(36) NOT NULL,
-    created         INTEGER     NOT NULL,
-    modified        INTEGER     NOT NULL,
-    deleted         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    project_id      TEXT    NOT NULL,
+    organization_id TEXT    NOT NULL,
+    created         INTEGER NOT NULL,
+    modified        INTEGER NOT NULL,
+    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (project_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -561,12 +561,12 @@ CREATE TABLE project_organization_mappings
 CREATE TABLE ticket_type_project_mappings
 (
 
-    id             VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    ticket_type_id VARCHAR(36) NOT NULL,
-    project_id     VARCHAR(36) NOT NULL,
-    created        INTEGER     NOT NULL,
-    modified       INTEGER     NOT NULL,
-    deleted        BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id             TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    ticket_type_id TEXT    NOT NULL,
+    project_id     TEXT    NOT NULL,
+    created        INTEGER NOT NULL,
+    modified       INTEGER NOT NULL,
+    deleted        BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
 );
 
@@ -576,12 +576,12 @@ CREATE TABLE ticket_type_project_mappings
 CREATE TABLE audit_meta_data
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    audit_id VARCHAR(36) NOT NULL,
-    property VARCHAR     NOT NULL,
-    value    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    audit_id TEXT    NOT NULL,
+    property TEXT    NOT NULL,
+    value    TEXT,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL
 );
 
 /*
@@ -590,12 +590,12 @@ CREATE TABLE audit_meta_data
 CREATE TABLE reports_meta_data
 (
 
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    report_id VARCHAR(36) NOT NULL,
-    property  VARCHAR     NOT NULL,
-    value     VARCHAR,
-    created   INTEGER     NOT NULL,
-    modified  INTEGER     NOT NULL
+    id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    report_id TEXT    NOT NULL,
+    property  TEXT    NOT NULL,
+    value     TEXT,
+    created   INTEGER NOT NULL,
+    modified  INTEGER NOT NULL
 );
 
 /*
@@ -604,12 +604,12 @@ CREATE TABLE reports_meta_data
 CREATE TABLE boards_meta_data
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    board_id VARCHAR(36) NOT NULL,
-    property VARCHAR     NOT NULL,
-    value    VARCHAR,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    board_id TEXT    NOT NULL,
+    property TEXT    NOT NULL,
+    value    TEXT,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL
 );
 
 /*
@@ -618,13 +618,13 @@ CREATE TABLE boards_meta_data
 CREATE TABLE tickets_meta_data
 (
 
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    ticket_id VARCHAR(36) NOT NULL,
-    property  VARCHAR     NOT NULL,
-    value     VARCHAR,
-    created   INTEGER     NOT NULL,
-    modified  INTEGER     NOT NULL,
-    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id TEXT    NOT NULL,
+    property  TEXT    NOT NULL,
+    value     TEXT,
+    created   INTEGER NOT NULL,
+    modified  INTEGER NOT NULL,
+    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -633,13 +633,13 @@ CREATE TABLE tickets_meta_data
 CREATE TABLE ticket_relationships
 (
 
-    id                          VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    ticket_relationship_type_id VARCHAR(36) NOT NULL,
-    ticket_id                   VARCHAR(36) NOT NULL,
-    child_ticket_id             VARCHAR(36) NOT NULL,
-    created                     INTEGER     NOT NULL,
-    modified                    INTEGER     NOT NULL,
-    deleted                     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id                          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    ticket_relationship_type_id TEXT    NOT NULL,
+    ticket_id                   TEXT    NOT NULL,
+    child_ticket_id             TEXT    NOT NULL,
+    created                     INTEGER NOT NULL,
+    modified                    INTEGER NOT NULL,
+    deleted                     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_id, child_ticket_id) ON CONFLICT ABORT
 );
 
@@ -649,12 +649,12 @@ CREATE TABLE ticket_relationships
 CREATE TABLE team_organization_mappings
 (
 
-    id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    team_id         VARCHAR(36) NOT NULL,
-    organization_id VARCHAR(36) NOT NULL,
-    created         INTEGER     NOT NULL,
-    modified        INTEGER     NOT NULL,
-    deleted         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    team_id         TEXT    NOT NULL,
+    organization_id TEXT    NOT NULL,
+    created         INTEGER NOT NULL,
+    modified        INTEGER NOT NULL,
+    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (team_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -664,12 +664,12 @@ CREATE TABLE team_organization_mappings
 CREATE TABLE team_project_mappings
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    team_id    VARCHAR(36) NOT NULL,
-    project_id VARCHAR(36) NOT NULL,
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    team_id    TEXT    NOT NULL,
+    project_id TEXT    NOT NULL,
+    created    INTEGER NOT NULL,
+    modified   INTEGER NOT NULL,
+    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (team_id, project_id) ON CONFLICT ABORT
 );
 
@@ -680,12 +680,12 @@ CREATE TABLE team_project_mappings
 CREATE TABLE repository_project_mappings
 (
 
-    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    repository_id VARCHAR(36) NOT NULL,
-    project_id    VARCHAR(36) NOT NULL,
-    created       INTEGER     NOT NULL,
-    modified      INTEGER     NOT NULL,
-    deleted       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id            TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    repository_id TEXT    NOT NULL,
+    project_id    TEXT    NOT NULL,
+    created       INTEGER NOT NULL,
+    modified      INTEGER NOT NULL,
+    deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (repository_id, project_id) ON CONFLICT ABORT
 );
 
@@ -695,13 +695,13 @@ CREATE TABLE repository_project_mappings
 CREATE TABLE repository_commit_ticket_mappings
 (
 
-    id            VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    repository_id VARCHAR(36) NOT NULL,
-    ticket_id     VARCHAR(36) NOT NULL,
-    commit_hash   VARCHAR     NOT NULL UNIQUE,
-    created       INTEGER     NOT NULL,
-    modified      INTEGER     NOT NULL,
-    deleted       BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id            TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    repository_id TEXT    NOT NULL,
+    ticket_id     TEXT    NOT NULL,
+    commit_hash   TEXT    NOT NULL UNIQUE,
+    created       INTEGER NOT NULL,
+    modified      INTEGER NOT NULL,
+    deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -711,12 +711,12 @@ CREATE TABLE repository_commit_ticket_mappings
 CREATE TABLE component_ticket_mappings
 (
 
-    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    component_id VARCHAR(36) NOT NULL,
-    ticket_id    VARCHAR(36) NOT NULL,
-    created      INTEGER     NOT NULL,
-    modified     INTEGER     NOT NULL,
-    deleted      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    component_id TEXT    NOT NULL,
+    ticket_id    TEXT    NOT NULL,
+    created      INTEGER NOT NULL,
+    modified     INTEGER NOT NULL,
+    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -727,13 +727,13 @@ CREATE TABLE component_ticket_mappings
 CREATE TABLE components_meta_data
 (
 
-    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    component_id VARCHAR(36) NOT NULL,
-    property     VARCHAR     NOT NULL,
-    value        VARCHAR,
-    created      INTEGER     NOT NULL,
-    modified     INTEGER     NOT NULL,
-    deleted      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    component_id TEXT    NOT NULL,
+    property     TEXT    NOT NULL,
+    value        TEXT,
+    created      INTEGER NOT NULL,
+    modified     INTEGER NOT NULL,
+    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -745,12 +745,12 @@ CREATE TABLE components_meta_data
 CREATE TABLE asset_project_mappings
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    asset_id   VARCHAR(36) NOT NULL,
-    project_id VARCHAR(36) NOT NULL,
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    asset_id   TEXT    NOT NULL,
+    project_id TEXT    NOT NULL,
+    created    INTEGER NOT NULL,
+    modified   INTEGER NOT NULL,
+    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (asset_id, project_id) ON CONFLICT ABORT
 );
 
@@ -762,12 +762,12 @@ CREATE TABLE asset_project_mappings
 CREATE TABLE asset_team_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    asset_id VARCHAR(36) NOT NULL,
-    team_id  VARCHAR(36) NOT NULL,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    asset_id TEXT    NOT NULL,
+    team_id  TEXT    NOT NULL,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
 
@@ -777,12 +777,12 @@ CREATE TABLE asset_team_mappings
 CREATE TABLE asset_ticket_mappings
 (
 
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    asset_id  VARCHAR(36) NOT NULL,
-    ticket_id VARCHAR(36) NOT NULL,
-    created   INTEGER     NOT NULL,
-    modified  INTEGER     NOT NULL,
-    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    asset_id  TEXT    NOT NULL,
+    ticket_id TEXT    NOT NULL,
+    created   INTEGER NOT NULL,
+    modified  INTEGER NOT NULL,
+    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (asset_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -792,12 +792,12 @@ CREATE TABLE asset_ticket_mappings
 CREATE TABLE asset_comment_mappings
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    asset_id   VARCHAR(36) NOT NULL,
-    comment_id VARCHAR(36) NOT NULL,
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    asset_id   TEXT    NOT NULL,
+    comment_id TEXT    NOT NULL,
+    created    INTEGER NOT NULL,
+    modified   INTEGER NOT NULL,
+    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (asset_id, comment_id) ON CONFLICT ABORT
 );
 
@@ -808,12 +808,12 @@ CREATE TABLE asset_comment_mappings
 CREATE TABLE label_label_category_mappings
 (
 
-    id                VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    label_id          VARCHAR(36) NOT NULL,
-    label_category_id VARCHAR(36) NOT NULL,
-    created           INTEGER     NOT NULL,
-    modified          INTEGER     NOT NULL,
-    deleted           BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id                TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    label_id          TEXT    NOT NULL,
+    label_category_id TEXT    NOT NULL,
+    created           INTEGER NOT NULL,
+    modified          INTEGER NOT NULL,
+    deleted           BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
 );
 
@@ -823,12 +823,12 @@ CREATE TABLE label_label_category_mappings
 CREATE TABLE label_project_mappings
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    label_id   VARCHAR(36) NOT NULL,
-    project_id VARCHAR(36) NOT NULL,
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    label_id   TEXT    NOT NULL,
+    project_id TEXT    NOT NULL,
+    created    INTEGER NOT NULL,
+    modified   INTEGER NOT NULL,
+    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (label_id, project_id) ON CONFLICT ABORT
 );
 
@@ -838,12 +838,12 @@ CREATE TABLE label_project_mappings
 CREATE TABLE label_team_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    label_id VARCHAR(36) NOT NULL,
-    team_id  VARCHAR(36) NOT NULL,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    label_id TEXT    NOT NULL,
+    team_id  TEXT    NOT NULL,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (label_id, team_id) ON CONFLICT ABORT
 );
 
@@ -853,12 +853,12 @@ CREATE TABLE label_team_mappings
 CREATE TABLE label_ticket_mappings
 (
 
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    label_id  VARCHAR(36) NOT NULL,
-    ticket_id VARCHAR(36) NOT NULL,
-    created   INTEGER     NOT NULL,
-    modified  INTEGER     NOT NULL,
-    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    label_id  TEXT    NOT NULL,
+    ticket_id TEXT    NOT NULL,
+    created   INTEGER NOT NULL,
+    modified  INTEGER NOT NULL,
+    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (label_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -868,12 +868,12 @@ CREATE TABLE label_ticket_mappings
 CREATE TABLE label_asset_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    label_id VARCHAR(36) NOT NULL,
-    asset_id VARCHAR(36) NOT NULL,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    label_id TEXT    NOT NULL,
+    asset_id TEXT    NOT NULL,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
 
@@ -883,12 +883,12 @@ CREATE TABLE label_asset_mappings
 CREATE TABLE comment_ticket_mappings
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    comment_id VARCHAR(36) NOT NULL,
-    ticket_id  VARCHAR(36) NOT NULL,
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    comment_id TEXT    NOT NULL,
+    ticket_id  TEXT    NOT NULL,
+    created    INTEGER NOT NULL,
+    modified   INTEGER NOT NULL,
+    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (comment_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -898,12 +898,12 @@ CREATE TABLE comment_ticket_mappings
 CREATE TABLE ticket_project_mappings
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    ticket_id  VARCHAR(36) NOT NULL,
-    project_id VARCHAR(36) NOT NULL,
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id  TEXT    NOT NULL,
+    project_id TEXT    NOT NULL,
+    created    INTEGER NOT NULL,
+    modified   INTEGER NOT NULL,
+    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_id, project_id) ON CONFLICT ABORT
 );
 
@@ -914,12 +914,12 @@ CREATE TABLE ticket_project_mappings
 CREATE TABLE cycle_project_mappings
 (
 
-    id         VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    cycle_id   VARCHAR(36) NOT NULL UNIQUE,
-    project_id VARCHAR(36) NOT NULL,
-    created    INTEGER     NOT NULL,
-    modified   INTEGER     NOT NULL,
-    deleted    BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    cycle_id   TEXT    NOT NULL UNIQUE,
+    project_id TEXT    NOT NULL,
+    created    INTEGER NOT NULL,
+    modified   INTEGER NOT NULL,
+    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (cycle_id, project_id) ON CONFLICT ABORT
 );
 
@@ -929,12 +929,12 @@ CREATE TABLE cycle_project_mappings
 CREATE TABLE ticket_cycle_mappings
 (
 
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    ticket_id VARCHAR(36) NOT NULL,
-    cycle_id  VARCHAR(36) NOT NULL,
-    created   INTEGER     NOT NULL,
-    modified  INTEGER     NOT NULL,
-    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id TEXT    NOT NULL,
+    cycle_id  TEXT    NOT NULL,
+    created   INTEGER NOT NULL,
+    modified  INTEGER NOT NULL,
+    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_id, cycle_id) ON CONFLICT ABORT
 );
 
@@ -944,12 +944,12 @@ CREATE TABLE ticket_cycle_mappings
 CREATE TABLE ticket_board_mappings
 (
 
-    id        VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    ticket_id VARCHAR(36) NOT NULL,
-    board_id  VARCHAR(36) NOT NULL,
-    created   INTEGER     NOT NULL,
-    modified  INTEGER     NOT NULL,
-    deleted   BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    ticket_id TEXT    NOT NULL,
+    board_id  TEXT    NOT NULL,
+    created   INTEGER NOT NULL,
+    modified  INTEGER NOT NULL,
+    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_id, board_id) ON CONFLICT ABORT
 );
 
@@ -963,12 +963,12 @@ CREATE TABLE ticket_board_mappings
 CREATE TABLE users_yandex_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    user_id  VARCHAR(36) NOT NULL UNIQUE,
-    username VARCHAR(36) NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    user_id  TEXT    NOT NULL UNIQUE,
+    username TEXT    NOT NULL UNIQUE,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -977,12 +977,12 @@ CREATE TABLE users_yandex_mappings
 CREATE TABLE users_google_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    user_id  VARCHAR(36) NOT NULL UNIQUE,
-    username VARCHAR(36) NOT NULL UNIQUE,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    user_id  TEXT    NOT NULL UNIQUE,
+    username TEXT    NOT NULL UNIQUE,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
 /*
@@ -995,12 +995,12 @@ CREATE TABLE users_google_mappings
 CREATE TABLE user_organization_mappings
 (
 
-    id              VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    user_id         VARCHAR(36) NOT NULL,
-    organization_id VARCHAR(36) NOT NULL,
-    created         INTEGER     NOT NULL,
-    modified        INTEGER     NOT NULL,
-    deleted         BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    user_id         TEXT    NOT NULL,
+    organization_id TEXT    NOT NULL,
+    created         INTEGER NOT NULL,
+    modified        INTEGER NOT NULL,
+    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (user_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -1010,12 +1010,12 @@ CREATE TABLE user_organization_mappings
 CREATE TABLE user_team_mappings
 (
 
-    id       VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    user_id  VARCHAR(36) NOT NULL,
-    team_id  VARCHAR(36) NOT NULL,
-    created  INTEGER     NOT NULL,
-    modified INTEGER     NOT NULL,
-    deleted  BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    user_id  TEXT    NOT NULL,
+    team_id  TEXT    NOT NULL,
+    created  INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
 
@@ -1026,13 +1026,13 @@ CREATE TABLE user_team_mappings
 CREATE TABLE permission_user_mappings
 (
 
-    id                    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    permission_id         VARCHAR(36) NOT NULL,
-    user_id               VARCHAR(36) NOT NULL,
-    permission_context_id VARCHAR(36) NOT NULL,
-    created               INTEGER     NOT NULL,
-    modified              INTEGER     NOT NULL,
-    deleted               BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id                    TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    permission_id         TEXT    NOT NULL,
+    user_id               TEXT    NOT NULL,
+    permission_context_id TEXT    NOT NULL,
+    created               INTEGER NOT NULL,
+    modified              INTEGER NOT NULL,
+    deleted               BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (user_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
@@ -1045,13 +1045,13 @@ CREATE TABLE permission_user_mappings
 CREATE TABLE permission_team_mappings
 (
 
-    id                    VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    permission_id         VARCHAR(36) NOT NULL,
-    team_id               VARCHAR(36) NOT NULL,
-    permission_context_id VARCHAR(36) NOT NULL,
-    created               INTEGER     NOT NULL,
-    modified              INTEGER     NOT NULL,
-    deleted               BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
+    id                    TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    permission_id         TEXT    NOT NULL,
+    team_id               TEXT    NOT NULL,
+    permission_context_id TEXT    NOT NULL,
+    created               INTEGER NOT NULL,
+    modified              INTEGER NOT NULL,
+    deleted               BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (team_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
@@ -1063,14 +1063,14 @@ CREATE TABLE permission_team_mappings
 CREATE TABLE configuration_data_extension_mappings
 (
 
-    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    extension_id VARCHAR(36) NOT NULL,
-    created      INTEGER     NOT NULL,
-    modified     INTEGER     NOT NULL,
-    property     VARCHAR     NOT NULL,
-    value        VARCHAR,
-    enabled      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1)),
-    deleted      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    extension_id TEXT    NOT NULL,
+    created      INTEGER NOT NULL,
+    modified     INTEGER NOT NULL,
+    property     TEXT    NOT NULL,
+    value        TEXT,
+    enabled      BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 /*
@@ -1081,11 +1081,11 @@ CREATE TABLE configuration_data_extension_mappings
 CREATE TABLE extensions_meta_data
 (
 
-    id           VARCHAR(36) NOT NULL PRIMARY KEY UNIQUE,
-    extension_id VARCHAR(36) NOT NULL,
-    property     VARCHAR     NOT NULL,
-    value        VARCHAR,
-    created      INTEGER     NOT NULL,
-    modified     INTEGER     NOT NULL,
-    deleted      BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    extension_id TEXT    NOT NULL,
+    property     TEXT    NOT NULL,
+    value        TEXT,
+    created      INTEGER NOT NULL,
+    modified     INTEGER NOT NULL,
+    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
