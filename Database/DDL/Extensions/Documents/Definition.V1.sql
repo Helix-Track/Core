@@ -31,6 +31,14 @@ CREATE TABLE documents
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
+CREATE INDEX IF NOT EXISTS get_by_title ON documents (title);
+CREATE INDEX IF NOT EXISTS get_by_project_id ON documents (project_id);
+CREATE INDEX IF NOT EXISTS get_by_document_id ON documents (document_id);
+CREATE INDEX IF NOT EXISTS get_by_created ON documents (created);
+CREATE INDEX IF NOT EXISTS get_by_modified ON documents (modified);
+CREATE INDEX IF NOT EXISTS get_by_created_and_modified ON documents (created, modified);
+CREATE INDEX IF NOT EXISTS get_by_deleted ON documents (deleted);
+
 /*
     Each document is associated with its content.
     The content field can contain the raw content or the 'identifier' of the content asset of some kind.
@@ -46,3 +54,5 @@ CREATE TABLE content_document_mappings
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX IF NOT EXISTS get_by_document_id ON content_document_mappings (document_id);
