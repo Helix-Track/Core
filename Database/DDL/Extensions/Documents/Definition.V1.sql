@@ -14,6 +14,14 @@
 DROP TABLE IF EXISTS documents;
 DROP TABLE IF EXISTS content_document_mappings;
 
+DROP INDEX IF EXISTS get_by_title;
+DROP INDEX IF EXISTS get_by_project_id;
+DROP INDEX IF EXISTS get_by_document_id;
+DROP INDEX IF EXISTS get_by_deleted;
+DROP INDEX IF EXISTS get_by_created;
+DROP INDEX IF EXISTS get_by_modified;
+DROP INDEX IF EXISTS get_by_created_and_modified;
+
 /*
     Documents.
     Users can create the project documentation.
@@ -31,13 +39,13 @@ CREATE TABLE documents
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
-CREATE INDEX IF NOT EXISTS get_by_title ON documents (title);
-CREATE INDEX IF NOT EXISTS get_by_project_id ON documents (project_id);
-CREATE INDEX IF NOT EXISTS get_by_document_id ON documents (document_id);
-CREATE INDEX IF NOT EXISTS get_by_created ON documents (created);
-CREATE INDEX IF NOT EXISTS get_by_modified ON documents (modified);
-CREATE INDEX IF NOT EXISTS get_by_created_and_modified ON documents (created, modified);
-CREATE INDEX IF NOT EXISTS get_by_deleted ON documents (deleted);
+CREATE INDEX get_by_title ON documents (title);
+CREATE INDEX get_by_project_id ON documents (project_id);
+CREATE INDEX get_by_document_id ON documents (document_id);
+CREATE INDEX get_by_deleted ON documents (deleted);
+CREATE INDEX get_by_created ON documents (created);
+CREATE INDEX get_by_modified ON documents (modified);
+CREATE INDEX get_by_created_and_modified ON documents (created, modified);
 
 /*
     Each document is associated with its content.
