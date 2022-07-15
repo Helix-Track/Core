@@ -1,0 +1,3 @@
+[submodule "Propriatery"]
+	path = Propriatery
+	url = git@github.com:Helix-Track/Propriatery.git
