@@ -1,3 +1,3 @@
-# Working title: Project Manager
+# Helix Track
 
-The project management project.
+The JIRA alternative for the free world.
