@@ -28,6 +28,12 @@ DROP INDEX IF EXISTS get_by_created;
 DROP INDEX IF EXISTS get_by_modified;
 DROP INDEX IF EXISTS get_by_created_and_modified;
 
+DROP INDEX IF EXISTS get_yandex_chat_mappings_by_chat_id;
+DROP INDEX IF EXISTS get_slack_chat_mappings_by_chat_id;
+DROP INDEX IF EXISTS get_telegram_chat_mappings_by_chat_id;
+DROP INDEX IF EXISTS get_google_chat_mappings_by_chat_id;
+DROP INDEX IF EXISTS get_whatsapp_chat_mappings_by_chat_id;
+
 /*
     Chat support for the projects.
 
@@ -85,6 +91,8 @@ CREATE TABLE chats_yandex_mappings
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
+CREATE INDEX get_yandex_chat_mappings_by_chat_id ON chats_yandex_mappings (chat_id);
+
 
 /*
     Chats can be provided by the Slack.
@@ -102,6 +110,7 @@ CREATE TABLE chats_slack_mappings
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
+CREATE INDEX get_slack_chat_mappings_by_chat_id ON chats_slack_mappings (chat_id);
 
 /*
     Chats can be provided by the Telegram.
@@ -118,6 +127,8 @@ CREATE TABLE chats_telegram_mappings
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX get_telegram_chat_mappings_by_chat_id ON chats_telegram_mappings (chat_id);
 
 
 /*
@@ -136,6 +147,7 @@ CREATE TABLE chats_google_mappings
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
 
+CREATE INDEX get_google_chat_mappings_by_chat_id ON chats_google_mappings (chat_id);
 
 /*
     Chats can be provided by the WhatsApp.
@@ -152,3 +164,5 @@ CREATE TABLE chats_whatsapp_mappings
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX get_whatsapp_chat_mappings_by_chat_id ON chats_whatsapp_mappings (chat_id);
