@@ -1,4 +1,4 @@
-![JIRA alternative for the free world!](docs/assets/Wide_Black.png)
+![JIRA alternative for the free world!](Assets/Wide_Black.png)
 
 # Core
 
