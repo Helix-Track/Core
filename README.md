@@ -1,3 +1,5 @@
-# Helix Track
+![JIRA alternative for the free world!](docs/assets/Wide_Black.png)
 
-The JIRA alternative for the free world.
+# Core
+
+The Core module for the Helix Track.
