@@ -73,7 +73,7 @@ CREATE INDEX get_by_organization_id ON chats (organization_id);
 CREATE INDEX get_by_deleted ON chats (deleted);
 CREATE INDEX get_by_created ON chats (created);
 CREATE INDEX get_by_modified ON chats (modified);
-CREATE INDEX get_by_created_and_modified ON documents (created, modified);
+CREATE INDEX get_by_created_and_modified ON chats (created, modified);
 
 /*
     Chats can be provided by the Yandex Messenger.

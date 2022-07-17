@@ -13,6 +13,16 @@
 
 DROP TABLE IF EXISTS times;
 
+DROP INDEX IF EXISTS get_by_title;
+DROP INDEX IF EXISTS get_by_description;
+DROP INDEX IF EXISTS get_by_title_and_description;
+DROP INDEX IF EXISTS get_by_created;
+DROP INDEX IF EXISTS get_by_modified;
+DROP INDEX IF EXISTS get_by_created_and_modified;
+DROP INDEX IF EXISTS get_by_deleted;
+DROP INDEX IF EXISTS get_by_ticket_id;
+DROP INDEX IF EXISTS get_by_ticket_id_and_title;
+
 /*
     Time tracking.
     Time is tracked against the tickets.
@@ -43,3 +53,12 @@ CREATE TABLE times
     deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
 );
 
+CREATE INDEX get_by_title ON times (title);
+CREATE INDEX get_by_description ON times (description);
+CREATE INDEX get_by_title_and_description ON times (title, description);
+CREATE INDEX get_by_ticket_id ON times (ticket_id);
+CREATE INDEX get_by_ticket_id_and_title ON times (ticket_id, title);
+CREATE INDEX get_by_deleted ON times (deleted);
+CREATE INDEX get_by_created ON times (created);
+CREATE INDEX get_by_modified ON times (modified);
+CREATE INDEX get_by_created_and_modified ON times (created, modified);
