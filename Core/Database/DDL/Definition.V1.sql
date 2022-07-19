@@ -71,6 +71,10 @@ DROP TABLE IF EXISTS permission_team_mappings;
 DROP TABLE IF EXISTS configuration_data_extension_mappings;
 DROP TABLE IF EXISTS extensions_meta_data;
 
+DROP INDEX IF EXISTS system_info_get_by_created;
+DROP INDEX IF EXISTS system_info_get_by_description;
+DROP INDEX IF EXISTS system_info_get_by_created_and_description;
+
 /*
   Identifies the version of the database (system).
   After each SQL script execution the version will be increased and execution description provided.
@@ -82,6 +86,10 @@ CREATE TABLE system_info
     description TEXT    NOT NULL,
     created     INTEGER NOT NULL
 );
+
+CREATE INDEX system_info_get_by_created ON system_info (created);
+CREATE INDEX system_info_get_by_description ON system_info (description);
+CREATE INDEX system_info_get_by_created_and_description ON system_info (created, description);
 
 /*
     The system entities:
