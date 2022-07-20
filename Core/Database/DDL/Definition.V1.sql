@@ -74,6 +74,9 @@ DROP TABLE IF EXISTS extensions_meta_data;
 DROP INDEX IF EXISTS system_info_get_by_created;
 DROP INDEX IF EXISTS system_info_get_by_description;
 DROP INDEX IF EXISTS system_info_get_by_created_and_description;
+DROP INDEX IF EXISTS users_get_by_created;
+DROP INDEX IF EXISTS users_get_by_modified;
+DROP INDEX IF EXISTS users_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -110,6 +113,10 @@ CREATE TABLE users
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX users_get_by_created ON users (created);
+CREATE INDEX users_get_by_modified ON users (modified);
+CREATE INDEX users_get_by_created_and_modified ON users (created, modified);
 
 /*
     The basic project definition.
