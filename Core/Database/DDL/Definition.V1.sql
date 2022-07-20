@@ -76,7 +76,17 @@ DROP INDEX IF EXISTS system_info_get_by_description;
 DROP INDEX IF EXISTS system_info_get_by_created_and_description;
 DROP INDEX IF EXISTS users_get_by_created;
 DROP INDEX IF EXISTS users_get_by_modified;
+DROP INDEX IF EXISTS users_get_by_deleted;
 DROP INDEX IF EXISTS users_get_by_created_and_modified;
+DROP INDEX IF EXISTS projects_get_by_title;
+DROP INDEX IF EXISTS projects_get_by_description;
+DROP INDEX IF EXISTS projects_get_by_title_and_description;
+DROP INDEX IF EXISTS projects_get_by_created;
+DROP INDEX IF EXISTS projects_get_by_modified;
+DROP INDEX IF EXISTS projects_get_by_created_and_modified;
+DROP INDEX IF EXISTS projects_get_by_deleted;
+DROP INDEX IF EXISTS projects_get_by_identifier;
+DROP INDEX IF EXISTS projects_get_by_workflow_id;
 
 /*
   Identifies the version of the database (system).
@@ -116,6 +126,7 @@ CREATE TABLE users
 
 CREATE INDEX users_get_by_created ON users (created);
 CREATE INDEX users_get_by_modified ON users (modified);
+CREATE INDEX users_get_by_deleted ON users (deleted);
 CREATE INDEX users_get_by_created_and_modified ON users (created, modified);
 
 /*
@@ -138,6 +149,16 @@ CREATE TABLE projects
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX projects_get_by_identifier ON projects (identifier);
+CREATE INDEX projects_get_by_title ON projects (title);
+CREATE INDEX projects_get_by_description ON projects (description);
+CREATE INDEX projects_get_by_title_and_description ON projects (title, description);
+CREATE INDEX projects_get_by_workflow_id ON projects (workflow_id);
+CREATE INDEX projects_get_by_created ON projects (created);
+CREATE INDEX projects_get_by_modified ON projects (modified);
+CREATE INDEX projects_get_by_deleted ON projects (deleted);
+CREATE INDEX projects_get_by_created_and_modified ON projects (created, modified);
 
 /*
     Ticket type definitions.
