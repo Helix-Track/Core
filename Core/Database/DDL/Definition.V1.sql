@@ -94,6 +94,13 @@ DROP INDEX IF EXISTS ticket_types_get_by_created;
 DROP INDEX IF EXISTS ticket_types_get_by_modified;
 DROP INDEX IF EXISTS ticket_types_get_by_deleted;
 DROP INDEX IF EXISTS ticket_types_get_by_created_and_modified;
+DROP INDEX IF EXISTS ticket_statuses_get_by_title;
+DROP INDEX IF EXISTS ticket_statuses_get_by_description;
+DROP INDEX IF EXISTS ticket_statuses_get_by_title_and_description;
+DROP INDEX IF EXISTS ticket_statuses_get_by_deleted;
+DROP INDEX IF EXISTS ticket_statuses_get_by_created;
+DROP INDEX IF EXISTS ticket_statuses_get_by_modified;
+DROP INDEX IF EXISTS ticket_statuses_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -207,6 +214,14 @@ CREATE TABLE ticket_statuses
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX ticket_statuses_get_by_title ON ticket_statuses (title);
+CREATE INDEX ticket_statuses_get_by_description ON ticket_statuses (description);
+CREATE INDEX ticket_statuses_get_by_title_and_description ON ticket_statuses (title, description);
+CREATE INDEX ticket_statuses_get_by_deleted ON ticket_statuses (deleted);
+CREATE INDEX ticket_statuses_get_by_created ON ticket_statuses (created);
+CREATE INDEX ticket_statuses_get_by_modified ON ticket_statuses (modified);
+CREATE INDEX ticket_statuses_get_by_created_and_modified ON ticket_statuses (created, modified);
 
 /*
     Tickets.
