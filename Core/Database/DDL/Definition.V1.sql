@@ -101,6 +101,23 @@ DROP INDEX IF EXISTS ticket_statuses_get_by_deleted;
 DROP INDEX IF EXISTS ticket_statuses_get_by_created;
 DROP INDEX IF EXISTS ticket_statuses_get_by_modified;
 DROP INDEX IF EXISTS ticket_statuses_get_by_created_and_modified;
+DROP INDEX IF EXISTS tickets_get_by_ticket_number;
+DROP INDEX IF EXISTS tickets_get_by_ticket_type_id;
+DROP INDEX IF EXISTS tickets_get_by_ticket_status_id;
+DROP INDEX IF EXISTS tickets_get_by_project_id;
+DROP INDEX IF EXISTS tickets_get_by_user_id;
+DROP INDEX IF EXISTS tickets_get_by_creator;
+DROP INDEX IF EXISTS tickets_get_by_project_id_and_user_id;
+DROP INDEX IF EXISTS tickets_get_by_project_id_and_creator;
+DROP INDEX IF EXISTS tickets_get_by_estimation;
+DROP INDEX IF EXISTS tickets_get_by_story_points;
+DROP INDEX IF EXISTS tickets_get_by_created;
+DROP INDEX IF EXISTS tickets_get_by_modified;
+DROP INDEX IF EXISTS tickets_get_by_deleted;
+DROP INDEX IF EXISTS tickets_get_by_created_and_modified;
+DROP INDEX IF EXISTS tickets_get_by_title;
+DROP INDEX IF EXISTS tickets_get_by_description;
+DROP INDEX IF EXISTS tickets_get_by_title_and_description;
 
 /*
   Identifies the version of the database (system).
@@ -258,6 +275,24 @@ CREATE TABLE tickets
     deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_number, project_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX tickets_get_by_ticket_number ON tickets (ticket_number);
+CREATE INDEX tickets_get_by_ticket_type_id ON tickets (ticket_type_id);
+CREATE INDEX tickets_get_by_ticket_status_id ON tickets (ticket_status_id);
+CREATE INDEX tickets_get_by_project_id ON tickets (project_id);
+CREATE INDEX tickets_get_by_user_id ON tickets (user_id);
+CREATE INDEX tickets_get_by_creator ON tickets (creator);
+CREATE INDEX tickets_get_by_project_id_and_user_id ON tickets (project_id, user_id);
+CREATE INDEX tickets_get_by_project_id_and_creator ON tickets (project_id, creator);
+CREATE INDEX tickets_get_by_estimation ON tickets (estimation);
+CREATE INDEX tickets_get_by_story_points ON tickets (story_points);
+CREATE INDEX tickets_get_by_created ON tickets (created);
+CREATE INDEX tickets_get_by_modified ON tickets (modified);
+CREATE INDEX tickets_get_by_deleted ON tickets (deleted);
+CREATE INDEX tickets_get_by_created_and_modified ON tickets (created, modified);
+CREATE INDEX tickets_get_by_title ON tickets (title);
+CREATE INDEX tickets_get_by_description ON tickets (description);
+CREATE INDEX tickets_get_by_title_and_description ON tickets (title, description);
 
 /*
     Ticket relationship types.
