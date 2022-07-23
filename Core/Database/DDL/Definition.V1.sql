@@ -118,6 +118,12 @@ DROP INDEX IF EXISTS tickets_get_by_created_and_modified;
 DROP INDEX IF EXISTS tickets_get_by_title;
 DROP INDEX IF EXISTS tickets_get_by_description;
 DROP INDEX IF EXISTS tickets_get_by_title_and_description;
+DROP INDEX IF EXISTS ticket_relationship_types_get_by_title;
+DROP INDEX IF EXISTS ticket_relationship_types_get_by_description;
+DROP INDEX IF EXISTS ticket_relationship_types_get_by_title_and_description;
+DROP INDEX IF EXISTS ticket_relationship_types_get_by_created;
+DROP INDEX IF EXISTS ticket_relationship_types_get_by_deleted;
+DROP INDEX IF EXISTS ticket_relationship_types_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -312,6 +318,13 @@ CREATE TABLE ticket_relationship_types
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX ticket_relationship_types_get_by_title ON ticket_relationship_types (title);
+CREATE INDEX ticket_relationship_types_get_by_description ON ticket_relationship_types (description);
+CREATE INDEX ticket_relationship_types_get_by_title_and_description ON ticket_relationship_types (title, description);
+CREATE INDEX ticket_relationship_types_get_by_created ON ticket_relationship_types (created);
+CREATE INDEX ticket_relationship_types_get_by_deleted ON ticket_relationship_types (deleted);
+CREATE INDEX ticket_relationship_types_get_by_created_and_modified ON ticket_relationship_types (created, modified);
 
 /*
     Ticket boards.
