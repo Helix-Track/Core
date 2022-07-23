@@ -131,6 +131,13 @@ DROP INDEX IF EXISTS boards_get_by_created;
 DROP INDEX IF EXISTS boards_get_by_modified;
 DROP INDEX IF EXISTS boards_get_by_deleted;
 DROP INDEX IF EXISTS boards_get_by_created_and_modified;
+DROP INDEX IF EXISTS workflows_get_by_title;
+DROP INDEX IF EXISTS workflows_get_by_description;
+DROP INDEX IF EXISTS workflows_get_by_title_and_description;
+DROP INDEX IF EXISTS workflows_get_by_created;
+DROP INDEX IF EXISTS workflows_get_by_modified;
+DROP INDEX IF EXISTS workflows_get_by_deleted;
+DROP INDEX IF EXISTS workflows_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -375,6 +382,14 @@ CREATE TABLE workflows
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX workflows_get_by_title ON workflows (title);
+CREATE INDEX workflows_get_by_description ON workflows (description);
+CREATE INDEX workflows_get_by_title_and_description ON workflows (title, description);
+CREATE INDEX workflows_get_by_created ON workflows (created);
+CREATE INDEX workflows_get_by_modified ON workflows (modified);
+CREATE INDEX workflows_get_by_deleted ON workflows (deleted);
+CREATE INDEX workflows_get_by_created_and_modified ON workflows (created, modified);
 
 /*
     Images, attachments, etc.
