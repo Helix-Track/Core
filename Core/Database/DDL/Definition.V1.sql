@@ -124,6 +124,13 @@ DROP INDEX IF EXISTS ticket_relationship_types_get_by_title_and_description;
 DROP INDEX IF EXISTS ticket_relationship_types_get_by_created;
 DROP INDEX IF EXISTS ticket_relationship_types_get_by_deleted;
 DROP INDEX IF EXISTS ticket_relationship_types_get_by_created_and_modified;
+DROP INDEX IF EXISTS boards_get_by_title;
+DROP INDEX IF EXISTS boards_get_by_description;
+DROP INDEX IF EXISTS boards_get_by_title_and_description;
+DROP INDEX IF EXISTS boards_get_by_created;
+DROP INDEX IF EXISTS boards_get_by_modified;
+DROP INDEX IF EXISTS boards_get_by_deleted;
+DROP INDEX IF EXISTS boards_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -345,6 +352,14 @@ CREATE TABLE boards
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX boards_get_by_title ON boards (title);
+CREATE INDEX boards_get_by_description ON boards (description);
+CREATE INDEX boards_get_by_title_and_description ON boards (title, description);
+CREATE INDEX boards_get_by_created ON boards (created);
+CREATE INDEX boards_get_by_modified ON boards (modified);
+CREATE INDEX boards_get_by_deleted ON boards (deleted);
+CREATE INDEX boards_get_by_created_and_modified ON boards (created, modified);
 
 /*
     Workflows.
