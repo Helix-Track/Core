@@ -144,6 +144,13 @@ DROP INDEX IF EXISTS assets_get_by_created;
 DROP INDEX IF EXISTS assets_get_by_deleted;
 DROP INDEX IF EXISTS assets_get_by_modified;
 DROP INDEX IF EXISTS assets_get_by_created_and_modified;
+DROP INDEX IF EXISTS labels_get_by_title;
+DROP INDEX IF EXISTS labels_get_by_description;
+DROP INDEX IF EXISTS labels_get_by_title_and_description;
+DROP INDEX IF EXISTS labels_get_by_created;
+DROP INDEX IF EXISTS labels_get_by_deleted;
+DROP INDEX IF EXISTS labels_get_by_modified;
+DROP INDEX IF EXISTS labels_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -437,6 +444,14 @@ CREATE TABLE labels
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX labels_get_by_title ON labels (title);
+CREATE INDEX labels_get_by_description ON labels (description);
+CREATE INDEX labels_get_by_title_and_description ON labels (title, description);
+CREATE INDEX labels_get_by_created ON labels (created);
+CREATE INDEX labels_get_by_deleted ON labels (deleted);
+CREATE INDEX labels_get_by_modified ON labels (modified);
+CREATE INDEX labels_get_by_created_and_modified ON labels (created, modified);
 
 /*
     Labels can be divided into categories (which is optional).
