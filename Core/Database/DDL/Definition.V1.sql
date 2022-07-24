@@ -138,6 +138,12 @@ DROP INDEX IF EXISTS workflows_get_by_created;
 DROP INDEX IF EXISTS workflows_get_by_modified;
 DROP INDEX IF EXISTS workflows_get_by_deleted;
 DROP INDEX IF EXISTS workflows_get_by_created_and_modified;
+DROP INDEX IF EXISTS assets_get_by_url;
+DROP INDEX IF EXISTS assets_get_by_description;
+DROP INDEX IF EXISTS assets_get_by_created;
+DROP INDEX IF EXISTS assets_get_by_deleted;
+DROP INDEX IF EXISTS assets_get_by_modified;
+DROP INDEX IF EXISTS assets_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -405,6 +411,13 @@ CREATE TABLE assets
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX assets_get_by_url ON assets (url);
+CREATE INDEX assets_get_by_description ON assets (description);
+CREATE INDEX assets_get_by_created ON assets (created);
+CREATE INDEX assets_get_by_deleted ON assets (deleted);
+CREATE INDEX assets_get_by_modified ON assets (modified);
+CREATE INDEX assets_get_by_created_and_modified ON assets (created, modified);
 
 /*
     Labels.
