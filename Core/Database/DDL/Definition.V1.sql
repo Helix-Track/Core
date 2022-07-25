@@ -151,6 +151,13 @@ DROP INDEX IF EXISTS labels_get_by_created;
 DROP INDEX IF EXISTS labels_get_by_deleted;
 DROP INDEX IF EXISTS labels_get_by_modified;
 DROP INDEX IF EXISTS labels_get_by_created_and_modified;
+DROP INDEX IF EXISTS label_categories_get_by_title;
+DROP INDEX IF EXISTS label_categories_get_by_description;
+DROP INDEX IF EXISTS label_categories_get_by_title_and_description;
+DROP INDEX IF EXISTS label_categories_get_by_created;
+DROP INDEX IF EXISTS label_categories_get_by_deleted;
+DROP INDEX IF EXISTS label_categories_get_by_modified;
+DROP INDEX IF EXISTS label_categories_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -466,6 +473,14 @@ CREATE TABLE label_categories
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX label_categories_get_by_title ON label_categories (title);
+CREATE INDEX label_categories_get_by_description ON label_categories (description);
+CREATE INDEX label_categories_get_by_title_and_description ON label_categories (title, description);
+CREATE INDEX label_categories_get_by_created ON label_categories (created);
+CREATE INDEX label_categories_get_by_deleted ON label_categories (deleted);
+CREATE INDEX label_categories_get_by_modified ON label_categories (modified);
+CREATE INDEX label_categories_get_by_created_and_modified ON label_categories (created, modified);
 
 /*
       The code repositories - Identified by the identifier and the repository URL.
