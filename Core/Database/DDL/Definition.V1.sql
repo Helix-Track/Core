@@ -163,8 +163,16 @@ DROP INDEX IF EXISTS repositories_get_by_description;
 DROP INDEX IF EXISTS repositories_get_by_repository_and_description;
 DROP INDEX IF EXISTS repositories_get_by_deleted;
 DROP INDEX IF EXISTS repositories_get_by_type;
+DROP INDEX IF EXISTS repositories_get_by_created;
 DROP INDEX IF EXISTS repositories_get_by_modified;
 DROP INDEX IF EXISTS repositories_get_by_created_and_modified;
+DROP INDEX IF EXISTS components_get_by_title;
+DROP INDEX IF EXISTS components_get_by_description;
+DROP INDEX IF EXISTS components_get_by_title_description;
+DROP INDEX IF EXISTS components_get_by_created;
+DROP INDEX IF EXISTS components_get_by_deleted;
+DROP INDEX IF EXISTS components_get_by_modified;
+DROP INDEX IF EXISTS components_get_by_created_modified;
 
 /*
   Identifies the version of the database (system).
@@ -519,6 +527,7 @@ CREATE INDEX repositories_get_by_description ON repositories (description);
 CREATE INDEX repositories_get_by_repository_and_description ON repositories (repository, description);
 CREATE INDEX repositories_get_by_deleted ON repositories (deleted);
 CREATE INDEX repositories_get_by_type ON repositories (type);
+CREATE INDEX repositories_get_by_created ON repositories (created);
 CREATE INDEX repositories_get_by_modified ON repositories (modified);
 CREATE INDEX repositories_get_by_created_and_modified ON repositories (created, modified);
 
@@ -541,6 +550,14 @@ CREATE TABLE components
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX components_get_by_title ON components (title);
+CREATE INDEX components_get_by_description ON components (description);
+CREATE INDEX components_get_by_title_description ON components (title, description);
+CREATE INDEX components_get_by_created ON components (created);
+CREATE INDEX components_get_by_deleted ON components (deleted);
+CREATE INDEX components_get_by_modified ON components (modified);
+CREATE INDEX components_get_by_created_modified ON components (created, modified);
 
 /*
     The organization definition. Organization is the owner of the project.
