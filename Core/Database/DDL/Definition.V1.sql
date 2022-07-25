@@ -158,6 +158,13 @@ DROP INDEX IF EXISTS label_categories_get_by_created;
 DROP INDEX IF EXISTS label_categories_get_by_deleted;
 DROP INDEX IF EXISTS label_categories_get_by_modified;
 DROP INDEX IF EXISTS label_categories_get_by_created_and_modified;
+DROP INDEX IF EXISTS repositories_get_by_repository;
+DROP INDEX IF EXISTS repositories_get_by_description;
+DROP INDEX IF EXISTS repositories_get_by_repository_and_description;
+DROP INDEX IF EXISTS repositories_get_by_deleted;
+DROP INDEX IF EXISTS repositories_get_by_type;
+DROP INDEX IF EXISTS repositories_get_by_modified;
+DROP INDEX IF EXISTS repositories_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -506,6 +513,14 @@ CREATE TABLE repositories
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX repositories_get_by_repository ON repositories (repository);
+CREATE INDEX repositories_get_by_description ON repositories (description);
+CREATE INDEX repositories_get_by_repository_and_description ON repositories (repository, description);
+CREATE INDEX repositories_get_by_deleted ON repositories (deleted);
+CREATE INDEX repositories_get_by_type ON repositories (type);
+CREATE INDEX repositories_get_by_modified ON repositories (modified);
+CREATE INDEX repositories_get_by_created_and_modified ON repositories (created, modified);
 
 /*
     Components.
