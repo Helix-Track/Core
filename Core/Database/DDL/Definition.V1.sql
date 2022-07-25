@@ -180,6 +180,13 @@ DROP INDEX IF EXISTS organizations_get_by_created;
 DROP INDEX IF EXISTS organizations_get_by_deleted;
 DROP INDEX IF EXISTS organizations_get_by_modified;
 DROP INDEX IF EXISTS organizations_get_by_created_and_modified;
+DROP INDEX IF EXISTS teams_get_by_title;
+DROP INDEX IF EXISTS teams_get_by_description;
+DROP INDEX IF EXISTS teams_get_by_title_and_description;
+DROP INDEX IF EXISTS teams_get_by_created;
+DROP INDEX IF EXISTS teams_get_by_modified;
+DROP INDEX IF EXISTS teams_get_by_deleted;
+DROP INDEX IF EXISTS teams_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -601,6 +608,14 @@ CREATE TABLE teams
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX teams_get_by_title ON teams (title);
+CREATE INDEX teams_get_by_description ON teams (description);
+CREATE INDEX teams_get_by_title_and_description ON teams (title, description);
+CREATE INDEX teams_get_by_created ON teams (created);
+CREATE INDEX teams_get_by_modified ON teams (modified);
+CREATE INDEX teams_get_by_deleted ON teams (deleted);
+CREATE INDEX teams_get_by_created_and_modified ON teams (created, modified);
 
 /*
     Permission definitions.
