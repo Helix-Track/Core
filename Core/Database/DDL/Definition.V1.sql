@@ -173,6 +173,13 @@ DROP INDEX IF EXISTS components_get_by_created;
 DROP INDEX IF EXISTS components_get_by_deleted;
 DROP INDEX IF EXISTS components_get_by_modified;
 DROP INDEX IF EXISTS components_get_by_created_modified;
+DROP INDEX IF EXISTS organizations_get_by_title;
+DROP INDEX IF EXISTS organizations_get_by_description;
+DROP INDEX IF EXISTS organizations_get_by_title_and_description;
+DROP INDEX IF EXISTS organizations_get_by_created;
+DROP INDEX IF EXISTS organizations_get_by_deleted;
+DROP INDEX IF EXISTS organizations_get_by_modified;
+DROP INDEX IF EXISTS organizations_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -572,6 +579,14 @@ CREATE TABLE organizations
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX organizations_get_by_title ON organizations (title);
+CREATE INDEX organizations_get_by_description ON organizations (description);
+CREATE INDEX organizations_get_by_title_and_description ON organizations (title, description);
+CREATE INDEX organizations_get_by_created ON organizations (created);
+CREATE INDEX organizations_get_by_deleted ON organizations (deleted);
+CREATE INDEX organizations_get_by_modified ON organizations (modified);
+CREATE INDEX organizations_get_by_created_and_modified ON organizations (created, modified);
 
 /*
     The team definition. Organization is the owner of the team.
