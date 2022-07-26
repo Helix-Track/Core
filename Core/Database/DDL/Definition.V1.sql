@@ -194,6 +194,11 @@ DROP INDEX IF EXISTS permissions_get_by_deleted;
 DROP INDEX IF EXISTS permissions_get_by_created;
 DROP INDEX IF EXISTS permissions_get_by_modified;
 DROP INDEX IF EXISTS permissions_get_by_created_and_modified;
+DROP INDEX IF EXISTS comments_get_by_comment;
+DROP INDEX IF EXISTS comments_get_by_created;
+DROP INDEX IF EXISTS comments_get_by_modified;
+DROP INDEX IF EXISTS comments_get_by_deleted;
+DROP INDEX IF EXISTS comments_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -652,7 +657,6 @@ CREATE INDEX permissions_get_by_created ON permissions (created);
 CREATE INDEX permissions_get_by_modified ON permissions (modified);
 CREATE INDEX permissions_get_by_created_and_modified ON permissions (created, modified);
 
-
 /*
     Comments.
     Users can comment on:
@@ -668,6 +672,12 @@ CREATE TABLE comments
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX comments_get_by_comment ON comments (comment);
+CREATE INDEX comments_get_by_created ON comments (created);
+CREATE INDEX comments_get_by_modified ON comments (modified);
+CREATE INDEX comments_get_by_deleted ON comments (deleted);
+CREATE INDEX comments_get_by_created_and_modified ON comments (created, modified);
 
 /*
     Permission contexts.
