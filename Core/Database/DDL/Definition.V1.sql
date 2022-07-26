@@ -199,6 +199,13 @@ DROP INDEX IF EXISTS comments_get_by_created;
 DROP INDEX IF EXISTS comments_get_by_modified;
 DROP INDEX IF EXISTS comments_get_by_deleted;
 DROP INDEX IF EXISTS comments_get_by_created_and_modified;
+DROP INDEX IF EXISTS permission_contexts_get_by_title;
+DROP INDEX IF EXISTS permission_contexts_get_by_description;
+DROP INDEX IF EXISTS permission_contexts_get_by_title_and_description;
+DROP INDEX IF EXISTS permission_contexts_get_by_created;
+DROP INDEX IF EXISTS permission_contexts_get_by_modified;
+DROP INDEX IF EXISTS permission_contexts_get_by_deleted;
+DROP INDEX IF EXISTS permission_contexts_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -697,6 +704,14 @@ CREATE TABLE permission_contexts
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX permission_contexts_get_by_title ON permission_contexts (title);
+CREATE INDEX permission_contexts_get_by_description ON permission_contexts (description);
+CREATE INDEX permission_contexts_get_by_title_and_description ON permission_contexts (title, description);
+CREATE INDEX permission_contexts_get_by_created ON permission_contexts (created);
+CREATE INDEX permission_contexts_get_by_modified ON permission_contexts (modified);
+CREATE INDEX permission_contexts_get_by_deleted ON permission_contexts (deleted);
+CREATE INDEX permission_contexts_get_by_created_and_modified ON permission_contexts (created, modified);
 
 /*
     Workflow steps.
