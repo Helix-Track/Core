@@ -187,6 +187,13 @@ DROP INDEX IF EXISTS teams_get_by_created;
 DROP INDEX IF EXISTS teams_get_by_modified;
 DROP INDEX IF EXISTS teams_get_by_deleted;
 DROP INDEX IF EXISTS teams_get_by_created_and_modified;
+DROP INDEX IF EXISTS permissions_get_by_title;
+DROP INDEX IF EXISTS permissions_get_by_description;
+DROP INDEX IF EXISTS permissions_get_by_title_and_description;
+DROP INDEX IF EXISTS permissions_get_by_deleted;
+DROP INDEX IF EXISTS permissions_get_by_created;
+DROP INDEX IF EXISTS permissions_get_by_modified;
+DROP INDEX IF EXISTS permissions_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -636,6 +643,14 @@ CREATE TABLE permissions
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX permissions_get_by_title ON permissions (title);
+CREATE INDEX permissions_get_by_description ON permissions (description);
+CREATE INDEX permissions_get_by_title_and_description ON permissions (title, description);
+CREATE INDEX permissions_get_by_deleted ON permissions (deleted);
+CREATE INDEX permissions_get_by_created ON permissions (created);
+CREATE INDEX permissions_get_by_modified ON permissions (modified);
+CREATE INDEX permissions_get_by_created_and_modified ON permissions (created, modified);
 
 
 /*
