@@ -226,6 +226,16 @@ DROP INDEX IF EXISTS reports_get_by_created;
 DROP INDEX IF EXISTS reports_get_by_deleted;
 DROP INDEX IF EXISTS reports_get_by_modified;
 DROP INDEX IF EXISTS reports_get_by_created_and_modified;
+DROP INDEX IF EXISTS cycles_by_title;
+DROP INDEX IF EXISTS cycles_by_description;
+DROP INDEX IF EXISTS cycles_by_title_and_description;
+DROP INDEX IF EXISTS cycles_by_cycle_id;
+DROP INDEX IF EXISTS cycles_by_type;
+DROP INDEX IF EXISTS cycles_by_cycle_id_and_type;
+DROP INDEX IF EXISTS cycles_by_created;
+DROP INDEX IF EXISTS cycles_by_deleted;
+DROP INDEX IF EXISTS cycles_by_modified;
+DROP INDEX IF EXISTS cycles_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -838,6 +848,17 @@ CREATE TABLE cycles
     type        INTEGER CHECK ( type IN (1000, 100, 10)) NOT NULL,
     deleted     BOOLEAN                                  NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX cycles_by_title ON cycles (title);
+CREATE INDEX cycles_by_description ON cycles (description);
+CREATE INDEX cycles_by_title_and_description ON cycles (title, description);
+CREATE INDEX cycles_by_cycle_id ON cycles (cycle_id);
+CREATE INDEX cycles_by_type ON cycles (type);
+CREATE INDEX cycles_by_cycle_id_and_type ON cycles (cycle_id, type);
+CREATE INDEX cycles_by_created ON cycles (created);
+CREATE INDEX cycles_by_deleted ON cycles (deleted);
+CREATE INDEX cycles_by_modified ON cycles (modified);
+CREATE INDEX cycles_by_created_and_modified ON cycles (created, modified);
 
 /*
   The 3rd party extensions.
