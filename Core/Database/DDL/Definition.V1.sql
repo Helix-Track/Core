@@ -206,6 +206,19 @@ DROP INDEX IF EXISTS permission_contexts_get_by_created;
 DROP INDEX IF EXISTS permission_contexts_get_by_modified;
 DROP INDEX IF EXISTS permission_contexts_get_by_deleted;
 DROP INDEX IF EXISTS permission_contexts_get_by_created_and_modified;
+DROP INDEX IF EXISTS workflow_steps_get_by_title;
+DROP INDEX IF EXISTS workflow_steps_get_by_description;
+DROP INDEX IF EXISTS workflow_steps_get_by_title_and_description;
+DROP INDEX IF EXISTS workflow_steps_get_by_workflow_id;
+DROP INDEX IF EXISTS workflow_steps_get_by_workflow_step_id;
+DROP INDEX IF EXISTS workflow_steps_get_by_ticket_status_id;
+DROP INDEX IF EXISTS workflow_steps_get_by_workflow_id_and_ticket_status_id;
+DROP INDEX IF EXISTS workflow_steps_get_by_workflow_id_and_workflow_step_id;
+DROP INDEX IF EXISTS workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id;
+DROP INDEX IF EXISTS workflow_steps_get_by_created;
+DROP INDEX IF EXISTS workflow_steps_get_by_deleted;
+DROP INDEX IF EXISTS workflow_steps_get_by_modified;
+DROP INDEX IF EXISTS workflow_steps_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -735,6 +748,23 @@ CREATE TABLE workflow_steps
     modified         INTEGER NOT NULL,
     deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX workflow_steps_get_by_title ON workflow_steps (title);
+CREATE INDEX workflow_steps_get_by_description ON workflow_steps (description);
+CREATE INDEX workflow_steps_get_by_title_and_description ON workflow_steps (title, description);
+CREATE INDEX workflow_steps_get_by_workflow_id ON workflow_steps (workflow_id);
+CREATE INDEX workflow_steps_get_by_workflow_step_id ON workflow_steps (workflow_step_id);
+CREATE INDEX workflow_steps_get_by_ticket_status_id ON workflow_steps (ticket_status_id);
+CREATE INDEX workflow_steps_get_by_workflow_id_and_ticket_status_id ON workflow_steps (workflow_id, ticket_status_id);
+CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id ON workflow_steps (workflow_id, workflow_step_id);
+
+CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id ON workflow_steps
+    (workflow_id, workflow_step_id, ticket_status_id);
+
+CREATE INDEX workflow_steps_get_by_created ON workflow_steps (created);
+CREATE INDEX workflow_steps_get_by_deleted ON workflow_steps (deleted);
+CREATE INDEX workflow_steps_get_by_modified ON workflow_steps (modified);
+CREATE INDEX workflow_steps_get_by_created_and_modified ON workflow_steps (created, modified);
 
 /*
     Reports, such as:
