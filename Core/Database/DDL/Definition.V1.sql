@@ -219,6 +219,13 @@ DROP INDEX IF EXISTS workflow_steps_get_by_created;
 DROP INDEX IF EXISTS workflow_steps_get_by_deleted;
 DROP INDEX IF EXISTS workflow_steps_get_by_modified;
 DROP INDEX IF EXISTS workflow_steps_get_by_created_and_modified;
+DROP INDEX IF EXISTS reports_get_by_title;
+DROP INDEX IF EXISTS reports_get_by_description;
+DROP INDEX IF EXISTS reports_get_by_title_and_description;
+DROP INDEX IF EXISTS reports_get_by_created;
+DROP INDEX IF EXISTS reports_get_by_deleted;
+DROP INDEX IF EXISTS reports_get_by_modified;
+DROP INDEX IF EXISTS reports_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -782,6 +789,13 @@ CREATE TABLE reports
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
+CREATE INDEX reports_get_by_title ON reports (title);
+CREATE INDEX reports_get_by_description ON reports (description);
+CREATE INDEX reports_get_by_title_and_description ON reports (title, description);
+CREATE INDEX reports_get_by_created ON reports (created);
+CREATE INDEX reports_get_by_deleted ON reports (deleted);
+CREATE INDEX reports_get_by_modified ON reports (modified);
+CREATE INDEX reports_get_by_created_and_modified ON reports (created, modified);
 
 /*
     Contains the information about all work cycles in the system.
