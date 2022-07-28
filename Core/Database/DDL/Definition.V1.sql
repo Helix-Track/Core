@@ -249,6 +249,13 @@ DROP INDEX IF EXISTS audit_get_by_created;
 DROP INDEX IF EXISTS audit_get_by_entity;
 DROP INDEX IF EXISTS audit_get_by_operation;
 DROP INDEX IF EXISTS audit_get_by_entity_and_operation;
+DROP INDEX IF EXISTS project_organization_mappings_get_by_project_id;
+DROP INDEX IF EXISTS project_organization_mappings_get_by_organization_id;
+DROP INDEX IF EXISTS project_organization_mappings_get_by_project_id_and_organization_id;
+DROP INDEX IF EXISTS project_organization_mappings_get_by_created;
+DROP INDEX IF EXISTS project_organization_mappings_get_by_deleted;
+DROP INDEX IF EXISTS project_organization_mappings_get_by_modified;
+DROP INDEX IF EXISTS project_organization_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -936,6 +943,19 @@ CREATE TABLE project_organization_mappings
     deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (project_id, organization_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX project_organization_mappings_get_by_project_id ON project_organization_mappings (project_id);
+CREATE INDEX project_organization_mappings_get_by_organization_id ON project_organization_mappings (organization_id);
+
+CREATE INDEX project_organization_mappings_get_by_project_id_and_organization_id ON
+    project_organization_mappings (project_id, organization_id);
+
+CREATE INDEX project_organization_mappings_get_by_created ON project_organization_mappings (created);
+CREATE INDEX project_organization_mappings_get_by_deleted ON project_organization_mappings (deleted);
+CREATE INDEX project_organization_mappings_get_by_modified ON project_organization_mappings (modified);
+
+CREATE INDEX project_organization_mappings_get_by_created_and_modified ON
+    project_organization_mappings (created, modified);
 
 /*
     Each project has the ticket types that it supports.
