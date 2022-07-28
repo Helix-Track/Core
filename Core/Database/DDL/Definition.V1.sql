@@ -236,6 +236,15 @@ DROP INDEX IF EXISTS cycles_by_created;
 DROP INDEX IF EXISTS cycles_by_deleted;
 DROP INDEX IF EXISTS cycles_by_modified;
 DROP INDEX IF EXISTS cycles_by_created_and_modified;
+DROP INDEX IF EXISTS extensions_by_title;
+DROP INDEX IF EXISTS extensions_by_description;
+DROP INDEX IF EXISTS extensions_by_title_and_description;
+DROP INDEX IF EXISTS extensions_by_extension_key;
+DROP INDEX IF EXISTS extensions_by_created;
+DROP INDEX IF EXISTS extensions_by_deleted;
+DROP INDEX IF EXISTS extensions_by_enabled;
+DROP INDEX IF EXISTS extensions_by_modified;
+DROP INDEX IF EXISTS extensions_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -877,6 +886,16 @@ CREATE TABLE extensions
     enabled       BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX extensions_by_title ON extensions (title);
+CREATE INDEX extensions_by_description ON extensions (description);
+CREATE INDEX extensions_by_title_and_description ON extensions (title, description);
+CREATE INDEX extensions_by_extension_key ON extensions (extension_key);
+CREATE INDEX extensions_by_created ON extensions (created);
+CREATE INDEX extensions_by_deleted ON extensions (deleted);
+CREATE INDEX extensions_by_enabled ON extensions (enabled);
+CREATE INDEX extensions_by_modified ON extensions (modified);
+CREATE INDEX extensions_by_created_and_modified ON extensions (created, modified);
 
 /*
     Audit trail.
