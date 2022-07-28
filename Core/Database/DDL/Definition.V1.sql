@@ -226,25 +226,29 @@ DROP INDEX IF EXISTS reports_get_by_created;
 DROP INDEX IF EXISTS reports_get_by_deleted;
 DROP INDEX IF EXISTS reports_get_by_modified;
 DROP INDEX IF EXISTS reports_get_by_created_and_modified;
-DROP INDEX IF EXISTS cycles_by_title;
-DROP INDEX IF EXISTS cycles_by_description;
-DROP INDEX IF EXISTS cycles_by_title_and_description;
-DROP INDEX IF EXISTS cycles_by_cycle_id;
-DROP INDEX IF EXISTS cycles_by_type;
-DROP INDEX IF EXISTS cycles_by_cycle_id_and_type;
-DROP INDEX IF EXISTS cycles_by_created;
-DROP INDEX IF EXISTS cycles_by_deleted;
-DROP INDEX IF EXISTS cycles_by_modified;
-DROP INDEX IF EXISTS cycles_by_created_and_modified;
-DROP INDEX IF EXISTS extensions_by_title;
-DROP INDEX IF EXISTS extensions_by_description;
-DROP INDEX IF EXISTS extensions_by_title_and_description;
-DROP INDEX IF EXISTS extensions_by_extension_key;
-DROP INDEX IF EXISTS extensions_by_created;
-DROP INDEX IF EXISTS extensions_by_deleted;
-DROP INDEX IF EXISTS extensions_by_enabled;
-DROP INDEX IF EXISTS extensions_by_modified;
-DROP INDEX IF EXISTS extensions_by_created_and_modified;
+DROP INDEX IF EXISTS cycles_get_by_title;
+DROP INDEX IF EXISTS cycles_get_by_description;
+DROP INDEX IF EXISTS cycles_get_by_title_and_description;
+DROP INDEX IF EXISTS cycles_get_by_cycle_id;
+DROP INDEX IF EXISTS cycles_get_by_type;
+DROP INDEX IF EXISTS cycles_get_by_cycle_id_and_type;
+DROP INDEX IF EXISTS cycles_get_by_created;
+DROP INDEX IF EXISTS cycles_get_by_deleted;
+DROP INDEX IF EXISTS cycles_get_by_modified;
+DROP INDEX IF EXISTS cycles_get_by_created_and_modified;
+DROP INDEX IF EXISTS extensions_get_by_title;
+DROP INDEX IF EXISTS extensions_get_by_description;
+DROP INDEX IF EXISTS extensions_get_by_title_and_description;
+DROP INDEX IF EXISTS extensions_get_by_extension_key;
+DROP INDEX IF EXISTS extensions_get_by_created;
+DROP INDEX IF EXISTS extensions_get_by_deleted;
+DROP INDEX IF EXISTS extensions_get_by_enabled;
+DROP INDEX IF EXISTS extensions_get_by_modified;
+DROP INDEX IF EXISTS extensions_get_by_created_and_modified;
+DROP INDEX IF EXISTS audit_get_by_created;
+DROP INDEX IF EXISTS audit_get_by_entity;
+DROP INDEX IF EXISTS audit_get_by_operation;
+DROP INDEX IF EXISTS audit_get_by_entity_and_operation;
 
 /*
   Identifies the version of the database (system).
@@ -858,16 +862,16 @@ CREATE TABLE cycles
     deleted     BOOLEAN                                  NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX cycles_by_title ON cycles (title);
-CREATE INDEX cycles_by_description ON cycles (description);
-CREATE INDEX cycles_by_title_and_description ON cycles (title, description);
-CREATE INDEX cycles_by_cycle_id ON cycles (cycle_id);
-CREATE INDEX cycles_by_type ON cycles (type);
-CREATE INDEX cycles_by_cycle_id_and_type ON cycles (cycle_id, type);
-CREATE INDEX cycles_by_created ON cycles (created);
-CREATE INDEX cycles_by_deleted ON cycles (deleted);
-CREATE INDEX cycles_by_modified ON cycles (modified);
-CREATE INDEX cycles_by_created_and_modified ON cycles (created, modified);
+CREATE INDEX cycles_get_by_title ON cycles (title);
+CREATE INDEX cycles_get_by_description ON cycles (description);
+CREATE INDEX cycles_get_by_title_and_description ON cycles (title, description);
+CREATE INDEX cycles_get_by_cycle_id ON cycles (cycle_id);
+CREATE INDEX cycles_get_by_type ON cycles (type);
+CREATE INDEX cycles_get_by_cycle_id_and_type ON cycles (cycle_id, type);
+CREATE INDEX cycles_get_by_created ON cycles (created);
+CREATE INDEX cycles_get_by_deleted ON cycles (deleted);
+CREATE INDEX cycles_get_by_modified ON cycles (modified);
+CREATE INDEX cycles_get_by_created_and_modified ON cycles (created, modified);
 
 /*
   The 3rd party extensions.
@@ -887,15 +891,15 @@ CREATE TABLE extensions
     deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX extensions_by_title ON extensions (title);
-CREATE INDEX extensions_by_description ON extensions (description);
-CREATE INDEX extensions_by_title_and_description ON extensions (title, description);
-CREATE INDEX extensions_by_extension_key ON extensions (extension_key);
-CREATE INDEX extensions_by_created ON extensions (created);
-CREATE INDEX extensions_by_deleted ON extensions (deleted);
-CREATE INDEX extensions_by_enabled ON extensions (enabled);
-CREATE INDEX extensions_by_modified ON extensions (modified);
-CREATE INDEX extensions_by_created_and_modified ON extensions (created, modified);
+CREATE INDEX extensions_get_by_title ON extensions (title);
+CREATE INDEX extensions_get_by_description ON extensions (description);
+CREATE INDEX extensions_get_by_title_and_description ON extensions (title, description);
+CREATE INDEX extensions_get_by_extension_key ON extensions (extension_key);
+CREATE INDEX extensions_get_by_created ON extensions (created);
+CREATE INDEX extensions_get_by_deleted ON extensions (deleted);
+CREATE INDEX extensions_get_by_enabled ON extensions (enabled);
+CREATE INDEX extensions_get_by_modified ON extensions (modified);
+CREATE INDEX extensions_get_by_created_and_modified ON extensions (created, modified);
 
 /*
     Audit trail.
@@ -908,6 +912,11 @@ CREATE TABLE audit
     entity    TEXT,
     operation TEXT
 );
+
+CREATE INDEX audit_get_by_created ON audit (created);
+CREATE INDEX audit_get_by_entity ON audit (entity);
+CREATE INDEX audit_get_by_operation ON audit (operation);
+CREATE INDEX audit_get_by_entity_and_operation ON audit (entity, operation);
 
 /*
     Mappings:
