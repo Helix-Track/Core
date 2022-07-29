@@ -269,6 +269,14 @@ DROP INDEX IF EXISTS audit_meta_data_get_by_audit_id_and_property;
 DROP INDEX IF EXISTS audit_meta_data_get_by_value;
 DROP INDEX IF EXISTS audit_meta_data_get_by_created;
 DROP INDEX IF EXISTS audit_meta_data_get_by_modified;
+DROP INDEX IF EXISTS reports_meta_data_get_by_report_id;
+DROP INDEX IF EXISTS reports_meta_data_get_by_property;
+DROP INDEX IF EXISTS reports_meta_data_get_by_report_id_and_property;
+DROP INDEX IF EXISTS reports_meta_data_get_by_value;
+DROP INDEX IF EXISTS reports_meta_data_get_by_report_id_and_value;
+DROP INDEX IF EXISTS reports_meta_data_get_by_report_id_and_property_and_value;
+DROP INDEX IF EXISTS reports_meta_data_get_by_created;
+DROP INDEX IF EXISTS reports_meta_data_get_by_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1032,6 +1040,15 @@ CREATE TABLE reports_meta_data
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL
 );
+
+CREATE INDEX reports_meta_data_get_by_report_id ON reports_meta_data (report_id);
+CREATE INDEX reports_meta_data_get_by_property ON reports_meta_data (property);
+CREATE INDEX reports_meta_data_get_by_report_id_and_property ON reports_meta_data (report_id, property);
+CREATE INDEX reports_meta_data_get_by_value ON reports_meta_data (value);
+CREATE INDEX reports_meta_data_get_by_report_id_and_value ON reports_meta_data (report_id, value);
+CREATE INDEX reports_meta_data_get_by_report_id_and_property_and_value ON reports_meta_data (report_id, property, value);
+CREATE INDEX reports_meta_data_get_by_created ON reports_meta_data (created);
+CREATE INDEX reports_meta_data_get_by_modified ON reports_meta_data (modified);
 
 /*
    Boards meta-data: additional data that can be associated with certain board.
