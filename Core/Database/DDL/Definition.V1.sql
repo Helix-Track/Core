@@ -263,6 +263,12 @@ DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_created;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_modified;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_deleted;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS audit_meta_data_get_by_audit_id;
+DROP INDEX IF EXISTS audit_meta_data_get_by_property;
+DROP INDEX IF EXISTS audit_meta_data_get_by_audit_id_and_property;
+DROP INDEX IF EXISTS audit_meta_data_get_by_value;
+DROP INDEX IF EXISTS audit_meta_data_get_by_created;
+DROP INDEX IF EXISTS audit_meta_data_get_by_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1005,6 +1011,13 @@ CREATE TABLE audit_meta_data
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL
 );
+
+CREATE INDEX audit_meta_data_get_by_audit_id ON audit_meta_data (audit_id);
+CREATE INDEX audit_meta_data_get_by_property ON audit_meta_data (property);
+CREATE INDEX audit_meta_data_get_by_audit_id_and_property ON audit_meta_data (audit_id, property);
+CREATE INDEX audit_meta_data_get_by_value ON audit_meta_data (value);
+CREATE INDEX audit_meta_data_get_by_created ON audit_meta_data (created);
+CREATE INDEX audit_meta_data_get_by_modified ON audit_meta_data (modified);
 
 /*
    Reports met-data: used to populate reports with the information.
