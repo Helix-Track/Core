@@ -269,6 +269,7 @@ DROP INDEX IF EXISTS audit_meta_data_get_by_audit_id_and_property;
 DROP INDEX IF EXISTS audit_meta_data_get_by_value;
 DROP INDEX IF EXISTS audit_meta_data_get_by_created;
 DROP INDEX IF EXISTS audit_meta_data_get_by_modified;
+DROP INDEX IF EXISTS audit_meta_data_get_by_created_and_modified;
 DROP INDEX IF EXISTS reports_meta_data_get_by_report_id;
 DROP INDEX IF EXISTS reports_meta_data_get_by_property;
 DROP INDEX IF EXISTS reports_meta_data_get_by_report_id_and_property;
@@ -277,6 +278,16 @@ DROP INDEX IF EXISTS reports_meta_data_get_by_report_id_and_value;
 DROP INDEX IF EXISTS reports_meta_data_get_by_report_id_and_property_and_value;
 DROP INDEX IF EXISTS reports_meta_data_get_by_created;
 DROP INDEX IF EXISTS reports_meta_data_get_by_modified;
+DROP INDEX IF EXISTS reports_meta_data_get_by_created_and_modified;
+DROP INDEX IF EXISTS boards_meta_data_get_by_board_id;
+DROP INDEX IF EXISTS boards_meta_data_get_by_property;
+DROP INDEX IF EXISTS boards_meta_data_get_by_value;
+DROP INDEX IF EXISTS boards_meta_data_get_by_board_id_and_property;
+DROP INDEX IF EXISTS boards_meta_data_get_by_board_id_and_value;
+DROP INDEX IF EXISTS boards_meta_data_get_by_board_id_and_property_and_value;
+DROP INDEX IF EXISTS boards_meta_data_get_by_created;
+DROP INDEX IF EXISTS boards_meta_data_get_by_modified;
+DROP INDEX IF EXISTS boards_meta_data_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1026,6 +1037,7 @@ CREATE INDEX audit_meta_data_get_by_audit_id_and_property ON audit_meta_data (au
 CREATE INDEX audit_meta_data_get_by_value ON audit_meta_data (value);
 CREATE INDEX audit_meta_data_get_by_created ON audit_meta_data (created);
 CREATE INDEX audit_meta_data_get_by_modified ON audit_meta_data (modified);
+CREATE INDEX audit_meta_data_get_by_created_and_modified ON audit_meta_data (created, modified);
 
 /*
    Reports met-data: used to populate reports with the information.
@@ -1049,6 +1061,7 @@ CREATE INDEX reports_meta_data_get_by_report_id_and_value ON reports_meta_data (
 CREATE INDEX reports_meta_data_get_by_report_id_and_property_and_value ON reports_meta_data (report_id, property, value);
 CREATE INDEX reports_meta_data_get_by_created ON reports_meta_data (created);
 CREATE INDEX reports_meta_data_get_by_modified ON reports_meta_data (modified);
+CREATE INDEX reports_meta_data_get_by_created_and_modified ON reports_meta_data (created, modified);
 
 /*
    Boards meta-data: additional data that can be associated with certain board.
@@ -1063,6 +1076,16 @@ CREATE TABLE boards_meta_data
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL
 );
+
+CREATE INDEX boards_meta_data_get_by_board_id ON boards_meta_data (board_id);
+CREATE INDEX boards_meta_data_get_by_property ON boards_meta_data (property);
+CREATE INDEX boards_meta_data_get_by_value ON boards_meta_data (value);
+CREATE INDEX boards_meta_data_get_by_board_id_and_property ON boards_meta_data (board_id, property);
+CREATE INDEX boards_meta_data_get_by_board_id_and_value ON boards_meta_data (board_id, value);
+CREATE INDEX boards_meta_data_get_by_board_id_and_property_and_value ON boards_meta_data (board_id, property, value);
+CREATE INDEX boards_meta_data_get_by_created ON boards_meta_data (created);
+CREATE INDEX boards_meta_data_get_by_modified ON boards_meta_data (modified);
+CREATE INDEX boards_meta_data_get_by_created_and_modified ON boards_meta_data (created, modified);
 
 /*
     Tickets meta-data.
