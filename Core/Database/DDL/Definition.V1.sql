@@ -309,6 +309,12 @@ DROP INDEX IF EXISTS ticket_relationships_get_by_deleted;
 DROP INDEX IF EXISTS ticket_relationships_get_by_created;
 DROP INDEX IF EXISTS ticket_relationships_get_by_modified;
 DROP INDEX IF EXISTS ticket_relationships_get_by_created_and_modified;
+DROP INDEX IF EXISTS team_organization_mappings_get_by_team_id;
+DROP INDEX IF EXISTS team_organization_mappings_get_by_organization_id;
+DROP INDEX IF EXISTS team_organization_mappings_get_by_deleted;
+DROP INDEX IF EXISTS team_organization_mappings_get_by_created;
+DROP INDEX IF EXISTS team_organization_mappings_get_by_modified;
+DROP INDEX IF EXISTS team_organization_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1185,6 +1191,13 @@ CREATE TABLE team_organization_mappings
     deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (team_id, organization_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX team_organization_mappings_get_by_team_id ON team_organization_mappings (team_id);
+CREATE INDEX team_organization_mappings_get_by_organization_id ON team_organization_mappings (organization_id);
+CREATE INDEX team_organization_mappings_get_by_deleted ON team_organization_mappings (deleted);
+CREATE INDEX team_organization_mappings_get_by_created ON team_organization_mappings (created);
+CREATE INDEX team_organization_mappings_get_by_modified ON team_organization_mappings (modified);
+CREATE INDEX team_organization_mappings_get_by_created_and_modified ON team_organization_mappings (created, modified);
 
 /*
     Team belongs to one or more projects. Multiple teams can work on multiple projects.
