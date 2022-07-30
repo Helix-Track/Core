@@ -299,6 +299,16 @@ DROP INDEX IF EXISTS tickets_meta_data_get_by_deleted;
 DROP INDEX IF EXISTS tickets_meta_data_get_by_created;
 DROP INDEX IF EXISTS tickets_meta_data_get_by_modified;
 DROP INDEX IF EXISTS tickets_meta_data_get_by_created_and_modified;
+DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_id;
+DROP INDEX IF EXISTS ticket_relationships_get_by_child_ticket_id;
+DROP INDEX IF EXISTS ticket_relationships_get_by_child_ticket_id_and_child_ticket_id;
+DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_relationship_type_id;
+DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id;
+DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id;
+DROP INDEX IF EXISTS ticket_relationships_get_by_deleted;
+DROP INDEX IF EXISTS ticket_relationships_get_by_created;
+DROP INDEX IF EXISTS ticket_relationships_get_by_modified;
+DROP INDEX IF EXISTS ticket_relationships_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1140,6 +1150,26 @@ CREATE TABLE ticket_relationships
     deleted                     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_id, child_ticket_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX ticket_relationships_get_by_ticket_id ON ticket_relationships (ticket_id);
+CREATE INDEX ticket_relationships_get_by_child_ticket_id ON ticket_relationships (child_ticket_id);
+
+CREATE INDEX ticket_relationships_get_by_child_ticket_id_and_child_ticket_id
+    ON ticket_relationships (ticket_id, child_ticket_id);
+
+CREATE INDEX ticket_relationships_get_by_ticket_relationship_type_id
+    ON ticket_relationships (ticket_relationship_type_id);
+
+CREATE INDEX ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id
+    ON ticket_relationships (ticket_id, ticket_relationship_type_id);
+
+CREATE INDEX ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id
+    ON ticket_relationships (ticket_id, child_ticket_id, ticket_relationship_type_id);
+
+CREATE INDEX ticket_relationships_get_by_deleted ON ticket_relationships (deleted);
+CREATE INDEX ticket_relationships_get_by_created ON ticket_relationships (created);
+CREATE INDEX ticket_relationships_get_by_modified ON ticket_relationships (modified);
+CREATE INDEX ticket_relationships_get_by_created_and_modified ON ticket_relationships (created, modified);
 
 /*
     Team belongs to the organization. Multiple teams can belong to one organization.
