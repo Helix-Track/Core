@@ -288,6 +288,17 @@ DROP INDEX IF EXISTS boards_meta_data_get_by_board_id_and_property_and_value;
 DROP INDEX IF EXISTS boards_meta_data_get_by_created;
 DROP INDEX IF EXISTS boards_meta_data_get_by_modified;
 DROP INDEX IF EXISTS boards_meta_data_get_by_created_and_modified;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_ticket_id;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_property;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_value;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_ticket_id_and_property;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_ticket_id_and_value;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_ticket_id_and_property_and_value;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_property_and_value;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_deleted;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_created;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_modified;
+DROP INDEX IF EXISTS tickets_meta_data_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1101,6 +1112,18 @@ CREATE TABLE tickets_meta_data
     modified  INTEGER NOT NULL,
     deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX tickets_meta_data_get_by_ticket_id ON tickets_meta_data (ticket_id);
+CREATE INDEX tickets_meta_data_get_by_property ON tickets_meta_data (property);
+CREATE INDEX tickets_meta_data_get_by_value ON tickets_meta_data (value);
+CREATE INDEX tickets_meta_data_get_by_ticket_id_and_property ON tickets_meta_data (ticket_id, property);
+CREATE INDEX tickets_meta_data_get_by_ticket_id_and_value ON tickets_meta_data (ticket_id, value);
+CREATE INDEX tickets_meta_data_get_by_ticket_id_and_property_and_value ON tickets_meta_data (ticket_id, property, value);
+CREATE INDEX tickets_meta_data_get_by_property_and_value ON tickets_meta_data (property, value);
+CREATE INDEX tickets_meta_data_get_by_deleted ON tickets_meta_data (deleted);
+CREATE INDEX tickets_meta_data_get_by_created ON tickets_meta_data (created);
+CREATE INDEX tickets_meta_data_get_by_modified ON tickets_meta_data (modified);
+CREATE INDEX tickets_meta_data_get_by_created_and_modified ON tickets_meta_data (created, modified);
 
 /*
     All relationships between the tickets.
