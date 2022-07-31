@@ -321,6 +321,12 @@ DROP INDEX IF EXISTS team_project_mappings_get_by_deleted;
 DROP INDEX IF EXISTS team_project_mappings_get_by_created;
 DROP INDEX IF EXISTS team_project_mappings_get_by_modified;
 DROP INDEX IF EXISTS team_project_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS repository_project_mappings_get_by_repository_id;
+DROP INDEX IF EXISTS repository_project_mappings_get_by_project_id;
+DROP INDEX IF EXISTS repository_project_mappings_get_by_deleted;
+DROP INDEX IF EXISTS repository_project_mappings_get_by_created;
+DROP INDEX IF EXISTS repository_project_mappings_get_by_modified;
+DROP INDEX IF EXISTS repository_project_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1242,6 +1248,13 @@ CREATE TABLE repository_project_mappings
     deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (repository_id, project_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX repository_project_mappings_get_by_repository_id ON repository_project_mappings (repository_id);
+CREATE INDEX repository_project_mappings_get_by_project_id ON repository_project_mappings (project_id);
+CREATE INDEX repository_project_mappings_get_by_deleted ON repository_project_mappings (deleted);
+CREATE INDEX repository_project_mappings_get_by_created ON repository_project_mappings (created);
+CREATE INDEX repository_project_mappings_get_by_modified ON repository_project_mappings (modified);
+CREATE INDEX repository_project_mappings_get_by_created_and_modified ON repository_project_mappings (created, modified);
 
 /*
      Mapping all commits to the corresponding tickets
