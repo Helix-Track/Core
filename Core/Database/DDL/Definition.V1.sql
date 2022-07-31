@@ -327,6 +327,16 @@ DROP INDEX IF EXISTS repository_project_mappings_get_by_deleted;
 DROP INDEX IF EXISTS repository_project_mappings_get_by_created;
 DROP INDEX IF EXISTS repository_project_mappings_get_by_modified;
 DROP INDEX IF EXISTS repository_project_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_repository_id;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_ticket_id;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_commit_hash;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_ticket_id_commit_hash;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_deleted;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_created;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_modified;
+DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1270,6 +1280,29 @@ CREATE TABLE repository_commit_ticket_mappings
     modified      INTEGER NOT NULL,
     deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id
+    ON repository_commit_ticket_mappings (repository_id);
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id ON repository_commit_ticket_mappings (ticket_id);
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id
+    ON repository_commit_ticket_mappings (repository_id, ticket_id);
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_commit_hash ON repository_commit_ticket_mappings (commit_hash);
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id_commit_hash
+    ON repository_commit_ticket_mappings (ticket_id, commit_hash);
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash
+    ON repository_commit_ticket_mappings (repository_id, ticket_id, commit_hash);
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_deleted ON repository_commit_ticket_mappings (deleted);
+CREATE INDEX repository_commit_ticket_mappings_get_by_created ON repository_commit_ticket_mappings (created);
+CREATE INDEX repository_commit_ticket_mappings_get_by_modified ON repository_commit_ticket_mappings (modified);
+
+CREATE INDEX repository_commit_ticket_mappings_get_by_created_and_modified
+    ON repository_commit_ticket_mappings (created, modified);
 
 /*
     Components to the tickets mappings.
