@@ -315,6 +315,12 @@ DROP INDEX IF EXISTS team_organization_mappings_get_by_deleted;
 DROP INDEX IF EXISTS team_organization_mappings_get_by_created;
 DROP INDEX IF EXISTS team_organization_mappings_get_by_modified;
 DROP INDEX IF EXISTS team_organization_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS team_project_mappings_get_by_team_id;
+DROP INDEX IF EXISTS team_project_mappings_get_by_project_id;
+DROP INDEX IF EXISTS team_project_mappings_get_by_deleted;
+DROP INDEX IF EXISTS team_project_mappings_get_by_created;
+DROP INDEX IF EXISTS team_project_mappings_get_by_modified;
+DROP INDEX IF EXISTS team_project_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1213,6 +1219,13 @@ CREATE TABLE team_project_mappings
     deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (team_id, project_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX team_project_mappings_get_by_team_id ON team_project_mappings (team_id);
+CREATE INDEX team_project_mappings_get_by_project_id ON team_project_mappings (project_id);
+CREATE INDEX team_project_mappings_get_by_deleted ON team_project_mappings (deleted);
+CREATE INDEX team_project_mappings_get_by_created ON team_project_mappings (created);
+CREATE INDEX team_project_mappings_get_by_modified ON team_project_mappings (modified);
+CREATE INDEX team_project_mappings_get_by_created_and_modified ON team_project_mappings (created, modified);
 
 /*
      Repository belongs to project. Multiple repositories can belong to multiple projects.
