@@ -343,6 +343,17 @@ DROP INDEX IF EXISTS component_ticket_mappings_get_by_deleted;
 DROP INDEX IF EXISTS component_ticket_mappings_get_by_created;
 DROP INDEX IF EXISTS component_ticket_mappings_get_by_modified;
 DROP INDEX IF EXISTS component_ticket_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS components_meta_data_get_by_component_id;
+DROP INDEX IF EXISTS components_meta_data_get_by_property;
+DROP INDEX IF EXISTS components_meta_data_get_by_component_id_and_property;
+DROP INDEX IF EXISTS components_meta_data_get_by_value;
+DROP INDEX IF EXISTS components_meta_data_get_by_component_id_and_value;
+DROP INDEX IF EXISTS components_meta_data_get_by_property_and_value;
+DROP INDEX IF EXISTS components_meta_data_get_by_component_id_and_property_and_value;
+DROP INDEX IF EXISTS components_meta_data_get_by_deleted;
+DROP INDEX IF EXISTS components_meta_data_get_by_created;
+DROP INDEX IF EXISTS components_meta_data_get_by_modified;
+DROP INDEX IF EXISTS components_meta_data_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1348,6 +1359,21 @@ CREATE TABLE components_meta_data
     modified     INTEGER NOT NULL,
     deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX components_meta_data_get_by_component_id ON components_meta_data (component_id);
+CREATE INDEX components_meta_data_get_by_property ON components_meta_data (property);
+CREATE INDEX components_meta_data_get_by_component_id_and_property ON components_meta_data (component_id, property);
+CREATE INDEX components_meta_data_get_by_value ON components_meta_data (value);
+CREATE INDEX components_meta_data_get_by_component_id_and_value ON components_meta_data (component_id, value);
+CREATE INDEX components_meta_data_get_by_property_and_value ON components_meta_data (property, value);
+
+CREATE INDEX components_meta_data_get_by_component_id_and_property_and_value
+    ON components_meta_data (component_id, property, value);
+
+CREATE INDEX components_meta_data_get_by_deleted ON components_meta_data (deleted);
+CREATE INDEX components_meta_data_get_by_created ON components_meta_data (created);
+CREATE INDEX components_meta_data_get_by_modified ON components_meta_data (modified);
+CREATE INDEX components_meta_data_get_by_created_and_modified ON components_meta_data (created, modified);
 
 /*
     Assets can belong to the multiple projects.
