@@ -354,6 +354,12 @@ DROP INDEX IF EXISTS components_meta_data_get_by_deleted;
 DROP INDEX IF EXISTS components_meta_data_get_by_created;
 DROP INDEX IF EXISTS components_meta_data_get_by_modified;
 DROP INDEX IF EXISTS components_meta_data_get_by_created_and_modified;
+DROP INDEX IF EXISTS asset_project_mappings_get_by_asset_id;
+DROP INDEX IF EXISTS asset_project_mappings_get_by_project_id;
+DROP INDEX IF EXISTS asset_project_mappings_get_by_deleted;
+DROP INDEX IF EXISTS asset_project_mappings_get_by_created;
+DROP INDEX IF EXISTS asset_project_mappings_get_by_modified;
+DROP INDEX IF EXISTS asset_project_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1392,6 +1398,13 @@ CREATE TABLE asset_project_mappings
     deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (asset_id, project_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX asset_project_mappings_get_by_asset_id ON asset_project_mappings (asset_id);
+CREATE INDEX asset_project_mappings_get_by_project_id ON asset_project_mappings (project_id);
+CREATE INDEX asset_project_mappings_get_by_deleted ON asset_project_mappings (deleted);
+CREATE INDEX asset_project_mappings_get_by_created ON asset_project_mappings (created);
+CREATE INDEX asset_project_mappings_get_by_modified ON asset_project_mappings (modified);
+CREATE INDEX asset_project_mappings_get_by_created_and_modified ON asset_project_mappings (created, modified);
 
 /*
     Assets can belong to the multiple teams.
