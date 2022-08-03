@@ -360,6 +360,12 @@ DROP INDEX IF EXISTS asset_project_mappings_get_by_deleted;
 DROP INDEX IF EXISTS asset_project_mappings_get_by_created;
 DROP INDEX IF EXISTS asset_project_mappings_get_by_modified;
 DROP INDEX IF EXISTS asset_project_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS asset_team_mappings_get_by_asset_id;
+DROP INDEX IF EXISTS asset_team_mappings_get_by_team_id;
+DROP INDEX IF EXISTS asset_team_mappings_get_by_deleted;
+DROP INDEX IF EXISTS asset_team_mappings_get_by_created;
+DROP INDEX IF EXISTS asset_team_mappings_get_by_modified;
+DROP INDEX IF EXISTS asset_team_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1422,6 +1428,13 @@ CREATE TABLE asset_team_mappings
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX asset_team_mappings_get_by_asset_id ON asset_team_mappings (asset_id);
+CREATE INDEX asset_team_mappings_get_by_team_id ON asset_team_mappings (team_id);
+CREATE INDEX asset_team_mappings_get_by_deleted ON asset_team_mappings (deleted);
+CREATE INDEX asset_team_mappings_get_by_created ON asset_team_mappings (created);
+CREATE INDEX asset_team_mappings_get_by_modified ON asset_team_mappings (modified);
+CREATE INDEX asset_team_mappings_get_by_created_and_modified ON asset_team_mappings (created, modified);
 
 /*
     Assets (attachments for example) can belong to the multiple tickets.
