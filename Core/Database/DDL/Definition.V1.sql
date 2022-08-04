@@ -384,6 +384,12 @@ DROP INDEX IF EXISTS label_label_category_mappings_get_by_deleted;
 DROP INDEX IF EXISTS label_label_category_mappings_get_by_created;
 DROP INDEX IF EXISTS label_label_category_mappings_get_by_modified;
 DROP INDEX IF EXISTS label_label_category_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS label_project_mappings_get_by_label_id;
+DROP INDEX IF EXISTS label_project_mappings_get_by_project_id;
+DROP INDEX IF EXISTS label_project_mappings_get_by_deleted;
+DROP INDEX IF EXISTS label_project_mappings_get_by_created;
+DROP INDEX IF EXISTS label_project_mappings_get_by_modified;
+DROP INDEX IF EXISTS label_project_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1540,6 +1546,13 @@ CREATE TABLE label_project_mappings
     deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (label_id, project_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX label_project_mappings_get_by_label_id ON label_project_mappings (label_id);
+CREATE INDEX label_project_mappings_get_by_project_id ON label_project_mappings (project_id);
+CREATE INDEX label_project_mappings_get_by_deleted ON label_project_mappings (deleted);
+CREATE INDEX label_project_mappings_get_by_created ON label_project_mappings (created);
+CREATE INDEX label_project_mappings_get_by_modified ON label_project_mappings (modified);
+CREATE INDEX label_project_mappings_get_by_created_and_modified ON label_project_mappings (created, modified);
 
 /*
     Label can be associated with one or more teams.
