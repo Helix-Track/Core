@@ -378,6 +378,12 @@ DROP INDEX IF EXISTS asset_comment_mappings_get_by_deleted;
 DROP INDEX IF EXISTS asset_comment_mappings_get_by_created;
 DROP INDEX IF EXISTS asset_comment_mappings_get_by_modified;
 DROP INDEX IF EXISTS asset_comment_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS label_label_category_mappings_get_by_label_id;
+DROP INDEX IF EXISTS label_label_category_mappings_get_by_label_category_id;
+DROP INDEX IF EXISTS label_label_category_mappings_get_by_deleted;
+DROP INDEX IF EXISTS label_label_category_mappings_get_by_created;
+DROP INDEX IF EXISTS label_label_category_mappings_get_by_modified;
+DROP INDEX IF EXISTS label_label_category_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1507,6 +1513,18 @@ CREATE TABLE label_label_category_mappings
     deleted           BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX label_label_category_mappings_get_by_label_id ON label_label_category_mappings (label_id);
+
+CREATE INDEX label_label_category_mappings_get_by_label_category_id
+    ON label_label_category_mappings (label_category_id);
+
+CREATE INDEX label_label_category_mappings_get_by_deleted ON label_label_category_mappings (deleted);
+CREATE INDEX label_label_category_mappings_get_by_created ON label_label_category_mappings (created);
+CREATE INDEX label_label_category_mappings_get_by_modified ON label_label_category_mappings (modified);
+
+CREATE INDEX label_label_category_mappings_get_by_created_and_modified
+    ON label_label_category_mappings (created, modified);
 
 /*
     Label can be associated with one or more projects.
