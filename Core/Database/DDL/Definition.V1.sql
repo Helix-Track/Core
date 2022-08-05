@@ -402,6 +402,12 @@ DROP INDEX IF EXISTS label_ticket_mappings_get_by_deleted;
 DROP INDEX IF EXISTS label_ticket_mappings_get_by_created;
 DROP INDEX IF EXISTS label_ticket_mappings_get_by_modified;
 DROP INDEX IF EXISTS label_ticket_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS label_asset_mappings_get_by_label_id;
+DROP INDEX IF EXISTS label_asset_mappings_get_by_team_id;
+DROP INDEX IF EXISTS label_asset_mappings_get_by_deleted;
+DROP INDEX IF EXISTS label_asset_mappings_get_by_created;
+DROP INDEX IF EXISTS label_asset_mappings_get_by_modified;
+DROP INDEX IF EXISTS label_asset_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1624,6 +1630,13 @@ CREATE TABLE label_asset_mappings
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
     UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX label_asset_mappings_get_by_label_id ON label_asset_mappings (label_id);
+CREATE INDEX label_asset_mappings_get_by_team_id ON label_asset_mappings (asset_id);
+CREATE INDEX label_asset_mappings_get_by_deleted ON label_asset_mappings (deleted);
+CREATE INDEX label_asset_mappings_get_by_created ON label_asset_mappings (created);
+CREATE INDEX label_asset_mappings_get_by_modified ON label_asset_mappings (modified);
+CREATE INDEX label_asset_mappings_get_by_created_and_modified ON label_asset_mappings (created, modified);
 
 /*
     Comments are usually associated with project tickets:
