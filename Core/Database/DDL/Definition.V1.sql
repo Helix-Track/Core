@@ -444,6 +444,12 @@ DROP INDEX IF EXISTS users_yandex_mappings_get_by_deleted;
 DROP INDEX IF EXISTS users_yandex_mappings_get_by_created;
 DROP INDEX IF EXISTS users_yandex_mappings_get_by_modified;
 DROP INDEX IF EXISTS users_yandex_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS users_google_mappings_get_by_user_id;
+DROP INDEX IF EXISTS users_google_mappings_get_by_username;
+DROP INDEX IF EXISTS users_google_mappings_get_by_deleted;
+DROP INDEX IF EXISTS users_google_mappings_get_by_created;
+DROP INDEX IF EXISTS users_google_mappings_get_by_modified;
+DROP INDEX IF EXISTS users_google_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1823,6 +1829,13 @@ CREATE TABLE users_google_mappings
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
 );
+
+CREATE INDEX users_google_mappings_get_by_user_id ON users_google_mappings (user_id);
+CREATE INDEX users_google_mappings_get_by_username ON users_google_mappings (username);
+CREATE INDEX users_google_mappings_get_by_deleted ON users_google_mappings (deleted);
+CREATE INDEX users_google_mappings_get_by_created ON users_google_mappings (created);
+CREATE INDEX users_google_mappings_get_by_modified ON users_google_mappings (modified);
+CREATE INDEX users_google_mappings_get_by_created_and_modified ON users_google_mappings (created, modified);
 
 /*
     User access rights:
