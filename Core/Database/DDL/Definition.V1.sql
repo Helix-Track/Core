@@ -432,6 +432,12 @@ DROP INDEX IF EXISTS ticket_cycle_mappings_get_by_deleted;
 DROP INDEX IF EXISTS ticket_cycle_mappings_get_by_created;
 DROP INDEX IF EXISTS ticket_cycle_mappings_get_by_modified;
 DROP INDEX IF EXISTS ticket_cycle_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS ticket_board_mappings_get_by_ticket_id;
+DROP INDEX IF EXISTS ticket_board_mappings_get_by_bord_id;
+DROP INDEX IF EXISTS ticket_board_mappings_get_by_deleted;
+DROP INDEX IF EXISTS ticket_board_mappings_get_by_created;
+DROP INDEX IF EXISTS ticket_board_mappings_get_by_modified;
+DROP INDEX IF EXISTS ticket_board_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1765,6 +1771,13 @@ CREATE TABLE ticket_board_mappings
     deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_id, board_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX ticket_board_mappings_get_by_ticket_id ON ticket_board_mappings (ticket_id);
+CREATE INDEX ticket_board_mappings_get_by_bord_id ON ticket_board_mappings (board_id);
+CREATE INDEX ticket_board_mappings_get_by_deleted ON ticket_board_mappings (deleted);
+CREATE INDEX ticket_board_mappings_get_by_created ON ticket_board_mappings (created);
+CREATE INDEX ticket_board_mappings_get_by_modified ON ticket_board_mappings (modified);
+CREATE INDEX ticket_board_mappings_get_by_created_and_modified ON ticket_board_mappings (created, modified);
 
 /*
     OAuth2 mappings:
