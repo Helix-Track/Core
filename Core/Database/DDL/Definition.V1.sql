@@ -462,6 +462,16 @@ DROP INDEX IF EXISTS user_team_mappings_get_by_deleted;
 DROP INDEX IF EXISTS user_team_mappings_get_by_created;
 DROP INDEX IF EXISTS user_team_mappings_get_by_modified;
 DROP INDEX IF EXISTS user_team_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_user_id;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_permission_id;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_permission_context_id;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_user_id_and_permission_id;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_user_id_and_permission_context_id;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_permission_id_and_permission_context_id;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_deleted;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_created;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_modified;
+DROP INDEX IF EXISTS permission_user_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1914,6 +1924,23 @@ CREATE TABLE permission_user_mappings
     UNIQUE (user_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
+CREATE INDEX permission_user_mappings_get_by_user_id ON permission_user_mappings (user_id);
+CREATE INDEX permission_user_mappings_get_by_permission_id ON permission_user_mappings (permission_id);
+CREATE INDEX permission_user_mappings_get_by_permission_context_id ON permission_user_mappings (permission_context_id);
+
+CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_id
+    ON permission_user_mappings (user_id, permission_id);
+
+CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_context_id
+    ON permission_user_mappings (user_id, permission_context_id);
+
+CREATE INDEX permission_user_mappings_get_by_permission_id_and_permission_context_id
+    ON permission_user_mappings (permission_id, permission_context_id);
+
+CREATE INDEX permission_user_mappings_get_by_deleted ON permission_user_mappings (deleted);
+CREATE INDEX permission_user_mappings_get_by_created ON permission_user_mappings (created);
+CREATE INDEX permission_user_mappings_get_by_modified ON permission_user_mappings (modified);
+CREATE INDEX permission_user_mappings_get_by_created_and_modified ON permission_user_mappings (created, modified);
 
 /*
     Team has the permissions.
