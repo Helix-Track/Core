@@ -450,6 +450,12 @@ DROP INDEX IF EXISTS users_google_mappings_get_by_deleted;
 DROP INDEX IF EXISTS users_google_mappings_get_by_created;
 DROP INDEX IF EXISTS users_google_mappings_get_by_modified;
 DROP INDEX IF EXISTS users_google_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS user_organization_mappings_get_by_user_id;
+DROP INDEX IF EXISTS user_organization_mappings_get_by_organization_id;
+DROP INDEX IF EXISTS user_organization_mappings_get_by_deleted;
+DROP INDEX IF EXISTS user_organization_mappings_get_by_created;
+DROP INDEX IF EXISTS user_organization_mappings_get_by_modified;
+DROP INDEX IF EXISTS user_organization_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1855,6 +1861,13 @@ CREATE TABLE user_organization_mappings
     deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (user_id, organization_id) ON CONFLICT ABORT
 );
+
+CREATE INDEX user_organization_mappings_get_by_user_id ON user_organization_mappings (user_id);
+CREATE INDEX user_organization_mappings_get_by_organization_id ON user_organization_mappings (organization_id);
+CREATE INDEX user_organization_mappings_get_by_deleted ON user_organization_mappings (deleted);
+CREATE INDEX user_organization_mappings_get_by_created ON user_organization_mappings (created);
+CREATE INDEX user_organization_mappings_get_by_modified ON user_organization_mappings (modified);
+CREATE INDEX user_organization_mappings_get_by_created_and_modified ON user_organization_mappings (created, modified);
 
 /*
     User belongs to the organization's teams:
