@@ -481,6 +481,17 @@ DROP INDEX IF EXISTS permission_team_mappings_get_by_deleted;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_created;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_modified;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_extension_id;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_property;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_value;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_property_and_value;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_extension_id_and_property;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_extension_id_and_property_and_value;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_enabled;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_deleted;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_created;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_modified;
+DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -1995,13 +2006,36 @@ CREATE TABLE configuration_data_extension_mappings
 
     id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
     extension_id TEXT    NOT NULL,
-    created      INTEGER NOT NULL,
-    modified     INTEGER NOT NULL,
     property     TEXT    NOT NULL,
     value        TEXT,
+    created      INTEGER NOT NULL,
+    modified     INTEGER NOT NULL,
     enabled      BOOLEAN NOT NULL CHECK (enabled IN (0, 1)),
     deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX configuration_data_extension_mappings_get_by_extension_id
+    ON configuration_data_extension_mappings (extension_id);
+
+CREATE INDEX configuration_data_extension_mappings_get_by_property ON configuration_data_extension_mappings (property);
+CREATE INDEX configuration_data_extension_mappings_get_by_value ON configuration_data_extension_mappings (value);
+
+CREATE INDEX configuration_data_extension_mappings_get_by_property_and_value
+    ON configuration_data_extension_mappings (property, value);
+
+CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property
+    ON configuration_data_extension_mappings (extension_id, property);
+
+CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property_and_value
+    ON configuration_data_extension_mappings (extension_id, property, value);
+
+CREATE INDEX configuration_data_extension_mappings_get_by_enabled ON configuration_data_extension_mappings (enabled);
+CREATE INDEX configuration_data_extension_mappings_get_by_deleted ON configuration_data_extension_mappings (deleted);
+CREATE INDEX configuration_data_extension_mappings_get_by_created ON configuration_data_extension_mappings (created);
+CREATE INDEX configuration_data_extension_mappings_get_by_modified ON configuration_data_extension_mappings (modified);
+
+CREATE INDEX configuration_data_extension_mappings_get_by_created_and_modified
+    ON configuration_data_extension_mappings (created, modified);
 
 /*
     Extensions meta-data:
