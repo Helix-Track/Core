@@ -1999,7 +1999,7 @@ CREATE TABLE configuration_data_extension_mappings
     modified     INTEGER NOT NULL,
     property     TEXT    NOT NULL,
     value        TEXT,
-    enabled      BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    enabled      BOOLEAN NOT NULL CHECK (enabled IN (0, 1)),
     deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
