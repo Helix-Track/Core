@@ -492,6 +492,16 @@ DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_deleted;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_created;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_modified;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_extension_id;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_property;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_value;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_property_and_value;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_extension_id_and_property_and_value;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_extension_id_and_property;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_deleted;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_created;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_modified;
+DROP INDEX IF EXISTS extensions_meta_data_get_by_created_and_modified;
 
 /*
   Identifies the version of the database (system).
@@ -2053,3 +2063,17 @@ CREATE TABLE extensions_meta_data
     modified     INTEGER NOT NULL,
     deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
+
+CREATE INDEX extensions_meta_data_get_by_extension_id ON extensions_meta_data (extension_id);
+CREATE INDEX extensions_meta_data_get_by_property ON extensions_meta_data (property);
+CREATE INDEX extensions_meta_data_get_by_value ON extensions_meta_data (value);
+CREATE INDEX extensions_meta_data_get_by_property_and_value ON extensions_meta_data (property, value);
+
+CREATE INDEX extensions_meta_data_get_by_extension_id_and_property_and_value
+    ON extensions_meta_data (extension_id, property, value);
+
+CREATE INDEX extensions_meta_data_get_by_extension_id_and_property ON extensions_meta_data (extension_id, property);
+CREATE INDEX extensions_meta_data_get_by_deleted ON extensions_meta_data (deleted);
+CREATE INDEX extensions_meta_data_get_by_created ON extensions_meta_data (created);
+CREATE INDEX extensions_meta_data_get_by_modified ON extensions_meta_data (modified);
+CREATE INDEX extensions_meta_data_get_by_created_and_modified ON extensions_meta_data (created, modified);
