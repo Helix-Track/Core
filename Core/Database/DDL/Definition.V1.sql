@@ -12,6 +12,8 @@
 */
 
 DROP TABLE IF EXISTS system_info;
+DROP TABLE IF EXISTS organizations;
+DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS tickets;
@@ -30,8 +32,6 @@ DROP TABLE IF EXISTS labels;
 DROP TABLE IF EXISTS label_categories;
 DROP TABLE IF EXISTS repositories;
 DROP TABLE IF EXISTS components;
-DROP TABLE IF EXISTS organizations;
-DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS permission_contexts;
