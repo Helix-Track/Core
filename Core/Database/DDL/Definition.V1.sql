@@ -5,7 +5,7 @@
 /*
     Notes:
 
-    - TODOs: https://github.com/orgs/red-elf/projects/2/views/1
+    - The main project board: https://github.com/orgs/red-elf/projects/2/views/1
     - Identifiers in the system are UUID strings.
     - Mapping tables are used for binding entities and defining relationships.
         Mapping tables are used as well to append properties to the entities.
