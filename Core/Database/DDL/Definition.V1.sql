@@ -10,6 +10,7 @@
     - Mapping tables are used for binding entities and defining relationships.
         Mapping tables are used as well to append properties to the entities.
     - Additional tables are defined to provide the meta-data to entities of the system.
+    - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
 */
 
 DROP TABLE IF EXISTS system_info;
