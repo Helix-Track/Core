@@ -23,6 +23,7 @@ DROP INDEX IF EXISTS get_by_deleted;
 DROP INDEX IF EXISTS get_by_created;
 DROP INDEX IF EXISTS get_by_modified;
 DROP INDEX IF EXISTS get_by_created_and_modified;
+DROP INDEX IF EXISTS content_document_mappings_get_by_document_id;
 
 /*
     Documents.
@@ -65,4 +66,4 @@ CREATE TABLE content_document_mappings
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX IF NOT EXISTS get_by_document_id ON content_document_mappings (document_id);
+CREATE INDEX content_document_mappings_get_by_document_id ON content_document_mappings (document_id);
