@@ -14,6 +14,7 @@
 */
 
 DROP TABLE IF EXISTS times;
+DROP TABLE IF EXISTS units;
 
 DROP INDEX IF EXISTS get_by_title;
 DROP INDEX IF EXISTS get_by_description;
@@ -24,6 +25,11 @@ DROP INDEX IF EXISTS get_by_created_and_modified;
 DROP INDEX IF EXISTS get_by_deleted;
 DROP INDEX IF EXISTS get_by_ticket_id;
 DROP INDEX IF EXISTS get_by_ticket_id_and_title;
+DROP INDEX IF EXISTS units_get_by_title;
+DROP INDEX IF EXISTS units_get_by_created;
+DROP INDEX IF EXISTS units_get_by_deleted;
+DROP INDEX IF EXISTS units_get_by_modified;
+DROP INDEX IF EXISTS units_get_by_created_and_modified;
 
 /*
     Time tracking.
@@ -38,16 +44,15 @@ DROP INDEX IF EXISTS get_by_ticket_id_and_title;
 CREATE TABLE times
 (
 
-    id          TEXT NOT NULL PRIMARY KEY UNIQUE,
-    created     INTEGER     NOT NULL,
-    modified    INTEGER     NOT NULL,
-    amount      INTEGER     NOT NULL,
-    /* FIXME: Unit into integer + units table */
-    unit        TEXT CHECK (unit IN ('Minute', 'Hour', 'Day', 'Week', 'Month')) NOT NULL DEFAULT 'Hour',
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    amount      INTEGER NOT NULL,
+    unit_id     TEXT    NOT NULL,
     title       TEXT,
     description TEXT,
-    ticket_id   TEXT NOT NULL,
-    deleted     BOOLEAN     NOT NULL CHECK (deleted IN (0, 1))
+    ticket_id   TEXT    NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_by_title ON times (title);
@@ -59,3 +64,23 @@ CREATE INDEX get_by_deleted ON times (deleted);
 CREATE INDEX get_by_created ON times (created);
 CREATE INDEX get_by_modified ON times (modified);
 CREATE INDEX get_by_created_and_modified ON times (created, modified);
+
+/*
+    'Minute', 'Hour', 'Day', 'Week', 'Month'
+*/
+CREATE TABLE units
+(
+
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+);
+
+CREATE INDEX units_get_by_title ON units (title);
+CREATE INDEX units_get_by_created ON units (created);
+CREATE INDEX units_get_by_deleted ON units (deleted);
+CREATE INDEX units_get_by_modified ON units (modified);
+CREATE INDEX units_get_by_created_and_modified ON units (created, modified);
