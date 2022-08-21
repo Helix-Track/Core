@@ -42,6 +42,7 @@ CREATE TABLE times
     created     INTEGER     NOT NULL,
     modified    INTEGER     NOT NULL,
     amount      INTEGER     NOT NULL,
+    /* FIXME: Unit into integer + units table */
     unit        TEXT CHECK (unit IN ('Minute', 'Hour', 'Day', 'Week', 'Month')) NOT NULL DEFAULT 'Hour',
     title       TEXT,
     description TEXT,

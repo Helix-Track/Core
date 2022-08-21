@@ -615,7 +615,7 @@ CREATE TABLE ticket_statuses
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX ticket_statuses_get_by_title ON ticket_statuses (title);
@@ -696,7 +696,7 @@ CREATE TABLE ticket_relationship_types
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX ticket_relationship_types_get_by_title ON ticket_relationship_types (title);
@@ -769,7 +769,7 @@ CREATE TABLE assets
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX assets_get_by_url ON assets (url);
@@ -795,7 +795,7 @@ CREATE TABLE labels
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX labels_get_by_title ON labels (title);
@@ -817,7 +817,7 @@ CREATE TABLE label_categories
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX label_categories_get_by_title ON label_categories (title);
@@ -838,7 +838,7 @@ CREATE TABLE repositories
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
     repository  TEXT    NOT NULL UNIQUE,
     description TEXT,
-
+    /* FIXME: Type into integer + types table */
     type        TEXT CHECK ( type IN
                              ('Git', 'CVS', 'SVN', 'Mercurial',
                               'Perforce', 'Monotone', 'Bazaar',
@@ -879,7 +879,7 @@ CREATE TABLE components
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX components_get_by_title ON components (title);
@@ -901,7 +901,7 @@ CREATE TABLE organizations
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX organizations_get_by_title ON organizations (title);
@@ -923,7 +923,7 @@ CREATE TABLE teams
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX teams_get_by_title ON teams (title);
@@ -951,7 +951,7 @@ CREATE TABLE permissions
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX permissions_get_by_title ON permissions (title);
@@ -975,7 +975,7 @@ CREATE TABLE comments
     comment  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX comments_get_by_comment ON comments (comment);
@@ -1000,7 +1000,7 @@ CREATE TABLE permission_contexts
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX permission_contexts_get_by_title ON permission_contexts (title);
@@ -1031,7 +1031,7 @@ CREATE TABLE workflow_steps
     ticket_status_id TEXT    NOT NULL,
     created          INTEGER NOT NULL,
     modified         INTEGER NOT NULL,
-    deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX workflow_steps_get_by_title ON workflow_steps (title);
@@ -1104,17 +1104,17 @@ CREATE INDEX reports_get_by_created_and_modified ON reports (created, modified);
 CREATE TABLE cycles
 (
 
-    id          TEXT                                     NOT NULL PRIMARY KEY UNIQUE,
-    created     INTEGER                                  NOT NULL,
-    modified    INTEGER                                  NOT NULL,
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
     title       TEXT,
     description TEXT,
     /**
       Prent cycle id.
      */
-    cycle_id    TEXT                                     NOT NULL UNIQUE,
-    type        INTEGER CHECK ( type IN (1000, 100, 10)) NOT NULL,
-    deleted     BOOLEAN                                  NOT NULL CHECK (deleted IN (0, 1))
+    cycle_id    TEXT    NOT NULL UNIQUE,
+    type        INTEGER NOT NULL CHECK ( type IN (1000, 100, 10)),
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX cycles_get_by_title ON cycles (title);
@@ -1723,7 +1723,7 @@ CREATE TABLE label_asset_mappings
     asset_id TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
 
@@ -1860,7 +1860,7 @@ CREATE TABLE users_yandex_mappings
     username TEXT    NOT NULL UNIQUE,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX users_yandex_mappings_get_by_user_id ON users_yandex_mappings (user_id);
@@ -1881,7 +1881,7 @@ CREATE TABLE users_google_mappings
     username TEXT    NOT NULL UNIQUE,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX users_google_mappings_get_by_user_id ON users_google_mappings (user_id);
@@ -1928,7 +1928,7 @@ CREATE TABLE user_team_mappings
     team_id  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
 
