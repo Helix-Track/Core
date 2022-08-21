@@ -42,13 +42,7 @@ CREATE TABLE times
     created     INTEGER     NOT NULL,
     modified    INTEGER     NOT NULL,
     amount      INTEGER     NOT NULL,
-
-    unit        TEXT CHECK (
-            unit IN (
-                     'Minute', 'Hour', 'Day', 'Week', 'Month'
-            )
-        )                   NOT NULL DEFAULT 'Hour',
-
+    unit        TEXT CHECK (unit IN ('Minute', 'Hour', 'Day', 'Week', 'Month')) NOT NULL DEFAULT 'Hour',
     title       TEXT,
     description TEXT,
     ticket_id   TEXT NOT NULL,
