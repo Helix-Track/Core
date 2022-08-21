@@ -56,6 +56,7 @@ DROP TABLE IF EXISTS label_project_mappings;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS comment_ticket_mappings;
 DROP TABLE IF EXISTS repositories;
+DROP TABLE IF EXISTS repository_types;
 DROP TABLE IF EXISTS repository_project_mappings;
 DROP TABLE IF EXISTS repository_commit_ticket_mappings;
 DROP TABLE IF EXISTS components;
@@ -164,10 +165,17 @@ DROP INDEX IF EXISTS repositories_get_by_repository;
 DROP INDEX IF EXISTS repositories_get_by_description;
 DROP INDEX IF EXISTS repositories_get_by_repository_and_description;
 DROP INDEX IF EXISTS repositories_get_by_deleted;
-DROP INDEX IF EXISTS repositories_get_by_type;
+DROP INDEX IF EXISTS repositories_get_by_repository_type_id;
 DROP INDEX IF EXISTS repositories_get_by_created;
 DROP INDEX IF EXISTS repositories_get_by_modified;
 DROP INDEX IF EXISTS repositories_get_by_created_and_modified;
+DROP INDEX IF EXISTS repository_types_get_by_title;
+DROP INDEX IF EXISTS repository_types_get_by_description;
+DROP INDEX IF EXISTS repository_types_get_by_title_and_description;
+DROP INDEX IF EXISTS repository_types_get_by_deleted;
+DROP INDEX IF EXISTS repository_types_get_by_created;
+DROP INDEX IF EXISTS repository_types_get_by_modified;
+DROP INDEX IF EXISTS repository_types_get_by_created_and_modified;
 DROP INDEX IF EXISTS components_get_by_title;
 DROP INDEX IF EXISTS components_get_by_description;
 DROP INDEX IF EXISTS components_get_by_title_description;
@@ -835,32 +843,50 @@ CREATE INDEX label_categories_get_by_created_and_modified ON label_categories (c
 CREATE TABLE repositories
 (
 
-    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
-    repository  TEXT    NOT NULL UNIQUE,
-    description TEXT,
-    /* FIXME: Type into integer + types table */
-    type        TEXT CHECK ( type IN
-                             ('Git', 'CVS', 'SVN', 'Mercurial',
-                              'Perforce', 'Monotone', 'Bazaar',
-                              'TFS', 'VSTS', 'IBM Rational ClearCase',
-                              'Revision Control System', 'VSS',
-                              'CA Harvest Software Change Manager',
-                              'PVCS', 'darcs')
-        )               NOT NULL DEFAULT 'Git',
-
-    created     INTEGER NOT NULL,
-    modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    id                 TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    repository         TEXT    NOT NULL UNIQUE,
+    description        TEXT,
+    repository_type_id TEXT    NOT NULL,
+    created            INTEGER NOT NULL,
+    modified           INTEGER NOT NULL,
+    deleted            BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX repositories_get_by_repository ON repositories (repository);
 CREATE INDEX repositories_get_by_description ON repositories (description);
 CREATE INDEX repositories_get_by_repository_and_description ON repositories (repository, description);
 CREATE INDEX repositories_get_by_deleted ON repositories (deleted);
-CREATE INDEX repositories_get_by_type ON repositories (type);
+CREATE INDEX repositories_get_by_repository_type_id ON repositories (repository_type_id);
 CREATE INDEX repositories_get_by_created ON repositories (created);
 CREATE INDEX repositories_get_by_modified ON repositories (modified);
 CREATE INDEX repositories_get_by_created_and_modified ON repositories (created, modified);
+
+/*
+    'Git', 'CVS', 'SVN', 'Mercurial',
+  'Perforce', 'Monotone', 'Bazaar',
+  'TFS', 'VSTS', 'IBM Rational ClearCase',
+  'Revision Control System', 'VSS',
+  'CA Harvest Software Change Manager',
+  'PVCS', 'darcs'
+*/
+CREATE TABLE repository_types
+(
+
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+);
+
+CREATE INDEX repository_types_get_by_title ON repository_types (title);
+CREATE INDEX repository_types_get_by_description ON repository_types (description);
+CREATE INDEX repository_types_get_by_title_and_description ON repository_types (title, description);
+CREATE INDEX repository_types_get_by_deleted ON repository_types (deleted);
+CREATE INDEX repository_types_get_by_created ON repository_types (created);
+CREATE INDEX repository_types_get_by_modified ON repository_types (modified);
+CREATE INDEX repository_types_get_by_created_and_modified ON repository_types (created, modified);
 
 /*
     Components.
