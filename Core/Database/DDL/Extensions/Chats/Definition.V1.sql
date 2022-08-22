@@ -64,7 +64,7 @@ CREATE TABLE chats
     ticket_id       TEXT UNIQUE,
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
-    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_by_title ON chats (title);
@@ -90,7 +90,7 @@ CREATE TABLE chats_yandex_mappings
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_yandex_chat_mappings_by_chat_id ON chats_yandex_mappings (chat_id);
@@ -109,7 +109,7 @@ CREATE TABLE chats_slack_mappings
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_slack_chat_mappings_by_chat_id ON chats_slack_mappings (chat_id);
@@ -127,7 +127,7 @@ CREATE TABLE chats_telegram_mappings
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_telegram_chat_mappings_by_chat_id ON chats_telegram_mappings (chat_id);
@@ -146,7 +146,7 @@ CREATE TABLE chats_google_mappings
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_google_chat_mappings_by_chat_id ON chats_google_mappings (chat_id);
@@ -164,7 +164,7 @@ CREATE TABLE chats_whatsapp_mappings
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_whatsapp_chat_mappings_by_chat_id ON chats_whatsapp_mappings (chat_id);

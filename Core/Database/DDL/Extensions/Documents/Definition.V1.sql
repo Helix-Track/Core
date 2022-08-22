@@ -39,7 +39,7 @@ CREATE TABLE documents
     document_id TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX get_by_title ON documents (title);

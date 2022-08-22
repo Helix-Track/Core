@@ -546,7 +546,7 @@ CREATE TABLE users
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX users_get_by_created ON users (created);
@@ -596,7 +596,7 @@ CREATE TABLE ticket_types
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0
+    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX ticket_types_get_by_title ON ticket_types (title);
@@ -663,8 +663,8 @@ CREATE TABLE tickets
     ticket_status_id TEXT    NOT NULL,
     project_id       TEXT    NOT NULL,
     user_id          TEXT,
-    estimation       REAL    NOT NULL DEFAULT 0,
-    story_points     INTEGER NOT NULL DEFAULT 0,
+    estimation       REAL    NOT NULL,
+    story_points     INTEGER NOT NULL,
     creator          TEXT    NOT NULL,
     deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (ticket_number, project_id) ON CONFLICT ABORT
@@ -1589,7 +1589,7 @@ CREATE TABLE asset_team_mappings
     team_id  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
 
@@ -1705,7 +1705,7 @@ CREATE TABLE label_team_mappings
     team_id  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)) DEFAULT 0,
+    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
     UNIQUE (label_id, team_id) ON CONFLICT ABORT
 );
 
