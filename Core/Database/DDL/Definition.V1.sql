@@ -654,7 +654,7 @@ CREATE TABLE tickets
 (
 
     id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
-    ticket_number    INTEGER NOT NULL DEFAULT 1,
+    ticket_number    INTEGER NOT NULL,
     title            TEXT,
     description      TEXT,
     created          INTEGER NOT NULL,
