@@ -1135,11 +1135,14 @@ CREATE TABLE cycles
     modified    INTEGER NOT NULL,
     title       TEXT,
     description TEXT,
-    /**
-      Prent cycle id.
+    /*
+      Parent cycle id.
      */
     cycle_id    TEXT    NOT NULL UNIQUE,
-    type        INTEGER NOT NULL CHECK ( type IN (1000, 100, 10)),
+    /*
+        CHECK ( type IN (1000, 100, 10))
+    */
+    type        INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
