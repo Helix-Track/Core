@@ -28,14 +28,16 @@ file(
 
         GLOB APP_SRC
         "*.h" "*.cpp"
-        "models/*.h" "models/*.cpp"
+        "generated/Source/cpp/*.h" "generated/Source/cpp/*.cpp"
 )
 add_executable(${VERSIONABLE_NAME} ${APP_SRC} main.cpp Utils.h Utils.cpp)
 
 # TODO: Connect with the sql2code installed by the 'Dependable' module:
 add_custom_command(
         TARGET ${VERSIONABLE_NAME}
-        COMMAND sql2code -h
+        COMMAND sql2code -i ../Database/DDL/Definition.V1.sql ../Database/DDL/Extensions/Chats/Definition.V1.sql
+            ../Database/DDL/Extensions/Documents/Definition.V1.sql ../Database/DDL/Extensions/Times/Definition.V1.sql
+            -t cpp -o generated
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
