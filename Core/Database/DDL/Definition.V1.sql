@@ -655,6 +655,7 @@ CREATE TABLE tickets
 
     id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
     ticket_number    INTEGER NOT NULL,
+    position         INTEGER NOT NULL,
     title            TEXT,
     description      TEXT,
     created          INTEGER NOT NULL,
