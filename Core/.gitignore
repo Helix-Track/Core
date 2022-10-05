@@ -2,3 +2,4 @@ _Dependencies
 BuildConfig.*
 Version.*
 VersionInfo.*
+cmake-build-*

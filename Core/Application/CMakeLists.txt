@@ -28,6 +28,7 @@ file(
 
         GLOB APP_SRC
         "*.h" "*.cpp"
+        "models/*.h" "models/*.cpp"
 )
 add_executable(${VERSIONABLE_NAME} ${APP_SRC} main.cpp Utils.h Utils.cpp)
 
