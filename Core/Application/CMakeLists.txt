@@ -32,4 +32,11 @@ file(
 )
 add_executable(${VERSIONABLE_NAME} ${APP_SRC} main.cpp Utils.h Utils.cpp)
 
+# TODO: Connect with the sql2code installed by the 'Dependable' module:
+add_custom_command(
+        TARGET ${VERSIONABLE_NAME}
+        COMMAND sql2code -h
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 install(TARGETS ${VERSIONABLE_NAME} DESTINATION bin/${PROJECT_NAME})
