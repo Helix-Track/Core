@@ -1,6 +1,6 @@
 /*
     Reports.h
-    Generated with 'sql2code' 1.0.0-SNAPSHOT
+    Generated with 'sql2code' 0.0.1
     https://github.com/red-elf/SQL-to-Code
 */
 
