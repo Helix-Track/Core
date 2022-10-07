@@ -1,4 +1,4 @@
 #!/bin/bash
 
-echo "To be implemented!"
+echo "HT Core :: Prepare recipe: To be implemented!"
 exit 1
