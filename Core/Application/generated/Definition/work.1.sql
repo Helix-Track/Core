@@ -1,4 +1,4 @@
-CREATE TABLE chats
+CREATE TABLE chat
 (
     id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
     title           TEXT    NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE chats
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
     deleted         BOOLEAN NOT NULL );
-CREATE TABLE chats_yandex_mappings
+CREATE TABLE chat_yandex_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     chat_id  TEXT    NOT NULL UNIQUE,
@@ -18,7 +18,7 @@ CREATE TABLE chats_yandex_mappings
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL );
-CREATE TABLE chats_slack_mappings
+CREATE TABLE chat_slack_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     chat_id  TEXT    NOT NULL UNIQUE,
@@ -27,7 +27,7 @@ CREATE TABLE chats_slack_mappings
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL );
-CREATE TABLE chats_telegram_mappings
+CREATE TABLE chat_telegram_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     chat_id  TEXT    NOT NULL UNIQUE,
@@ -36,7 +36,7 @@ CREATE TABLE chats_telegram_mappings
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL );
-CREATE TABLE chats_google_mappings
+CREATE TABLE chat_google_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     chat_id  TEXT    NOT NULL UNIQUE,
@@ -45,7 +45,7 @@ CREATE TABLE chats_google_mappings
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL );
-CREATE TABLE chats_whatsapp_mappings
+CREATE TABLE chat_whatsapp_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     chat_id  TEXT    NOT NULL UNIQUE,

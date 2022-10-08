@@ -1,4 +1,4 @@
-CREATE TABLE times
+CREATE TABLE time_tracking
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
     created     INTEGER NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE times
     description TEXT,
     ticket_id   TEXT    NOT NULL,
     deleted     BOOLEAN NOT NULL );
-CREATE TABLE units
+CREATE TABLE time_unit
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
     title       TEXT    NOT NULL UNIQUE,

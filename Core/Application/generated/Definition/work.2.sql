@@ -1,4 +1,4 @@
-CREATE TABLE documents
+CREATE TABLE document
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
     title       TEXT    NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE documents
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL );
-CREATE TABLE content_document_mappings
+CREATE TABLE content_document_mapping
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
     document_id TEXT    NOT NULL UNIQUE,

@@ -8,7 +8,7 @@
 #include "BuildConfig.h"
 #include "VersionInfo.h"
 
-#include "generated/Source/cpp/Projects.h"
+#include "generated/Source/cpp/Project.h"
 
 using namespace Utils;
 using namespace Commons::IO;
@@ -16,7 +16,7 @@ using namespace Commons::Strings;
 
 int main(int argc, char *argv[]) {
 
-    Projects project;
+    Project project;
     project.setTitle("Hello");
     project.setIdentifier("World");
 
