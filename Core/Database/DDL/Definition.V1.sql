@@ -14,65 +14,65 @@
 */
 
 DROP TABLE IF EXISTS system_info;
-DROP TABLE IF EXISTS organizations;
-DROP TABLE IF EXISTS teams;
-DROP TABLE IF EXISTS team_organization_mappings;
-DROP TABLE IF EXISTS team_project_mappings;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS user_organization_mappings;
-DROP TABLE IF EXISTS user_team_mappings;
-DROP TABLE IF EXISTS users_yandex_mappings;
-DROP TABLE IF EXISTS users_google_mappings;
-DROP TABLE IF EXISTS projects;
-DROP TABLE IF EXISTS project_organization_mappings;
-DROP TABLE IF EXISTS tickets;
-DROP TABLE IF EXISTS tickets_meta_data;
-DROP TABLE IF EXISTS ticket_project_mappings;
-DROP TABLE IF EXISTS ticket_cycle_mappings;
-DROP TABLE IF EXISTS ticket_board_mappings;
-DROP TABLE IF EXISTS ticket_types;
-DROP TABLE IF EXISTS ticket_statuses;
-DROP TABLE IF EXISTS ticket_relationship_types;
-DROP TABLE IF EXISTS ticket_relationships;
-DROP TABLE IF EXISTS ticket_type_project_mappings;
-DROP TABLE IF EXISTS boards;
-DROP TABLE IF EXISTS boards_meta_data;
-DROP TABLE IF EXISTS workflows;
-DROP TABLE IF EXISTS workflow_steps;
-DROP TABLE IF EXISTS cycles;
-DROP TABLE IF EXISTS cycle_project_mappings;
-DROP TABLE IF EXISTS assets;
-DROP TABLE IF EXISTS asset_ticket_mappings;
-DROP TABLE IF EXISTS asset_comment_mappings;
-DROP TABLE IF EXISTS asset_project_mappings;
-DROP TABLE IF EXISTS asset_team_mappings;
-DROP TABLE IF EXISTS labels;
-DROP TABLE IF EXISTS label_categories;
-DROP TABLE IF EXISTS label_label_category_mappings;
-DROP TABLE IF EXISTS label_ticket_mappings;
-DROP TABLE IF EXISTS label_asset_mappings;
-DROP TABLE IF EXISTS label_team_mappings;
-DROP TABLE IF EXISTS label_project_mappings;
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS comment_ticket_mappings;
-DROP TABLE IF EXISTS repositories;
-DROP TABLE IF EXISTS repository_types;
-DROP TABLE IF EXISTS repository_project_mappings;
-DROP TABLE IF EXISTS repository_commit_ticket_mappings;
-DROP TABLE IF EXISTS components;
-DROP TABLE IF EXISTS components_meta_data;
-DROP TABLE IF EXISTS component_ticket_mappings;
-DROP TABLE IF EXISTS permissions;
-DROP TABLE IF EXISTS permission_user_mappings;
-DROP TABLE IF EXISTS permission_team_mappings;
-DROP TABLE IF EXISTS permission_contexts;
+DROP TABLE IF EXISTS organization;
+DROP TABLE IF EXISTS team;
+DROP TABLE IF EXISTS team_organization_mapping;
+DROP TABLE IF EXISTS team_project_mapping;
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS user_organization_mapping;
+DROP TABLE IF EXISTS user_team_mapping;
+DROP TABLE IF EXISTS user_yandex_mapping;
+DROP TABLE IF EXISTS user_google_mappings;
+DROP TABLE IF EXISTS project;
+DROP TABLE IF EXISTS project_organization_mapping;
+DROP TABLE IF EXISTS ticket;
+DROP TABLE IF EXISTS ticket_meta_data;
+DROP TABLE IF EXISTS ticket_project_mapping;
+DROP TABLE IF EXISTS ticket_cycle_mapping;
+DROP TABLE IF EXISTS ticket_board_mapping;
+DROP TABLE IF EXISTS ticket_type;
+DROP TABLE IF EXISTS ticket_status;
+DROP TABLE IF EXISTS ticket_relationship_type;
+DROP TABLE IF EXISTS ticket_relationship;
+DROP TABLE IF EXISTS ticket_type_project_mapping;
+DROP TABLE IF EXISTS board;
+DROP TABLE IF EXISTS board_meta_data;
+DROP TABLE IF EXISTS workflow;
+DROP TABLE IF EXISTS workflow_step;
+DROP TABLE IF EXISTS cycle;
+DROP TABLE IF EXISTS cycle_project_mapping;
+DROP TABLE IF EXISTS asset;
+DROP TABLE IF EXISTS asset_ticket_mapping;
+DROP TABLE IF EXISTS asset_comment_mapping;
+DROP TABLE IF EXISTS asset_project_mapping;
+DROP TABLE IF EXISTS asset_team_mapping;
+DROP TABLE IF EXISTS label;
+DROP TABLE IF EXISTS label_category;
+DROP TABLE IF EXISTS label_label_category_mapping;
+DROP TABLE IF EXISTS label_ticket_mapping;
+DROP TABLE IF EXISTS label_asset_mapping;
+DROP TABLE IF EXISTS label_team_mapping;
+DROP TABLE IF EXISTS label_project_mapping;
+DROP TABLE IF EXISTS comment;
+DROP TABLE IF EXISTS comment_ticket_mapping;
+DROP TABLE IF EXISTS repository;
+DROP TABLE IF EXISTS repository_type;
+DROP TABLE IF EXISTS repository_project_mapping;
+DROP TABLE IF EXISTS repository_commit_ticket_mapping;
+DROP TABLE IF EXISTS component;
+DROP TABLE IF EXISTS component_meta_data;
+DROP TABLE IF EXISTS component_ticket_mapping;
+DROP TABLE IF EXISTS permission;
+DROP TABLE IF EXISTS permission_user_mapping;
+DROP TABLE IF EXISTS permission_team_mapping;
+DROP TABLE IF EXISTS permission_context;
 DROP TABLE IF EXISTS audit;
 DROP TABLE IF EXISTS audit_meta_data;
-DROP TABLE IF EXISTS reports;
-DROP TABLE IF EXISTS reports_meta_data;
-DROP TABLE IF EXISTS extensions;
-DROP TABLE IF EXISTS extensions_meta_data;
-DROP TABLE IF EXISTS configuration_data_extension_mappings;
+DROP TABLE IF EXISTS report;
+DROP TABLE IF EXISTS report_meta_data;
+DROP TABLE IF EXISTS extension;
+DROP TABLE IF EXISTS extension_meta_data;
+DROP TABLE IF EXISTS configuration_data_extension_mapping;
 
 DROP INDEX IF EXISTS system_info_get_by_created;
 DROP INDEX IF EXISTS system_info_get_by_description;
@@ -540,7 +540,7 @@ CREATE INDEX system_info_get_by_created_and_description ON system_info (created,
      can be mapped (associated) with the user ID.
      For that purpose there are other mappings to the user ID such as Yandex OAuth2 mappings for example.
 */
-CREATE TABLE users
+CREATE TABLE user
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -549,10 +549,10 @@ CREATE TABLE users
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX users_get_by_created ON users (created);
-CREATE INDEX users_get_by_modified ON users (modified);
-CREATE INDEX users_get_by_deleted ON users (deleted);
-CREATE INDEX users_get_by_created_and_modified ON users (created, modified);
+CREATE INDEX users_get_by_created ON user (created);
+CREATE INDEX users_get_by_modified ON user (modified);
+CREATE INDEX users_get_by_deleted ON user (deleted);
+CREATE INDEX users_get_by_created_and_modified ON user (created, modified);
 
 /*
     The basic project definition.
@@ -562,7 +562,7 @@ CREATE INDEX users_get_by_created_and_modified ON users (created, modified);
         - The 'identifier' represents the human readable identifier for the project up to 4 characters,
             for example: MSF, KSS, etc.
 */
-CREATE TABLE projects
+CREATE TABLE project
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -575,20 +575,20 @@ CREATE TABLE projects
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX projects_get_by_identifier ON projects (identifier);
-CREATE INDEX projects_get_by_title ON projects (title);
-CREATE INDEX projects_get_by_description ON projects (description);
-CREATE INDEX projects_get_by_title_and_description ON projects (title, description);
-CREATE INDEX projects_get_by_workflow_id ON projects (workflow_id);
-CREATE INDEX projects_get_by_created ON projects (created);
-CREATE INDEX projects_get_by_modified ON projects (modified);
-CREATE INDEX projects_get_by_deleted ON projects (deleted);
-CREATE INDEX projects_get_by_created_and_modified ON projects (created, modified);
+CREATE INDEX projects_get_by_identifier ON project (identifier);
+CREATE INDEX projects_get_by_title ON project (title);
+CREATE INDEX projects_get_by_description ON project (description);
+CREATE INDEX projects_get_by_title_and_description ON project (title, description);
+CREATE INDEX projects_get_by_workflow_id ON project (workflow_id);
+CREATE INDEX projects_get_by_created ON project (created);
+CREATE INDEX projects_get_by_modified ON project (modified);
+CREATE INDEX projects_get_by_deleted ON project (deleted);
+CREATE INDEX projects_get_by_created_and_modified ON project (created, modified);
 
 /*
     Ticket type definitions.
 */
-CREATE TABLE ticket_types
+CREATE TABLE ticket_type
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -599,13 +599,13 @@ CREATE TABLE ticket_types
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX ticket_types_get_by_title ON ticket_types (title);
-CREATE INDEX ticket_types_get_by_description ON ticket_types (description);
-CREATE INDEX ticket_types_get_by_title_and_description ON ticket_types (title, description);
-CREATE INDEX ticket_types_get_by_created ON ticket_types (created);
-CREATE INDEX ticket_types_get_by_modified ON ticket_types (modified);
-CREATE INDEX ticket_types_get_by_deleted ON ticket_types (deleted);
-CREATE INDEX ticket_types_get_by_created_and_modified ON ticket_types (created, modified);
+CREATE INDEX ticket_types_get_by_title ON ticket_type (title);
+CREATE INDEX ticket_types_get_by_description ON ticket_type (description);
+CREATE INDEX ticket_types_get_by_title_and_description ON ticket_type (title, description);
+CREATE INDEX ticket_types_get_by_created ON ticket_type (created);
+CREATE INDEX ticket_types_get_by_modified ON ticket_type (modified);
+CREATE INDEX ticket_types_get_by_deleted ON ticket_type (deleted);
+CREATE INDEX ticket_types_get_by_created_and_modified ON ticket_type (created, modified);
 
 /*
     Ticket statuses.
@@ -615,7 +615,7 @@ CREATE INDEX ticket_types_get_by_created_and_modified ON ticket_types (created, 
         - In progress
         - Completed, etc.
 */
-CREATE TABLE ticket_statuses
+CREATE TABLE ticket_status
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -626,13 +626,13 @@ CREATE TABLE ticket_statuses
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX ticket_statuses_get_by_title ON ticket_statuses (title);
-CREATE INDEX ticket_statuses_get_by_description ON ticket_statuses (description);
-CREATE INDEX ticket_statuses_get_by_title_and_description ON ticket_statuses (title, description);
-CREATE INDEX ticket_statuses_get_by_deleted ON ticket_statuses (deleted);
-CREATE INDEX ticket_statuses_get_by_created ON ticket_statuses (created);
-CREATE INDEX ticket_statuses_get_by_modified ON ticket_statuses (modified);
-CREATE INDEX ticket_statuses_get_by_created_and_modified ON ticket_statuses (created, modified);
+CREATE INDEX ticket_statuses_get_by_title ON ticket_status (title);
+CREATE INDEX ticket_statuses_get_by_description ON ticket_status (description);
+CREATE INDEX ticket_statuses_get_by_title_and_description ON ticket_status (title, description);
+CREATE INDEX ticket_statuses_get_by_deleted ON ticket_status (deleted);
+CREATE INDEX ticket_statuses_get_by_created ON ticket_status (created);
+CREATE INDEX ticket_statuses_get_by_modified ON ticket_status (modified);
+CREATE INDEX ticket_statuses_get_by_created_and_modified ON ticket_status (created, modified);
 
 /*
     Tickets.
@@ -650,7 +650,7 @@ CREATE INDEX ticket_statuses_get_by_created_and_modified ON ticket_statuses (cre
             In combination with 'project's 'identifier' field it can give the whole ticket numbers (identifiers),
             for example: MSF-112, BBP-222, etc.
 */
-CREATE TABLE tickets
+CREATE TABLE ticket
 (
 
     id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -671,23 +671,23 @@ CREATE TABLE tickets
     UNIQUE (ticket_number, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX tickets_get_by_ticket_number ON tickets (ticket_number);
-CREATE INDEX tickets_get_by_ticket_type_id ON tickets (ticket_type_id);
-CREATE INDEX tickets_get_by_ticket_status_id ON tickets (ticket_status_id);
-CREATE INDEX tickets_get_by_project_id ON tickets (project_id);
-CREATE INDEX tickets_get_by_user_id ON tickets (user_id);
-CREATE INDEX tickets_get_by_creator ON tickets (creator);
-CREATE INDEX tickets_get_by_project_id_and_user_id ON tickets (project_id, user_id);
-CREATE INDEX tickets_get_by_project_id_and_creator ON tickets (project_id, creator);
-CREATE INDEX tickets_get_by_estimation ON tickets (estimation);
-CREATE INDEX tickets_get_by_story_points ON tickets (story_points);
-CREATE INDEX tickets_get_by_created ON tickets (created);
-CREATE INDEX tickets_get_by_modified ON tickets (modified);
-CREATE INDEX tickets_get_by_deleted ON tickets (deleted);
-CREATE INDEX tickets_get_by_created_and_modified ON tickets (created, modified);
-CREATE INDEX tickets_get_by_title ON tickets (title);
-CREATE INDEX tickets_get_by_description ON tickets (description);
-CREATE INDEX tickets_get_by_title_and_description ON tickets (title, description);
+CREATE INDEX tickets_get_by_ticket_number ON ticket (ticket_number);
+CREATE INDEX tickets_get_by_ticket_type_id ON ticket (ticket_type_id);
+CREATE INDEX tickets_get_by_ticket_status_id ON ticket (ticket_status_id);
+CREATE INDEX tickets_get_by_project_id ON ticket (project_id);
+CREATE INDEX tickets_get_by_user_id ON ticket (user_id);
+CREATE INDEX tickets_get_by_creator ON ticket (creator);
+CREATE INDEX tickets_get_by_project_id_and_user_id ON ticket (project_id, user_id);
+CREATE INDEX tickets_get_by_project_id_and_creator ON ticket (project_id, creator);
+CREATE INDEX tickets_get_by_estimation ON ticket (estimation);
+CREATE INDEX tickets_get_by_story_points ON ticket (story_points);
+CREATE INDEX tickets_get_by_created ON ticket (created);
+CREATE INDEX tickets_get_by_modified ON ticket (modified);
+CREATE INDEX tickets_get_by_deleted ON ticket (deleted);
+CREATE INDEX tickets_get_by_created_and_modified ON ticket (created, modified);
+CREATE INDEX tickets_get_by_title ON ticket (title);
+CREATE INDEX tickets_get_by_description ON ticket (description);
+CREATE INDEX tickets_get_by_title_and_description ON ticket (title, description);
 
 /*
     Ticket relationship types.
@@ -697,7 +697,7 @@ CREATE INDEX tickets_get_by_title_and_description ON tickets (title, description
         - Cloned by
         - Clones, etc.
 */
-CREATE TABLE ticket_relationship_types
+CREATE TABLE ticket_relationship_type
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -708,12 +708,12 @@ CREATE TABLE ticket_relationship_types
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX ticket_relationship_types_get_by_title ON ticket_relationship_types (title);
-CREATE INDEX ticket_relationship_types_get_by_description ON ticket_relationship_types (description);
-CREATE INDEX ticket_relationship_types_get_by_title_and_description ON ticket_relationship_types (title, description);
-CREATE INDEX ticket_relationship_types_get_by_created ON ticket_relationship_types (created);
-CREATE INDEX ticket_relationship_types_get_by_deleted ON ticket_relationship_types (deleted);
-CREATE INDEX ticket_relationship_types_get_by_created_and_modified ON ticket_relationship_types (created, modified);
+CREATE INDEX ticket_relationship_types_get_by_title ON ticket_relationship_type (title);
+CREATE INDEX ticket_relationship_types_get_by_description ON ticket_relationship_type (description);
+CREATE INDEX ticket_relationship_types_get_by_title_and_description ON ticket_relationship_type (title, description);
+CREATE INDEX ticket_relationship_types_get_by_created ON ticket_relationship_type (created);
+CREATE INDEX ticket_relationship_types_get_by_deleted ON ticket_relationship_type (deleted);
+CREATE INDEX ticket_relationship_types_get_by_created_and_modified ON ticket_relationship_type (created, modified);
 
 /*
     Ticket boards.
@@ -724,7 +724,7 @@ CREATE INDEX ticket_relationship_types_get_by_created_and_modified ON ticket_rel
         - Backlog
         - Main board
 */
-CREATE TABLE boards
+CREATE TABLE board
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -735,19 +735,19 @@ CREATE TABLE boards
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX boards_get_by_title ON boards (title);
-CREATE INDEX boards_get_by_description ON boards (description);
-CREATE INDEX boards_get_by_title_and_description ON boards (title, description);
-CREATE INDEX boards_get_by_created ON boards (created);
-CREATE INDEX boards_get_by_modified ON boards (modified);
-CREATE INDEX boards_get_by_deleted ON boards (deleted);
-CREATE INDEX boards_get_by_created_and_modified ON boards (created, modified);
+CREATE INDEX boards_get_by_title ON board (title);
+CREATE INDEX boards_get_by_description ON board (description);
+CREATE INDEX boards_get_by_title_and_description ON board (title, description);
+CREATE INDEX boards_get_by_created ON board (created);
+CREATE INDEX boards_get_by_modified ON board (modified);
+CREATE INDEX boards_get_by_deleted ON board (deleted);
+CREATE INDEX boards_get_by_created_and_modified ON board (created, modified);
 
 /*
     Workflows.
     The workflow represents a ordered set of steps (statuses) for the tickets that are connected to each other.
 */
-CREATE TABLE workflows
+CREATE TABLE workflow
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -758,19 +758,19 @@ CREATE TABLE workflows
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX workflows_get_by_title ON workflows (title);
-CREATE INDEX workflows_get_by_description ON workflows (description);
-CREATE INDEX workflows_get_by_title_and_description ON workflows (title, description);
-CREATE INDEX workflows_get_by_created ON workflows (created);
-CREATE INDEX workflows_get_by_modified ON workflows (modified);
-CREATE INDEX workflows_get_by_deleted ON workflows (deleted);
-CREATE INDEX workflows_get_by_created_and_modified ON workflows (created, modified);
+CREATE INDEX workflows_get_by_title ON workflow (title);
+CREATE INDEX workflows_get_by_description ON workflow (description);
+CREATE INDEX workflows_get_by_title_and_description ON workflow (title, description);
+CREATE INDEX workflows_get_by_created ON workflow (created);
+CREATE INDEX workflows_get_by_modified ON workflow (modified);
+CREATE INDEX workflows_get_by_deleted ON workflow (deleted);
+CREATE INDEX workflows_get_by_created_and_modified ON workflow (created, modified);
 
 /*
     Images, attachments, etc.
     Defined by the identifier and the resource url.
 */
-CREATE TABLE assets
+CREATE TABLE asset
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -781,12 +781,12 @@ CREATE TABLE assets
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX assets_get_by_url ON assets (url);
-CREATE INDEX assets_get_by_description ON assets (description);
-CREATE INDEX assets_get_by_created ON assets (created);
-CREATE INDEX assets_get_by_deleted ON assets (deleted);
-CREATE INDEX assets_get_by_modified ON assets (modified);
-CREATE INDEX assets_get_by_created_and_modified ON assets (created, modified);
+CREATE INDEX assets_get_by_url ON asset (url);
+CREATE INDEX assets_get_by_description ON asset (description);
+CREATE INDEX assets_get_by_created ON asset (created);
+CREATE INDEX assets_get_by_deleted ON asset (deleted);
+CREATE INDEX assets_get_by_modified ON asset (modified);
+CREATE INDEX assets_get_by_created_and_modified ON asset (created, modified);
 
 /*
     Labels.
@@ -796,7 +796,7 @@ CREATE INDEX assets_get_by_created_and_modified ON assets (created, modified);
         - Ticket
         - Asset
 */
-CREATE TABLE labels
+CREATE TABLE label
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -807,18 +807,18 @@ CREATE TABLE labels
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX labels_get_by_title ON labels (title);
-CREATE INDEX labels_get_by_description ON labels (description);
-CREATE INDEX labels_get_by_title_and_description ON labels (title, description);
-CREATE INDEX labels_get_by_created ON labels (created);
-CREATE INDEX labels_get_by_deleted ON labels (deleted);
-CREATE INDEX labels_get_by_modified ON labels (modified);
-CREATE INDEX labels_get_by_created_and_modified ON labels (created, modified);
+CREATE INDEX labels_get_by_title ON label (title);
+CREATE INDEX labels_get_by_description ON label (description);
+CREATE INDEX labels_get_by_title_and_description ON label (title, description);
+CREATE INDEX labels_get_by_created ON label (created);
+CREATE INDEX labels_get_by_deleted ON label (deleted);
+CREATE INDEX labels_get_by_modified ON label (modified);
+CREATE INDEX labels_get_by_created_and_modified ON label (created, modified);
 
 /*
     Labels can be divided into categories (which is optional).
 */
-CREATE TABLE label_categories
+CREATE TABLE label_category
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -829,19 +829,19 @@ CREATE TABLE label_categories
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX label_categories_get_by_title ON label_categories (title);
-CREATE INDEX label_categories_get_by_description ON label_categories (description);
-CREATE INDEX label_categories_get_by_title_and_description ON label_categories (title, description);
-CREATE INDEX label_categories_get_by_created ON label_categories (created);
-CREATE INDEX label_categories_get_by_deleted ON label_categories (deleted);
-CREATE INDEX label_categories_get_by_modified ON label_categories (modified);
-CREATE INDEX label_categories_get_by_created_and_modified ON label_categories (created, modified);
+CREATE INDEX label_categories_get_by_title ON label_category (title);
+CREATE INDEX label_categories_get_by_description ON label_category (description);
+CREATE INDEX label_categories_get_by_title_and_description ON label_category (title, description);
+CREATE INDEX label_categories_get_by_created ON label_category (created);
+CREATE INDEX label_categories_get_by_deleted ON label_category (deleted);
+CREATE INDEX label_categories_get_by_modified ON label_category (modified);
+CREATE INDEX label_categories_get_by_created_and_modified ON label_category (created, modified);
 
 /*
       The code repositories - Identified by the identifier and the repository URL.
       Default repository type is Git repository.
 */
-CREATE TABLE repositories
+CREATE TABLE repository
 (
 
     id                 TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -853,14 +853,14 @@ CREATE TABLE repositories
     deleted            BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX repositories_get_by_repository ON repositories (repository);
-CREATE INDEX repositories_get_by_description ON repositories (description);
-CREATE INDEX repositories_get_by_repository_and_description ON repositories (repository, description);
-CREATE INDEX repositories_get_by_deleted ON repositories (deleted);
-CREATE INDEX repositories_get_by_repository_type_id ON repositories (repository_type_id);
-CREATE INDEX repositories_get_by_created ON repositories (created);
-CREATE INDEX repositories_get_by_modified ON repositories (modified);
-CREATE INDEX repositories_get_by_created_and_modified ON repositories (created, modified);
+CREATE INDEX repositories_get_by_repository ON repository (repository);
+CREATE INDEX repositories_get_by_description ON repository (description);
+CREATE INDEX repositories_get_by_repository_and_description ON repository (repository, description);
+CREATE INDEX repositories_get_by_deleted ON repository (deleted);
+CREATE INDEX repositories_get_by_repository_type_id ON repository (repository_type_id);
+CREATE INDEX repositories_get_by_created ON repository (created);
+CREATE INDEX repositories_get_by_modified ON repository (modified);
+CREATE INDEX repositories_get_by_created_and_modified ON repository (created, modified);
 
 /*
     'Git', 'CVS', 'SVN', 'Mercurial',
@@ -870,7 +870,7 @@ CREATE INDEX repositories_get_by_created_and_modified ON repositories (created, 
   'CA Harvest Software Change Manager',
   'PVCS', 'darcs'
 */
-CREATE TABLE repository_types
+CREATE TABLE repository_type
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -881,13 +881,13 @@ CREATE TABLE repository_types
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX repository_types_get_by_title ON repository_types (title);
-CREATE INDEX repository_types_get_by_description ON repository_types (description);
-CREATE INDEX repository_types_get_by_title_and_description ON repository_types (title, description);
-CREATE INDEX repository_types_get_by_deleted ON repository_types (deleted);
-CREATE INDEX repository_types_get_by_created ON repository_types (created);
-CREATE INDEX repository_types_get_by_modified ON repository_types (modified);
-CREATE INDEX repository_types_get_by_created_and_modified ON repository_types (created, modified);
+CREATE INDEX repository_types_get_by_title ON repository_type (title);
+CREATE INDEX repository_types_get_by_description ON repository_type (description);
+CREATE INDEX repository_types_get_by_title_and_description ON repository_type (title, description);
+CREATE INDEX repository_types_get_by_deleted ON repository_type (deleted);
+CREATE INDEX repository_types_get_by_created ON repository_type (created);
+CREATE INDEX repository_types_get_by_modified ON repository_type (modified);
+CREATE INDEX repository_types_get_by_created_and_modified ON repository_type (created, modified);
 
 /*
     Components.
@@ -898,7 +898,7 @@ CREATE INDEX repository_types_get_by_created_and_modified ON repository_types (c
         - Core Engine
         - Webapp, etc.
 */
-CREATE TABLE components
+CREATE TABLE component
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -909,18 +909,18 @@ CREATE TABLE components
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX components_get_by_title ON components (title);
-CREATE INDEX components_get_by_description ON components (description);
-CREATE INDEX components_get_by_title_description ON components (title, description);
-CREATE INDEX components_get_by_created ON components (created);
-CREATE INDEX components_get_by_deleted ON components (deleted);
-CREATE INDEX components_get_by_modified ON components (modified);
-CREATE INDEX components_get_by_created_modified ON components (created, modified);
+CREATE INDEX components_get_by_title ON component (title);
+CREATE INDEX components_get_by_description ON component (description);
+CREATE INDEX components_get_by_title_description ON component (title, description);
+CREATE INDEX components_get_by_created ON component (created);
+CREATE INDEX components_get_by_deleted ON component (deleted);
+CREATE INDEX components_get_by_modified ON component (modified);
+CREATE INDEX components_get_by_created_modified ON component (created, modified);
 
 /*
     The organization definition. Organization is the owner of the project.
 */
-CREATE TABLE organizations
+CREATE TABLE organization
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -931,18 +931,18 @@ CREATE TABLE organizations
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX organizations_get_by_title ON organizations (title);
-CREATE INDEX organizations_get_by_description ON organizations (description);
-CREATE INDEX organizations_get_by_title_and_description ON organizations (title, description);
-CREATE INDEX organizations_get_by_created ON organizations (created);
-CREATE INDEX organizations_get_by_deleted ON organizations (deleted);
-CREATE INDEX organizations_get_by_modified ON organizations (modified);
-CREATE INDEX organizations_get_by_created_and_modified ON organizations (created, modified);
+CREATE INDEX organizations_get_by_title ON organization (title);
+CREATE INDEX organizations_get_by_description ON organization (description);
+CREATE INDEX organizations_get_by_title_and_description ON organization (title, description);
+CREATE INDEX organizations_get_by_created ON organization (created);
+CREATE INDEX organizations_get_by_deleted ON organization (deleted);
+CREATE INDEX organizations_get_by_modified ON organization (modified);
+CREATE INDEX organizations_get_by_created_and_modified ON organization (created, modified);
 
 /*
     The team definition. Organization is the owner of the team.
 */
-CREATE TABLE teams
+CREATE TABLE team
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -953,13 +953,13 @@ CREATE TABLE teams
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX teams_get_by_title ON teams (title);
-CREATE INDEX teams_get_by_description ON teams (description);
-CREATE INDEX teams_get_by_title_and_description ON teams (title, description);
-CREATE INDEX teams_get_by_created ON teams (created);
-CREATE INDEX teams_get_by_modified ON teams (modified);
-CREATE INDEX teams_get_by_deleted ON teams (deleted);
-CREATE INDEX teams_get_by_created_and_modified ON teams (created, modified);
+CREATE INDEX teams_get_by_title ON team (title);
+CREATE INDEX teams_get_by_description ON team (description);
+CREATE INDEX teams_get_by_title_and_description ON team (title, description);
+CREATE INDEX teams_get_by_created ON team (created);
+CREATE INDEX teams_get_by_modified ON team (modified);
+CREATE INDEX teams_get_by_deleted ON team (deleted);
+CREATE INDEX teams_get_by_created_and_modified ON team (created, modified);
 
 /*
     Permission definitions.
@@ -970,7 +970,7 @@ CREATE INDEX teams_get_by_created_and_modified ON teams (created, modified);
         DELETE
         etc.
 */
-CREATE TABLE permissions
+CREATE TABLE permission
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -981,13 +981,13 @@ CREATE TABLE permissions
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX permissions_get_by_title ON permissions (title);
-CREATE INDEX permissions_get_by_description ON permissions (description);
-CREATE INDEX permissions_get_by_title_and_description ON permissions (title, description);
-CREATE INDEX permissions_get_by_deleted ON permissions (deleted);
-CREATE INDEX permissions_get_by_created ON permissions (created);
-CREATE INDEX permissions_get_by_modified ON permissions (modified);
-CREATE INDEX permissions_get_by_created_and_modified ON permissions (created, modified);
+CREATE INDEX permissions_get_by_title ON permission (title);
+CREATE INDEX permissions_get_by_description ON permission (description);
+CREATE INDEX permissions_get_by_title_and_description ON permission (title, description);
+CREATE INDEX permissions_get_by_deleted ON permission (deleted);
+CREATE INDEX permissions_get_by_created ON permission (created);
+CREATE INDEX permissions_get_by_modified ON permission (modified);
+CREATE INDEX permissions_get_by_created_and_modified ON permission (created, modified);
 
 /*
     Comments.
@@ -995,7 +995,7 @@ CREATE INDEX permissions_get_by_created_and_modified ON permissions (created, mo
         - Tickets
         - Tbd.
 */
-CREATE TABLE comments
+CREATE TABLE comment
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1005,11 +1005,11 @@ CREATE TABLE comments
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX comments_get_by_comment ON comments (comment);
-CREATE INDEX comments_get_by_created ON comments (created);
-CREATE INDEX comments_get_by_modified ON comments (modified);
-CREATE INDEX comments_get_by_deleted ON comments (deleted);
-CREATE INDEX comments_get_by_created_and_modified ON comments (created, modified);
+CREATE INDEX comments_get_by_comment ON comment (comment);
+CREATE INDEX comments_get_by_created ON comment (created);
+CREATE INDEX comments_get_by_modified ON comment (modified);
+CREATE INDEX comments_get_by_deleted ON comment (deleted);
+CREATE INDEX comments_get_by_created_and_modified ON comment (created, modified);
 
 /*
     Permission contexts.
@@ -1019,7 +1019,7 @@ CREATE INDEX comments_get_by_created_and_modified ON comments (created, modified
         organization.project
         organization.team
 */
-CREATE TABLE permission_contexts
+CREATE TABLE permission_context
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1030,13 +1030,13 @@ CREATE TABLE permission_contexts
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX permission_contexts_get_by_title ON permission_contexts (title);
-CREATE INDEX permission_contexts_get_by_description ON permission_contexts (description);
-CREATE INDEX permission_contexts_get_by_title_and_description ON permission_contexts (title, description);
-CREATE INDEX permission_contexts_get_by_created ON permission_contexts (created);
-CREATE INDEX permission_contexts_get_by_modified ON permission_contexts (modified);
-CREATE INDEX permission_contexts_get_by_deleted ON permission_contexts (deleted);
-CREATE INDEX permission_contexts_get_by_created_and_modified ON permission_contexts (created, modified);
+CREATE INDEX permission_contexts_get_by_title ON permission_context (title);
+CREATE INDEX permission_contexts_get_by_description ON permission_context (description);
+CREATE INDEX permission_contexts_get_by_title_and_description ON permission_context (title, description);
+CREATE INDEX permission_contexts_get_by_created ON permission_context (created);
+CREATE INDEX permission_contexts_get_by_modified ON permission_context (modified);
+CREATE INDEX permission_contexts_get_by_deleted ON permission_context (deleted);
+CREATE INDEX permission_contexts_get_by_created_and_modified ON permission_context (created, modified);
 
 /*
     Workflow steps.
@@ -1047,7 +1047,7 @@ CREATE INDEX permission_contexts_get_by_created_and_modified ON permission_conte
         - The 'ticket_status_id' represents the status (connection with it) that will be assigned to the ticket once
             the ticket gets to the workflow step.
 */
-CREATE TABLE workflow_steps
+CREATE TABLE workflow_step
 (
 
     id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1061,29 +1061,29 @@ CREATE TABLE workflow_steps
     deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX workflow_steps_get_by_title ON workflow_steps (title);
-CREATE INDEX workflow_steps_get_by_description ON workflow_steps (description);
-CREATE INDEX workflow_steps_get_by_title_and_description ON workflow_steps (title, description);
-CREATE INDEX workflow_steps_get_by_workflow_id ON workflow_steps (workflow_id);
-CREATE INDEX workflow_steps_get_by_workflow_step_id ON workflow_steps (workflow_step_id);
-CREATE INDEX workflow_steps_get_by_ticket_status_id ON workflow_steps (ticket_status_id);
-CREATE INDEX workflow_steps_get_by_workflow_id_and_ticket_status_id ON workflow_steps (workflow_id, ticket_status_id);
-CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id ON workflow_steps (workflow_id, workflow_step_id);
+CREATE INDEX workflow_steps_get_by_title ON workflow_step (title);
+CREATE INDEX workflow_steps_get_by_description ON workflow_step (description);
+CREATE INDEX workflow_steps_get_by_title_and_description ON workflow_step (title, description);
+CREATE INDEX workflow_steps_get_by_workflow_id ON workflow_step (workflow_id);
+CREATE INDEX workflow_steps_get_by_workflow_step_id ON workflow_step (workflow_step_id);
+CREATE INDEX workflow_steps_get_by_ticket_status_id ON workflow_step (ticket_status_id);
+CREATE INDEX workflow_steps_get_by_workflow_id_and_ticket_status_id ON workflow_step (workflow_id, ticket_status_id);
+CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id ON workflow_step (workflow_id, workflow_step_id);
 
-CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id ON workflow_steps
+CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id ON workflow_step
     (workflow_id, workflow_step_id, ticket_status_id);
 
-CREATE INDEX workflow_steps_get_by_created ON workflow_steps (created);
-CREATE INDEX workflow_steps_get_by_deleted ON workflow_steps (deleted);
-CREATE INDEX workflow_steps_get_by_modified ON workflow_steps (modified);
-CREATE INDEX workflow_steps_get_by_created_and_modified ON workflow_steps (created, modified);
+CREATE INDEX workflow_steps_get_by_created ON workflow_step (created);
+CREATE INDEX workflow_steps_get_by_deleted ON workflow_step (deleted);
+CREATE INDEX workflow_steps_get_by_modified ON workflow_step (modified);
+CREATE INDEX workflow_steps_get_by_created_and_modified ON workflow_step (created, modified);
 
 /*
     Reports, such as:
         - Time tracking reports
         - Progress status(es), etc.
 */
-CREATE TABLE reports
+CREATE TABLE report
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1094,13 +1094,13 @@ CREATE TABLE reports
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX reports_get_by_title ON reports (title);
-CREATE INDEX reports_get_by_description ON reports (description);
-CREATE INDEX reports_get_by_title_and_description ON reports (title, description);
-CREATE INDEX reports_get_by_created ON reports (created);
-CREATE INDEX reports_get_by_deleted ON reports (deleted);
-CREATE INDEX reports_get_by_modified ON reports (modified);
-CREATE INDEX reports_get_by_created_and_modified ON reports (created, modified);
+CREATE INDEX reports_get_by_title ON report (title);
+CREATE INDEX reports_get_by_description ON report (description);
+CREATE INDEX reports_get_by_title_and_description ON report (title, description);
+CREATE INDEX reports_get_by_created ON report (created);
+CREATE INDEX reports_get_by_deleted ON report (deleted);
+CREATE INDEX reports_get_by_modified ON report (modified);
+CREATE INDEX reports_get_by_created_and_modified ON report (created, modified);
 
 /*
     Contains the information about all work cycles in the system.
@@ -1128,7 +1128,7 @@ CREATE INDEX reports_get_by_created_and_modified ON reports (created, modified);
     Cycle can belong to only one parent.
     Parent's type integer value mus be > than the type integer value of current cycle (this).
 */
-CREATE TABLE cycles
+CREATE TABLE cycle
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1147,23 +1147,23 @@ CREATE TABLE cycles
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX cycles_get_by_title ON cycles (title);
-CREATE INDEX cycles_get_by_description ON cycles (description);
-CREATE INDEX cycles_get_by_title_and_description ON cycles (title, description);
-CREATE INDEX cycles_get_by_cycle_id ON cycles (cycle_id);
-CREATE INDEX cycles_get_by_type ON cycles (type);
-CREATE INDEX cycles_get_by_cycle_id_and_type ON cycles (cycle_id, type);
-CREATE INDEX cycles_get_by_created ON cycles (created);
-CREATE INDEX cycles_get_by_deleted ON cycles (deleted);
-CREATE INDEX cycles_get_by_modified ON cycles (modified);
-CREATE INDEX cycles_get_by_created_and_modified ON cycles (created, modified);
+CREATE INDEX cycles_get_by_title ON cycle (title);
+CREATE INDEX cycles_get_by_description ON cycle (description);
+CREATE INDEX cycles_get_by_title_and_description ON cycle (title, description);
+CREATE INDEX cycles_get_by_cycle_id ON cycle (cycle_id);
+CREATE INDEX cycles_get_by_type ON cycle (type);
+CREATE INDEX cycles_get_by_cycle_id_and_type ON cycle (cycle_id, type);
+CREATE INDEX cycles_get_by_created ON cycle (created);
+CREATE INDEX cycles_get_by_deleted ON cycle (deleted);
+CREATE INDEX cycles_get_by_modified ON cycle (modified);
+CREATE INDEX cycles_get_by_created_and_modified ON cycle (created, modified);
 
 /*
   The 3rd party extensions.
   Each extension is identified by the 'extension_key' which is properly verified by the system.
   Extension can be enabled or disabled - the 'enabled' field.
 */
-CREATE TABLE extensions
+CREATE TABLE extension
 (
 
     id            TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1176,15 +1176,15 @@ CREATE TABLE extensions
     deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX extensions_get_by_title ON extensions (title);
-CREATE INDEX extensions_get_by_description ON extensions (description);
-CREATE INDEX extensions_get_by_title_and_description ON extensions (title, description);
-CREATE INDEX extensions_get_by_extension_key ON extensions (extension_key);
-CREATE INDEX extensions_get_by_created ON extensions (created);
-CREATE INDEX extensions_get_by_deleted ON extensions (deleted);
-CREATE INDEX extensions_get_by_enabled ON extensions (enabled);
-CREATE INDEX extensions_get_by_modified ON extensions (modified);
-CREATE INDEX extensions_get_by_created_and_modified ON extensions (created, modified);
+CREATE INDEX extensions_get_by_title ON extension (title);
+CREATE INDEX extensions_get_by_description ON extension (description);
+CREATE INDEX extensions_get_by_title_and_description ON extension (title, description);
+CREATE INDEX extensions_get_by_extension_key ON extension (extension_key);
+CREATE INDEX extensions_get_by_created ON extension (created);
+CREATE INDEX extensions_get_by_deleted ON extension (deleted);
+CREATE INDEX extensions_get_by_enabled ON extension (enabled);
+CREATE INDEX extensions_get_by_modified ON extension (modified);
+CREATE INDEX extensions_get_by_created_and_modified ON extension (created, modified);
 
 /*
     Audit trail.
@@ -1210,7 +1210,7 @@ CREATE INDEX audit_get_by_entity_and_operation ON audit (entity, operation);
 /*
     Project belongs to the organization. Multiple projects can belong to one organization.
 */
-CREATE TABLE project_organization_mappings
+CREATE TABLE project_organization_mapping
 (
 
     id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1222,23 +1222,23 @@ CREATE TABLE project_organization_mappings
     UNIQUE (project_id, organization_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX project_organization_mappings_get_by_project_id ON project_organization_mappings (project_id);
-CREATE INDEX project_organization_mappings_get_by_organization_id ON project_organization_mappings (organization_id);
+CREATE INDEX project_organization_mappings_get_by_project_id ON project_organization_mapping (project_id);
+CREATE INDEX project_organization_mappings_get_by_organization_id ON project_organization_mapping (organization_id);
 
 CREATE INDEX project_organization_mappings_get_by_project_id_and_organization_id ON
-    project_organization_mappings (project_id, organization_id);
+    project_organization_mapping (project_id, organization_id);
 
-CREATE INDEX project_organization_mappings_get_by_created ON project_organization_mappings (created);
-CREATE INDEX project_organization_mappings_get_by_deleted ON project_organization_mappings (deleted);
-CREATE INDEX project_organization_mappings_get_by_modified ON project_organization_mappings (modified);
+CREATE INDEX project_organization_mappings_get_by_created ON project_organization_mapping (created);
+CREATE INDEX project_organization_mappings_get_by_deleted ON project_organization_mapping (deleted);
+CREATE INDEX project_organization_mappings_get_by_modified ON project_organization_mapping (modified);
 
 CREATE INDEX project_organization_mappings_get_by_created_and_modified ON
-    project_organization_mappings (created, modified);
+    project_organization_mapping (created, modified);
 
 /*
     Each project has the ticket types that it supports.
 */
-CREATE TABLE ticket_type_project_mappings
+CREATE TABLE ticket_type_project_mapping
 (
 
     id             TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1250,18 +1250,18 @@ CREATE TABLE ticket_type_project_mappings
     UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX ticket_type_project_mappings_get_by_ticket_type_id ON ticket_type_project_mappings (ticket_type_id);
-CREATE INDEX ticket_type_project_mappings_get_by_project_id ON ticket_type_project_mappings (project_id);
+CREATE INDEX ticket_type_project_mappings_get_by_ticket_type_id ON ticket_type_project_mapping (ticket_type_id);
+CREATE INDEX ticket_type_project_mappings_get_by_project_id ON ticket_type_project_mapping (project_id);
 
 CREATE INDEX ticket_type_project_mappings_get_by_ticket_type_id_and_project_id
-    ON ticket_type_project_mappings (ticket_type_id, project_id);
+    ON ticket_type_project_mapping (ticket_type_id, project_id);
 
-CREATE INDEX ticket_type_project_mappings_get_by_created ON ticket_type_project_mappings (created);
-CREATE INDEX ticket_type_project_mappings_get_by_modified ON ticket_type_project_mappings (modified);
-CREATE INDEX ticket_type_project_mappings_get_by_deleted ON ticket_type_project_mappings (deleted);
+CREATE INDEX ticket_type_project_mappings_get_by_created ON ticket_type_project_mapping (created);
+CREATE INDEX ticket_type_project_mappings_get_by_modified ON ticket_type_project_mapping (modified);
+CREATE INDEX ticket_type_project_mappings_get_by_deleted ON ticket_type_project_mapping (deleted);
 
 CREATE INDEX ticket_type_project_mappings_get_by_created_and_modified
-    ON ticket_type_project_mappings (created, modified);
+    ON ticket_type_project_mapping (created, modified);
 
 /*
     Audit trail meta-data.
@@ -1288,7 +1288,7 @@ CREATE INDEX audit_meta_data_get_by_created_and_modified ON audit_meta_data (cre
 /*
    Reports met-data: used to populate reports with the information.
 */
-CREATE TABLE reports_meta_data
+CREATE TABLE report_meta_data
 (
 
     id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1299,20 +1299,20 @@ CREATE TABLE reports_meta_data
     modified  INTEGER NOT NULL
 );
 
-CREATE INDEX reports_meta_data_get_by_report_id ON reports_meta_data (report_id);
-CREATE INDEX reports_meta_data_get_by_property ON reports_meta_data (property);
-CREATE INDEX reports_meta_data_get_by_report_id_and_property ON reports_meta_data (report_id, property);
-CREATE INDEX reports_meta_data_get_by_value ON reports_meta_data (value);
-CREATE INDEX reports_meta_data_get_by_report_id_and_value ON reports_meta_data (report_id, value);
-CREATE INDEX reports_meta_data_get_by_report_id_and_property_and_value ON reports_meta_data (report_id, property, value);
-CREATE INDEX reports_meta_data_get_by_created ON reports_meta_data (created);
-CREATE INDEX reports_meta_data_get_by_modified ON reports_meta_data (modified);
-CREATE INDEX reports_meta_data_get_by_created_and_modified ON reports_meta_data (created, modified);
+CREATE INDEX reports_meta_data_get_by_report_id ON report_meta_data (report_id);
+CREATE INDEX reports_meta_data_get_by_property ON report_meta_data (property);
+CREATE INDEX reports_meta_data_get_by_report_id_and_property ON report_meta_data (report_id, property);
+CREATE INDEX reports_meta_data_get_by_value ON report_meta_data (value);
+CREATE INDEX reports_meta_data_get_by_report_id_and_value ON report_meta_data (report_id, value);
+CREATE INDEX reports_meta_data_get_by_report_id_and_property_and_value ON report_meta_data (report_id, property, value);
+CREATE INDEX reports_meta_data_get_by_created ON report_meta_data (created);
+CREATE INDEX reports_meta_data_get_by_modified ON report_meta_data (modified);
+CREATE INDEX reports_meta_data_get_by_created_and_modified ON report_meta_data (created, modified);
 
 /*
    Boards meta-data: additional data that can be associated with certain board.
 */
-CREATE TABLE boards_meta_data
+CREATE TABLE board_meta_data
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1323,20 +1323,20 @@ CREATE TABLE boards_meta_data
     modified INTEGER NOT NULL
 );
 
-CREATE INDEX boards_meta_data_get_by_board_id ON boards_meta_data (board_id);
-CREATE INDEX boards_meta_data_get_by_property ON boards_meta_data (property);
-CREATE INDEX boards_meta_data_get_by_value ON boards_meta_data (value);
-CREATE INDEX boards_meta_data_get_by_board_id_and_property ON boards_meta_data (board_id, property);
-CREATE INDEX boards_meta_data_get_by_board_id_and_value ON boards_meta_data (board_id, value);
-CREATE INDEX boards_meta_data_get_by_board_id_and_property_and_value ON boards_meta_data (board_id, property, value);
-CREATE INDEX boards_meta_data_get_by_created ON boards_meta_data (created);
-CREATE INDEX boards_meta_data_get_by_modified ON boards_meta_data (modified);
-CREATE INDEX boards_meta_data_get_by_created_and_modified ON boards_meta_data (created, modified);
+CREATE INDEX boards_meta_data_get_by_board_id ON board_meta_data (board_id);
+CREATE INDEX boards_meta_data_get_by_property ON board_meta_data (property);
+CREATE INDEX boards_meta_data_get_by_value ON board_meta_data (value);
+CREATE INDEX boards_meta_data_get_by_board_id_and_property ON board_meta_data (board_id, property);
+CREATE INDEX boards_meta_data_get_by_board_id_and_value ON board_meta_data (board_id, value);
+CREATE INDEX boards_meta_data_get_by_board_id_and_property_and_value ON board_meta_data (board_id, property, value);
+CREATE INDEX boards_meta_data_get_by_created ON board_meta_data (created);
+CREATE INDEX boards_meta_data_get_by_modified ON board_meta_data (modified);
+CREATE INDEX boards_meta_data_get_by_created_and_modified ON board_meta_data (created, modified);
 
 /*
     Tickets meta-data.
 */
-CREATE TABLE tickets_meta_data
+CREATE TABLE ticket_meta_data
 (
 
     id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1348,22 +1348,22 @@ CREATE TABLE tickets_meta_data
     deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX tickets_meta_data_get_by_ticket_id ON tickets_meta_data (ticket_id);
-CREATE INDEX tickets_meta_data_get_by_property ON tickets_meta_data (property);
-CREATE INDEX tickets_meta_data_get_by_value ON tickets_meta_data (value);
-CREATE INDEX tickets_meta_data_get_by_ticket_id_and_property ON tickets_meta_data (ticket_id, property);
-CREATE INDEX tickets_meta_data_get_by_ticket_id_and_value ON tickets_meta_data (ticket_id, value);
-CREATE INDEX tickets_meta_data_get_by_ticket_id_and_property_and_value ON tickets_meta_data (ticket_id, property, value);
-CREATE INDEX tickets_meta_data_get_by_property_and_value ON tickets_meta_data (property, value);
-CREATE INDEX tickets_meta_data_get_by_deleted ON tickets_meta_data (deleted);
-CREATE INDEX tickets_meta_data_get_by_created ON tickets_meta_data (created);
-CREATE INDEX tickets_meta_data_get_by_modified ON tickets_meta_data (modified);
-CREATE INDEX tickets_meta_data_get_by_created_and_modified ON tickets_meta_data (created, modified);
+CREATE INDEX tickets_meta_data_get_by_ticket_id ON ticket_meta_data (ticket_id);
+CREATE INDEX tickets_meta_data_get_by_property ON ticket_meta_data (property);
+CREATE INDEX tickets_meta_data_get_by_value ON ticket_meta_data (value);
+CREATE INDEX tickets_meta_data_get_by_ticket_id_and_property ON ticket_meta_data (ticket_id, property);
+CREATE INDEX tickets_meta_data_get_by_ticket_id_and_value ON ticket_meta_data (ticket_id, value);
+CREATE INDEX tickets_meta_data_get_by_ticket_id_and_property_and_value ON ticket_meta_data (ticket_id, property, value);
+CREATE INDEX tickets_meta_data_get_by_property_and_value ON ticket_meta_data (property, value);
+CREATE INDEX tickets_meta_data_get_by_deleted ON ticket_meta_data (deleted);
+CREATE INDEX tickets_meta_data_get_by_created ON ticket_meta_data (created);
+CREATE INDEX tickets_meta_data_get_by_modified ON ticket_meta_data (modified);
+CREATE INDEX tickets_meta_data_get_by_created_and_modified ON ticket_meta_data (created, modified);
 
 /*
     All relationships between the tickets.
 */
-CREATE TABLE ticket_relationships
+CREATE TABLE ticket_relationship
 (
 
     id                          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1376,30 +1376,30 @@ CREATE TABLE ticket_relationships
     UNIQUE (ticket_id, child_ticket_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX ticket_relationships_get_by_ticket_id ON ticket_relationships (ticket_id);
-CREATE INDEX ticket_relationships_get_by_child_ticket_id ON ticket_relationships (child_ticket_id);
+CREATE INDEX ticket_relationships_get_by_ticket_id ON ticket_relationship (ticket_id);
+CREATE INDEX ticket_relationships_get_by_child_ticket_id ON ticket_relationship (child_ticket_id);
 
 CREATE INDEX ticket_relationships_get_by_child_ticket_id_and_child_ticket_id
-    ON ticket_relationships (ticket_id, child_ticket_id);
+    ON ticket_relationship (ticket_id, child_ticket_id);
 
 CREATE INDEX ticket_relationships_get_by_ticket_relationship_type_id
-    ON ticket_relationships (ticket_relationship_type_id);
+    ON ticket_relationship (ticket_relationship_type_id);
 
 CREATE INDEX ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id
-    ON ticket_relationships (ticket_id, ticket_relationship_type_id);
+    ON ticket_relationship (ticket_id, ticket_relationship_type_id);
 
 CREATE INDEX ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id
-    ON ticket_relationships (ticket_id, child_ticket_id, ticket_relationship_type_id);
+    ON ticket_relationship (ticket_id, child_ticket_id, ticket_relationship_type_id);
 
-CREATE INDEX ticket_relationships_get_by_deleted ON ticket_relationships (deleted);
-CREATE INDEX ticket_relationships_get_by_created ON ticket_relationships (created);
-CREATE INDEX ticket_relationships_get_by_modified ON ticket_relationships (modified);
-CREATE INDEX ticket_relationships_get_by_created_and_modified ON ticket_relationships (created, modified);
+CREATE INDEX ticket_relationships_get_by_deleted ON ticket_relationship (deleted);
+CREATE INDEX ticket_relationships_get_by_created ON ticket_relationship (created);
+CREATE INDEX ticket_relationships_get_by_modified ON ticket_relationship (modified);
+CREATE INDEX ticket_relationships_get_by_created_and_modified ON ticket_relationship (created, modified);
 
 /*
     Team belongs to the organization. Multiple teams can belong to one organization.
 */
-CREATE TABLE team_organization_mappings
+CREATE TABLE team_organization_mapping
 (
 
     id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1411,17 +1411,17 @@ CREATE TABLE team_organization_mappings
     UNIQUE (team_id, organization_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX team_organization_mappings_get_by_team_id ON team_organization_mappings (team_id);
-CREATE INDEX team_organization_mappings_get_by_organization_id ON team_organization_mappings (organization_id);
-CREATE INDEX team_organization_mappings_get_by_deleted ON team_organization_mappings (deleted);
-CREATE INDEX team_organization_mappings_get_by_created ON team_organization_mappings (created);
-CREATE INDEX team_organization_mappings_get_by_modified ON team_organization_mappings (modified);
-CREATE INDEX team_organization_mappings_get_by_created_and_modified ON team_organization_mappings (created, modified);
+CREATE INDEX team_organization_mappings_get_by_team_id ON team_organization_mapping (team_id);
+CREATE INDEX team_organization_mappings_get_by_organization_id ON team_organization_mapping (organization_id);
+CREATE INDEX team_organization_mappings_get_by_deleted ON team_organization_mapping (deleted);
+CREATE INDEX team_organization_mappings_get_by_created ON team_organization_mapping (created);
+CREATE INDEX team_organization_mappings_get_by_modified ON team_organization_mapping (modified);
+CREATE INDEX team_organization_mappings_get_by_created_and_modified ON team_organization_mapping (created, modified);
 
 /*
     Team belongs to one or more projects. Multiple teams can work on multiple projects.
 */
-CREATE TABLE team_project_mappings
+CREATE TABLE team_project_mapping
 (
 
     id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1433,18 +1433,18 @@ CREATE TABLE team_project_mappings
     UNIQUE (team_id, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX team_project_mappings_get_by_team_id ON team_project_mappings (team_id);
-CREATE INDEX team_project_mappings_get_by_project_id ON team_project_mappings (project_id);
-CREATE INDEX team_project_mappings_get_by_deleted ON team_project_mappings (deleted);
-CREATE INDEX team_project_mappings_get_by_created ON team_project_mappings (created);
-CREATE INDEX team_project_mappings_get_by_modified ON team_project_mappings (modified);
-CREATE INDEX team_project_mappings_get_by_created_and_modified ON team_project_mappings (created, modified);
+CREATE INDEX team_project_mappings_get_by_team_id ON team_project_mapping (team_id);
+CREATE INDEX team_project_mappings_get_by_project_id ON team_project_mapping (project_id);
+CREATE INDEX team_project_mappings_get_by_deleted ON team_project_mapping (deleted);
+CREATE INDEX team_project_mappings_get_by_created ON team_project_mapping (created);
+CREATE INDEX team_project_mappings_get_by_modified ON team_project_mapping (modified);
+CREATE INDEX team_project_mappings_get_by_created_and_modified ON team_project_mapping (created, modified);
 
 /*
      Repository belongs to project. Multiple repositories can belong to multiple projects.
      So, two projects can actually have the same repository.
 */
-CREATE TABLE repository_project_mappings
+CREATE TABLE repository_project_mapping
 (
 
     id            TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1456,17 +1456,17 @@ CREATE TABLE repository_project_mappings
     UNIQUE (repository_id, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX repository_project_mappings_get_by_repository_id ON repository_project_mappings (repository_id);
-CREATE INDEX repository_project_mappings_get_by_project_id ON repository_project_mappings (project_id);
-CREATE INDEX repository_project_mappings_get_by_deleted ON repository_project_mappings (deleted);
-CREATE INDEX repository_project_mappings_get_by_created ON repository_project_mappings (created);
-CREATE INDEX repository_project_mappings_get_by_modified ON repository_project_mappings (modified);
-CREATE INDEX repository_project_mappings_get_by_created_and_modified ON repository_project_mappings (created, modified);
+CREATE INDEX repository_project_mappings_get_by_repository_id ON repository_project_mapping (repository_id);
+CREATE INDEX repository_project_mappings_get_by_project_id ON repository_project_mapping (project_id);
+CREATE INDEX repository_project_mappings_get_by_deleted ON repository_project_mapping (deleted);
+CREATE INDEX repository_project_mappings_get_by_created ON repository_project_mapping (created);
+CREATE INDEX repository_project_mappings_get_by_modified ON repository_project_mapping (modified);
+CREATE INDEX repository_project_mappings_get_by_created_and_modified ON repository_project_mapping (created, modified);
 
 /*
      Mapping all commits to the corresponding tickets
 */
-CREATE TABLE repository_commit_ticket_mappings
+CREATE TABLE repository_commit_ticket_mapping
 (
 
     id            TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1479,33 +1479,33 @@ CREATE TABLE repository_commit_ticket_mappings
 );
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id
-    ON repository_commit_ticket_mappings (repository_id);
+    ON repository_commit_ticket_mapping (repository_id);
 
-CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id ON repository_commit_ticket_mappings (ticket_id);
+CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id ON repository_commit_ticket_mapping (ticket_id);
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id
-    ON repository_commit_ticket_mappings (repository_id, ticket_id);
+    ON repository_commit_ticket_mapping (repository_id, ticket_id);
 
-CREATE INDEX repository_commit_ticket_mappings_get_by_commit_hash ON repository_commit_ticket_mappings (commit_hash);
+CREATE INDEX repository_commit_ticket_mappings_get_by_commit_hash ON repository_commit_ticket_mapping (commit_hash);
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id_commit_hash
-    ON repository_commit_ticket_mappings (ticket_id, commit_hash);
+    ON repository_commit_ticket_mapping (ticket_id, commit_hash);
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash
-    ON repository_commit_ticket_mappings (repository_id, ticket_id, commit_hash);
+    ON repository_commit_ticket_mapping (repository_id, ticket_id, commit_hash);
 
-CREATE INDEX repository_commit_ticket_mappings_get_by_deleted ON repository_commit_ticket_mappings (deleted);
-CREATE INDEX repository_commit_ticket_mappings_get_by_created ON repository_commit_ticket_mappings (created);
-CREATE INDEX repository_commit_ticket_mappings_get_by_modified ON repository_commit_ticket_mappings (modified);
+CREATE INDEX repository_commit_ticket_mappings_get_by_deleted ON repository_commit_ticket_mapping (deleted);
+CREATE INDEX repository_commit_ticket_mappings_get_by_created ON repository_commit_ticket_mapping (created);
+CREATE INDEX repository_commit_ticket_mappings_get_by_modified ON repository_commit_ticket_mapping (modified);
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_created_and_modified
-    ON repository_commit_ticket_mappings (created, modified);
+    ON repository_commit_ticket_mapping (created, modified);
 
 /*
     Components to the tickets mappings.
     Component can be mapped to the multiple tickets.
 */
-CREATE TABLE component_ticket_mappings
+CREATE TABLE component_ticket_mapping
 (
 
     id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1517,18 +1517,18 @@ CREATE TABLE component_ticket_mappings
     UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX component_ticket_mappings_get_by_ticket_id ON component_ticket_mappings (ticket_id);
-CREATE INDEX component_ticket_mappings_get_by_component_id ON component_ticket_mappings (component_id);
-CREATE INDEX component_ticket_mappings_get_by_deleted ON component_ticket_mappings (deleted);
-CREATE INDEX component_ticket_mappings_get_by_created ON component_ticket_mappings (created);
-CREATE INDEX component_ticket_mappings_get_by_modified ON component_ticket_mappings (modified);
-CREATE INDEX component_ticket_mappings_get_by_created_and_modified ON component_ticket_mappings (created, modified);
+CREATE INDEX component_ticket_mappings_get_by_ticket_id ON component_ticket_mapping (ticket_id);
+CREATE INDEX component_ticket_mappings_get_by_component_id ON component_ticket_mapping (component_id);
+CREATE INDEX component_ticket_mappings_get_by_deleted ON component_ticket_mapping (deleted);
+CREATE INDEX component_ticket_mappings_get_by_created ON component_ticket_mapping (created);
+CREATE INDEX component_ticket_mappings_get_by_modified ON component_ticket_mapping (modified);
+CREATE INDEX component_ticket_mappings_get_by_created_and_modified ON component_ticket_mapping (created, modified);
 
 /*
     Components meta-data:
     Associate the various information with different components.
 */
-CREATE TABLE components_meta_data
+CREATE TABLE component_meta_data
 (
 
     id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1540,20 +1540,20 @@ CREATE TABLE components_meta_data
     deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX components_meta_data_get_by_component_id ON components_meta_data (component_id);
-CREATE INDEX components_meta_data_get_by_property ON components_meta_data (property);
-CREATE INDEX components_meta_data_get_by_component_id_and_property ON components_meta_data (component_id, property);
-CREATE INDEX components_meta_data_get_by_value ON components_meta_data (value);
-CREATE INDEX components_meta_data_get_by_component_id_and_value ON components_meta_data (component_id, value);
-CREATE INDEX components_meta_data_get_by_property_and_value ON components_meta_data (property, value);
+CREATE INDEX components_meta_data_get_by_component_id ON component_meta_data (component_id);
+CREATE INDEX components_meta_data_get_by_property ON component_meta_data (property);
+CREATE INDEX components_meta_data_get_by_component_id_and_property ON component_meta_data (component_id, property);
+CREATE INDEX components_meta_data_get_by_value ON component_meta_data (value);
+CREATE INDEX components_meta_data_get_by_component_id_and_value ON component_meta_data (component_id, value);
+CREATE INDEX components_meta_data_get_by_property_and_value ON component_meta_data (property, value);
 
 CREATE INDEX components_meta_data_get_by_component_id_and_property_and_value
-    ON components_meta_data (component_id, property, value);
+    ON component_meta_data (component_id, property, value);
 
-CREATE INDEX components_meta_data_get_by_deleted ON components_meta_data (deleted);
-CREATE INDEX components_meta_data_get_by_created ON components_meta_data (created);
-CREATE INDEX components_meta_data_get_by_modified ON components_meta_data (modified);
-CREATE INDEX components_meta_data_get_by_created_and_modified ON components_meta_data (created, modified);
+CREATE INDEX components_meta_data_get_by_deleted ON component_meta_data (deleted);
+CREATE INDEX components_meta_data_get_by_created ON component_meta_data (created);
+CREATE INDEX components_meta_data_get_by_modified ON component_meta_data (modified);
+CREATE INDEX components_meta_data_get_by_created_and_modified ON component_meta_data (created, modified);
 
 /*
     Assets can belong to the multiple projects.
@@ -1561,7 +1561,7 @@ CREATE INDEX components_meta_data_get_by_created_and_modified ON components_meta
     Projects may have various other assets associated to itself.
     Various documentation for example.
 */
-CREATE TABLE asset_project_mappings
+CREATE TABLE asset_project_mapping
 (
 
     id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1573,19 +1573,19 @@ CREATE TABLE asset_project_mappings
     UNIQUE (asset_id, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX asset_project_mappings_get_by_asset_id ON asset_project_mappings (asset_id);
-CREATE INDEX asset_project_mappings_get_by_project_id ON asset_project_mappings (project_id);
-CREATE INDEX asset_project_mappings_get_by_deleted ON asset_project_mappings (deleted);
-CREATE INDEX asset_project_mappings_get_by_created ON asset_project_mappings (created);
-CREATE INDEX asset_project_mappings_get_by_modified ON asset_project_mappings (modified);
-CREATE INDEX asset_project_mappings_get_by_created_and_modified ON asset_project_mappings (created, modified);
+CREATE INDEX asset_project_mappings_get_by_asset_id ON asset_project_mapping (asset_id);
+CREATE INDEX asset_project_mappings_get_by_project_id ON asset_project_mapping (project_id);
+CREATE INDEX asset_project_mappings_get_by_deleted ON asset_project_mapping (deleted);
+CREATE INDEX asset_project_mappings_get_by_created ON asset_project_mapping (created);
+CREATE INDEX asset_project_mappings_get_by_modified ON asset_project_mapping (modified);
+CREATE INDEX asset_project_mappings_get_by_created_and_modified ON asset_project_mapping (created, modified);
 
 /*
     Assets can belong to the multiple teams.
     The image used in the context of the team is the team's avatar, for example.
     Teams may have other additions associated to itself. Various documents for example,
 */
-CREATE TABLE asset_team_mappings
+CREATE TABLE asset_team_mapping
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1597,17 +1597,17 @@ CREATE TABLE asset_team_mappings
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX asset_team_mappings_get_by_asset_id ON asset_team_mappings (asset_id);
-CREATE INDEX asset_team_mappings_get_by_team_id ON asset_team_mappings (team_id);
-CREATE INDEX asset_team_mappings_get_by_deleted ON asset_team_mappings (deleted);
-CREATE INDEX asset_team_mappings_get_by_created ON asset_team_mappings (created);
-CREATE INDEX asset_team_mappings_get_by_modified ON asset_team_mappings (modified);
-CREATE INDEX asset_team_mappings_get_by_created_and_modified ON asset_team_mappings (created, modified);
+CREATE INDEX asset_team_mappings_get_by_asset_id ON asset_team_mapping (asset_id);
+CREATE INDEX asset_team_mappings_get_by_team_id ON asset_team_mapping (team_id);
+CREATE INDEX asset_team_mappings_get_by_deleted ON asset_team_mapping (deleted);
+CREATE INDEX asset_team_mappings_get_by_created ON asset_team_mapping (created);
+CREATE INDEX asset_team_mappings_get_by_modified ON asset_team_mapping (modified);
+CREATE INDEX asset_team_mappings_get_by_created_and_modified ON asset_team_mapping (created, modified);
 
 /*
     Assets (attachments for example) can belong to the multiple tickets.
 */
-CREATE TABLE asset_ticket_mappings
+CREATE TABLE asset_ticket_mapping
 (
 
     id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1619,17 +1619,17 @@ CREATE TABLE asset_ticket_mappings
     UNIQUE (asset_id, ticket_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX asset_ticket_mappings_get_by_asset_id ON asset_ticket_mappings (asset_id);
-CREATE INDEX asset_ticket_mappings_get_by_ticket_id ON asset_ticket_mappings (ticket_id);
-CREATE INDEX asset_ticket_mappings_get_by_deleted ON asset_ticket_mappings (deleted);
-CREATE INDEX asset_ticket_mappings_get_by_created ON asset_ticket_mappings (created);
-CREATE INDEX asset_ticket_mappings_get_by_modified ON asset_ticket_mappings (modified);
-CREATE INDEX asset_ticket_mappings_get_by_created_and_modified ON asset_ticket_mappings (created, modified);
+CREATE INDEX asset_ticket_mappings_get_by_asset_id ON asset_ticket_mapping (asset_id);
+CREATE INDEX asset_ticket_mappings_get_by_ticket_id ON asset_ticket_mapping (ticket_id);
+CREATE INDEX asset_ticket_mappings_get_by_deleted ON asset_ticket_mapping (deleted);
+CREATE INDEX asset_ticket_mappings_get_by_created ON asset_ticket_mapping (created);
+CREATE INDEX asset_ticket_mappings_get_by_modified ON asset_ticket_mapping (modified);
+CREATE INDEX asset_ticket_mappings_get_by_created_and_modified ON asset_ticket_mapping (created, modified);
 
 /*
     Assets (attachments for example) can belong to the multiple comments.
 */
-CREATE TABLE asset_comment_mappings
+CREATE TABLE asset_comment_mapping
 (
 
     id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1641,18 +1641,18 @@ CREATE TABLE asset_comment_mappings
     UNIQUE (asset_id, comment_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX asset_comment_mappings_get_by_asset_id ON asset_comment_mappings (asset_id);
-CREATE INDEX asset_comment_mappings_get_by_comment_id ON asset_comment_mappings (comment_id);
-CREATE INDEX asset_comment_mappings_get_by_deleted ON asset_comment_mappings (deleted);
-CREATE INDEX asset_comment_mappings_get_by_created ON asset_comment_mappings (created);
-CREATE INDEX asset_comment_mappings_get_by_modified ON asset_comment_mappings (modified);
-CREATE INDEX asset_comment_mappings_get_by_created_and_modified ON asset_comment_mappings (created, modified);
+CREATE INDEX asset_comment_mappings_get_by_asset_id ON asset_comment_mapping (asset_id);
+CREATE INDEX asset_comment_mappings_get_by_comment_id ON asset_comment_mapping (comment_id);
+CREATE INDEX asset_comment_mappings_get_by_deleted ON asset_comment_mapping (deleted);
+CREATE INDEX asset_comment_mappings_get_by_created ON asset_comment_mapping (created);
+CREATE INDEX asset_comment_mappings_get_by_modified ON asset_comment_mapping (modified);
+CREATE INDEX asset_comment_mappings_get_by_created_and_modified ON asset_comment_mapping (created, modified);
 
 /*
     Labels can belong to the label category.
     One single asset can belong to multiple categories.
 */
-CREATE TABLE label_label_category_mappings
+CREATE TABLE label_label_category_mapping
 (
 
     id                TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1664,22 +1664,22 @@ CREATE TABLE label_label_category_mappings
     UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX label_label_category_mappings_get_by_label_id ON label_label_category_mappings (label_id);
+CREATE INDEX label_label_category_mappings_get_by_label_id ON label_label_category_mapping (label_id);
 
 CREATE INDEX label_label_category_mappings_get_by_label_category_id
-    ON label_label_category_mappings (label_category_id);
+    ON label_label_category_mapping (label_category_id);
 
-CREATE INDEX label_label_category_mappings_get_by_deleted ON label_label_category_mappings (deleted);
-CREATE INDEX label_label_category_mappings_get_by_created ON label_label_category_mappings (created);
-CREATE INDEX label_label_category_mappings_get_by_modified ON label_label_category_mappings (modified);
+CREATE INDEX label_label_category_mappings_get_by_deleted ON label_label_category_mapping (deleted);
+CREATE INDEX label_label_category_mappings_get_by_created ON label_label_category_mapping (created);
+CREATE INDEX label_label_category_mappings_get_by_modified ON label_label_category_mapping (modified);
 
 CREATE INDEX label_label_category_mappings_get_by_created_and_modified
-    ON label_label_category_mappings (created, modified);
+    ON label_label_category_mapping (created, modified);
 
 /*
     Label can be associated with one or more projects.
 */
-CREATE TABLE label_project_mappings
+CREATE TABLE label_project_mapping
 (
 
     id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1691,17 +1691,17 @@ CREATE TABLE label_project_mappings
     UNIQUE (label_id, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX label_project_mappings_get_by_label_id ON label_project_mappings (label_id);
-CREATE INDEX label_project_mappings_get_by_project_id ON label_project_mappings (project_id);
-CREATE INDEX label_project_mappings_get_by_deleted ON label_project_mappings (deleted);
-CREATE INDEX label_project_mappings_get_by_created ON label_project_mappings (created);
-CREATE INDEX label_project_mappings_get_by_modified ON label_project_mappings (modified);
-CREATE INDEX label_project_mappings_get_by_created_and_modified ON label_project_mappings (created, modified);
+CREATE INDEX label_project_mappings_get_by_label_id ON label_project_mapping (label_id);
+CREATE INDEX label_project_mappings_get_by_project_id ON label_project_mapping (project_id);
+CREATE INDEX label_project_mappings_get_by_deleted ON label_project_mapping (deleted);
+CREATE INDEX label_project_mappings_get_by_created ON label_project_mapping (created);
+CREATE INDEX label_project_mappings_get_by_modified ON label_project_mapping (modified);
+CREATE INDEX label_project_mappings_get_by_created_and_modified ON label_project_mapping (created, modified);
 
 /*
     Label can be associated with one or more teams.
 */
-CREATE TABLE label_team_mappings
+CREATE TABLE label_team_mapping
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1713,17 +1713,17 @@ CREATE TABLE label_team_mappings
     UNIQUE (label_id, team_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX label_team_mappings_get_by_label_id ON label_team_mappings (label_id);
-CREATE INDEX label_team_mappings_get_by_team_id ON label_team_mappings (team_id);
-CREATE INDEX label_team_mappings_get_by_deleted ON label_team_mappings (deleted);
-CREATE INDEX label_team_mappings_get_by_created ON label_team_mappings (created);
-CREATE INDEX label_team_mappings_get_by_modified ON label_team_mappings (modified);
-CREATE INDEX label_team_mappings_get_by_created_and_modified ON label_team_mappings (created, modified);
+CREATE INDEX label_team_mappings_get_by_label_id ON label_team_mapping (label_id);
+CREATE INDEX label_team_mappings_get_by_team_id ON label_team_mapping (team_id);
+CREATE INDEX label_team_mappings_get_by_deleted ON label_team_mapping (deleted);
+CREATE INDEX label_team_mappings_get_by_created ON label_team_mapping (created);
+CREATE INDEX label_team_mappings_get_by_modified ON label_team_mapping (modified);
+CREATE INDEX label_team_mappings_get_by_created_and_modified ON label_team_mapping (created, modified);
 
 /*
     Label can be associated with one or more tickets.
 */
-CREATE TABLE label_ticket_mappings
+CREATE TABLE label_ticket_mapping
 (
 
     id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1735,17 +1735,17 @@ CREATE TABLE label_ticket_mappings
     UNIQUE (label_id, ticket_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX label_ticket_mappings_get_by_label_id ON label_ticket_mappings (label_id);
-CREATE INDEX label_ticket_mappings_get_by_team_id ON label_ticket_mappings (ticket_id);
-CREATE INDEX label_ticket_mappings_get_by_deleted ON label_ticket_mappings (deleted);
-CREATE INDEX label_ticket_mappings_get_by_created ON label_ticket_mappings (created);
-CREATE INDEX label_ticket_mappings_get_by_modified ON label_ticket_mappings (modified);
-CREATE INDEX label_ticket_mappings_get_by_created_and_modified ON label_ticket_mappings (created, modified);
+CREATE INDEX label_ticket_mappings_get_by_label_id ON label_ticket_mapping (label_id);
+CREATE INDEX label_ticket_mappings_get_by_team_id ON label_ticket_mapping (ticket_id);
+CREATE INDEX label_ticket_mappings_get_by_deleted ON label_ticket_mapping (deleted);
+CREATE INDEX label_ticket_mappings_get_by_created ON label_ticket_mapping (created);
+CREATE INDEX label_ticket_mappings_get_by_modified ON label_ticket_mapping (modified);
+CREATE INDEX label_ticket_mappings_get_by_created_and_modified ON label_ticket_mapping (created, modified);
 
 /*
     Label can be associated with one or more assets.
 */
-CREATE TABLE label_asset_mappings
+CREATE TABLE label_asset_mapping
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1757,17 +1757,17 @@ CREATE TABLE label_asset_mappings
     UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX label_asset_mappings_get_by_label_id ON label_asset_mappings (label_id);
-CREATE INDEX label_asset_mappings_get_by_team_id ON label_asset_mappings (asset_id);
-CREATE INDEX label_asset_mappings_get_by_deleted ON label_asset_mappings (deleted);
-CREATE INDEX label_asset_mappings_get_by_created ON label_asset_mappings (created);
-CREATE INDEX label_asset_mappings_get_by_modified ON label_asset_mappings (modified);
-CREATE INDEX label_asset_mappings_get_by_created_and_modified ON label_asset_mappings (created, modified);
+CREATE INDEX label_asset_mappings_get_by_label_id ON label_asset_mapping (label_id);
+CREATE INDEX label_asset_mappings_get_by_team_id ON label_asset_mapping (asset_id);
+CREATE INDEX label_asset_mappings_get_by_deleted ON label_asset_mapping (deleted);
+CREATE INDEX label_asset_mappings_get_by_created ON label_asset_mapping (created);
+CREATE INDEX label_asset_mappings_get_by_modified ON label_asset_mapping (modified);
+CREATE INDEX label_asset_mappings_get_by_created_and_modified ON label_asset_mapping (created, modified);
 
 /*
     Comments are usually associated with project tickets:
 */
-CREATE TABLE comment_ticket_mappings
+CREATE TABLE comment_ticket_mapping
 (
 
     id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1779,17 +1779,17 @@ CREATE TABLE comment_ticket_mappings
     UNIQUE (comment_id, ticket_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX comment_ticket_mappings_get_by_comment_id ON comment_ticket_mappings (comment_id);
-CREATE INDEX comment_ticket_mappings_get_by_ticket_id ON comment_ticket_mappings (ticket_id);
-CREATE INDEX comment_ticket_mappings_get_by_deleted ON comment_ticket_mappings (deleted);
-CREATE INDEX comment_ticket_mappings_get_by_created ON comment_ticket_mappings (created);
-CREATE INDEX comment_ticket_mappings_get_by_modified ON comment_ticket_mappings (modified);
-CREATE INDEX comment_ticket_mappings_get_by_created_and_modified ON comment_ticket_mappings (created, modified);
+CREATE INDEX comment_ticket_mappings_get_by_comment_id ON comment_ticket_mapping (comment_id);
+CREATE INDEX comment_ticket_mappings_get_by_ticket_id ON comment_ticket_mapping (ticket_id);
+CREATE INDEX comment_ticket_mappings_get_by_deleted ON comment_ticket_mapping (deleted);
+CREATE INDEX comment_ticket_mappings_get_by_created ON comment_ticket_mapping (created);
+CREATE INDEX comment_ticket_mappings_get_by_modified ON comment_ticket_mapping (modified);
+CREATE INDEX comment_ticket_mappings_get_by_created_and_modified ON comment_ticket_mapping (created, modified);
 
 /*
     Tickets belong to the project:
 */
-CREATE TABLE ticket_project_mappings
+CREATE TABLE ticket_project_mapping
 (
 
     id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1801,18 +1801,18 @@ CREATE TABLE ticket_project_mappings
     UNIQUE (ticket_id, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX ticket_project_mappings_get_by_project_id ON ticket_project_mappings (project_id);
-CREATE INDEX ticket_project_mappings_get_by_ticket_id ON ticket_project_mappings (ticket_id);
-CREATE INDEX ticket_project_mappings_get_by_deleted ON ticket_project_mappings (deleted);
-CREATE INDEX ticket_project_mappings_get_by_created ON ticket_project_mappings (created);
-CREATE INDEX ticket_project_mappings_get_by_modified ON ticket_project_mappings (modified);
-CREATE INDEX ticket_project_mappings_get_by_created_and_modified ON ticket_project_mappings (created, modified);
+CREATE INDEX ticket_project_mappings_get_by_project_id ON ticket_project_mapping (project_id);
+CREATE INDEX ticket_project_mappings_get_by_ticket_id ON ticket_project_mapping (ticket_id);
+CREATE INDEX ticket_project_mappings_get_by_deleted ON ticket_project_mapping (deleted);
+CREATE INDEX ticket_project_mappings_get_by_created ON ticket_project_mapping (created);
+CREATE INDEX ticket_project_mappings_get_by_modified ON ticket_project_mapping (modified);
+CREATE INDEX ticket_project_mappings_get_by_created_and_modified ON ticket_project_mapping (created, modified);
 
 /*
     Cycles belong to the projects.
     Cycle can belong to exactly one project.
 */
-CREATE TABLE cycle_project_mappings
+CREATE TABLE cycle_project_mapping
 (
 
     id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1824,17 +1824,17 @@ CREATE TABLE cycle_project_mappings
     UNIQUE (cycle_id, project_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX cycle_project_mappings_get_by_project_id ON cycle_project_mappings (project_id);
-CREATE INDEX cycle_project_mappings_get_by_cycle_id ON cycle_project_mappings (cycle_id);
-CREATE INDEX cycle_project_mappings_get_by_deleted ON cycle_project_mappings (deleted);
-CREATE INDEX cycle_project_mappings_get_by_created ON cycle_project_mappings (created);
-CREATE INDEX cycle_project_mappings_get_by_modified ON cycle_project_mappings (modified);
-CREATE INDEX cycle_project_mappings_get_by_created_and_modified ON cycle_project_mappings (created, modified);
+CREATE INDEX cycle_project_mappings_get_by_project_id ON cycle_project_mapping (project_id);
+CREATE INDEX cycle_project_mappings_get_by_cycle_id ON cycle_project_mapping (cycle_id);
+CREATE INDEX cycle_project_mappings_get_by_deleted ON cycle_project_mapping (deleted);
+CREATE INDEX cycle_project_mappings_get_by_created ON cycle_project_mapping (created);
+CREATE INDEX cycle_project_mappings_get_by_modified ON cycle_project_mapping (modified);
+CREATE INDEX cycle_project_mappings_get_by_created_and_modified ON cycle_project_mapping (created, modified);
 
 /*
     Tickets can belong to cycles:
 */
-CREATE TABLE ticket_cycle_mappings
+CREATE TABLE ticket_cycle_mapping
 (
 
     id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1846,17 +1846,17 @@ CREATE TABLE ticket_cycle_mappings
     UNIQUE (ticket_id, cycle_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX ticket_cycle_mappings_get_by_ticket_id ON ticket_cycle_mappings (ticket_id);
-CREATE INDEX ticket_cycle_mappings_get_by_cycle_id ON ticket_cycle_mappings (cycle_id);
-CREATE INDEX ticket_cycle_mappings_get_by_deleted ON ticket_cycle_mappings (deleted);
-CREATE INDEX ticket_cycle_mappings_get_by_created ON ticket_cycle_mappings (created);
-CREATE INDEX ticket_cycle_mappings_get_by_modified ON ticket_cycle_mappings (modified);
-CREATE INDEX ticket_cycle_mappings_get_by_created_and_modified ON ticket_cycle_mappings (created, modified);
+CREATE INDEX ticket_cycle_mappings_get_by_ticket_id ON ticket_cycle_mapping (ticket_id);
+CREATE INDEX ticket_cycle_mappings_get_by_cycle_id ON ticket_cycle_mapping (cycle_id);
+CREATE INDEX ticket_cycle_mappings_get_by_deleted ON ticket_cycle_mapping (deleted);
+CREATE INDEX ticket_cycle_mappings_get_by_created ON ticket_cycle_mapping (created);
+CREATE INDEX ticket_cycle_mappings_get_by_modified ON ticket_cycle_mapping (modified);
+CREATE INDEX ticket_cycle_mappings_get_by_created_and_modified ON ticket_cycle_mapping (created, modified);
 
 /*
     Tickets can belong to one or more boards:
 */
-CREATE TABLE ticket_board_mappings
+CREATE TABLE ticket_board_mapping
 (
 
     id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1868,12 +1868,12 @@ CREATE TABLE ticket_board_mappings
     UNIQUE (ticket_id, board_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX ticket_board_mappings_get_by_ticket_id ON ticket_board_mappings (ticket_id);
-CREATE INDEX ticket_board_mappings_get_by_bord_id ON ticket_board_mappings (board_id);
-CREATE INDEX ticket_board_mappings_get_by_deleted ON ticket_board_mappings (deleted);
-CREATE INDEX ticket_board_mappings_get_by_created ON ticket_board_mappings (created);
-CREATE INDEX ticket_board_mappings_get_by_modified ON ticket_board_mappings (modified);
-CREATE INDEX ticket_board_mappings_get_by_created_and_modified ON ticket_board_mappings (created, modified);
+CREATE INDEX ticket_board_mappings_get_by_ticket_id ON ticket_board_mapping (ticket_id);
+CREATE INDEX ticket_board_mappings_get_by_bord_id ON ticket_board_mapping (board_id);
+CREATE INDEX ticket_board_mappings_get_by_deleted ON ticket_board_mapping (deleted);
+CREATE INDEX ticket_board_mappings_get_by_created ON ticket_board_mapping (created);
+CREATE INDEX ticket_board_mappings_get_by_modified ON ticket_board_mapping (modified);
+CREATE INDEX ticket_board_mappings_get_by_created_and_modified ON ticket_board_mapping (created, modified);
 
 /*
     OAuth2 mappings:
@@ -1882,7 +1882,7 @@ CREATE INDEX ticket_board_mappings_get_by_created_and_modified ON ticket_board_m
 /*
     Users can be Yandex OAuth2 account users:
 */
-CREATE TABLE users_yandex_mappings
+CREATE TABLE user_yandex_mapping
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1893,17 +1893,17 @@ CREATE TABLE users_yandex_mappings
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX users_yandex_mappings_get_by_user_id ON users_yandex_mappings (user_id);
-CREATE INDEX users_yandex_mappings_get_by_username ON users_yandex_mappings (username);
-CREATE INDEX users_yandex_mappings_get_by_deleted ON users_yandex_mappings (deleted);
-CREATE INDEX users_yandex_mappings_get_by_created ON users_yandex_mappings (created);
-CREATE INDEX users_yandex_mappings_get_by_modified ON users_yandex_mappings (modified);
-CREATE INDEX users_yandex_mappings_get_by_created_and_modified ON users_yandex_mappings (created, modified);
+CREATE INDEX users_yandex_mappings_get_by_user_id ON user_yandex_mapping (user_id);
+CREATE INDEX users_yandex_mappings_get_by_username ON user_yandex_mapping (username);
+CREATE INDEX users_yandex_mappings_get_by_deleted ON user_yandex_mapping (deleted);
+CREATE INDEX users_yandex_mappings_get_by_created ON user_yandex_mapping (created);
+CREATE INDEX users_yandex_mappings_get_by_modified ON user_yandex_mapping (modified);
+CREATE INDEX users_yandex_mappings_get_by_created_and_modified ON user_yandex_mapping (created, modified);
 
 /*
     Users can be Google OAuth2 account users:
 */
-CREATE TABLE users_google_mappings
+CREATE TABLE user_google_mappings
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1914,12 +1914,12 @@ CREATE TABLE users_google_mappings
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX users_google_mappings_get_by_user_id ON users_google_mappings (user_id);
-CREATE INDEX users_google_mappings_get_by_username ON users_google_mappings (username);
-CREATE INDEX users_google_mappings_get_by_deleted ON users_google_mappings (deleted);
-CREATE INDEX users_google_mappings_get_by_created ON users_google_mappings (created);
-CREATE INDEX users_google_mappings_get_by_modified ON users_google_mappings (modified);
-CREATE INDEX users_google_mappings_get_by_created_and_modified ON users_google_mappings (created, modified);
+CREATE INDEX users_google_mappings_get_by_user_id ON user_google_mappings (user_id);
+CREATE INDEX users_google_mappings_get_by_username ON user_google_mappings (username);
+CREATE INDEX users_google_mappings_get_by_deleted ON user_google_mappings (deleted);
+CREATE INDEX users_google_mappings_get_by_created ON user_google_mappings (created);
+CREATE INDEX users_google_mappings_get_by_modified ON user_google_mappings (modified);
+CREATE INDEX users_google_mappings_get_by_created_and_modified ON user_google_mappings (created, modified);
 
 /*
     User access rights:
@@ -1928,7 +1928,7 @@ CREATE INDEX users_google_mappings_get_by_created_and_modified ON users_google_m
 /*
     User belongs to organizations:
 */
-CREATE TABLE user_organization_mappings
+CREATE TABLE user_organization_mapping
 (
 
     id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1940,17 +1940,17 @@ CREATE TABLE user_organization_mappings
     UNIQUE (user_id, organization_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX user_organization_mappings_get_by_user_id ON user_organization_mappings (user_id);
-CREATE INDEX user_organization_mappings_get_by_organization_id ON user_organization_mappings (organization_id);
-CREATE INDEX user_organization_mappings_get_by_deleted ON user_organization_mappings (deleted);
-CREATE INDEX user_organization_mappings_get_by_created ON user_organization_mappings (created);
-CREATE INDEX user_organization_mappings_get_by_modified ON user_organization_mappings (modified);
-CREATE INDEX user_organization_mappings_get_by_created_and_modified ON user_organization_mappings (created, modified);
+CREATE INDEX user_organization_mappings_get_by_user_id ON user_organization_mapping (user_id);
+CREATE INDEX user_organization_mappings_get_by_organization_id ON user_organization_mapping (organization_id);
+CREATE INDEX user_organization_mappings_get_by_deleted ON user_organization_mapping (deleted);
+CREATE INDEX user_organization_mappings_get_by_created ON user_organization_mapping (created);
+CREATE INDEX user_organization_mappings_get_by_modified ON user_organization_mapping (modified);
+CREATE INDEX user_organization_mappings_get_by_created_and_modified ON user_organization_mapping (created, modified);
 
 /*
     User belongs to the organization's teams:
 */
-CREATE TABLE user_team_mappings
+CREATE TABLE user_team_mapping
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1962,18 +1962,18 @@ CREATE TABLE user_team_mappings
     UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX user_team_mappings_get_by_user_id ON user_team_mappings (user_id);
-CREATE INDEX user_team_mappings_get_by_team_id ON user_team_mappings (team_id);
-CREATE INDEX user_team_mappings_get_by_deleted ON user_team_mappings (deleted);
-CREATE INDEX user_team_mappings_get_by_created ON user_team_mappings (created);
-CREATE INDEX user_team_mappings_get_by_modified ON user_team_mappings (modified);
-CREATE INDEX user_team_mappings_get_by_created_and_modified ON user_team_mappings (created, modified);
+CREATE INDEX user_team_mappings_get_by_user_id ON user_team_mapping (user_id);
+CREATE INDEX user_team_mappings_get_by_team_id ON user_team_mapping (team_id);
+CREATE INDEX user_team_mappings_get_by_deleted ON user_team_mapping (deleted);
+CREATE INDEX user_team_mappings_get_by_created ON user_team_mapping (created);
+CREATE INDEX user_team_mappings_get_by_modified ON user_team_mapping (modified);
+CREATE INDEX user_team_mappings_get_by_created_and_modified ON user_team_mapping (created, modified);
 
 /*
     User has the permissions.
     Each permission has be associated to the proper permission context.
 */
-CREATE TABLE permission_user_mappings
+CREATE TABLE permission_user_mapping
 (
 
     id                    TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -1986,30 +1986,30 @@ CREATE TABLE permission_user_mappings
     UNIQUE (user_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX permission_user_mappings_get_by_user_id ON permission_user_mappings (user_id);
-CREATE INDEX permission_user_mappings_get_by_permission_id ON permission_user_mappings (permission_id);
-CREATE INDEX permission_user_mappings_get_by_permission_context_id ON permission_user_mappings (permission_context_id);
+CREATE INDEX permission_user_mappings_get_by_user_id ON permission_user_mapping (user_id);
+CREATE INDEX permission_user_mappings_get_by_permission_id ON permission_user_mapping (permission_id);
+CREATE INDEX permission_user_mappings_get_by_permission_context_id ON permission_user_mapping (permission_context_id);
 
 CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_id
-    ON permission_user_mappings (user_id, permission_id);
+    ON permission_user_mapping (user_id, permission_id);
 
 CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_context_id
-    ON permission_user_mappings (user_id, permission_context_id);
+    ON permission_user_mapping (user_id, permission_context_id);
 
 CREATE INDEX permission_user_mappings_get_by_permission_id_and_permission_context_id
-    ON permission_user_mappings (permission_id, permission_context_id);
+    ON permission_user_mapping (permission_id, permission_context_id);
 
-CREATE INDEX permission_user_mappings_get_by_deleted ON permission_user_mappings (deleted);
-CREATE INDEX permission_user_mappings_get_by_created ON permission_user_mappings (created);
-CREATE INDEX permission_user_mappings_get_by_modified ON permission_user_mappings (modified);
-CREATE INDEX permission_user_mappings_get_by_created_and_modified ON permission_user_mappings (created, modified);
+CREATE INDEX permission_user_mappings_get_by_deleted ON permission_user_mapping (deleted);
+CREATE INDEX permission_user_mappings_get_by_created ON permission_user_mapping (created);
+CREATE INDEX permission_user_mappings_get_by_modified ON permission_user_mapping (modified);
+CREATE INDEX permission_user_mappings_get_by_created_and_modified ON permission_user_mapping (created, modified);
 
 /*
     Team has the permissions.
     Each team permission has be associated to the proper permission context.
     All team members (users) will inherit team's permissions.
 */
-CREATE TABLE permission_team_mappings
+CREATE TABLE permission_team_mapping
 (
 
     id                    TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -2022,28 +2022,28 @@ CREATE TABLE permission_team_mappings
     UNIQUE (team_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
-CREATE INDEX permission_team_mappings_get_by_team_id ON permission_team_mappings (team_id);
-CREATE INDEX permission_team_mappings_get_by_permission_id ON permission_team_mappings (permission_id);
+CREATE INDEX permission_team_mappings_get_by_team_id ON permission_team_mapping (team_id);
+CREATE INDEX permission_team_mappings_get_by_permission_id ON permission_team_mapping (permission_id);
 
 CREATE INDEX permission_team_mappings_get_by_team_id_and_permission_id
-    ON permission_team_mappings (team_id, permission_id);
+    ON permission_team_mapping (team_id, permission_id);
 
-CREATE INDEX permission_team_mappings_get_by_permission_context_id ON permission_team_mappings (permission_context_id);
+CREATE INDEX permission_team_mappings_get_by_permission_context_id ON permission_team_mapping (permission_context_id);
 
 CREATE INDEX permission_team_mappings_get_by_team_id_and_permission_context_id
-    ON permission_team_mappings (team_id, permission_context_id);
+    ON permission_team_mapping (team_id, permission_context_id);
 
-CREATE INDEX permission_team_mappings_get_by_deleted ON permission_team_mappings (deleted);
-CREATE INDEX permission_team_mappings_get_by_created ON permission_team_mappings (created);
-CREATE INDEX permission_team_mappings_get_by_modified ON permission_team_mappings (modified);
-CREATE INDEX permission_team_mappings_get_by_created_and_modified ON permission_team_mappings (created, modified);
+CREATE INDEX permission_team_mappings_get_by_deleted ON permission_team_mapping (deleted);
+CREATE INDEX permission_team_mappings_get_by_created ON permission_team_mapping (created);
+CREATE INDEX permission_team_mappings_get_by_modified ON permission_team_mapping (modified);
+CREATE INDEX permission_team_mappings_get_by_created_and_modified ON permission_team_mapping (created, modified);
 
 /*
     The configuration data for the extension.
     Basically it represents the meta-data associated with each extension.
     Each configuration property can be enabled or disabled.
 */
-CREATE TABLE configuration_data_extension_mappings
+CREATE TABLE configuration_data_extension_mapping
 (
 
     id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -2057,34 +2057,34 @@ CREATE TABLE configuration_data_extension_mappings
 );
 
 CREATE INDEX configuration_data_extension_mappings_get_by_extension_id
-    ON configuration_data_extension_mappings (extension_id);
+    ON configuration_data_extension_mapping (extension_id);
 
-CREATE INDEX configuration_data_extension_mappings_get_by_property ON configuration_data_extension_mappings (property);
-CREATE INDEX configuration_data_extension_mappings_get_by_value ON configuration_data_extension_mappings (value);
+CREATE INDEX configuration_data_extension_mappings_get_by_property ON configuration_data_extension_mapping (property);
+CREATE INDEX configuration_data_extension_mappings_get_by_value ON configuration_data_extension_mapping (value);
 
 CREATE INDEX configuration_data_extension_mappings_get_by_property_and_value
-    ON configuration_data_extension_mappings (property, value);
+    ON configuration_data_extension_mapping (property, value);
 
 CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property
-    ON configuration_data_extension_mappings (extension_id, property);
+    ON configuration_data_extension_mapping (extension_id, property);
 
 CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property_and_value
-    ON configuration_data_extension_mappings (extension_id, property, value);
+    ON configuration_data_extension_mapping (extension_id, property, value);
 
-CREATE INDEX configuration_data_extension_mappings_get_by_enabled ON configuration_data_extension_mappings (enabled);
-CREATE INDEX configuration_data_extension_mappings_get_by_deleted ON configuration_data_extension_mappings (deleted);
-CREATE INDEX configuration_data_extension_mappings_get_by_created ON configuration_data_extension_mappings (created);
-CREATE INDEX configuration_data_extension_mappings_get_by_modified ON configuration_data_extension_mappings (modified);
+CREATE INDEX configuration_data_extension_mappings_get_by_enabled ON configuration_data_extension_mapping (enabled);
+CREATE INDEX configuration_data_extension_mappings_get_by_deleted ON configuration_data_extension_mapping (deleted);
+CREATE INDEX configuration_data_extension_mappings_get_by_created ON configuration_data_extension_mapping (created);
+CREATE INDEX configuration_data_extension_mappings_get_by_modified ON configuration_data_extension_mapping (modified);
 
 CREATE INDEX configuration_data_extension_mappings_get_by_created_and_modified
-    ON configuration_data_extension_mappings (created, modified);
+    ON configuration_data_extension_mapping (created, modified);
 
 /*
     Extensions meta-data:
     Associate the various information with different extension.
     Meta-data information are the extension specific.
 */
-CREATE TABLE extensions_meta_data
+CREATE TABLE extension_meta_data
 (
 
     id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -2096,16 +2096,16 @@ CREATE TABLE extensions_meta_data
     deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX extensions_meta_data_get_by_extension_id ON extensions_meta_data (extension_id);
-CREATE INDEX extensions_meta_data_get_by_property ON extensions_meta_data (property);
-CREATE INDEX extensions_meta_data_get_by_value ON extensions_meta_data (value);
-CREATE INDEX extensions_meta_data_get_by_property_and_value ON extensions_meta_data (property, value);
+CREATE INDEX extensions_meta_data_get_by_extension_id ON extension_meta_data (extension_id);
+CREATE INDEX extensions_meta_data_get_by_property ON extension_meta_data (property);
+CREATE INDEX extensions_meta_data_get_by_value ON extension_meta_data (value);
+CREATE INDEX extensions_meta_data_get_by_property_and_value ON extension_meta_data (property, value);
 
 CREATE INDEX extensions_meta_data_get_by_extension_id_and_property_and_value
-    ON extensions_meta_data (extension_id, property, value);
+    ON extension_meta_data (extension_id, property, value);
 
-CREATE INDEX extensions_meta_data_get_by_extension_id_and_property ON extensions_meta_data (extension_id, property);
-CREATE INDEX extensions_meta_data_get_by_deleted ON extensions_meta_data (deleted);
-CREATE INDEX extensions_meta_data_get_by_created ON extensions_meta_data (created);
-CREATE INDEX extensions_meta_data_get_by_modified ON extensions_meta_data (modified);
-CREATE INDEX extensions_meta_data_get_by_created_and_modified ON extensions_meta_data (created, modified);
+CREATE INDEX extensions_meta_data_get_by_extension_id_and_property ON extension_meta_data (extension_id, property);
+CREATE INDEX extensions_meta_data_get_by_deleted ON extension_meta_data (deleted);
+CREATE INDEX extensions_meta_data_get_by_created ON extension_meta_data (created);
+CREATE INDEX extensions_meta_data_get_by_modified ON extension_meta_data (modified);
+CREATE INDEX extensions_meta_data_get_by_created_and_modified ON extension_meta_data (created, modified);
