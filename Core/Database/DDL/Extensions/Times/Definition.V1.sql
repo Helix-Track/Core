@@ -13,8 +13,8 @@
     - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
 */
 
-DROP TABLE IF EXISTS time;
-DROP TABLE IF EXISTS unit;
+DROP TABLE IF EXISTS time_tracking;
+DROP TABLE IF EXISTS time_unit;
 
 DROP INDEX IF EXISTS get_by_title;
 DROP INDEX IF EXISTS get_by_description;
@@ -41,7 +41,7 @@ DROP INDEX IF EXISTS units_get_by_created_and_modified;
         - The description for the performed work (optional)
         - The identifier of the work ticket.
 */
-CREATE TABLE time
+CREATE TABLE time_tracking
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -55,20 +55,20 @@ CREATE TABLE time
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX get_by_title ON time (title);
-CREATE INDEX get_by_description ON time (description);
-CREATE INDEX get_by_title_and_description ON time (title, description);
-CREATE INDEX get_by_ticket_id ON time (ticket_id);
-CREATE INDEX get_by_ticket_id_and_title ON time (ticket_id, title);
-CREATE INDEX get_by_deleted ON time (deleted);
-CREATE INDEX get_by_created ON time (created);
-CREATE INDEX get_by_modified ON time (modified);
-CREATE INDEX get_by_created_and_modified ON time (created, modified);
+CREATE INDEX get_by_title ON time_tracking (title);
+CREATE INDEX get_by_description ON time_tracking (description);
+CREATE INDEX get_by_title_and_description ON time_tracking (title, description);
+CREATE INDEX get_by_ticket_id ON time_tracking (ticket_id);
+CREATE INDEX get_by_ticket_id_and_title ON time_tracking (ticket_id, title);
+CREATE INDEX get_by_deleted ON time_tracking (deleted);
+CREATE INDEX get_by_created ON time_tracking (created);
+CREATE INDEX get_by_modified ON time_tracking (modified);
+CREATE INDEX get_by_created_and_modified ON time_tracking (created, modified);
 
 /*
     'Minute', 'Hour', 'Day', 'Week', 'Month'
 */
-CREATE TABLE unit
+CREATE TABLE time_unit
 (
 
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -79,8 +79,8 @@ CREATE TABLE unit
     deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX units_get_by_title ON unit (title);
-CREATE INDEX units_get_by_created ON unit (created);
-CREATE INDEX units_get_by_deleted ON unit (deleted);
-CREATE INDEX units_get_by_modified ON unit (modified);
-CREATE INDEX units_get_by_created_and_modified ON unit (created, modified);
+CREATE INDEX units_get_by_title ON time_unit (title);
+CREATE INDEX units_get_by_created ON time_unit (created);
+CREATE INDEX units_get_by_deleted ON time_unit (deleted);
+CREATE INDEX units_get_by_modified ON time_unit (modified);
+CREATE INDEX units_get_by_created_and_modified ON time_unit (created, modified);
