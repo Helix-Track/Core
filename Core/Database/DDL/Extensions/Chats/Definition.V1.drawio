@@ -2,75 +2,75 @@
   <root>
     <mxCell id="0" />
     <mxCell id="1" parent="0" />
-    <mxCell id="node1" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chats&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; title: text&lt;br/&gt; organization_id: text&lt;br/&gt; team_id: text&lt;br/&gt; project_id: text&lt;br/&gt; ticket_id: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
-      <mxGeometry x="475" y="-141" width="180" height="281" as="geometry" />
+    <mxCell id="node3" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chat&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; title: text&lt;br/&gt; organization_id: text&lt;br/&gt; team_id: text&lt;br/&gt; project_id: text&lt;br/&gt; ticket_id: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="364" y="-120" width="150" height="240" as="geometry" />
     </mxCell>
-    <mxCell id="node0" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chats_google_mappings&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
-      <mxGeometry x="-143" y="190" width="260" height="227" as="geometry" />
+    <mxCell id="node5" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chat_google_mapping&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="338" y="170" width="203" height="194" as="geometry" />
     </mxCell>
-    <mxCell id="node4" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chats_slack_mappings&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
-      <mxGeometry x="443" y="190" width="243" height="227" as="geometry" />
+    <mxCell id="node1" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chat_slack_mapping&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="129" y="170" width="189" height="194" as="geometry" />
     </mxCell>
-    <mxCell id="node3" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chats_telegram_mappings&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
-      <mxGeometry x="989" y="190" width="282" height="227" as="geometry" />
+    <mxCell id="node0" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chat_telegram_mapping&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="-113" y="170" width="222" height="194" as="geometry" />
     </mxCell>
-    <mxCell id="node2" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chats_whatsapp_mappings&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
-      <mxGeometry x="137" y="190" width="286" height="227" as="geometry" />
+    <mxCell id="node2" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chat_whatsapp_mapping&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="788" y="170" width="226" height="194" as="geometry" />
     </mxCell>
-    <mxCell id="node5" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chats_yandex_mappings&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
-      <mxGeometry x="706" y="190" width="263" height="227" as="geometry" />
+    <mxCell id="node4" parent="1" vertex="1" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;chat_yandex_mapping&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; chat_id: text&lt;br/&gt; property: text&lt;br/&gt; value: text&lt;br/&gt; created: integer&lt;br/&gt; modified: integer&lt;br/&gt; deleted: boolean&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0 0 0 4px;line-height:1.6;&quot;&gt; id: text&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=14;fontFamily=Helvetica;html=1;rounded=0;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;">
+      <mxGeometry x="561" y="170" width="207" height="194" as="geometry" />
     </mxCell>
-    <mxCell id="edge1" edge="1" value="" parent="1" source="node0" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
-      <mxGeometry width="50" height="50" relative="1" as="geometry">
-        <Array as="points">
-          <mxPoint x="-13" y="165" />
-          <mxPoint x="565" y="165" />
-        </Array>
-      </mxGeometry>
-    </mxCell>
-    <mxCell id="label8" parent="edge1" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
-      <mxGeometry x="306" y="145" as="geometry" />
-    </mxCell>
-    <mxCell id="edge2" edge="1" value="" parent="1" source="node4" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+    <mxCell id="edge1" edge="1" value="" parent="1" source="node5" target="node3" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
       <mxGeometry width="50" height="50" relative="1" as="geometry">
         <Array as="points" />
       </mxGeometry>
     </mxCell>
-    <mxCell id="label14" parent="edge2" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
-      <mxGeometry x="509" y="155" as="geometry" />
+    <mxCell id="label8" parent="edge1" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
+      <mxGeometry x="375" y="136" as="geometry" />
     </mxCell>
-    <mxCell id="edge4" edge="1" value="" parent="1" source="node3" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+    <mxCell id="edge0" edge="1" value="" parent="1" source="node1" target="node3" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
       <mxGeometry width="50" height="50" relative="1" as="geometry">
         <Array as="points">
-          <mxPoint x="1130" y="165" />
-          <mxPoint x="565" y="165" />
-        </Array>
-      </mxGeometry>
-    </mxCell>
-    <mxCell id="label26" parent="edge4" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
-      <mxGeometry x="763" y="145" as="geometry" />
-    </mxCell>
-    <mxCell id="edge0" edge="1" value="" parent="1" source="node2" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
-      <mxGeometry width="50" height="50" relative="1" as="geometry">
-        <Array as="points">
-          <mxPoint x="280" y="165" />
-          <mxPoint x="565" y="165" />
+          <mxPoint x="223" y="145" />
+          <mxPoint x="440" y="145" />
         </Array>
       </mxGeometry>
     </mxCell>
     <mxCell id="label2" parent="edge0" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
-      <mxGeometry x="394" y="145" as="geometry" />
+      <mxGeometry x="300" y="127" as="geometry" />
     </mxCell>
-    <mxCell id="edge3" edge="1" value="" parent="1" source="node5" target="node1" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+    <mxCell id="edge4" edge="1" value="" parent="1" source="node0" target="node3" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
       <mxGeometry width="50" height="50" relative="1" as="geometry">
         <Array as="points">
-          <mxPoint x="838" y="165" />
-          <mxPoint x="565" y="165" />
+          <mxPoint x="-2" y="145" />
+          <mxPoint x="440" y="145" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="label26" parent="edge4" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
+      <mxGeometry x="187" y="127" as="geometry" />
+    </mxCell>
+    <mxCell id="edge3" edge="1" value="" parent="1" source="node2" target="node3" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="901" y="145" />
+          <mxPoint x="440" y="145" />
         </Array>
       </mxGeometry>
     </mxCell>
     <mxCell id="label20" parent="edge3" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
-      <mxGeometry x="673" y="145" as="geometry" />
+      <mxGeometry x="638" y="127" as="geometry" />
+    </mxCell>
+    <mxCell id="edge2" edge="1" value="" parent="1" source="node4" target="node3" style="html=1;rounded=1;edgeStyle=orthogonalEdgeStyle;dashed=0;startArrow=none;endArrow=block;endSize=12;strokeColor=#595959;exitX=0.500;exitY=0.000;exitDx=0;exitDy=0;entryX=0.500;entryY=1.000;entryDx=0;entryDy=0;">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="665" y="145" />
+          <mxPoint x="440" y="145" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="label14" parent="edge2" vertex="1" connectable="0" value="chat_id:id" style="edgeLabel;resizable=0;html=1;align=left;verticalAlign=top;strokeColor=default;">
+      <mxGeometry x="520" y="127" as="geometry" />
     </mxCell>
   </root>
 </mxGraphModel>
