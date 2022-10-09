@@ -4,6 +4,10 @@
 
 The Core module for the Helix Track.
 
+## Development
+
+The HelixTrack Core has been developed and tested on [Alt Linux](https://alt-linux.ru/).
+
 ## Database
 
 The system database
