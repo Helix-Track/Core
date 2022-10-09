@@ -42,7 +42,7 @@ add_custom_target(
 add_custom_command(
 
         OUTPUT generated
-        COMMAND rm -rf generated && mkdir generated && /usr/local/bin/sql2code-0.0.1/sql2code -i
+        COMMAND sudo rm -rf generated && mkdir generated && /usr/local/bin/sql2code-0.0.1/sql2code -i
             ../Database/DDL/Definition.V1.sql ../Database/DDL/Extensions/Chats/Definition.V1.sql
             ../Database/DDL/Extensions/Documents/Definition.V1.sql ../Database/DDL/Extensions/Times/Definition.V1.sql
             -t cpp -o generated
