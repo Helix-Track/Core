@@ -1,8 +1,8 @@
 ![JIRA alternative for the free world!](Assets/Wide_Black.png)
 
-# Core
+# HelixTrack Core
 
-The Core module for the Helix Track.
+Core module for the Helix Track.
 
 ## Development
 
