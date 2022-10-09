@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="update_software_toolkit.sh Core" type="ShConfigurationType" folderName="Software Toolkit">
+  <configuration default="false" name="update_software_toolkit.sh Core" type="ShConfigurationType" folderName="Core - Software Toolkit">
     <option name="SCRIPT_TEXT" value="" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="$PROJECT_DIR$/Core/update_software_toolkit.sh" />
