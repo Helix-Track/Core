@@ -8,6 +8,10 @@ The Core module for the Helix Track.
 
 The HelixTrack Core has been developed and tested on [Alt Linux](https://alt-linux.ru/).
 
+## Before you start
+
+TBD: Executing init. scripts.
+
 ## Database
 
 The system database
