@@ -1,6 +1,6 @@
 /*
     Permission.cpp
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -10,7 +10,7 @@ std::string Permission::getId() {
     return this->id;
 }
 
-void Permission::setId(std::string value) {
+void Permission::setId(std::string &value) {
     this->id = value;
 }
 
@@ -18,7 +18,7 @@ std::string Permission::getTitle() {
     return this->title;
 }
 
-void Permission::setTitle(std::string value) {
+void Permission::setTitle(std::string &value) {
     this->title = value;
 }
 
@@ -26,7 +26,7 @@ std::string Permission::getDescription() {
     return this->description;
 }
 
-void Permission::setDescription(std::string value) {
+void Permission::setDescription(std::string &value) {
     this->description = value;
 }
 
@@ -34,7 +34,7 @@ int Permission::getCreated() {
     return this->created;
 }
 
-void Permission::setCreated(int value) {
+void Permission::setCreated(int &value) {
     this->created = value;
 }
 
@@ -42,7 +42,7 @@ int Permission::getModified() {
     return this->modified;
 }
 
-void Permission::setModified(int value) {
+void Permission::setModified(int &value) {
     this->modified = value;
 }
 
@@ -50,7 +50,7 @@ bool Permission::isDeleted() {
     return this->deleted;
 }
 
-void Permission::setDeleted(bool value) {
+void Permission::setDeleted(bool &value) {
     this->deleted = value;
 }
 

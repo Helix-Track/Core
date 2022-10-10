@@ -1,6 +1,6 @@
 /*
     LabelLabelCategoryMapping.h
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -18,15 +18,15 @@ private:
 
 public:
     std::string getId();
-    void setId(std::string value);
+    void setId(std::string &value);
     std::string getLabelId();
-    void setLabelId(std::string value);
+    void setLabelId(std::string &value);
     std::string getLabelCategoryId();
-    void setLabelCategoryId(std::string value);
+    void setLabelCategoryId(std::string &value);
     int getCreated();
-    void setCreated(int value);
+    void setCreated(int &value);
     int getModified();
-    void setModified(int value);
+    void setModified(int &value);
     bool isDeleted();
-    void setDeleted(bool value);
+    void setDeleted(bool &value);
 };

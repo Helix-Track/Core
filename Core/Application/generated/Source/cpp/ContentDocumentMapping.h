@@ -1,6 +1,6 @@
 /*
     ContentDocumentMapping.h
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -18,15 +18,15 @@ private:
 
 public:
     std::string getId();
-    void setId(std::string value);
+    void setId(std::string &value);
     std::string getDocumentId();
-    void setDocumentId(std::string value);
+    void setDocumentId(std::string &value);
     std::string getContent();
-    void setContent(std::string value);
+    void setContent(std::string &value);
     int getCreated();
-    void setCreated(int value);
+    void setCreated(int &value);
     int getModified();
-    void setModified(int value);
+    void setModified(int &value);
     bool isDeleted();
-    void setDeleted(bool value);
+    void setDeleted(bool &value);
 };

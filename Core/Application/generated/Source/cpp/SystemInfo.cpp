@@ -1,6 +1,6 @@
 /*
     SystemInfo.cpp
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -10,7 +10,7 @@ int SystemInfo::getId() {
     return this->id;
 }
 
-void SystemInfo::setId(int value) {
+void SystemInfo::setId(int &value) {
     this->id = value;
 }
 
@@ -18,7 +18,7 @@ std::string SystemInfo::getDescription() {
     return this->description;
 }
 
-void SystemInfo::setDescription(std::string value) {
+void SystemInfo::setDescription(std::string &value) {
     this->description = value;
 }
 
@@ -26,7 +26,7 @@ int SystemInfo::getCreated() {
     return this->created;
 }
 
-void SystemInfo::setCreated(int value) {
+void SystemInfo::setCreated(int &value) {
     this->created = value;
 }
 

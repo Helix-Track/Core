@@ -1,6 +1,6 @@
 /*
     Audit.h
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -16,11 +16,11 @@ private:
 
 public:
     std::string getId();
-    void setId(std::string value);
+    void setId(std::string &value);
     int getCreated();
-    void setCreated(int value);
+    void setCreated(int &value);
     std::string getEntity();
-    void setEntity(std::string value);
+    void setEntity(std::string &value);
     std::string getOperation();
-    void setOperation(std::string value);
+    void setOperation(std::string &value);
 };

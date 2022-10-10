@@ -1,6 +1,6 @@
 /*
     TicketStatus.cpp
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -10,7 +10,7 @@ std::string TicketStatus::getId() {
     return this->id;
 }
 
-void TicketStatus::setId(std::string value) {
+void TicketStatus::setId(std::string &value) {
     this->id = value;
 }
 
@@ -18,7 +18,7 @@ std::string TicketStatus::getTitle() {
     return this->title;
 }
 
-void TicketStatus::setTitle(std::string value) {
+void TicketStatus::setTitle(std::string &value) {
     this->title = value;
 }
 
@@ -26,7 +26,7 @@ std::string TicketStatus::getDescription() {
     return this->description;
 }
 
-void TicketStatus::setDescription(std::string value) {
+void TicketStatus::setDescription(std::string &value) {
     this->description = value;
 }
 
@@ -34,7 +34,7 @@ int TicketStatus::getCreated() {
     return this->created;
 }
 
-void TicketStatus::setCreated(int value) {
+void TicketStatus::setCreated(int &value) {
     this->created = value;
 }
 
@@ -42,7 +42,7 @@ int TicketStatus::getModified() {
     return this->modified;
 }
 
-void TicketStatus::setModified(int value) {
+void TicketStatus::setModified(int &value) {
     this->modified = value;
 }
 
@@ -50,7 +50,7 @@ bool TicketStatus::isDeleted() {
     return this->deleted;
 }
 
-void TicketStatus::setDeleted(bool value) {
+void TicketStatus::setDeleted(bool &value) {
     this->deleted = value;
 }
 

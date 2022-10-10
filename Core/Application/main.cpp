@@ -16,9 +16,12 @@ using namespace Commons::Strings;
 
 int main(int argc, char *argv[]) {
 
+    std::string title = "Generated code";
+    std::string description = "READY";
+
     Label label;
-    label.setTitle("Generated code");
-    label.setDescription("READY");
+    label.setTitle(title);
+    label.setDescription(description);
 
     auto errTag = "error";
     auto paramsTag = "parameters";

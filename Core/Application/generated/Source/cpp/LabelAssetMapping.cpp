@@ -1,6 +1,6 @@
 /*
     LabelAssetMapping.cpp
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -10,7 +10,7 @@ std::string LabelAssetMapping::getId() {
     return this->id;
 }
 
-void LabelAssetMapping::setId(std::string value) {
+void LabelAssetMapping::setId(std::string &value) {
     this->id = value;
 }
 
@@ -18,7 +18,7 @@ std::string LabelAssetMapping::getLabelId() {
     return this->labelId;
 }
 
-void LabelAssetMapping::setLabelId(std::string value) {
+void LabelAssetMapping::setLabelId(std::string &value) {
     this->labelId = value;
 }
 
@@ -26,7 +26,7 @@ std::string LabelAssetMapping::getAssetId() {
     return this->assetId;
 }
 
-void LabelAssetMapping::setAssetId(std::string value) {
+void LabelAssetMapping::setAssetId(std::string &value) {
     this->assetId = value;
 }
 
@@ -34,7 +34,7 @@ int LabelAssetMapping::getCreated() {
     return this->created;
 }
 
-void LabelAssetMapping::setCreated(int value) {
+void LabelAssetMapping::setCreated(int &value) {
     this->created = value;
 }
 
@@ -42,7 +42,7 @@ int LabelAssetMapping::getModified() {
     return this->modified;
 }
 
-void LabelAssetMapping::setModified(int value) {
+void LabelAssetMapping::setModified(int &value) {
     this->modified = value;
 }
 
@@ -50,7 +50,7 @@ bool LabelAssetMapping::isDeleted() {
     return this->deleted;
 }
 
-void LabelAssetMapping::setDeleted(bool value) {
+void LabelAssetMapping::setDeleted(bool &value) {
     this->deleted = value;
 }
 

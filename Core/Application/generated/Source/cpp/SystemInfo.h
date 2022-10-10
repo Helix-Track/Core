@@ -1,6 +1,6 @@
 /*
     SystemInfo.h
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -15,9 +15,9 @@ private:
 
 public:
     int getId();
-    void setId(int value);
+    void setId(int &value);
     std::string getDescription();
-    void setDescription(std::string value);
+    void setDescription(std::string &value);
     int getCreated();
-    void setCreated(int value);
+    void setCreated(int &value);
 };

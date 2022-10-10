@@ -1,6 +1,6 @@
 /*
     Extension.h
-    Generated with 'sql2code' 0.0.1
+    Generated with 'sql2code' 0.0.2-SNAPSHOT
     https://github.com/red-elf/SQL-to-Code
 */
 
@@ -20,19 +20,19 @@ private:
 
 public:
     std::string getId();
-    void setId(std::string value);
+    void setId(std::string &value);
     int getCreated();
-    void setCreated(int value);
+    void setCreated(int &value);
     int getModified();
-    void setModified(int value);
+    void setModified(int &value);
     std::string getTitle();
-    void setTitle(std::string value);
+    void setTitle(std::string &value);
     std::string getDescription();
-    void setDescription(std::string value);
+    void setDescription(std::string &value);
     std::string getExtensionKey();
-    void setExtensionKey(std::string value);
+    void setExtensionKey(std::string &value);
     bool isEnabled();
-    void setEnabled(bool value);
+    void setEnabled(bool &value);
     bool isDeleted();
-    void setDeleted(bool value);
+    void setDeleted(bool &value);
 };
