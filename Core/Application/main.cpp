@@ -18,7 +18,7 @@ using namespace Commons::Strings;
 
 int main(int argc, char *argv[]) {
 
-    std::string title = "Generated code";
+    std::string title = "generated code";
     std::string description = "READY";
 
     Label label;
@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
     label.setDescription(description);
 
     auto errTag = "error";
+    auto statusTag = "status";
     auto paramsTag = "parameters";
 
     argparse::ArgumentParser program(VERSIONABLE_NAME, getVersion());
@@ -71,6 +72,14 @@ int main(int argc, char *argv[]) {
             w(paramsTag, "Debug mode is on");
             v(label.getTitle(), label.getDescription());
         }
+
+        // TODO: Pass the port through the arguments
+        drogon::app().addListener("0.0.0.0",8081);
+        // TODO: Load config file
+        //  drogon::app().loadConfigFile("../config.json");
+        //  Run HTTP framework,the method will block in the internal event loop
+        d(statusTag, "starting");
+        drogon::app().run();
 
     } catch (std::logic_error &err) {
 
