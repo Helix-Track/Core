@@ -22,13 +22,7 @@ link_directories("/usr/local/lib/Tester-1.0.0")
 link_libraries(Tester-1.0.0)
 
 # Drogon (with Trantor) dependency:
-link_directories("/usr/local/lib64")
-
-include_directories("/usr/local/include/drogon")
-link_libraries(drogon)
-
-include_directories("/usr/local/include/trantor")
-link_libraries(trantor)
+add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/Drogon/Library" "Drogon_Build")
 
 # argparse dependency:
 include_directories("/usr/local/include/argparse")
@@ -40,5 +34,8 @@ file(
         "generated/Source/cpp/*.h" "generated/Source/cpp/*.cpp"
 )
 add_executable(${VERSIONABLE_NAME} ${APP_SRC} main.cpp Utils.h Utils.cpp)
+
+target_link_libraries(${VERSIONABLE_NAME} PRIVATE trantor)
+target_link_libraries(${VERSIONABLE_NAME} PRIVATE drogon)
 
 install(TARGETS ${VERSIONABLE_NAME} DESTINATION bin/${PROJECT_NAME})
