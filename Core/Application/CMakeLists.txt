@@ -21,6 +21,15 @@ include_directories("/usr/local/include/Tester-1.0.0")
 link_directories("/usr/local/lib/Tester-1.0.0")
 link_libraries(Tester-1.0.0)
 
+# Drogon (with Trantor) dependency:
+link_directories("/usr/local/lib64")
+
+include_directories("/usr/local/include/drogon")
+link_libraries(drogon)
+
+include_directories("/usr/local/include/trantor")
+link_libraries(trantor)
+
 # argparse dependency:
 include_directories("/usr/local/include/argparse")
 
