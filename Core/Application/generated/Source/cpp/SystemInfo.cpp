@@ -1,6 +1,6 @@
 /*
     SystemInfo.cpp
-    Generated with 'sql2code' 0.0.2-SNAPSHOT
+    Generated with 'sql2code' 0.0.2
     https://github.com/red-elf/SQL-to-Code
 */
 
