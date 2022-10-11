@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
             v(label.getTitle(), label.getDescription());
         }
 
-        // TODO: Pass the port through the arguments
         drogon::app().addListener("0.0.0.0", port);
+
         // TODO: Load config file
         //  drogon::app().loadConfigFile("../config.json");
         //  Run HTTP framework,the method will block in the internal event loop
