@@ -1,6 +1,6 @@
 {
   "log": {
-    "log_path": "/tmp/HelixTrack_Logs_DEV",
+    "log_path": "/tmp/htCoreLogs_DEV",
     "logfile_base_name": "",
     "log_size_limit": 5000000
   },
