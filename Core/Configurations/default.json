@@ -1,13 +1,13 @@
 {
   "log": {
-    "log_path": "/tmp/HelixTrack_Logs_DEV",
+    "log_path": "/tmp/htCoreLogs",
     "logfile_base_name": "",
-    "log_size_limit": 5000000
+    "log_size_limit": 100000000
   },
   "listeners": [
     {
       "address": "0.0.0.0",
-      "port": 8081,
+      "port": 8080,
       "https": false
     }
   ]

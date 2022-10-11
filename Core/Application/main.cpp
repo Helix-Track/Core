@@ -28,7 +28,8 @@ int main(int argc, char *argv[]) {
     auto errTag = "error";
     auto startingTag = "starting";
     auto paramsTag = "parameters";
-    auto noConfigurationFile = "-";
+    // FIXME: CMake to deploy the default configuration
+    auto defaultConfigurationFile = "../../Configurations/default.json";
 
     argparse::ArgumentParser program(VERSIONABLE_NAME, getVersion());
 
@@ -42,18 +43,10 @@ int main(int argc, char *argv[]) {
             .implicit_value(true)
             .help("Additional information related to the parsing and code generating");
 
-    program.add_argument("-p", "--port")
-            .required()
-            .scan<'i', int>()
-            .help("Port to bind to");
-
     program.add_argument("-c", "--configurationFile")
-            .default_value(std::string(noConfigurationFile))
+            .required()
+            .default_value(std::string(defaultConfigurationFile))
             .help("Path to the HelixTrack core configuration file");
-
-    program.add_argument("-g", "--logsFile")
-            .default_value(std::string("/tmp/htCoreLogs"))
-            .help("Path to the HelixTrack core logs file");
 
     std::string epilog("Project homepage: ");
     epilog.append(getHomepage());
@@ -76,15 +69,7 @@ int main(int argc, char *argv[]) {
         setLogFull(program["--logFull"] == true);
         setDebug(program["--debug"] == true && logFull());
 
-        int port = program.get<int>("port");
-        auto logsFile = program.get<std::string>("logsFile");
         auto configurationFile = program.get<std::string>("configurationFile");
-
-        if (!createDirectories(logsFile)) {
-
-            e(errTag, "Directory could not be created: " + logsFile);
-            std::exit(1);
-        }
 
         if (logFull()) {
 
@@ -97,39 +82,27 @@ int main(int argc, char *argv[]) {
             v(label.getTitle(), label.getDescription());
         }
 
-        v(startingTag, "Initializing");
-        d(startingTag, "Logs file path: " + logsFile);
+        d(startingTag, "Configuration file provided: " + configurationFile);
 
-        if (configurationFile != noConfigurationFile) {
-
-            d(startingTag, "Configuration file provided: " + configurationFile);
-
-            /*
-                Details on the configuration file:
-                https://drogon.docsforge.com/master/configuration-file/
-            */
-            drogon::app().loadConfigFile(configurationFile);
-
-        } else {
-
-            drogon::app().addListener("0.0.0.0", port);
-
-            if (logFull()) {
-
-                v(startingTag, "No configuration file provided");
-            }
-
-            d(startingTag, "Port: " + std::to_string(port));
-        }
+        /*
+            Details on the configuration file:
+            https://drogon.docsforge.com/master/configuration-file/
+        */
+        drogon::app().loadConfigFile(configurationFile);
 
         auto logLevel = trantor::Logger::kWarn;
+
         if (isDebug()) {
+
+            logLevel = trantor::Logger::kTrace;
+
+        } else if (logFull()) {
 
             logLevel = trantor::Logger::kDebug;
         }
 
         drogon::app()
-                .setLogPath(logsFile)
+                .setThreadNum(0)
                 .setLogLevel(logLevel);
 
         d(startingTag, "Ok");
