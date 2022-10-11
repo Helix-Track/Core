@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
             .help("Path to the HelixTrack core configuration file");
 
     program.add_argument("-g", "--logsFile")
-            .default_value(std::string("HelixTrack_Logs"))
+            .default_value(std::string("/tmp/htCoreLogs"))
             .help("Path to the HelixTrack core logs file");
 
     std::string epilog("Project homepage: ");
@@ -80,6 +80,12 @@ int main(int argc, char *argv[]) {
         auto logsFile = program.get<std::string>("logsFile");
         auto configurationFile = program.get<std::string>("configurationFile");
 
+        if (!createDirectories(logsFile)) {
+
+            e(errTag, "Directory could not be created: " + logsFile);
+            std::exit(1);
+        }
+
         if (logFull()) {
 
             v(paramsTag, "Full-log mode is on");
@@ -92,7 +98,6 @@ int main(int argc, char *argv[]) {
         }
 
         v(startingTag, "Initializing");
-
         d(startingTag, "Logs file path: " + logsFile);
 
         if (configurationFile != noConfigurationFile) {
@@ -105,27 +110,29 @@ int main(int argc, char *argv[]) {
             */
             drogon::app().loadConfigFile(configurationFile);
 
-            d(startingTag, "Ok");
-
         } else {
 
-            auto logLevel = trantor::Logger::kWarn;
-            if (isDebug()) {
-
-                logLevel = trantor::Logger::kDebug;
-            }
-
-            drogon::app().addListener("0.0.0.0", port)
-                    .setLogPath(logsFile)
-                    .setLogLevel(logLevel);
+            drogon::app().addListener("0.0.0.0", port);
 
             if (logFull()) {
 
                 v(startingTag, "No configuration file provided");
             }
 
-            d(startingTag, "Starting on port: " + std::to_string(port));
+            d(startingTag, "Port: " + std::to_string(port));
         }
+
+        auto logLevel = trantor::Logger::kWarn;
+        if (isDebug()) {
+
+            logLevel = trantor::Logger::kDebug;
+        }
+
+        drogon::app()
+                .setLogPath(logsFile)
+                .setLogLevel(logLevel);
+
+        d(startingTag, "Ok");
 
         drogon::app().run();
 
