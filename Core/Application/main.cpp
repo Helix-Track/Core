@@ -41,6 +41,11 @@ int main(int argc, char *argv[]) {
             .implicit_value(true)
             .help("Additional information related to the parsing and code generating");
 
+    program.add_argument("-p", "--port")
+            .required()
+
+            .help("Log with the full details");
+
     std::string epilog("Project homepage: ");
     epilog.append(getHomepage());
 
