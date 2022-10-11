@@ -73,12 +73,13 @@ int main(int argc, char *argv[]) {
             v(label.getTitle(), label.getDescription());
         }
 
+        auto port = 8081;
         // TODO: Pass the port through the arguments
-        drogon::app().addListener("0.0.0.0",8081);
+        drogon::app().addListener("0.0.0.0", port);
         // TODO: Load config file
         //  drogon::app().loadConfigFile("../config.json");
         //  Run HTTP framework,the method will block in the internal event loop
-        d(statusTag, "starting");
+        d(statusTag, "Starting on port: " + std::to_string(port));
         drogon::app().run();
 
     } catch (std::logic_error &err) {
