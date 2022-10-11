@@ -88,23 +88,30 @@ int main(int argc, char *argv[]) {
 
         v(statusTag, "Initializing");
 
-        drogon::app().addListener("0.0.0.0", port);
-
         if (configurationFile != noConfigurationFile) {
 
             d(statusTag, "Configuration file provided: " + configurationFile);
 
+            /*
+                Details on the configuration file:
+                https://drogon.docsforge.com/master/configuration-file/
+            */
             drogon::app().loadConfigFile(configurationFile);
 
+            d(statusTag, "Starting");
+
         } else {
+
+            drogon::app().addListener("0.0.0.0", port);
 
             if (logFull()) {
 
                 v(statusTag, "No configuration file provided");
             }
+
+            d(statusTag, "Starting on port: " + std::to_string(port));
         }
 
-        d(statusTag, "Starting on port: " + std::to_string(port));
         drogon::app().run();
 
     } catch (std::logic_error &err) {
