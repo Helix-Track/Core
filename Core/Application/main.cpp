@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     label.setDescription(description);
 
     auto errTag = "error";
-    auto statusTag = "status";
+    auto startingTag = "starting";
     auto paramsTag = "parameters";
     auto noConfigurationFile = "-";
 
@@ -51,6 +51,10 @@ int main(int argc, char *argv[]) {
             .default_value(std::string(noConfigurationFile))
             .help("Path to the HelixTrack core configuration file");
 
+    program.add_argument("-g", "--logsFile")
+            .default_value(std::string("HelixTrack_Logs"))
+            .help("Path to the HelixTrack core logs file");
+
     std::string epilog("Project homepage: ");
     epilog.append(getHomepage());
 
@@ -73,6 +77,7 @@ int main(int argc, char *argv[]) {
         setDebug(program["--debug"] == true && logFull());
 
         int port = program.get<int>("port");
+        auto logsFile = program.get<std::string>("logsFile");
         auto configurationFile = program.get<std::string>("configurationFile");
 
         if (logFull()) {
@@ -86,11 +91,13 @@ int main(int argc, char *argv[]) {
             v(label.getTitle(), label.getDescription());
         }
 
-        v(statusTag, "Initializing");
+        v(startingTag, "Initializing");
+
+        d(startingTag, "Logs file path: " + logsFile);
 
         if (configurationFile != noConfigurationFile) {
 
-            d(statusTag, "Configuration file provided: " + configurationFile);
+            d(startingTag, "Configuration file provided: " + configurationFile);
 
             /*
                 Details on the configuration file:
@@ -98,18 +105,26 @@ int main(int argc, char *argv[]) {
             */
             drogon::app().loadConfigFile(configurationFile);
 
-            d(statusTag, "Starting");
+            d(startingTag, "Ok");
 
         } else {
 
-            drogon::app().addListener("0.0.0.0", port);
+            auto logLevel = trantor::Logger::kWarn;
+            if (isDebug()) {
+
+                logLevel = trantor::Logger::kDebug;
+            }
+
+            drogon::app().addListener("0.0.0.0", port)
+                    .setLogPath(logsFile)
+                    .setLogLevel(logLevel);
 
             if (logFull()) {
 
-                v(statusTag, "No configuration file provided");
+                v(startingTag, "No configuration file provided");
             }
 
-            d(statusTag, "Starting on port: " + std::to_string(port));
+            d(startingTag, "Starting on port: " + std::to_string(port));
         }
 
         drogon::app().run();
