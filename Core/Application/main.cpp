@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
     auto errTag = "error";
     auto statusTag = "status";
     auto paramsTag = "parameters";
+    auto noConfigurationFile = "-";
 
     argparse::ArgumentParser program(VERSIONABLE_NAME, getVersion());
 
@@ -45,6 +46,10 @@ int main(int argc, char *argv[]) {
             .required()
             .scan<'i', int>()
             .help("Port to bind to");
+
+    program.add_argument("-c", "--configurationFile")
+            .default_value(std::string(noConfigurationFile))
+            .help("Path to the HelixTrack core configuration file");
 
     std::string epilog("Project homepage: ");
     epilog.append(getHomepage());
@@ -66,7 +71,9 @@ int main(int argc, char *argv[]) {
 
         setLogFull(program["--logFull"] == true);
         setDebug(program["--debug"] == true && logFull());
+
         int port = program.get<int>("port");
+        auto configurationFile = program.get<std::string>("configurationFile");
 
         if (logFull()) {
 
@@ -79,11 +86,25 @@ int main(int argc, char *argv[]) {
             v(label.getTitle(), label.getDescription());
         }
 
+        v(statusTag, "Initializing");
+
         drogon::app().addListener("0.0.0.0", port);
 
-        // TODO: Load config file
-        //  drogon::app().loadConfigFile("../config.json");
-        //  Run HTTP framework,the method will block in the internal event loop
+        if (configurationFile != noConfigurationFile) {
+
+            d(statusTag, "Configuration file provided: " + configurationFile);
+
+            // TODO: Check if file exists then load:
+            drogon::app().loadConfigFile(configurationFile);
+
+        } else {
+
+            if (logFull()) {
+
+                v(statusTag, "No configuration file provided");
+            }
+        }
+
         d(statusTag, "Starting on port: " + std::to_string(port));
         drogon::app().run();
 
