@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
 
     program.add_argument("-p", "--port")
             .required()
-
-            .help("Log with the full details");
+            .scan<'i', int>()
+            .help("Port to bind to");
 
     std::string epilog("Project homepage: ");
     epilog.append(getHomepage());
@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
 
         setLogFull(program["--logFull"] == true);
         setDebug(program["--debug"] == true && logFull());
+        int port = program.get<int>("port");
 
         if (logFull()) {
 
@@ -78,7 +79,6 @@ int main(int argc, char *argv[]) {
             v(label.getTitle(), label.getDescription());
         }
 
-        auto port = 8081;
         // TODO: Pass the port through the arguments
         drogon::app().addListener("0.0.0.0", port);
         // TODO: Load config file
