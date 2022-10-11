@@ -94,7 +94,6 @@ int main(int argc, char *argv[]) {
 
             d(statusTag, "Configuration file provided: " + configurationFile);
 
-            // TODO: Check if file exists then load:
             drogon::app().loadConfigFile(configurationFile);
 
         } else {
@@ -109,6 +108,11 @@ int main(int argc, char *argv[]) {
         drogon::app().run();
 
     } catch (std::logic_error &err) {
+
+        e(errTag, err.what());
+        std::exit(1);
+
+    } catch (std::runtime_error &err) {
 
         e(errTag, err.what());
         std::exit(1);
