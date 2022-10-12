@@ -112,6 +112,26 @@ int main(int argc, char *argv[]) {
                 .setThreadNum(0)
                 .setLogLevel(logLevel);
 
+        auto versionCallback = [](
+
+                const drogon::HttpRequestPtr &,
+                std::function<void(const drogon::HttpResponsePtr &)> &&callback
+
+        ) {
+
+            auto resp = drogon::HttpResponse::newHttpResponse();
+            resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
+            resp->setBody(R"({"version": ")" + getVersion() + "\"}");
+            callback(resp);
+        };
+
+        drogon::app().registerHandler(
+
+                "/version",
+                versionCallback,
+                {drogon::Get}
+        );
+
         d(startingTag, "Ok");
 
         drogon::app().run();
