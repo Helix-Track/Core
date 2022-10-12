@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
     auto errTag = "error";
     auto startingTag = "starting";
     auto paramsTag = "parameters";
-    // FIXME: CMake to deploy the default configuration
-    auto defaultConfigurationFile = "../../Configurations/default.json";
+    auto installationDirectory = std::string(VERSIONABLE_NAME).append("-").append(getVersion());
+    auto defaultConfigurationFile = "/usr/local/bin/" + installationDirectory + "/default.json";
 
     argparse::ArgumentParser program(VERSIONABLE_NAME, getVersion());
 
@@ -82,7 +82,14 @@ int main(int argc, char *argv[]) {
             v(label.getTitle(), label.getDescription());
         }
 
-        d(startingTag, "Configuration file provided: " + configurationFile);
+        if (configurationFile == defaultConfigurationFile) {
+
+            d(startingTag, "Using default configuration file: " + configurationFile);
+
+        } else {
+
+            d(startingTag, "Configuration file provided: " + configurationFile);
+        }
 
         /*
             Details on the configuration file:

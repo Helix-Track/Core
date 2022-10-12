@@ -39,3 +39,9 @@ target_link_libraries(${VERSIONABLE_NAME} PRIVATE trantor)
 target_link_libraries(${VERSIONABLE_NAME} PRIVATE drogon)
 
 install(TARGETS ${VERSIONABLE_NAME} DESTINATION bin/${PROJECT_NAME})
+
+install(
+
+        FILES ${CMAKE_SOURCE_DIR}/../Configurations/default.json
+        DESTINATION bin/${PROJECT_NAME} PERMISSIONS OWNER_WRITE WORLD_READ
+)
