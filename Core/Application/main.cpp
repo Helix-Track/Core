@@ -111,6 +111,7 @@ int main(int argc, char *argv[]) {
 
         drogon::app()
                 .setThreadNum(0)
+                .setServerHeaderField(std::string(VERSIONABLE_NAME).append(" ").append(getVersion()))
                 .setLogLevel(logLevel);
 
         const auto processorCount = std::thread::hardware_concurrency();
