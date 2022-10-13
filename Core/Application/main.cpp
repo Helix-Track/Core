@@ -1,4 +1,5 @@
 #include <vector>
+#include <thread>
 #include <iostream>
 #include <filesystem>
 #include <drogon/drogon.h>
@@ -111,6 +112,13 @@ int main(int argc, char *argv[]) {
         drogon::app()
                 .setThreadNum(0)
                 .setLogLevel(logLevel);
+
+        const auto processorCount = std::thread::hardware_concurrency();
+
+        if (logFull() && processorCount > 0) {
+
+            d(startingTag, "Running on " + std::to_string(processorCount) + " cpu cores");
+        }
 
         auto versionCallback = [](
 
