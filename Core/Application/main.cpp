@@ -128,9 +128,9 @@ int main(int argc, char *argv[]) {
 
         ) {
 
-            auto resp = drogon::HttpResponse::newHttpResponse();
-            resp->setContentTypeCode(drogon::CT_APPLICATION_JSON);
-            resp->setBody(R"({"version": ")" + getVersion() + "\"}");
+            Json::Value jsonBody;
+            jsonBody["version"] = getVersion();
+            auto resp = drogon::HttpResponse::newHttpJsonResponse(jsonBody);
             callback(resp);
         };
 
