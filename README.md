@@ -1,3 +1,4 @@
+![JWT Compatible](https://jwt.io/img/badge-compatible.svg)
 ![JIRA alternative for the free world!](Assets/Wide_Black.png)
 
 # HelixTrack Core
