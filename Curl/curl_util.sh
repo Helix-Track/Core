@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # TODO: Move into the commonly used utility!
+
 function RUN_CURL {
 
   CURL_UTIL_PORT="80"
