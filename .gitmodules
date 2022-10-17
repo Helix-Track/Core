@@ -13,3 +13,6 @@
 [submodule "Upstreamable"]
 	path = Upstreamable
 	url = git@github.com:red-elf/Upstreamable.git
+[submodule "Core/Toolkit"]
+	path = Core/Toolkit
+	url = git@github.com:red-elf/Software-Toolkit.git
