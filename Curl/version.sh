@@ -13,4 +13,19 @@ else
   exit 1
 fi
 
-RUN_CURL "$1" "$2" "$3" "$4"
+if [ -n "$1" ]; then
+
+  UTIL_PROTOCOL="$1"
+fi
+
+if [ -n "$2" ]; then
+
+  UTIL_HOST="$2"
+fi
+
+if [ -n "$3" ]; then
+
+  UTIL_PORT="$3"
+fi
+
+RUN_CURL "$UTIL_PROTOCOL" "$UTIL_HOST" "$UTIL_PORT" version
