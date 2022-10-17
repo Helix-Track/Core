@@ -1,17 +1,18 @@
 /*
-    UserGoogleMappings.h
+    UserDefaultMapping.h
     Generated with 'sql2code' 0.0.2
     https://github.com/red-elf/SQL-to-Code
 */
 
 #include "string"
 
-class UserGoogleMappings {
+class UserDefaultMapping {
 
 private:
     std::string id;
     std::string userId;
     std::string username;
+    std::string secret;
     int created;
     int modified;
     bool deleted;
@@ -23,6 +24,8 @@ public:
     void setUserId(std::string &value);
     std::string getUsername();
     void setUsername(std::string &value);
+    std::string getSecret();
+    void setSecret(std::string &value);
     int getCreated();
     void setCreated(int &value);
     int getModified();

@@ -463,19 +463,12 @@ CREATE TABLE ticket_board_mapping
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
     deleted   BOOLEAN NOT NULL );
-CREATE TABLE user_yandex_mapping
+CREATE TABLE user_default_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     user_id  TEXT    NOT NULL UNIQUE,
     username TEXT    NOT NULL UNIQUE,
-    created  INTEGER NOT NULL,
-    modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL );
-CREATE TABLE user_google_mappings
-(
-    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
-    user_id  TEXT    NOT NULL UNIQUE,
-    username TEXT    NOT NULL UNIQUE,
+    secret   TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL );
