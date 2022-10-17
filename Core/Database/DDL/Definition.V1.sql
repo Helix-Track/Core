@@ -21,8 +21,7 @@ DROP TABLE IF EXISTS team_project_mapping;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS user_organization_mapping;
 DROP TABLE IF EXISTS user_team_mapping;
-DROP TABLE IF EXISTS user_yandex_mapping;
-DROP TABLE IF EXISTS user_google_mappings;
+DROP TABLE IF EXISTS user_default_mapping;
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS project_organization_mapping;
 DROP TABLE IF EXISTS ticket;
@@ -448,18 +447,13 @@ DROP INDEX IF EXISTS ticket_board_mappings_get_by_deleted;
 DROP INDEX IF EXISTS ticket_board_mappings_get_by_created;
 DROP INDEX IF EXISTS ticket_board_mappings_get_by_modified;
 DROP INDEX IF EXISTS ticket_board_mappings_get_by_created_and_modified;
-DROP INDEX IF EXISTS users_yandex_mappings_get_by_user_id;
-DROP INDEX IF EXISTS users_yandex_mappings_get_by_username;
-DROP INDEX IF EXISTS users_yandex_mappings_get_by_deleted;
-DROP INDEX IF EXISTS users_yandex_mappings_get_by_created;
-DROP INDEX IF EXISTS users_yandex_mappings_get_by_modified;
-DROP INDEX IF EXISTS users_yandex_mappings_get_by_created_and_modified;
-DROP INDEX IF EXISTS users_google_mappings_get_by_user_id;
-DROP INDEX IF EXISTS users_google_mappings_get_by_username;
-DROP INDEX IF EXISTS users_google_mappings_get_by_deleted;
-DROP INDEX IF EXISTS users_google_mappings_get_by_created;
-DROP INDEX IF EXISTS users_google_mappings_get_by_modified;
-DROP INDEX IF EXISTS users_google_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS users_default_mappings_get_by_user_id;
+DROP INDEX IF EXISTS users_default_mappings_get_by_username;
+DROP INDEX IF EXISTS users_default_mappings_get_by_username_and_secret;
+DROP INDEX IF EXISTS users_default_mappings_get_by_deleted;
+DROP INDEX IF EXISTS users_default_mappings_get_by_created;
+DROP INDEX IF EXISTS users_default_mappings_get_by_modified;
+DROP INDEX IF EXISTS users_default_mappings_get_by_created_and_modified;
 DROP INDEX IF EXISTS user_organization_mappings_get_by_user_id;
 DROP INDEX IF EXISTS user_organization_mappings_get_by_organization_id;
 DROP INDEX IF EXISTS user_organization_mappings_get_by_deleted;
@@ -1876,50 +1870,28 @@ CREATE INDEX ticket_board_mappings_get_by_modified ON ticket_board_mapping (modi
 CREATE INDEX ticket_board_mappings_get_by_created_and_modified ON ticket_board_mapping (created, modified);
 
 /*
-    OAuth2 mappings:
+    Default mapping for users (default auth.)
+    The 'secret' field represnts the salted/hashed password value.
 */
-
-/*
-    Users can be Yandex OAuth2 account users:
-*/
-CREATE TABLE user_yandex_mapping
+CREATE TABLE user_default_mapping
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     user_id  TEXT    NOT NULL UNIQUE,
     username TEXT    NOT NULL UNIQUE,
+    secret   TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
-CREATE INDEX users_yandex_mappings_get_by_user_id ON user_yandex_mapping (user_id);
-CREATE INDEX users_yandex_mappings_get_by_username ON user_yandex_mapping (username);
-CREATE INDEX users_yandex_mappings_get_by_deleted ON user_yandex_mapping (deleted);
-CREATE INDEX users_yandex_mappings_get_by_created ON user_yandex_mapping (created);
-CREATE INDEX users_yandex_mappings_get_by_modified ON user_yandex_mapping (modified);
-CREATE INDEX users_yandex_mappings_get_by_created_and_modified ON user_yandex_mapping (created, modified);
-
-/*
-    Users can be Google OAuth2 account users:
-*/
-CREATE TABLE user_google_mappings
-(
-
-    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
-    user_id  TEXT    NOT NULL UNIQUE,
-    username TEXT    NOT NULL UNIQUE,
-    created  INTEGER NOT NULL,
-    modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
-);
-
-CREATE INDEX users_google_mappings_get_by_user_id ON user_google_mappings (user_id);
-CREATE INDEX users_google_mappings_get_by_username ON user_google_mappings (username);
-CREATE INDEX users_google_mappings_get_by_deleted ON user_google_mappings (deleted);
-CREATE INDEX users_google_mappings_get_by_created ON user_google_mappings (created);
-CREATE INDEX users_google_mappings_get_by_modified ON user_google_mappings (modified);
-CREATE INDEX users_google_mappings_get_by_created_and_modified ON user_google_mappings (created, modified);
+CREATE INDEX users_default_mappings_get_by_user_id ON user_default_mapping (user_id);
+CREATE INDEX users_default_mappings_get_by_username ON user_default_mapping (username);
+CREATE INDEX users_default_mappings_get_by_username_and_secret ON user_default_mapping (username, secret);
+CREATE INDEX users_default_mappings_get_by_deleted ON user_default_mapping (deleted);
+CREATE INDEX users_default_mappings_get_by_created ON user_default_mapping (created);
+CREATE INDEX users_default_mappings_get_by_modified ON user_default_mapping (modified);
+CREATE INDEX users_default_mappings_get_by_created_and_modified ON user_default_mapping (created, modified);
 
 /*
     User access rights:
