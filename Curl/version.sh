@@ -1,31 +1,16 @@
 #!/bin/bash
 
-CURL="../Core/Toolkit/Utils/curl.sh"
+API_CALL="api_call.sh"
 
-if test -e "$CURL"; then
+if test -e "$API_CALL"; then
 
   # shellcheck disable=SC1090
-  . "$CURL"
+  . "$API_CALL"
 
 else
 
-  echo "ERROR: '$CURL' not found"
+  echo "ERROR: '$API_CALL' not found"
   exit 1
 fi
 
-if [ -n "$1" ]; then
-
-  UTIL_PROTOCOL="$1"
-fi
-
-if [ -n "$2" ]; then
-
-  UTIL_HOST="$2"
-fi
-
-if [ -n "$3" ]; then
-
-  UTIL_PORT="$3"
-fi
-
-RUN_CURL "$UTIL_PROTOCOL" "$UTIL_HOST" "$UTIL_PORT" version
+API_CALL "$UTIL_PROTOCOL" "$UTIL_HOST" "$UTIL_PORT" version
