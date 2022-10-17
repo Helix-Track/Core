@@ -1,10 +1,11 @@
 #!/bin/bash
 
-CURL="curl_util.sh"
+CURL="../Core/Toolkit/Utils/curl.sh"
 
 if test -e "$CURL"; then
 
-  . curl_util.sh
+  # shellcheck disable=SC1090
+  . "$CURL"
 
 else
 
