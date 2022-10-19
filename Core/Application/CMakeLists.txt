@@ -22,7 +22,12 @@ link_directories("/usr/local/lib/Tester-1.0.0")
 link_libraries(Tester-1.0.0)
 
 # Drogon (with Trantor) dependency:
-add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/Drogon/Library" "Drogon_Build")
+add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/Drogon/Library" "Build_Drogon")
+
+# TODO:
+# Drogon JWT support:
+# add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JWT-Drogon/Library" "Build_Drogon_JWT")
+# add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JSON/Library" "Build_JSON")
 
 # argparse dependency:
 include_directories("/usr/local/include/argparse")
