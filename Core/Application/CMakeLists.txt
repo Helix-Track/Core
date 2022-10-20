@@ -26,9 +26,9 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/Drogon/Library" "
 
 # Drogon JWT support:
 add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JSON/Library" "Build_JSON")
+add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/CPP-JWT/Library" "Build_CPP_JWT")
 
 # TODO:
-# add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/CPP-JWT/Library" "Build_CPP_JWT")
 # add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JWT-Drogon/Library" "Build_Drogon_JWT")
 
 # argparse dependency:
@@ -45,9 +45,7 @@ add_executable(${VERSIONABLE_NAME} ${APP_SRC} main.cpp Utils.h Utils.cpp)
 target_link_libraries(${VERSIONABLE_NAME} PRIVATE trantor)
 target_link_libraries(${VERSIONABLE_NAME} PRIVATE drogon)
 target_link_libraries(${VERSIONABLE_NAME} PRIVATE nlohmann_json::nlohmann_json)
-
-# TODO:
-# target_link_libraries(${VERSIONABLE_NAME} PRIVATE cpp-jwt::cpp-jwt)
+target_link_libraries(${VERSIONABLE_NAME} PRIVATE cpp-jwt::cpp-jwt)
 
 install(TARGETS ${VERSIONABLE_NAME} DESTINATION bin/${PROJECT_NAME})
 
