@@ -16,3 +16,6 @@
 [submodule "Core/Toolkit"]
 	path = Core/Toolkit
 	url = git@github.com:red-elf/Software-Toolkit.git
+[submodule "Core/Upstreamable"]
+	path = Core/Upstreamable
+	url = git@github.com:red-elf/Upstreamable.git
