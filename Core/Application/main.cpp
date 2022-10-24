@@ -19,9 +19,9 @@ using namespace Utils;
 using namespace Commons::IO;
 using namespace Commons::Strings;
 
-bool verifyJWT(drogon::HttpAppFramework &drogonApp) {
+bool verifyJWT() {
 
-    auto *jwtPtr = drogonApp.getPlugin<JWT>();
+    auto *jwtPtr = drogon::app().getPlugin<JWT>();
     auto jwtClass = jwtPtr->init("super-passcode");
 
     auto keySub = "sub";
@@ -159,6 +159,19 @@ int main(int argc, char *argv[]) {
             callback(resp);
         };
 
+        auto jwtCheckCallback = [](
+
+                const drogon::HttpRequestPtr &,
+                std::function<void(const drogon::HttpResponsePtr &)> &&callback
+
+        ) {
+
+            Json::Value jsonBody;
+            jsonBody["jwt_capable"] = std::to_string(verifyJWT());
+            auto resp = drogon::HttpResponse::newHttpJsonResponse(jsonBody);
+            callback(resp);
+        };
+
         drogon::app().registerHandler(
 
                 "/version",
@@ -166,15 +179,12 @@ int main(int argc, char *argv[]) {
                 {drogon::Get}
         );
 
-        if (verifyJWT(drogon::app())) {
+        drogon::app().registerHandler(
 
-            v(errTag, "JWT capability check passed");
-
-        } else {
-
-            e(errTag, "JWT capability check failed");
-            std::exit(1);
-        }
+                "/jwt_check",
+                jwtCheckCallback,
+                {drogon::Get}
+        );
 
         d(startingTag, "Ok");
 
