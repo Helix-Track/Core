@@ -27,9 +27,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/Drogon/Library" "
 # Drogon JWT support:
 add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JSON/Library" "Build_JSON")
 add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/CPP-JWT/Library" "Build_CPP_JWT")
-
-# TODO:
-# add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JWT-Drogon/Library" "Build_Drogon_JWT")
+add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JWT-Drogon/Library" "Build_Drogon_JWT")
 
 # argparse dependency:
 include_directories("/usr/local/include/argparse")
