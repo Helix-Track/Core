@@ -35,6 +35,7 @@ file(
         GLOB APP_SRC
         "*.h" "*.cpp"
         "generated/Source/cpp/*.h" "generated/Source/cpp/*.cpp"
+        "plugins/*.h" "plugins/*.cc"
 )
 add_executable(${VERSIONABLE_NAME} ${APP_SRC} main.cpp Utils.h Utils.cpp)
 
