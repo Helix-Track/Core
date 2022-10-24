@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
 
         drogon::app().registerHandler(
 
-                "/jwt_check",
+                "/version.sh",
                 jwtCheckCallback,
                 {drogon::Get}
         );
