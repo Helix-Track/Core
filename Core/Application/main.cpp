@@ -13,9 +13,34 @@
 
 #include "generated/Source/cpp/Label.h"
 
+#include "plugins/JWTplugin.h"
+
 using namespace Utils;
 using namespace Commons::IO;
 using namespace Commons::Strings;
+
+bool verifyJWT(drogon::HttpAppFramework &drogonApp) {
+
+    auto *jwtPtr = drogonApp.getPlugin<JWT>();
+    auto jwtClass = jwtPtr->init("super-passcode");
+
+    auto keySub = "sub";
+    auto something = "something";
+
+    std::map<std::string, std::string> payload;
+
+    payload["iss"] = "somebody";
+    payload[keySub] = something;
+    payload["X-pld"] = "data1";
+
+    auto token = jwtClass.encode(payload);
+
+    jwt::jwt_object decodedData = jwtClass.decode(token);
+
+    auto verify = decodedData.payload().get_claim_value<std::string>(keySub);
+
+    return verify == something;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -140,6 +165,16 @@ int main(int argc, char *argv[]) {
                 versionCallback,
                 {drogon::Get}
         );
+
+        if (verifyJWT(drogon::app())) {
+
+            v(errTag, "JWT capability check passed");
+
+        } else {
+
+            e(errTag, "JWT capability check failed");
+            std::exit(1);
+        }
 
         d(startingTag, "Ok");
 
