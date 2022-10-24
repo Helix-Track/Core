@@ -25,8 +25,6 @@ link_libraries(Tester-1.0.0)
 add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/Drogon/Library" "Build_Drogon")
 
 # Drogon JWT support:
-add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JSON/Library" "Build_JSON")
-add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/CPP-JWT/Library" "Build_CPP_JWT")
 add_subdirectory("${PROJECT_SOURCE_DIR}/../_Dependencies/Cache/JWT-Drogon/Library" "Build_Drogon_JWT")
 
 # argparse dependency:
