@@ -10,5 +10,13 @@
       "port": 8081,
       "https": false
     }
+  ],
+  "plugins": [
+    {
+      "name": "JWT",
+      "dependencies": [],
+      "config": {
+      }
+    }
   ]
 }

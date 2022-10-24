@@ -12,5 +12,13 @@
       "cert": "",
       "key": ""
     }
+  ],
+  "plugins": [
+    {
+      "name": "JWT",
+      "dependencies": [],
+      "config": {
+      }
+    }
   ]
 }
