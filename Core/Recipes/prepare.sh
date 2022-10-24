@@ -57,8 +57,7 @@ DEPENDENCIES_WORKING_DIRECTORY="$DEPENDABLE_DEPENDENCIES_HOME/_Dependencies"
 
 echo "The dependencies working directory: '$DEPENDENCIES_WORKING_DIRECTORY'"
 
-if cp "$DEPENDENCIES_WORKING_DIRECTORY/Cache/JWT-Drogon/Library/JWT.*" "$PLUGINS" && \
-  cp "$DEPENDENCIES_WORKING_DIRECTORY/Cache/JWT-Drogon/Library/JWT*.*" "$PLUGINS"; then
+if cp "$DEPENDENCIES_WORKING_DIRECTORY/Cache/JWT-Drogon/Library/JWT"* "$PLUGINS"; then
 
   echo "Drogon JWT plugin copied"
 else
