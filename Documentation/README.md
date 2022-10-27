@@ -1,3 +1,3 @@
 # Project documentation
 
-- [API calls]("./API") documentation
+- [API calls](API) documentation
