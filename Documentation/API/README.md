@@ -8,6 +8,9 @@ Table of contents
   - [Authenticate the user](#Authenticate-the-user)
   - [Sign out the user from the system](#Sign-out-the-user-from-the-system)
   - [Obtain the version of the authentication API service](#Obtain-the-version-of-the-authentication-API-service)
+- [Core API](#Core-API)
+  - [JWT capability check](#JWT-capability-check)
+  - [Obtain the version of the HelixTrack Core API service](#Obtain-the-version-of-the-HelixTrack-Core-API-service)
 
 ## Authentication API
 
