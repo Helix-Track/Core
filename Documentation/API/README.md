@@ -9,16 +9,16 @@ The following sections list all the HeliXTrack API calls specifications.
 - endpoint: `/do`
 - method: `POST`
 - payload: 
-  ```json
+  ```yaml
   {
-    "action": "authenticate",
-    "username": "string",
-    "password": "string",
-    "locale": "string?"
+    "action": "authenticate", /* mandatory */
+    "username": "string",     /* mandatory */
+    "password": "string",     /* mandatory */
+    "locale": "string?"       /* optional  */
   }
   ```
 - response:
-  ```json
+  ```yaml
   {
     "jwt": "string",
     "errorCode": -1,
