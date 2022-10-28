@@ -27,6 +27,27 @@ The following sections list all the HeliXTrack API calls specifications.
   }
   ```
 
+### Sign out the user from the system
+
+- endpoint: `/do`
+- method: `POST`
+- payload:
+  ```yaml
+  {
+    "action":      "signOut"      /* mandatory */
+    "jwt":         "string"       /* mandatory */
+    "locale":      "string"       /* optional  */
+  }
+  ```
+- response:
+  ```yaml
+  {
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
+  }
+  ```
+
 ### Obtain the version of the authentication API service
 
 - endpoint: `/do`
