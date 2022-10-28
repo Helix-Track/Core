@@ -2,6 +2,13 @@
 
 The following sections list all the HeliXTrack API calls specifications.
 
+Table of contents
+
+- [Authentication API](#Authentication-API)
+  - [Authenticate the user](#Authenticate-the-user)
+  - [Sign out the user from the system](#Sign-out-the-user-from-the-system)
+  - [Obtain the version of the authentication API service](#Obtain-the-version-of-the-authentication-API-service)
+
 ## Authentication API
 
 ### Authenticate the user
