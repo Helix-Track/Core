@@ -11,23 +11,87 @@ The following sections list all the HeliXTrack API calls specifications.
 - payload: 
   ```yaml
   {
-    "action": "authenticate", /* mandatory */
-    "username": "string",     /* mandatory */
-    "password": "string",     /* mandatory */
-    "locale": "string?"       /* optional  */
+    "action":     "authenticate"   /* mandatory */
+    "username":   "string",        /* mandatory */
+    "password":   "string",        /* mandatory */
+    "locale":     "string"         /* optional  */
   }
   ```
 - response:
   ```yaml
   {
-    "jwt": "string",
-    "errorCode": -1,
-    "errorMessage": "string",
-    "errorMessageLocalised": "string"
+    "jwt":                    "string",
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
   }
   ```
 
+### Obtain the version of the authentication API service
+
+- endpoint: `/do`
+- method: `POST`
+- payload:
+  ```yaml
+  {
+    "action":      "version"      /* mandatory */
+    "jwt":         "string"       /* mandatory */
+    "locale":      "string"       /* optional  */
+  }
+  ```
+- response:
+  ```yaml
+  {
+    "version":                "string",
+    "versionCode":            "string",
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
+  }
+  ```
 
 ## Core API
 
-Tbd.
+### JWT capability check
+
+- endpoint: `/do`
+- method: `POST`
+- payload:
+  ```yaml
+  {
+    "action":      "jwtCapable"   /* mandatory */
+    "locale":      "string"       /* optional  */
+  }
+  ```
+- response:
+  ```yaml
+  {
+    "jwtCapable":             "boolean",
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
+  }
+  ```
+
+### Obtain the version of the HelixTrack Core API service
+
+- endpoint: `/do`
+- method: `POST`
+- payload:
+  ```yaml
+  {
+    "action":      "version"      /* mandatory */
+    "jwt":         "string"       /* mandatory */
+    "locale":      "string"       /* optional  */
+  }
+  ```
+- response:
+  ```yaml
+  {
+    "version":                "string",
+    "versionCode":            "string",
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
+  }
+  ```
