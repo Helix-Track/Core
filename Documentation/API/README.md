@@ -2,9 +2,9 @@
 
 The following sections list all the HeliXTrack API calls specifications.
 
-## Authentication
+## Authentication API
 
-### Authenticate user
+### Authenticate the user
 
 - endpoint: `/do`
 - method: `POST`
