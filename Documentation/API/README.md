@@ -14,7 +14,7 @@ The following sections list all the HeliXTrack API calls specifications.
     "action": "authenticate",
     "username": "string",
     "password": "string",
-    "locale": "string"
+    "locale": "string?"
   }
   ```
 - response:
