@@ -6,6 +6,7 @@ Table of contents
 
 - [Authentication API](#Authentication-API)
   - [Authenticate the user](#Authenticate-the-user)
+    - [The JWT structure](#The-JWT-structure)
   - [Sign out the user from the system](#Sign-out-the-user-from-the-system)
   - [Obtain the version of the authentication API service](#Obtain-the-version-of-the-authentication-API-service)
 - [Core API](#Core-API)
@@ -36,6 +37,10 @@ Table of contents
     "errorMessageLocalised":  "string"
   }
   ```
+  
+#### The JWT structure:
+
+Tbd.
 
 ### Sign out the user from the system
 
