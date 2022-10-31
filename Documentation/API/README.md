@@ -165,7 +165,7 @@ Table of contents
   }
   ```
   
-Supported 'actions' are:
+Supported `action`(s) are:
 
 - `create`
 - `modify`
@@ -184,3 +184,5 @@ if operation is successful.
 The following list contains all supported error codes:
 
 - -1: No error
+
+*More rror codes will be documented*
