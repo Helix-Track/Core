@@ -12,6 +12,7 @@ Table of contents
 - [Core API](#Core-API)
   - [JWT capability check](#JWT-capability-check)
   - [Obtain the version of the HelixTrack Core API service](#Obtain-the-version-of-the-HelixTrack-Core-API-service)
+- [API response error codes](#API-response-error-codes)
 
 ## Authentication API
 
@@ -38,7 +39,7 @@ Table of contents
   }
   ```
   
-#### The JWT payload:
+#### The JWT payload
 
 ```yaml
 {
@@ -139,3 +140,46 @@ Table of contents
     "errorMessageLocalised":  "string"
   }
   ```
+
+### Perform entity CRUD operation
+
+- endpoint: `/do`
+- method: `POST`
+- payload:
+  ```yaml
+  {
+    "action":      "string"       /* mandatory */
+    "jwt":         "string"       /* mandatory */
+    "locale":      "string"       /* optional  */
+    "object":      "string"       /* mandatory */
+  }
+  ```
+- response:
+  ```yaml
+  {
+    "id":                     "string",
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
+  }
+  ```
+  
+Supported 'actions' are:
+
+- `create`
+- `modify`
+- `remove`.
+
+The 'object' payload can be:
+
+- JSON serialized value of the object if `action` is `create` or `modify`
+- The UUID identifier of the object if it is the `remove` `action`.
+
+Response will contain the UUID identifier of the object with no error code (-1) 
+if operation is successful.
+
+## API response error codes
+
+The following list contains all supported error codes:
+
+- -1: No error
