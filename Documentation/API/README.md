@@ -12,6 +12,7 @@ Table of contents
 - [Core API](#Core-API)
   - [JWT capability check](#JWT-capability-check)
   - [Obtain the version of the HelixTrack Core API service](#Obtain-the-version-of-the-HelixTrack-Core-API-service)
+  - [Perform the entity CRUD operations](#Perform-the-entity-CRUD-operations)
 - [API response error codes](#API-response-error-codes)
 
 ## Authentication API
@@ -141,7 +142,7 @@ Table of contents
   }
   ```
 
-### Perform entity CRUD operation
+### Perform the entity CRUD operations
 
 - endpoint: `/do`
 - method: `POST`
