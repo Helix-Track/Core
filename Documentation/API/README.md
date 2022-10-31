@@ -185,4 +185,4 @@ The following list contains all supported error codes:
 
 - -1: No error
 
-*More error codes will be documented*
+*Note:* More error codes will be documented soon.
