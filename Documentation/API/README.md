@@ -171,7 +171,7 @@ Supported 'actions' are:
 - `modify`
 - `remove`.
 
-The 'object' payload can be:
+The `object` payload can be:
 
 - JSON serialized value of the object if `action` is `create` or `modify`
 - The UUID identifier of the object if it is the `remove` `action`.
