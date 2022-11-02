@@ -114,7 +114,7 @@ Table of contents
 - response:
   ```yaml
   {
-    "jwtCapable":             "boolean",
+    "capable":                "boolean",
     "errorCode":              -1,
     "errorMessage":           "string",
     "errorMessageLocalised":  "string"
@@ -135,7 +135,7 @@ Table of contents
 - response:
   ```yaml
   {
-    "jwtCapable":             "boolean",
+    "capable":                "boolean",
     "errorCode":              -1,
     "errorMessage":           "string",
     "errorMessageLocalised":  "string"
