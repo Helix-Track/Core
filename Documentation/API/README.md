@@ -251,8 +251,8 @@ Tbd.
 
 Tbd.
 
-## [HashiCorp Vault](https://github.com/hashicorp/vault) API
+## HashiCorp Vault API
 
-Vault API documentation can be found [here](https://developer.hashicorp.com/vault/api-docs).
+[HashiCorp Vault](https://github.com/hashicorp/vault) API documentation can be found [here](https://developer.hashicorp.com/vault/api-docs).
 
 *Note:* Vault is used by API services.
