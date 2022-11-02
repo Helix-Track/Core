@@ -16,6 +16,9 @@ Table of contents
   - [Obtain the version of the HelixTrack Core API service](#Obtain-the-version-of-the-HelixTrack-Core-API-service)
   - [Perform the entity CRUD operations](#Perform-the-entity-CRUD-operations)
 - [API response error codes](#API-response-error-codes)
+  - [Request related error codes](#Request-related-error-codes)
+  - [System related error codes](#System-related-error-codes)
+  - [Entity related error codes](#Entity-related-error-codes)
 
 ## Authentication API
 
@@ -233,3 +236,15 @@ The following list contains all supported error codes:
 - 300X: Entity related error codes
 
 *Note:* More error codes will be documented soon.
+
+### Request related error codes
+
+Tbd.
+
+### System related error codes
+
+Tbd.
+
+### Entity related error codes
+
+Tbd.
