@@ -1,3 +1,3 @@
-# USer permissions
+# User permissions
 
 Tbd.
