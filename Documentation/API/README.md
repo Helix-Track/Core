@@ -227,6 +227,9 @@ if operation is successful.
 
 The following list contains all supported error codes:
 
-- -1: No error
+- -1:   No error
+- 100X: Request related error codes
+- 200X: System related error codes
+- 300X: Entity related error codes
 
 *Note:* More error codes will be documented soon.
