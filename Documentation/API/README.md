@@ -53,6 +53,7 @@ Table of contents
   "name":                      "string",
   "username":                  "string",
   "role":                      "string",
+  "permissions":               "string",
   "htCoreAddress":             "string"
 }
 ```
