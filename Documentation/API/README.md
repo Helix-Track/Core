@@ -11,6 +11,7 @@ Table of contents
   - [Obtain the version of the authentication API service](#Obtain-the-version-of-the-authentication-API-service)
 - [Core API](#Core-API)
   - [JWT capability check](#JWT-capability-check)
+  - [Database capability check](#Database-capability-check)
   - [Obtain the version of the HelixTrack Core API service](#Obtain-the-version-of-the-HelixTrack-Core-API-service)
   - [Perform the entity CRUD operations](#Perform-the-entity-CRUD-operations)
 - [API response error codes](#API-response-error-codes)
@@ -106,6 +107,27 @@ Table of contents
   ```yaml
   {
     "action":      "jwtCapable"   /* mandatory */
+    "locale":      "string"       /* optional  */
+  }
+  ```
+- response:
+  ```yaml
+  {
+    "jwtCapable":             "boolean",
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
+  }
+  ```
+
+### Database capability check
+
+- endpoint: `/do`
+- method: `POST`
+- payload:
+  ```yaml
+  {
+    "action":      "dbCapable"    /* mandatory */
     "locale":      "string"       /* optional  */
   }
   ```
