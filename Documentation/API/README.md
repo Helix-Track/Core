@@ -12,6 +12,7 @@ Table of contents
 - [Core API](#Core-API)
   - [JWT capability check](#JWT-capability-check)
   - [Database capability check](#Database-capability-check)
+  - [System health](#System-health)
   - [Obtain the version of the HelixTrack Core API service](#Obtain-the-version-of-the-HelixTrack-Core-API-service)
   - [Perform the entity CRUD operations](#Perform-the-entity-CRUD-operations)
 - [API response error codes](#API-response-error-codes)
@@ -135,6 +136,27 @@ Table of contents
   ```yaml
   {
     "jwtCapable":             "boolean",
+    "errorCode":              -1,
+    "errorMessage":           "string",
+    "errorMessageLocalised":  "string"
+  }
+  ```
+
+### System health
+
+- endpoint: `/do`
+- method: `POST`
+- payload:
+  ```yaml
+  {
+    "action":      "health"       /* mandatory */
+    "locale":      "string"       /* optional  */
+  }
+  ```
+- response:
+  ```yaml
+  {
+    "report":                 "string",
     "errorCode":              -1,
     "errorMessage":           "string",
     "errorMessageLocalised":  "string"
