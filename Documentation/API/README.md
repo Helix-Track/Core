@@ -255,4 +255,4 @@ Tbd.
 
 [HashiCorp Vault](https://github.com/hashicorp/vault) API documentation can be found [here](https://developer.hashicorp.com/vault/api-docs).
 
-*Note:* Vault is used by API services.
+*Note:* Vault is used by the API services.
