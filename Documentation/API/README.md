@@ -19,6 +19,7 @@ Table of contents
   - [Request related error codes](#Request-related-error-codes)
   - [System related error codes](#System-related-error-codes)
   - [Entity related error codes](#Entity-related-error-codes)
+- [HashiCorp Vault API](#HashiCorp-Vault-API)
 
 ## Authentication API
 
