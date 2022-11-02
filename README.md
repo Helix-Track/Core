@@ -38,6 +38,10 @@ All SQL scripts are executed by the shell and the `Definition.sqlite` is created
 
 The system scripts and tools located in the `Scripts` directory.
 
-All scripts and tools required for the system to intialize (database, generated code, etc.) are located here.
+All scripts and tools required for the system to initialize (database, generated code, etc.) are located here.
+
+## Technical documentation
+
+Documentation can be found [here](Documentation).
 
 
