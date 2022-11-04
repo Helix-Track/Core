@@ -18,7 +18,6 @@ DROP TABLE IF EXISTS organization;
 DROP TABLE IF EXISTS team;
 DROP TABLE IF EXISTS team_organization_mapping;
 DROP TABLE IF EXISTS team_project_mapping;
-DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS user_organization_mapping;
 DROP TABLE IF EXISTS user_team_mapping;
 DROP TABLE IF EXISTS user_default_mapping;
@@ -76,10 +75,6 @@ DROP TABLE IF EXISTS configuration_data_extension_mapping;
 DROP INDEX IF EXISTS system_info_get_by_created;
 DROP INDEX IF EXISTS system_info_get_by_description;
 DROP INDEX IF EXISTS system_info_get_by_created_and_description;
-DROP INDEX IF EXISTS users_get_by_created;
-DROP INDEX IF EXISTS users_get_by_modified;
-DROP INDEX IF EXISTS users_get_by_deleted;
-DROP INDEX IF EXISTS users_get_by_created_and_modified;
 DROP INDEX IF EXISTS projects_get_by_title;
 DROP INDEX IF EXISTS projects_get_by_description;
 DROP INDEX IF EXISTS projects_get_by_title_and_description;
@@ -526,27 +521,6 @@ CREATE INDEX system_info_get_by_created_and_description ON system_info (created,
 /*
     The system entities:
 */
-
-/*
-     System's users.
-     User is identified by the unique identifier (id).
-     Since there may be different types of users, different kinds of data
-     can be mapped (associated) with the user ID.
-     For that purpose there are other mappings to the user ID such as Yandex OAuth2 mappings for example.
-*/
-CREATE TABLE user
-(
-
-    id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
-    created  INTEGER NOT NULL,
-    modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
-);
-
-CREATE INDEX users_get_by_created ON user (created);
-CREATE INDEX users_get_by_modified ON user (modified);
-CREATE INDEX users_get_by_deleted ON user (deleted);
-CREATE INDEX users_get_by_created_and_modified ON user (created, modified);
 
 /*
     The basic project definition.
