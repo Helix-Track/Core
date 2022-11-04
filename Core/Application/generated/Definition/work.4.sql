@@ -1,17 +1,19 @@
-CREATE TABLE document
+CREATE TABLE time_tracking
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
-    title       TEXT    NOT NULL,
-    project_id  TEXT    NOT NULL,
-    document_id TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
+    amount      INTEGER NOT NULL,
+    unit_id     TEXT    NOT NULL,
+    title       TEXT,
+    description TEXT,
+    ticket_id   TEXT    NOT NULL,
     deleted     BOOLEAN NOT NULL );
-CREATE TABLE content_document_mapping
+CREATE TABLE time_unit
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
-    document_id TEXT    NOT NULL UNIQUE,
-    content     TEXT,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL );

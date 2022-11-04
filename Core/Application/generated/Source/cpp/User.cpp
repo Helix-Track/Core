@@ -14,6 +14,30 @@ void User::setId(std::string &value) {
     this->id = value;
 }
 
+std::string User::getUsername() {    
+    return this->username;
+}
+
+void User::setUsername(std::string &value) {
+    this->username = value;
+}
+
+std::string User::getPassword() {    
+    return this->password;
+}
+
+void User::setPassword(std::string &value) {
+    this->password = value;
+}
+
+std::string User::getToken() {    
+    return this->token;
+}
+
+void User::setToken(std::string &value) {
+    this->token = value;
+}
+
 int User::getCreated() {    
     return this->created;
 }
