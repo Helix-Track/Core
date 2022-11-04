@@ -17,6 +17,8 @@ DROP TABLE IF EXISTS user;
 
 DROP INDEX IF EXISTS users_get_by_username;
 DROP INDEX IF EXISTS users_get_by_username_and_password;
+DROP INDEX IF EXISTS users_get_by_token;
+DROP INDEX IF EXISTS users_get_by_username_and_token;
 DROP INDEX IF EXISTS users_get_by_created;
 DROP INDEX IF EXISTS users_get_by_modified;
 DROP INDEX IF EXISTS users_get_by_deleted;
@@ -43,8 +45,10 @@ CREATE TABLE user
 );
 
 CREATE INDEX users_get_by_username ON user (username);
+CREATE INDEX users_get_by_token ON user (token);
+CREATE INDEX users_get_by_username_and_token ON user (username, token);
 CREATE INDEX users_get_by_username_and_password ON user (username, password);
+CREATE INDEX users_get_by_deleted ON user (deleted);
 CREATE INDEX users_get_by_created ON user (created);
 CREATE INDEX users_get_by_modified ON user (modified);
-CREATE INDEX users_get_by_deleted ON user (deleted);
 CREATE INDEX users_get_by_created_and_modified ON user (created, modified);
