@@ -15,6 +15,8 @@
 
 DROP TABLE IF EXISTS user;
 
+DROP INDEX IF EXISTS users_get_by_username;
+DROP INDEX IF EXISTS users_get_by_username_and_password;
 DROP INDEX IF EXISTS users_get_by_created;
 DROP INDEX IF EXISTS users_get_by_modified;
 DROP INDEX IF EXISTS users_get_by_deleted;
@@ -32,11 +34,15 @@ CREATE TABLE user
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    username TEXT    NOT NULL UNIQUE,
+    password TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
 );
 
+CREATE INDEX users_get_by_username ON user (username);
+CREATE INDEX users_get_by_username_and_password ON user (username, password);
 CREATE INDEX users_get_by_created ON user (created);
 CREATE INDEX users_get_by_modified ON user (modified);
 CREATE INDEX users_get_by_deleted ON user (deleted);
