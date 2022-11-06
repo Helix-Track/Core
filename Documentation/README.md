@@ -1,4 +1,4 @@
 # Project documentation
 
 - [API calls](API) documentation
-- [Permissions](Permissions) documentation
+- [User roles and permissions](Permissions) documentation
