@@ -26,7 +26,9 @@ Permission IDs are connected to the one of the following permissions:
 - `UPDATE`: Allowed modification of the context
 - `DELETE`: Allowed removal of the context
 
-## Permission context
+## Permission context ID
+
+Permission context IDs are connected to the one of the following contexts:
 
 - `account`: Access to the accounts
 - `account.ACCOUNT_ID`: Access to the account
