@@ -1,5 +1,9 @@
 # User roles
 
+After user is authenticated with success and got the information about the particular HelixTrack Core
+instance that it belongs to, role information is obtained from that HelixTrack Core instance and returned in the JWT token
+as the part of its payload.
+
 User can belong to the one (or more) of the predefined `roles`:
 
 ## Role `root`
@@ -21,7 +25,8 @@ level. Access level can be gained by:
 
 # User permissions
 
-Each user will have a list of permissions. Each permission has the structure.
+Each user will have a list of permissions. Permissions are obtained the same way as the user role from the particular HelicTrack Core instance to which user belongs.
+The list of permissions is a part of the JWT payload that is returned to the user as well. Each permission has the structure.
 
 The following example illustrates regular user with its permissions:
 
