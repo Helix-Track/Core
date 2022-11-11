@@ -46,6 +46,8 @@ The following example illustrates regular user with its permissions:
 
 - `organization`: Access to the organizations
 - `organization.ORGANIZATION_ID`: Access to the organization
+- `team`: Access to the teams (requires access to the organization)
+- `team.TEAM_ID`: Access to the team (requires access to the organization)
 - `project`: Access to the projects (requires access to the organization)
 - `project.PROJECT_ID`: Access to the project (requires access to the organization)
 
