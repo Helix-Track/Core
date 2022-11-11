@@ -2,11 +2,11 @@
 
 User can belong to the one (or more) of the predefined `roles`:
 
-## Role `root` 
+## Role `root`
 
 Root access to everything on the particular HelixTrack Core instance.
 
-## Role `admin`: 
+## Role `admin`
 
 Admin access to everything under the particular account.
 
