@@ -50,3 +50,7 @@ The following example illustrates regular user with its permissions:
 - `project.PROJECT_ID`: Access to the project (requires access to the organization)
 
 *Note:* More permissions contexts to be documented soon.
+
+## How do user permissions work?
+
+Tbd.
