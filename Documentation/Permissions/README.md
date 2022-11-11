@@ -21,4 +21,32 @@ level. Access level can be gained by:
 
 # User permissions
 
-Tbd.
+Each user will have a list of permissions. Each permission has the structure.
+
+The following example illustrates regular user with its permissions:
+
+```yaml
+{
+  "permissions": [
+    {
+      "permission_id":         "string",
+      "permission_context_id": "string"
+    }
+  ]
+}
+```
+
+## Permission IDs
+
+- `CREATE`: Allowed insertion into the permission context
+- `UPDATE`: Allowed modification of the permission context
+- `DELETE`: Allowed removal of the permission context
+
+## Permission contexts
+
+- `organization`: Access to the organizations
+- `organization.ORGANIZATION_ID`: Access to the organization
+- `project`: Access to the projects (requires access to the organization)
+- `project.PROJECT_ID`: Access to the project (requires access to the organization)
+
+*Note:* More permissions contexts to be documented soon.
