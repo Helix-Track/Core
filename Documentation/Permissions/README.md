@@ -23,6 +23,10 @@ level. Access level can be gained by:
 - Receiving various permissions from the `admin` or the `root` users
 - Transferring the ownership from the `admin` or the `root` users.
 
+## Custom roles
+
+There is a possibility for introducing custom roles. This has to be defined in the future.
+
 # User permissions
 
 Each user will have a list of permissions. Permissions are obtained the same way as the user role from the particular HelicTrack Core instance to which user belongs.
