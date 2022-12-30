@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="htCore - Invalid" type="CMakeRunConfiguration" factoryName="Application" folderName="Core" PROGRAM_PARAMS="-l -d -c ../../Configurations/invalid.json" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="htCore-0.0.1-SNAPSHOT" TARGET_NAME="htCore" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="htCore-0.0.1-SNAPSHOT" RUN_TARGET_NAME="htCore">
-    <method v="2">
-      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-    </method>
-  </configuration>
-</component>
