@@ -1,6 +1,7 @@
 #!/bin/bash
+DIR="$(dirname "$0")"
 
-API_CALL="api_call.sh"
+API_CALL="$DIR/api_call.sh"
 
 if test -e "$API_CALL"; then
 
