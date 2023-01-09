@@ -4,7 +4,6 @@ After user is authenticated with success and got the information about the parti
 instance that it belongs to, permissions information is obtained from that HelixTrack Core instance and returned 
 as the part of JWT token's payload.
 
-
 Each user will have a list of permissions. The following example illustrates regular user with its permissions:
 
 ```yaml
@@ -25,6 +24,7 @@ Permission IDs are connected to the one of the following permissions:
 - `CREATE`: Allowed insertion into the context
 - `UPDATE`: Allowed modification of the context
 - `DELETE`: Allowed removal of the context
+- `ALL`   : Allowed to perform all operations on the context
 
 ## Permission context ID
 
