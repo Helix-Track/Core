@@ -51,9 +51,9 @@ Tbd.
 For each context where we want to perform certain operation we will verify if that operation is possible to perform by evaluating the following rules:
 
 - Do I have access to the context? If we have access to the context or to a parent context (higher in the hierarchy) the access is granted.
-+ No, reject.
-+ Yes, lets go to the next check step.
+  - No, reject.
+  - Yes, lets go to the next check step.
 
 - Do I have propper permission access level? Each operation that we want to execute requires certain level. Let's say that we want to read the content of the context. We need level >= 1. User has the level of 2 (creation granted). That means that it is allowed to read as well.
-+ No, reject.
-+ Yes, perform the desired operation.
+  - No, reject.
+  - Yes, perform the desired operation.
