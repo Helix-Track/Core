@@ -19,12 +19,13 @@ Each user will have a list of permissions. The following example illustrates reg
 
 ## Permission ID
 
-Permission IDs are connected to the one of the following permissions:
+Permission IDs are connected to the one of the following permissions (with each the proper access level numeric value is associated):
 
-- `CREATE`: Allowed insertion into the context
-- `UPDATE`: Allowed modification of the context
-- `DELETE`: Allowed removal of the context
-- `ALL`   : Allowed to perform all operations on the context
+- `READ`  : Allowed reading of the context,                     access level = 1
+- `CREATE`: Allowed insertion into the context,                 access level = 2
+- `UPDATE`: Allowed modification of the context,                access level = 3
+- `DELETE`: Allowed removal of the context,                     access level = 5
+- `ALL`   : Allowed to perform all operations on the context    access level = 5
 
 ## Permission context ID
 
@@ -41,6 +42,18 @@ Permission context IDs are connected to the one of the following contexts:
 
 *Note:* More permissions contexts to be documented soon.
 
-## How do user permissions work?
+## Permission contexts hierarchy
 
 Tbd.
+
+## How do user permissions work?
+
+For each context where we want to perform certain operation we will verify if that operation is possible to perform by evaluating the following rules:
+
+- Do I have access to the context? If we have access to the context or to a parent context (higher in the hierarchy) the access is granted.
++ No, reject.
++ Yes, lets go to the next check step.
+
+- Do I have propper permission access level? Each operation that we want to execute requires certain level. Let's say that we want to read the content of the context. We need level >= 1. User has the level of 2 (creation granted). That means that it is allowed to read as well.
++ No, reject.
++ Yes, perform the desired operation.
