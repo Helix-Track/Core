@@ -44,16 +44,16 @@ Permission context IDs are connected to the one of the following contexts:
 
 ## Permission contexts hierarchy
 
-- System
-  - Node
-    - Account
-      - account.ACCOUNT_ID
-        - organization
-          - organization.ORGANIZATION_ID
-            - team
-              - team.TEAM_ID
-            - project
-              - project.PROJECT_ID
+- `system`
+  - `node`
+    - `account`
+      - `account.ACCOUNT_ID`
+        - `organization`
+          - `organization.ORGANIZATION_ID`
+            - `team`
+              - `team.TEAM_ID`
+            - `project`
+              - `project.PROJECT_ID`
 
 *Note:* More permissions context hierarchy to be documented soon.
 
