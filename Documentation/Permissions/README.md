@@ -31,6 +31,8 @@ Permission IDs are connected to the one of the following permissions (with each 
 
 Permission context IDs are connected to the one of the following contexts:
 
+- `node`: Access to all nodes
+- `node.NODE_ID`: Access to the node
 - `account`: Access to the accounts
 - `account.ACCOUNT_ID`: Access to the account
 - `organization`: Access to the organizations (requires access to the account)
@@ -56,7 +58,6 @@ Permission context IDs are connected to the one of the following contexts:
               - `project.PROJECT_ID`
 
 *Note:* More permissions context hierarchy to be documented soon.
-
 
 ## How do user permissions work?
 
