@@ -43,5 +43,3 @@ All scripts and tools required for the system to initialize (database, generated
 ## Developers documentation
 
 Documentation can be found [here](Documentation).
-
-
