@@ -40,7 +40,7 @@ The system scripts and tools located in the `Scripts` directory.
 
 All scripts and tools required for the system to initialize (database, generated code, etc.) are located here.
 
-## Technical documentation
+## Developers documentation
 
 Documentation can be found [here](Documentation).
 
