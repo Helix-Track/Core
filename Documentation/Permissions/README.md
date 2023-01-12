@@ -44,8 +44,8 @@ Permission context IDs are connected to the one of the following contexts:
 
 ## Permission contexts hierarchy
 
-- `system`
-  - `node`
+- `node`
+  - `node.NODE_ID`
     - `account`
       - `account.ACCOUNT_ID`
         - `organization`
