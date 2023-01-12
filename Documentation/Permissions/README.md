@@ -42,7 +42,7 @@ Permission context IDs are connected to the one of the following contexts:
 - `project`: Access to the projects (requires access to the organization)
 - `project.PROJECT_ID`: Access to the project (requires access to the organization)
 
-*Note:* More permissions contexts to be documented soon.
+*Note:* More permissions contexts to be documented soon, TODOs: `audit`, `report`, `extension`, `system_info`
 
 ## Permission contexts hierarchy
 
