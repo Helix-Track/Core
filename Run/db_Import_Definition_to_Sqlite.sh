@@ -2,4 +2,4 @@
 
 cd "$(dirname "$0")"
 
-sh Database/import_to_sqlite.sh ../Database/DDL/Definition.V1.sql
+sh Database/import_to_sqlite.sh ../Core/Database/DDL/Definition.V1.sql
