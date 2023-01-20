@@ -540,7 +540,7 @@ CREATE TABLE project
     workflow_id TEXT    NOT NULL,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX projects_get_by_identifier ON project (identifier);
@@ -564,7 +564,7 @@ CREATE TABLE ticket_type
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX ticket_types_get_by_title ON ticket_type (title);
@@ -591,7 +591,7 @@ CREATE TABLE ticket_status
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX ticket_statuses_get_by_title ON ticket_status (title);
@@ -635,7 +635,7 @@ CREATE TABLE ticket
     estimation       REAL    NOT NULL,
     story_points     INTEGER NOT NULL,
     creator          TEXT    NOT NULL,
-    deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted          BOOLEAN NOT NULL,
     UNIQUE (ticket_number, project_id) ON CONFLICT ABORT
 );
 
@@ -673,7 +673,7 @@ CREATE TABLE ticket_relationship_type
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX ticket_relationship_types_get_by_title ON ticket_relationship_type (title);
@@ -700,7 +700,7 @@ CREATE TABLE board
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX boards_get_by_title ON board (title);
@@ -723,7 +723,7 @@ CREATE TABLE workflow
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX workflows_get_by_title ON workflow (title);
@@ -746,7 +746,7 @@ CREATE TABLE asset
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX assets_get_by_url ON asset (url);
@@ -772,7 +772,7 @@ CREATE TABLE label
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX labels_get_by_title ON label (title);
@@ -794,7 +794,7 @@ CREATE TABLE label_category
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX label_categories_get_by_title ON label_category (title);
@@ -818,7 +818,7 @@ CREATE TABLE repository
     repository_type_id TEXT    NOT NULL,
     created            INTEGER NOT NULL,
     modified           INTEGER NOT NULL,
-    deleted            BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted            BOOLEAN NOT NULL
 );
 
 CREATE INDEX repositories_get_by_repository ON repository (repository);
@@ -846,7 +846,7 @@ CREATE TABLE repository_type
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX repository_types_get_by_title ON repository_type (title);
@@ -874,7 +874,7 @@ CREATE TABLE component
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX components_get_by_title ON component (title);
@@ -896,7 +896,7 @@ CREATE TABLE organization
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX organizations_get_by_title ON organization (title);
@@ -918,7 +918,7 @@ CREATE TABLE team
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX teams_get_by_title ON team (title);
@@ -946,7 +946,7 @@ CREATE TABLE permission
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX permissions_get_by_title ON permission (title);
@@ -970,7 +970,7 @@ CREATE TABLE comment
     comment  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX comments_get_by_comment ON comment (comment);
@@ -995,7 +995,7 @@ CREATE TABLE permission_context
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX permission_contexts_get_by_title ON permission_context (title);
@@ -1026,7 +1026,7 @@ CREATE TABLE workflow_step
     ticket_status_id TEXT    NOT NULL,
     created          INTEGER NOT NULL,
     modified         INTEGER NOT NULL,
-    deleted          BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted          BOOLEAN NOT NULL
 );
 
 CREATE INDEX workflow_steps_get_by_title ON workflow_step (title);
@@ -1059,7 +1059,7 @@ CREATE TABLE report
     modified    INTEGER NOT NULL,
     title       TEXT,
     description TEXT,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX reports_get_by_title ON report (title);
@@ -1109,10 +1109,10 @@ CREATE TABLE cycle
      */
     cycle_id    TEXT    NOT NULL UNIQUE,
     /*
-        CHECK ( type IN (1000, 100, 10))
+        Possible type values: 1000, 100, 10
     */
     type        INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX cycles_get_by_title ON cycle (title);
@@ -1140,8 +1140,8 @@ CREATE TABLE extension
     title         TEXT,
     description   TEXT,
     extension_key TEXT    NOT NULL UNIQUE,
-    enabled       BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
-    deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    enabled       BOOLEAN NOT NULL,
+    deleted       BOOLEAN NOT NULL
 );
 
 CREATE INDEX extensions_get_by_title ON extension (title);
@@ -1186,7 +1186,7 @@ CREATE TABLE project_organization_mapping
     organization_id TEXT    NOT NULL,
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
-    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted         BOOLEAN NOT NULL,
     UNIQUE (project_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -1214,7 +1214,7 @@ CREATE TABLE ticket_type_project_mapping
     project_id     TEXT    NOT NULL,
     created        INTEGER NOT NULL,
     modified       INTEGER NOT NULL,
-    deleted        BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted        BOOLEAN NOT NULL,
     UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
 );
 
@@ -1313,7 +1313,7 @@ CREATE TABLE ticket_meta_data
     value     TEXT,
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
-    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted   BOOLEAN NOT NULL
 );
 
 CREATE INDEX tickets_meta_data_get_by_ticket_id ON ticket_meta_data (ticket_id);
@@ -1340,7 +1340,7 @@ CREATE TABLE ticket_relationship
     child_ticket_id             TEXT    NOT NULL,
     created                     INTEGER NOT NULL,
     modified                    INTEGER NOT NULL,
-    deleted                     BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted                     BOOLEAN NOT NULL,
     UNIQUE (ticket_id, child_ticket_id) ON CONFLICT ABORT
 );
 
@@ -1375,7 +1375,7 @@ CREATE TABLE team_organization_mapping
     organization_id TEXT    NOT NULL,
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
-    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted         BOOLEAN NOT NULL,
     UNIQUE (team_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -1397,7 +1397,7 @@ CREATE TABLE team_project_mapping
     project_id TEXT    NOT NULL,
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
-    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted    BOOLEAN NOT NULL,
     UNIQUE (team_id, project_id) ON CONFLICT ABORT
 );
 
@@ -1420,7 +1420,7 @@ CREATE TABLE repository_project_mapping
     project_id    TEXT    NOT NULL,
     created       INTEGER NOT NULL,
     modified      INTEGER NOT NULL,
-    deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted       BOOLEAN NOT NULL,
     UNIQUE (repository_id, project_id) ON CONFLICT ABORT
 );
 
@@ -1443,7 +1443,7 @@ CREATE TABLE repository_commit_ticket_mapping
     commit_hash   TEXT    NOT NULL UNIQUE,
     created       INTEGER NOT NULL,
     modified      INTEGER NOT NULL,
-    deleted       BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted       BOOLEAN NOT NULL
 );
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id
@@ -1481,7 +1481,7 @@ CREATE TABLE component_ticket_mapping
     ticket_id    TEXT    NOT NULL,
     created      INTEGER NOT NULL,
     modified     INTEGER NOT NULL,
-    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted      BOOLEAN NOT NULL,
     UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -1505,7 +1505,7 @@ CREATE TABLE component_meta_data
     value        TEXT,
     created      INTEGER NOT NULL,
     modified     INTEGER NOT NULL,
-    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted      BOOLEAN NOT NULL
 );
 
 CREATE INDEX components_meta_data_get_by_component_id ON component_meta_data (component_id);
@@ -1537,7 +1537,7 @@ CREATE TABLE asset_project_mapping
     project_id TEXT    NOT NULL,
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
-    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted    BOOLEAN NOT NULL,
     UNIQUE (asset_id, project_id) ON CONFLICT ABORT
 );
 
@@ -1561,7 +1561,7 @@ CREATE TABLE asset_team_mapping
     team_id  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN NOT NULL,
     UNIQUE (asset_id, team_id) ON CONFLICT ABORT
 );
 
@@ -1583,7 +1583,7 @@ CREATE TABLE asset_ticket_mapping
     ticket_id TEXT    NOT NULL,
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
-    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted   BOOLEAN NOT NULL,
     UNIQUE (asset_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -1605,7 +1605,7 @@ CREATE TABLE asset_comment_mapping
     comment_id TEXT    NOT NULL,
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
-    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted    BOOLEAN NOT NULL,
     UNIQUE (asset_id, comment_id) ON CONFLICT ABORT
 );
 
@@ -1628,7 +1628,7 @@ CREATE TABLE label_label_category_mapping
     label_category_id TEXT    NOT NULL,
     created           INTEGER NOT NULL,
     modified          INTEGER NOT NULL,
-    deleted           BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted           BOOLEAN NOT NULL,
     UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
 );
 
@@ -1655,7 +1655,7 @@ CREATE TABLE label_project_mapping
     project_id TEXT    NOT NULL,
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
-    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted    BOOLEAN NOT NULL,
     UNIQUE (label_id, project_id) ON CONFLICT ABORT
 );
 
@@ -1677,7 +1677,7 @@ CREATE TABLE label_team_mapping
     team_id  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN NOT NULL,
     UNIQUE (label_id, team_id) ON CONFLICT ABORT
 );
 
@@ -1699,7 +1699,7 @@ CREATE TABLE label_ticket_mapping
     ticket_id TEXT    NOT NULL,
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
-    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted   BOOLEAN NOT NULL,
     UNIQUE (label_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -1721,7 +1721,7 @@ CREATE TABLE label_asset_mapping
     asset_id TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN NOT NULL,
     UNIQUE (label_id, asset_id) ON CONFLICT ABORT
 );
 
@@ -1743,7 +1743,7 @@ CREATE TABLE comment_ticket_mapping
     ticket_id  TEXT    NOT NULL,
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
-    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted    BOOLEAN NOT NULL,
     UNIQUE (comment_id, ticket_id) ON CONFLICT ABORT
 );
 
@@ -1765,7 +1765,7 @@ CREATE TABLE ticket_project_mapping
     project_id TEXT    NOT NULL,
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
-    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted    BOOLEAN NOT NULL,
     UNIQUE (ticket_id, project_id) ON CONFLICT ABORT
 );
 
@@ -1788,7 +1788,7 @@ CREATE TABLE cycle_project_mapping
     project_id TEXT    NOT NULL,
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
-    deleted    BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted    BOOLEAN NOT NULL,
     UNIQUE (cycle_id, project_id) ON CONFLICT ABORT
 );
 
@@ -1810,7 +1810,7 @@ CREATE TABLE ticket_cycle_mapping
     cycle_id  TEXT    NOT NULL,
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
-    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted   BOOLEAN NOT NULL,
     UNIQUE (ticket_id, cycle_id) ON CONFLICT ABORT
 );
 
@@ -1832,7 +1832,7 @@ CREATE TABLE ticket_board_mapping
     board_id  TEXT    NOT NULL,
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
-    deleted   BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted   BOOLEAN NOT NULL,
     UNIQUE (ticket_id, board_id) ON CONFLICT ABORT
 );
 
@@ -1856,7 +1856,7 @@ CREATE TABLE user_default_mapping
     secret   TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX users_default_mappings_get_by_user_id ON user_default_mapping (user_id);
@@ -1882,7 +1882,7 @@ CREATE TABLE user_organization_mapping
     organization_id TEXT    NOT NULL,
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
-    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted         BOOLEAN NOT NULL,
     UNIQUE (user_id, organization_id) ON CONFLICT ABORT
 );
 
@@ -1904,7 +1904,7 @@ CREATE TABLE user_team_mapping
     team_id  TEXT    NOT NULL,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted  BOOLEAN NOT NULL,
     UNIQUE (user_id, team_id) ON CONFLICT ABORT
 );
 
@@ -1928,7 +1928,7 @@ CREATE TABLE permission_user_mapping
     permission_context_id TEXT    NOT NULL,
     created               INTEGER NOT NULL,
     modified              INTEGER NOT NULL,
-    deleted               BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted               BOOLEAN NOT NULL,
     UNIQUE (user_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
@@ -1964,7 +1964,7 @@ CREATE TABLE permission_team_mapping
     permission_context_id TEXT    NOT NULL,
     created               INTEGER NOT NULL,
     modified              INTEGER NOT NULL,
-    deleted               BOOLEAN NOT NULL CHECK (deleted IN (0, 1)),
+    deleted               BOOLEAN NOT NULL,
     UNIQUE (team_id, permission_id, permission_context_id) ON CONFLICT ABORT
 );
 
@@ -1998,8 +1998,8 @@ CREATE TABLE configuration_data_extension_mapping
     value        TEXT,
     created      INTEGER NOT NULL,
     modified     INTEGER NOT NULL,
-    enabled      BOOLEAN NOT NULL CHECK (enabled IN (0, 1)),
-    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    enabled      BOOLEAN NOT NULL,
+    deleted      BOOLEAN NOT NULL
 );
 
 CREATE INDEX configuration_data_extension_mappings_get_by_extension_id
@@ -2039,7 +2039,7 @@ CREATE TABLE extension_meta_data
     value        TEXT,
     created      INTEGER NOT NULL,
     modified     INTEGER NOT NULL,
-    deleted      BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted      BOOLEAN NOT NULL
 );
 
 CREATE INDEX extensions_meta_data_get_by_extension_id ON extension_meta_data (extension_id);
