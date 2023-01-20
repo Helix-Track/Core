@@ -6,7 +6,7 @@ CREATE TABLE document
     document_id TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL );
+    deleted     BOOLEAN NOT NULL);
 CREATE TABLE content_document_mapping
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -14,4 +14,4 @@ CREATE TABLE content_document_mapping
     content     TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL );
+    deleted     BOOLEAN NOT NULL);

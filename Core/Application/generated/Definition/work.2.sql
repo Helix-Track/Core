@@ -8,7 +8,7 @@ CREATE TABLE chat
     ticket_id       TEXT UNIQUE,
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
-    deleted         BOOLEAN NOT NULL );
+    deleted         BOOLEAN NOT NULL);
 CREATE TABLE chat_yandex_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -17,7 +17,7 @@ CREATE TABLE chat_yandex_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL );
+    deleted  BOOLEAN NOT NULL);
 CREATE TABLE chat_slack_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -26,7 +26,7 @@ CREATE TABLE chat_slack_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL );
+    deleted  BOOLEAN NOT NULL);
 CREATE TABLE chat_telegram_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -35,7 +35,7 @@ CREATE TABLE chat_telegram_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL );
+    deleted  BOOLEAN NOT NULL);
 CREATE TABLE chat_google_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -44,7 +44,7 @@ CREATE TABLE chat_google_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL );
+    deleted  BOOLEAN NOT NULL);
 CREATE TABLE chat_whatsapp_mapping
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -53,4 +53,4 @@ CREATE TABLE chat_whatsapp_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL );
+    deleted  BOOLEAN NOT NULL);

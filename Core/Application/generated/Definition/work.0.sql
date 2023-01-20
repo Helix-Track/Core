@@ -6,4 +6,4 @@ CREATE TABLE user
     token    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL );
+    deleted  BOOLEAN NOT NULL);
