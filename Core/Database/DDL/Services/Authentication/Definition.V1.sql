@@ -41,7 +41,7 @@ CREATE TABLE user
     token    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX users_get_by_username ON user (username);

@@ -52,7 +52,7 @@ CREATE TABLE time_tracking
     title       TEXT,
     description TEXT,
     ticket_id   TEXT    NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_by_title ON time_tracking (title);
@@ -76,7 +76,7 @@ CREATE TABLE time_unit
     description TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX units_get_by_title ON time_unit (title);

@@ -39,7 +39,7 @@ CREATE TABLE document
     document_id TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_by_title ON document (title);
@@ -63,7 +63,7 @@ CREATE TABLE content_document_mapping
     content     TEXT,
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
-    deleted     BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted     BOOLEAN NOT NULL
 );
 
 CREATE INDEX content_document_mappings_get_by_document_id ON content_document_mapping (document_id);

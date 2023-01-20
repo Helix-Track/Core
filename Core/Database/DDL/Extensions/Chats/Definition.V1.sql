@@ -64,7 +64,7 @@ CREATE TABLE chat
     ticket_id       TEXT UNIQUE,
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
-    deleted         BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted         BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_by_title ON chat (title);
@@ -90,7 +90,7 @@ CREATE TABLE chat_yandex_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_yandex_chat_mappings_by_chat_id ON chat_yandex_mapping (chat_id);
@@ -109,7 +109,7 @@ CREATE TABLE chat_slack_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_slack_chat_mappings_by_chat_id ON chat_slack_mapping (chat_id);
@@ -127,7 +127,7 @@ CREATE TABLE chat_telegram_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_telegram_chat_mappings_by_chat_id ON chat_telegram_mapping (chat_id);
@@ -146,7 +146,7 @@ CREATE TABLE chat_google_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_google_chat_mappings_by_chat_id ON chat_google_mapping (chat_id);
@@ -164,7 +164,7 @@ CREATE TABLE chat_whatsapp_mapping
     value    TEXT,
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
-    deleted  BOOLEAN NOT NULL CHECK (deleted IN (0, 1))
+    deleted  BOOLEAN NOT NULL
 );
 
 CREATE INDEX get_whatsapp_chat_mappings_by_chat_id ON chat_whatsapp_mapping (chat_id);
