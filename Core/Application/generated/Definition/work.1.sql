@@ -479,10 +479,6 @@ CREATE TABLE permission_user_mapping
     deleted               BOOLEAN NOT NULL);
 CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_id
     ON permission_user_mapping (user_id, permission_id);
-CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_context_id
-    ON permission_user_mapping (user_id, permission_context_id);
-CREATE INDEX permission_user_mappings_get_by_permission_id_and_permission_context_id
-    ON permission_user_mapping (permission_id, permission_context_id);
 CREATE TABLE permission_team_mapping
 (
     id                    TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -494,8 +490,6 @@ CREATE TABLE permission_team_mapping
     deleted               BOOLEAN NOT NULL);
 CREATE INDEX permission_team_mappings_get_by_team_id_and_permission_id
     ON permission_team_mapping (team_id, permission_id);
-CREATE INDEX permission_team_mappings_get_by_team_id_and_permission_context_id
-    ON permission_team_mapping (team_id, permission_context_id);
 CREATE TABLE configuration_data_extension_mapping
 (
     id           TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -510,12 +504,6 @@ CREATE INDEX configuration_data_extension_mappings_get_by_extension_id
     ON configuration_data_extension_mapping (extension_id);
 CREATE INDEX configuration_data_extension_mappings_get_by_property_and_value
     ON configuration_data_extension_mapping (property, value);
-CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property
-    ON configuration_data_extension_mapping (extension_id, property);
-CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property_and_value
-    ON configuration_data_extension_mapping (extension_id, property, value);
-CREATE INDEX configuration_data_extension_mappings_get_by_created_and_modified
-    ON configuration_data_extension_mapping (created, modified);
 CREATE TABLE extension_meta_data
 (
     id           TEXT    NOT NULL PRIMARY KEY UNIQUE,

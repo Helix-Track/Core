@@ -11,17 +11,7 @@
         Mapping tables are used as well to append properties to the entities.
     - Additional tables are defined to provide the meta-data to entities of the system.
     - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
-
-    FIXMEs:
-
-    - Shorten identifier names:
-
-        permission_user_mappings_get_by_user_id_and_permission_context_id                           -> permission_user_mappings_get_by_user_id_and_permission_context_
-        permission_user_mappings_get_by_permission_id_and_permission_context_id                     -> permission_user_mappings_get_by_permission_id_and_permission_co
-        permission_team_mappings_get_by_team_id_and_permission_context_id                           -> permission_team_mappings_get_by_team_id_and_permission_context_
-        configuration_data_extension_mappings_get_by_extension_id_and_property                      -> configuration_data_extension_mappings_get_by_extension_id_and_p
-        configuration_data_extension_mappings_get_by_extension_id_and_property_and_value            -> configuration_data_extension_mappings_get_by_extension_id_and_p
-        configuration_data_extension_mappings_get_by_created_and_modified                           -> configuration_data_extension_mappings_get_by_created_and_modifi        
+    
 */
 
 DROP TABLE IF EXISTS system_info;
@@ -476,8 +466,8 @@ DROP INDEX IF EXISTS permission_user_mappings_get_by_user_id;
 DROP INDEX IF EXISTS permission_user_mappings_get_by_permission_id;
 DROP INDEX IF EXISTS permission_user_mappings_get_by_permission_context_id;
 DROP INDEX IF EXISTS permission_user_mappings_get_by_user_id_and_permission_id;
-DROP INDEX IF EXISTS permission_user_mappings_get_by_user_id_and_permission_context_id;
-DROP INDEX IF EXISTS permission_user_mappings_get_by_permission_id_and_permission_context_id;
+DROP INDEX IF EXISTS permission_long_8;
+DROP INDEX IF EXISTS permission_long_9;
 DROP INDEX IF EXISTS permission_user_mappings_get_by_deleted;
 DROP INDEX IF EXISTS permission_user_mappings_get_by_created;
 DROP INDEX IF EXISTS permission_user_mappings_get_by_modified;
@@ -486,7 +476,7 @@ DROP INDEX IF EXISTS permission_team_mappings_get_by_team_id;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_permission_id;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_team_id_and_permission_id;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_permission_context_id;
-DROP INDEX IF EXISTS permission_team_mappings_get_by_team_id_and_permission_context_id;
+DROP INDEX IF EXISTS permission_long_10;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_deleted;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_created;
 DROP INDEX IF EXISTS permission_team_mappings_get_by_modified;
@@ -495,13 +485,13 @@ DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_extension_id;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_property;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_value;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_property_and_value;
-DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_extension_id_and_property;
-DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_extension_id_and_property_and_value;
+DROP INDEX IF EXISTS configuration_long_11;
+DROP INDEX IF EXISTS configuration_long_12;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_enabled;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_deleted;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_created;
 DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_modified;
-DROP INDEX IF EXISTS configuration_data_extension_mappings_get_by_created_and_modified;
+DROP INDEX IF EXISTS configuration_long_13;
 DROP INDEX IF EXISTS extensions_meta_data_get_by_extension_id;
 DROP INDEX IF EXISTS extensions_meta_data_get_by_property;
 DROP INDEX IF EXISTS extensions_meta_data_get_by_value;
@@ -1964,11 +1954,15 @@ CREATE INDEX permission_user_mappings_get_by_permission_context_id ON permission
 CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_id
     ON permission_user_mapping (user_id, permission_id);
 
-CREATE INDEX permission_user_mappings_get_by_user_id_and_permission_context_id
-    ON permission_user_mapping (user_id, permission_context_id);
+/*
+    permission_user_mappings_get_by_user_id_and_permission_context_id
+*/
+CREATE INDEX permission_long_8 ON permission_user_mapping (user_id, permission_context_id);
 
-CREATE INDEX permission_user_mappings_get_by_permission_id_and_permission_context_id
-    ON permission_user_mapping (permission_id, permission_context_id);
+/*
+    permission_user_mappings_get_by_permission_id_and_permission_context_id
+*/
+CREATE INDEX permission_long_9 ON permission_user_mapping (permission_id, permission_context_id);
 
 CREATE INDEX permission_user_mappings_get_by_deleted ON permission_user_mapping (deleted);
 CREATE INDEX permission_user_mappings_get_by_created ON permission_user_mapping (created);
@@ -2001,8 +1995,10 @@ CREATE INDEX permission_team_mappings_get_by_team_id_and_permission_id
 
 CREATE INDEX permission_team_mappings_get_by_permission_context_id ON permission_team_mapping (permission_context_id);
 
-CREATE INDEX permission_team_mappings_get_by_team_id_and_permission_context_id
-    ON permission_team_mapping (team_id, permission_context_id);
+/*
+    permission_team_mappings_get_by_team_id_and_permission_context_id
+*/
+CREATE INDEX permission_long_10 ON permission_team_mapping (team_id, permission_context_id);
 
 CREATE INDEX permission_team_mappings_get_by_deleted ON permission_team_mapping (deleted);
 CREATE INDEX permission_team_mappings_get_by_created ON permission_team_mapping (created);
@@ -2036,19 +2032,26 @@ CREATE INDEX configuration_data_extension_mappings_get_by_value ON configuration
 CREATE INDEX configuration_data_extension_mappings_get_by_property_and_value
     ON configuration_data_extension_mapping (property, value);
 
-CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property
-    ON configuration_data_extension_mapping (extension_id, property);
+/*
+    configuration_data_extension_mappings_get_by_extension_id_and_property
+*/
+CREATE INDEX configuration_long_11 ON configuration_data_extension_mapping (extension_id, property);
 
-CREATE INDEX configuration_data_extension_mappings_get_by_extension_id_and_property_and_value
-    ON configuration_data_extension_mapping (extension_id, property, value);
+/*
+    configuration_data_extension_mappings_get_by_extension_id_and_property_and_value
+*/
+CREATE INDEX configuration_long_12 ON configuration_data_extension_mapping (extension_id, property, value);
 
 CREATE INDEX configuration_data_extension_mappings_get_by_enabled ON configuration_data_extension_mapping (enabled);
 CREATE INDEX configuration_data_extension_mappings_get_by_deleted ON configuration_data_extension_mapping (deleted);
 CREATE INDEX configuration_data_extension_mappings_get_by_created ON configuration_data_extension_mapping (created);
 CREATE INDEX configuration_data_extension_mappings_get_by_modified ON configuration_data_extension_mapping (modified);
 
-CREATE INDEX configuration_data_extension_mappings_get_by_created_and_modified
-    ON configuration_data_extension_mapping (created, modified);
+
+/*
+    configuration_data_extension_mappings_get_by_created_and_modified
+*/
+CREATE INDEX configuration_long_13 ON configuration_data_extension_mapping (created, modified);
 
 /*
     Extensions meta-data:
