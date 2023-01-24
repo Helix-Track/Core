@@ -11,6 +11,23 @@
         Mapping tables are used as well to append properties to the entities.
     - Additional tables are defined to provide the meta-data to entities of the system.
     - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
+
+    FIXMEs:
+
+    - Shorten identifier names:
+        workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id                 -> workflow_steps_get_by_workflow_id_and_workflow_step_id_and_tick
+        project_organization_mappings_get_by_project_id_and_organization_id                         -> project_organization_mappings_get_by_project_id_and_organizatio
+        ticket_type_project_mappings_get_by_ticket_type_id_and_project_id                           -> ticket_type_project_mappings_get_by_ticket_type_id_and_project_
+        ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id                       -> ticket_relationships_get_by_ticket_id_and_ticket_relationship_t
+        ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id   -> ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_t
+        repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id                        -> repository_commit_ticket_mappings_get_by_repository_id_and_tick
+        repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash            -> repository_commit_ticket_mappings_get_by_repository_id_and_tick
+        permission_user_mappings_get_by_user_id_and_permission_context_id                           -> permission_user_mappings_get_by_user_id_and_permission_context_
+        permission_user_mappings_get_by_permission_id_and_permission_context_id                     -> permission_user_mappings_get_by_permission_id_and_permission_co
+        permission_team_mappings_get_by_team_id_and_permission_context_id                           -> permission_team_mappings_get_by_team_id_and_permission_context_
+        configuration_data_extension_mappings_get_by_extension_id_and_property                      -> configuration_data_extension_mappings_get_by_extension_id_and_p
+        configuration_data_extension_mappings_get_by_extension_id_and_property_and_value            -> configuration_data_extension_mappings_get_by_extension_id_and_p
+        configuration_data_extension_mappings_get_by_created_and_modified                           -> configuration_data_extension_mappings_get_by_created_and_modifi        
 */
 
 DROP TABLE IF EXISTS system_info;
