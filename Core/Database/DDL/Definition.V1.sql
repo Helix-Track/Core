@@ -12,12 +12,10 @@
     - Additional tables are defined to provide the meta-data to entities of the system.
     - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
 
-    TODO:
+    FIXMEs:
 
     - Shorten identifier names:
-        workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id                 -> workflow_steps_get_by_workflow_id_and_workflow_step_id_and_tick
-        project_organization_mappings_get_by_project_id_and_organization_id                         -> project_organization_mappings_get_by_project_id_and_organizatio
-        ticket_type_project_mappings_get_by_ticket_type_id_and_project_id                           -> ticket_type_project_mappings_get_by_ticket_type_id_and_project_
+    
         ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id                       -> ticket_relationships_get_by_ticket_id_and_ticket_relationship_t
         ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id   -> ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_t
         repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id                        -> repository_commit_ticket_mappings_get_by_repository_id_and_tick
@@ -235,7 +233,7 @@ DROP INDEX IF EXISTS workflow_steps_get_by_workflow_step_id;
 DROP INDEX IF EXISTS workflow_steps_get_by_ticket_status_id;
 DROP INDEX IF EXISTS workflow_steps_get_by_workflow_id_and_ticket_status_id;
 DROP INDEX IF EXISTS workflow_steps_get_by_workflow_id_and_workflow_step_id;
-DROP INDEX IF EXISTS workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id;
+DROP INDEX IF EXISTS workflow_long_1;
 DROP INDEX IF EXISTS workflow_steps_get_by_created;
 DROP INDEX IF EXISTS workflow_steps_get_by_deleted;
 DROP INDEX IF EXISTS workflow_steps_get_by_modified;
@@ -272,14 +270,14 @@ DROP INDEX IF EXISTS audit_get_by_operation;
 DROP INDEX IF EXISTS audit_get_by_entity_and_operation;
 DROP INDEX IF EXISTS project_organization_mappings_get_by_project_id;
 DROP INDEX IF EXISTS project_organization_mappings_get_by_organization_id;
-DROP INDEX IF EXISTS project_organization_mappings_get_by_project_id_and_organization_id;
+DROP INDEX IF EXISTS project_long_2;
 DROP INDEX IF EXISTS project_organization_mappings_get_by_created;
 DROP INDEX IF EXISTS project_organization_mappings_get_by_deleted;
 DROP INDEX IF EXISTS project_organization_mappings_get_by_modified;
 DROP INDEX IF EXISTS project_organization_mappings_get_by_created_and_modified;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_ticket_type_id;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_project_id;
-DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_ticket_type_id_and_project_id;
+DROP INDEX IF EXISTS ticket_long_3;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_created;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_modified;
 DROP INDEX IF EXISTS ticket_type_project_mappings_get_by_deleted;
@@ -1055,8 +1053,10 @@ CREATE INDEX workflow_steps_get_by_ticket_status_id ON workflow_step (ticket_sta
 CREATE INDEX workflow_steps_get_by_workflow_id_and_ticket_status_id ON workflow_step (workflow_id, ticket_status_id);
 CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id ON workflow_step (workflow_id, workflow_step_id);
 
-CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id ON workflow_step
-    (workflow_id, workflow_step_id, ticket_status_id);
+/*
+    workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id
+*/
+CREATE INDEX workflow_long_1 ON workflow_step (workflow_id, workflow_step_id, ticket_status_id);
 
 CREATE INDEX workflow_steps_get_by_created ON workflow_step (created);
 CREATE INDEX workflow_steps_get_by_deleted ON workflow_step (deleted);
@@ -1210,8 +1210,10 @@ CREATE TABLE project_organization_mapping
 CREATE INDEX project_organization_mappings_get_by_project_id ON project_organization_mapping (project_id);
 CREATE INDEX project_organization_mappings_get_by_organization_id ON project_organization_mapping (organization_id);
 
-CREATE INDEX project_organization_mappings_get_by_project_id_and_organization_id ON
-    project_organization_mapping (project_id, organization_id);
+/*
+    project_organization_mappings_get_by_project_id_and_organization_id
+*/
+CREATE INDEX project_long_2 ON project_organization_mapping (project_id, organization_id);
 
 CREATE INDEX project_organization_mappings_get_by_created ON project_organization_mapping (created);
 CREATE INDEX project_organization_mappings_get_by_deleted ON project_organization_mapping (deleted);
@@ -1238,8 +1240,10 @@ CREATE TABLE ticket_type_project_mapping
 CREATE INDEX ticket_type_project_mappings_get_by_ticket_type_id ON ticket_type_project_mapping (ticket_type_id);
 CREATE INDEX ticket_type_project_mappings_get_by_project_id ON ticket_type_project_mapping (project_id);
 
-CREATE INDEX ticket_type_project_mappings_get_by_ticket_type_id_and_project_id
-    ON ticket_type_project_mapping (ticket_type_id, project_id);
+/*
+    ticket_type_project_mappings_get_by_ticket_type_id_and_project_id
+*/
+CREATE INDEX ticket_long_3 ON ticket_type_project_mapping (ticket_type_id, project_id);
 
 CREATE INDEX ticket_type_project_mappings_get_by_created ON ticket_type_project_mapping (created);
 CREATE INDEX ticket_type_project_mappings_get_by_modified ON ticket_type_project_mapping (modified);
