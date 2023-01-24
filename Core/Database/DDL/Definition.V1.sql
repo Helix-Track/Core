@@ -12,7 +12,7 @@
     - Additional tables are defined to provide the meta-data to entities of the system.
     - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
 
-    FIXMEs:
+    TODO:
 
     - Shorten identifier names:
         workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id                 -> workflow_steps_get_by_workflow_id_and_workflow_step_id_and_tick
