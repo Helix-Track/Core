@@ -15,11 +15,7 @@
     FIXMEs:
 
     - Shorten identifier names:
-    
-        ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id                       -> ticket_relationships_get_by_ticket_id_and_ticket_relationship_t
-        ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id   -> ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_t
-        repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id                        -> repository_commit_ticket_mappings_get_by_repository_id_and_tick
-        repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash            -> repository_commit_ticket_mappings_get_by_repository_id_and_tick
+
         permission_user_mappings_get_by_user_id_and_permission_context_id                           -> permission_user_mappings_get_by_user_id_and_permission_context_
         permission_user_mappings_get_by_permission_id_and_permission_context_id                     -> permission_user_mappings_get_by_permission_id_and_permission_co
         permission_team_mappings_get_by_team_id_and_permission_context_id                           -> permission_team_mappings_get_by_team_id_and_permission_context_
@@ -322,8 +318,8 @@ DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_id;
 DROP INDEX IF EXISTS ticket_relationships_get_by_child_ticket_id;
 DROP INDEX IF EXISTS ticket_relationships_get_by_child_ticket_id_and_child_ticket_id;
 DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_relationship_type_id;
-DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id;
-DROP INDEX IF EXISTS ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id;
+DROP INDEX IF EXISTS ticket_long_4;
+DROP INDEX IF EXISTS ticket_long_5;
 DROP INDEX IF EXISTS ticket_relationships_get_by_deleted;
 DROP INDEX IF EXISTS ticket_relationships_get_by_created;
 DROP INDEX IF EXISTS ticket_relationships_get_by_modified;
@@ -348,10 +344,10 @@ DROP INDEX IF EXISTS repository_project_mappings_get_by_modified;
 DROP INDEX IF EXISTS repository_project_mappings_get_by_created_and_modified;
 DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_repository_id;
 DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_ticket_id;
-DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id;
+DROP INDEX IF EXISTS repository_long_6;
 DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_commit_hash;
 DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_ticket_id_commit_hash;
-DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash;
+DROP INDEX IF EXISTS repository_long_7;
 DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_deleted;
 DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_created;
 DROP INDEX IF EXISTS repository_commit_ticket_mappings_get_by_modified;
@@ -1374,11 +1370,15 @@ CREATE INDEX ticket_relationships_get_by_child_ticket_id_and_child_ticket_id
 CREATE INDEX ticket_relationships_get_by_ticket_relationship_type_id
     ON ticket_relationship (ticket_relationship_type_id);
 
-CREATE INDEX ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id
-    ON ticket_relationship (ticket_id, ticket_relationship_type_id);
+/*
+    ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id
+*/
+CREATE INDEX ticket_long_4 ON ticket_relationship (ticket_id, ticket_relationship_type_id);
 
-CREATE INDEX ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id
-    ON ticket_relationship (ticket_id, child_ticket_id, ticket_relationship_type_id);
+/*
+    ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id
+*/
+CREATE INDEX ticket_long_5 ON ticket_relationship (ticket_id, child_ticket_id, ticket_relationship_type_id);
 
 CREATE INDEX ticket_relationships_get_by_deleted ON ticket_relationship (deleted);
 CREATE INDEX ticket_relationships_get_by_created ON ticket_relationship (created);
@@ -1472,16 +1472,20 @@ CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id ON repository_commit_ticket_mapping (ticket_id);
 
-CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id
-    ON repository_commit_ticket_mapping (repository_id, ticket_id);
+/*
+    repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id
+*/
+CREATE INDEX repository_long_6 ON repository_commit_ticket_mapping (repository_id, ticket_id);
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_commit_hash ON repository_commit_ticket_mapping (commit_hash);
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id_commit_hash
     ON repository_commit_ticket_mapping (ticket_id, commit_hash);
 
-CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash
-    ON repository_commit_ticket_mapping (repository_id, ticket_id, commit_hash);
+/*
+    repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash
+*/
+CREATE INDEX repository_long_7 ON repository_commit_ticket_mapping (repository_id, ticket_id, commit_hash);
 
 CREATE INDEX repository_commit_ticket_mappings_get_by_deleted ON repository_commit_ticket_mapping (deleted);
 CREATE INDEX repository_commit_ticket_mappings_get_by_created ON repository_commit_ticket_mapping (created);

@@ -169,8 +169,6 @@ CREATE TABLE workflow_step
     created          INTEGER NOT NULL,
     modified         INTEGER NOT NULL,
     deleted          BOOLEAN NOT NULL);
-CREATE INDEX workflow_steps_get_by_workflow_id_and_workflow_step_id_and_ticket_status_id ON workflow_step
-(workflow_id, workflow_step_id, ticket_status_id);
 CREATE TABLE report
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -213,8 +211,6 @@ CREATE TABLE project_organization_mapping
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
     deleted         BOOLEAN NOT NULL);
-CREATE INDEX project_organization_mappings_get_by_project_id_and_organization_id ON
-    project_organization_mapping (project_id, organization_id);
 CREATE INDEX project_organization_mappings_get_by_created_and_modified ON
     project_organization_mapping (created, modified);
 CREATE TABLE ticket_type_project_mapping
@@ -225,8 +221,6 @@ CREATE TABLE ticket_type_project_mapping
     created        INTEGER NOT NULL,
     modified       INTEGER NOT NULL,
     deleted        BOOLEAN NOT NULL);
-CREATE INDEX ticket_type_project_mappings_get_by_ticket_type_id_and_project_id
-    ON ticket_type_project_mapping (ticket_type_id, project_id);
 CREATE INDEX ticket_type_project_mappings_get_by_created_and_modified
     ON ticket_type_project_mapping (created, modified);
 CREATE TABLE audit_meta_data
@@ -275,10 +269,6 @@ CREATE INDEX ticket_relationships_get_by_child_ticket_id_and_child_ticket_id
     ON ticket_relationship (ticket_id, child_ticket_id);
 CREATE INDEX ticket_relationships_get_by_ticket_relationship_type_id
     ON ticket_relationship (ticket_relationship_type_id);
-CREATE INDEX ticket_relationships_get_by_ticket_id_and_ticket_relationship_type_id
-    ON ticket_relationship (ticket_id, ticket_relationship_type_id);
-CREATE INDEX ticket_relationships_get_by_ticket_id_and_child_ticket_id_and_ticket_relationship_type_id
-    ON ticket_relationship (ticket_id, child_ticket_id, ticket_relationship_type_id);
 CREATE TABLE team_organization_mapping
 (
     id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -314,12 +304,8 @@ CREATE TABLE repository_commit_ticket_mapping
     deleted       BOOLEAN NOT NULL);
 CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id
     ON repository_commit_ticket_mapping (repository_id);
-CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id
-    ON repository_commit_ticket_mapping (repository_id, ticket_id);
 CREATE INDEX repository_commit_ticket_mappings_get_by_ticket_id_commit_hash
     ON repository_commit_ticket_mapping (ticket_id, commit_hash);
-CREATE INDEX repository_commit_ticket_mappings_get_by_repository_id_and_ticket_id_commit_hash
-    ON repository_commit_ticket_mapping (repository_id, ticket_id, commit_hash);
 CREATE INDEX repository_commit_ticket_mappings_get_by_created_and_modified
     ON repository_commit_ticket_mapping (created, modified);
 CREATE TABLE component_ticket_mapping
