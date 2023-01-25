@@ -1,5 +1,7 @@
 #!/bin/bash
 
-# TODO: Extend with check for 'code' application
-# TODO: MAke the script available through the Toolkit
-code "$(pwd)"
+HERE="$PWD"
+PROJECT="$HERE"
+
+sh "$HERE/Core/Toolkit/Utils/Project/open_project_vscode.sh" "$PROJECT"
+
