@@ -15,7 +15,7 @@ fi
 
 echo "Generating the code"
 
-if mkdir "$GENERATED" && /usr/local/bin/sql2code-0.0.2/sql2code -i \
+if mkdir "$GENERATED" && /usr/local/bin/sql2code-0.0.3/sql2code -i \
             Database/DDL/Services/Authentication/Definition.V1.sql \
             Database/DDL/Definition.V1.sql \
             Database/DDL/Extensions/Chats/Definition.V1.sql \
@@ -28,7 +28,6 @@ if mkdir "$GENERATED" && /usr/local/bin/sql2code-0.0.2/sql2code -i \
 else
 
     echo "ERROR: Code not generated"
-
     exit 1
 fi
 

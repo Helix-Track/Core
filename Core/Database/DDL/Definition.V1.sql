@@ -11,7 +11,7 @@
         Mapping tables are used as well to append properties to the entities.
     - Additional tables are defined to provide the meta-data to entities of the system.
     - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
-    
+
 */
 
 DROP TABLE IF EXISTS system_info;
@@ -637,7 +637,7 @@ CREATE TABLE ticket
     story_points     INTEGER NOT NULL,
     creator          TEXT    NOT NULL,
     deleted          BOOLEAN NOT NULL,
-    UNIQUE (ticket_number, project_id) ON CONFLICT ABORT
+    UNIQUE (ticket_number, project_id)
 );
 
 CREATE INDEX tickets_get_by_ticket_number ON ticket (ticket_number);
@@ -1190,7 +1190,7 @@ CREATE TABLE project_organization_mapping
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
     deleted         BOOLEAN NOT NULL,
-    UNIQUE (project_id, organization_id) ON CONFLICT ABORT
+    UNIQUE (project_id, organization_id)
 );
 
 CREATE INDEX project_organization_mappings_get_by_project_id ON project_organization_mapping (project_id);
@@ -1220,7 +1220,7 @@ CREATE TABLE ticket_type_project_mapping
     created        INTEGER NOT NULL,
     modified       INTEGER NOT NULL,
     deleted        BOOLEAN NOT NULL,
-    UNIQUE (ticket_type_id, project_id) ON CONFLICT ABORT
+    UNIQUE (ticket_type_id, project_id)
 );
 
 CREATE INDEX ticket_type_project_mappings_get_by_ticket_type_id ON ticket_type_project_mapping (ticket_type_id);
@@ -1348,7 +1348,7 @@ CREATE TABLE ticket_relationship
     created                     INTEGER NOT NULL,
     modified                    INTEGER NOT NULL,
     deleted                     BOOLEAN NOT NULL,
-    UNIQUE (ticket_id, child_ticket_id) ON CONFLICT ABORT
+    UNIQUE (ticket_id, child_ticket_id)
 );
 
 CREATE INDEX ticket_relationships_get_by_ticket_id ON ticket_relationship (ticket_id);
@@ -1387,7 +1387,7 @@ CREATE TABLE team_organization_mapping
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
     deleted         BOOLEAN NOT NULL,
-    UNIQUE (team_id, organization_id) ON CONFLICT ABORT
+    UNIQUE (team_id, organization_id)
 );
 
 CREATE INDEX team_organization_mappings_get_by_team_id ON team_organization_mapping (team_id);
@@ -1409,7 +1409,7 @@ CREATE TABLE team_project_mapping
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
     deleted    BOOLEAN NOT NULL,
-    UNIQUE (team_id, project_id) ON CONFLICT ABORT
+    UNIQUE (team_id, project_id)
 );
 
 CREATE INDEX team_project_mappings_get_by_team_id ON team_project_mapping (team_id);
@@ -1432,7 +1432,7 @@ CREATE TABLE repository_project_mapping
     created       INTEGER NOT NULL,
     modified      INTEGER NOT NULL,
     deleted       BOOLEAN NOT NULL,
-    UNIQUE (repository_id, project_id) ON CONFLICT ABORT
+    UNIQUE (repository_id, project_id)
 );
 
 CREATE INDEX repository_project_mappings_get_by_repository_id ON repository_project_mapping (repository_id);
@@ -1497,7 +1497,7 @@ CREATE TABLE component_ticket_mapping
     created      INTEGER NOT NULL,
     modified     INTEGER NOT NULL,
     deleted      BOOLEAN NOT NULL,
-    UNIQUE (component_id, ticket_id) ON CONFLICT ABORT
+    UNIQUE (component_id, ticket_id)
 );
 
 CREATE INDEX component_ticket_mappings_get_by_ticket_id ON component_ticket_mapping (ticket_id);
@@ -1553,7 +1553,7 @@ CREATE TABLE asset_project_mapping
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
     deleted    BOOLEAN NOT NULL,
-    UNIQUE (asset_id, project_id) ON CONFLICT ABORT
+    UNIQUE (asset_id, project_id)
 );
 
 CREATE INDEX asset_project_mappings_get_by_asset_id ON asset_project_mapping (asset_id);
@@ -1577,7 +1577,7 @@ CREATE TABLE asset_team_mapping
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL,
-    UNIQUE (asset_id, team_id) ON CONFLICT ABORT
+    UNIQUE (asset_id, team_id)
 );
 
 CREATE INDEX asset_team_mappings_get_by_asset_id ON asset_team_mapping (asset_id);
@@ -1599,7 +1599,7 @@ CREATE TABLE asset_ticket_mapping
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
     deleted   BOOLEAN NOT NULL,
-    UNIQUE (asset_id, ticket_id) ON CONFLICT ABORT
+    UNIQUE (asset_id, ticket_id)
 );
 
 CREATE INDEX asset_ticket_mappings_get_by_asset_id ON asset_ticket_mapping (asset_id);
@@ -1621,7 +1621,7 @@ CREATE TABLE asset_comment_mapping
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
     deleted    BOOLEAN NOT NULL,
-    UNIQUE (asset_id, comment_id) ON CONFLICT ABORT
+    UNIQUE (asset_id, comment_id)
 );
 
 CREATE INDEX asset_comment_mappings_get_by_asset_id ON asset_comment_mapping (asset_id);
@@ -1644,7 +1644,7 @@ CREATE TABLE label_label_category_mapping
     created           INTEGER NOT NULL,
     modified          INTEGER NOT NULL,
     deleted           BOOLEAN NOT NULL,
-    UNIQUE (label_id, label_category_id) ON CONFLICT ABORT
+    UNIQUE (label_id, label_category_id)
 );
 
 CREATE INDEX label_label_category_mappings_get_by_label_id ON label_label_category_mapping (label_id);
@@ -1671,7 +1671,7 @@ CREATE TABLE label_project_mapping
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
     deleted    BOOLEAN NOT NULL,
-    UNIQUE (label_id, project_id) ON CONFLICT ABORT
+    UNIQUE (label_id, project_id)
 );
 
 CREATE INDEX label_project_mappings_get_by_label_id ON label_project_mapping (label_id);
@@ -1693,7 +1693,7 @@ CREATE TABLE label_team_mapping
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL,
-    UNIQUE (label_id, team_id) ON CONFLICT ABORT
+    UNIQUE (label_id, team_id)
 );
 
 CREATE INDEX label_team_mappings_get_by_label_id ON label_team_mapping (label_id);
@@ -1715,7 +1715,7 @@ CREATE TABLE label_ticket_mapping
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
     deleted   BOOLEAN NOT NULL,
-    UNIQUE (label_id, ticket_id) ON CONFLICT ABORT
+    UNIQUE (label_id, ticket_id)
 );
 
 CREATE INDEX label_ticket_mappings_get_by_label_id ON label_ticket_mapping (label_id);
@@ -1737,7 +1737,7 @@ CREATE TABLE label_asset_mapping
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL,
-    UNIQUE (label_id, asset_id) ON CONFLICT ABORT
+    UNIQUE (label_id, asset_id)
 );
 
 CREATE INDEX label_asset_mappings_get_by_label_id ON label_asset_mapping (label_id);
@@ -1759,7 +1759,7 @@ CREATE TABLE comment_ticket_mapping
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
     deleted    BOOLEAN NOT NULL,
-    UNIQUE (comment_id, ticket_id) ON CONFLICT ABORT
+    UNIQUE (comment_id, ticket_id)
 );
 
 CREATE INDEX comment_ticket_mappings_get_by_comment_id ON comment_ticket_mapping (comment_id);
@@ -1781,7 +1781,7 @@ CREATE TABLE ticket_project_mapping
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
     deleted    BOOLEAN NOT NULL,
-    UNIQUE (ticket_id, project_id) ON CONFLICT ABORT
+    UNIQUE (ticket_id, project_id)
 );
 
 CREATE INDEX ticket_project_mappings_get_by_project_id ON ticket_project_mapping (project_id);
@@ -1804,7 +1804,7 @@ CREATE TABLE cycle_project_mapping
     created    INTEGER NOT NULL,
     modified   INTEGER NOT NULL,
     deleted    BOOLEAN NOT NULL,
-    UNIQUE (cycle_id, project_id) ON CONFLICT ABORT
+    UNIQUE (cycle_id, project_id)
 );
 
 CREATE INDEX cycle_project_mappings_get_by_project_id ON cycle_project_mapping (project_id);
@@ -1826,7 +1826,7 @@ CREATE TABLE ticket_cycle_mapping
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
     deleted   BOOLEAN NOT NULL,
-    UNIQUE (ticket_id, cycle_id) ON CONFLICT ABORT
+    UNIQUE (ticket_id, cycle_id)
 );
 
 CREATE INDEX ticket_cycle_mappings_get_by_ticket_id ON ticket_cycle_mapping (ticket_id);
@@ -1848,7 +1848,7 @@ CREATE TABLE ticket_board_mapping
     created   INTEGER NOT NULL,
     modified  INTEGER NOT NULL,
     deleted   BOOLEAN NOT NULL,
-    UNIQUE (ticket_id, board_id) ON CONFLICT ABORT
+    UNIQUE (ticket_id, board_id)
 );
 
 CREATE INDEX ticket_board_mappings_get_by_ticket_id ON ticket_board_mapping (ticket_id);
@@ -1898,7 +1898,7 @@ CREATE TABLE user_organization_mapping
     created         INTEGER NOT NULL,
     modified        INTEGER NOT NULL,
     deleted         BOOLEAN NOT NULL,
-    UNIQUE (user_id, organization_id) ON CONFLICT ABORT
+    UNIQUE (user_id, organization_id)
 );
 
 CREATE INDEX user_organization_mappings_get_by_user_id ON user_organization_mapping (user_id);
@@ -1920,7 +1920,7 @@ CREATE TABLE user_team_mapping
     created  INTEGER NOT NULL,
     modified INTEGER NOT NULL,
     deleted  BOOLEAN NOT NULL,
-    UNIQUE (user_id, team_id) ON CONFLICT ABORT
+    UNIQUE (user_id, team_id)
 );
 
 CREATE INDEX user_team_mappings_get_by_user_id ON user_team_mapping (user_id);
@@ -1944,7 +1944,7 @@ CREATE TABLE permission_user_mapping
     created               INTEGER NOT NULL,
     modified              INTEGER NOT NULL,
     deleted               BOOLEAN NOT NULL,
-    UNIQUE (user_id, permission_id, permission_context_id) ON CONFLICT ABORT
+    UNIQUE (user_id, permission_id, permission_context_id)
 );
 
 CREATE INDEX permission_user_mappings_get_by_user_id ON permission_user_mapping (user_id);
@@ -1984,7 +1984,7 @@ CREATE TABLE permission_team_mapping
     created               INTEGER NOT NULL,
     modified              INTEGER NOT NULL,
     deleted               BOOLEAN NOT NULL,
-    UNIQUE (team_id, permission_id, permission_context_id) ON CONFLICT ABORT
+    UNIQUE (team_id, permission_id, permission_context_id)
 );
 
 CREATE INDEX permission_team_mappings_get_by_team_id ON permission_team_mapping (team_id);

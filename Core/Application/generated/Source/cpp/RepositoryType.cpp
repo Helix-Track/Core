@@ -1,6 +1,6 @@
 /*
     RepositoryType.cpp
-    Generated with 'sql2code' 0.0.2
+    Generated with 'sql2code' 0.0.3
     https://github.com/red-elf/SQL-to-Code
 */
 
