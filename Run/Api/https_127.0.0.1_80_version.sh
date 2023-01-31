@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd "$(dirname "$0")"
+HERE="$(pwd)"
 
-sh Curl/version.sh https 127.0.0.1 80
+cd "$HERE" && sh Run/Include/Curl/version.sh https 127.0.0.1 80

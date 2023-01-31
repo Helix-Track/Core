@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURL="../Core/Toolkit/Utils/curl.sh"
+CURL="Core/Toolkit/Utils/curl.sh"
 
 if test -e "$CURL"; then
 
