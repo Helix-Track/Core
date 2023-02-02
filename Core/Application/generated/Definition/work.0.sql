@@ -1,4 +1,4 @@
-CREATE TABLE user
+CREATE TABLE users
 (
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
     username TEXT    NOT NULL UNIQUE,

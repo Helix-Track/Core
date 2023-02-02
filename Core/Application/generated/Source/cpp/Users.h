@@ -1,12 +1,12 @@
 /*
-    User.h
+    Users.h
     Generated with 'sql2code' 0.0.3
     https://github.com/red-elf/SQL-to-Code
 */
 
 #include "string"
 
-class User {
+class Users {
 
 private:
     std::string id;
