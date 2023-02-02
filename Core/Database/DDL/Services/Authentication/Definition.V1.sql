@@ -13,7 +13,7 @@
     - To follow the order of entities definition in the system follow the 'DROP TABLE' directives.
 */
 
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS users;
 
 DROP INDEX IF EXISTS users_get_by_username;
 DROP INDEX IF EXISTS users_get_by_username_and_password;
@@ -32,7 +32,7 @@ DROP INDEX IF EXISTS users_get_by_created_and_modified;
      can be mapped (associated) with the user ID.
      For that purpose there are other mappings to the user ID such as Yandex OAuth2 mappings for example.
 */
-CREATE TABLE user
+CREATE TABLE users
 (
 
     id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -44,11 +44,11 @@ CREATE TABLE user
     deleted  BOOLEAN NOT NULL
 );
 
-CREATE INDEX users_get_by_username ON user (username);
-CREATE INDEX users_get_by_token ON user (token);
-CREATE INDEX users_get_by_username_and_token ON user (username, token);
-CREATE INDEX users_get_by_username_and_password ON user (username, password);
-CREATE INDEX users_get_by_deleted ON user (deleted);
-CREATE INDEX users_get_by_created ON user (created);
-CREATE INDEX users_get_by_modified ON user (modified);
-CREATE INDEX users_get_by_created_and_modified ON user (created, modified);
+CREATE INDEX users_get_by_username ON users (username);
+CREATE INDEX users_get_by_token ON users (token);
+CREATE INDEX users_get_by_username_and_token ON users (username, token);
+CREATE INDEX users_get_by_username_and_password ON users (username, password);
+CREATE INDEX users_get_by_deleted ON users (deleted);
+CREATE INDEX users_get_by_created ON users (created);
+CREATE INDEX users_get_by_modified ON users (modified);
+CREATE INDEX users_get_by_created_and_modified ON users (created, modified);
