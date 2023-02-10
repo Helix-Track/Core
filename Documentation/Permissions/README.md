@@ -37,19 +37,23 @@ Permission context IDs are connected to the one of the following contexts:
 - `node.NODE_ID`:                             Access to the node
 - `system_info`:                              Access to the system information for the particular node
 - `extension`                                 Access to the system's extensions
+- `audit`                                     Access to the system's audit data
 - `account`:                                  Access to the accounts
 - `account.ACCOUNT_ID`:                       Access to the account
 - `extension.account.ACCOUNT_ID`              Access to the accounts's extensions
+- `audit.account.ACCOUNT_ID`                  Access to the accounts's audit data
 - `organization`:                             Access to the organizations (requires access to the account)
 - `organization.ORGANIZATION_ID`:             Access to the organization (requires access to the account)
 - `extension.organization.ORGANIZATION_ID`    Access to the organization's extensions
+- `audit.organization.ORGANIZATION_ID`        Access to the organization's audit data
 - `team`:                                     Access to the teams (requires access to the organization)
 - `team.TEAM_ID`:                             Access to the team (requires access to the organization)
 - `project`:                                  Access to the projects (requires access to the organization)
 - `project.PROJECT_ID`:                       Access to the project (requires access to the organization)
 - `extension.project.PROJECT_ID`              Access to the project's extensions
+- `audit.project.PROJECT_ID`                  Access to the project's audit data
 
-*Note:* More permissions contexts to be documented soon, TODOs: `audit`, `report`, 
+*Note:* More permissions contexts to be documented soon, TODOs: `report`, 
 
 ## Permission contexts hierarchy
 
@@ -57,21 +61,25 @@ Permission context IDs are connected to the one of the following contexts:
   - `node.NODE_ID`
     - `system_info`
     - `extension`
+    - `audit`
     - `account`
       - `account.ACCOUNT_ID`
         - `extension.account.ACCOUNT_ID`
+        - `audit.account.ACCOUNT_ID`
         - `organization`
           - `organization.ORGANIZATION_ID`
             - `extension.organization.ORGANIZATION_ID`
+            - `audit.organization.ORGANIZATION_ID`
             - `team`
               - `team.TEAM_ID`
             - `project`
               - `project.PROJECT_ID`
                 - `extension.project.PROJECT_ID`
+                - `audit.project.PROJECT_ID`
 
 *Note:* More permissions context hierarchy to be documented soon.
 
-## How do user permissions work?
+## How do the user permissions work?
 
 For each context where we want to perform certain operation we will verify if that operation is possible to perform by evaluating the following rules:
 
