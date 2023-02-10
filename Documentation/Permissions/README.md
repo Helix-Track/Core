@@ -33,16 +33,17 @@ Permission IDs are connected to the one of the following permissions (with each 
 
 Permission context IDs are connected to the one of the following contexts:
 
-- `node`: Access to all nodes
-- `node.NODE_ID`: Access to the node
-- `account`: Access to the accounts
-- `account.ACCOUNT_ID`: Access to the account
-- `organization`: Access to the organizations (requires access to the account)
-- `organization.ORGANIZATION_ID`: Access to the organization (requires access to the account)
-- `team`: Access to the teams (requires access to the organization)
-- `team.TEAM_ID`: Access to the team (requires access to the organization)
-- `project`: Access to the projects (requires access to the organization)
-- `project.PROJECT_ID`: Access to the project (requires access to the organization)
+- `node`:                           Access to all nodes
+- `node.NODE_ID`:                   Access to the node
+- `system_info`:                    Access to the system information for the particular node
+- `account`:                        Access to the accounts
+- `account.ACCOUNT_ID`:             Access to the account
+- `organization`:                   Access to the organizations (requires access to the account)
+- `organization.ORGANIZATION_ID`:   Access to the organization (requires access to the account)
+- `team`:                           Access to the teams (requires access to the organization)
+- `team.TEAM_ID`:                   Access to the team (requires access to the organization)
+- `project`:                        Access to the projects (requires access to the organization)
+- `project.PROJECT_ID`:             Access to the project (requires access to the organization)
 
 *Note:* More permissions contexts to be documented soon, TODOs: `audit`, `report`, `extension`, `system_info`
 
@@ -50,6 +51,7 @@ Permission context IDs are connected to the one of the following contexts:
 
 - `node`
   - `node.NODE_ID`
+    - `system_info`
     - `account`
       - `account.ACCOUNT_ID`
         - `organization`
