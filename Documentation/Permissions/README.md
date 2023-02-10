@@ -38,22 +38,26 @@ Permission context IDs are connected to the one of the following contexts:
 - `system_info`:                              Access to the system information for the particular node
 - `extension`                                 Access to the system's extensions
 - `audit`                                     Access to the system's audit data
+- `reports`                                   Access to the system's reports
 - `account`:                                  Access to the accounts
 - `account.ACCOUNT_ID`:                       Access to the account
 - `extension.account.ACCOUNT_ID`              Access to the accounts's extensions
 - `audit.account.ACCOUNT_ID`                  Access to the accounts's audit data
+- `reports.account.ACCOUNT_ID`                Access to the account's reports
 - `organization`:                             Access to the organizations (requires access to the account)
 - `organization.ORGANIZATION_ID`:             Access to the organization (requires access to the account)
 - `extension.organization.ORGANIZATION_ID`    Access to the organization's extensions
 - `audit.organization.ORGANIZATION_ID`        Access to the organization's audit data
+- `reports.organization.ORGANIZATION_ID`      Access to the organization's reports
 - `team`:                                     Access to the teams (requires access to the organization)
 - `team.TEAM_ID`:                             Access to the team (requires access to the organization)
 - `project`:                                  Access to the projects (requires access to the organization)
 - `project.PROJECT_ID`:                       Access to the project (requires access to the organization)
 - `extension.project.PROJECT_ID`              Access to the project's extensions
 - `audit.project.PROJECT_ID`                  Access to the project's audit data
+- `reports.project.PROJECT_ID`                Access to the project's reports
 
-*Note:* More permissions contexts to be documented soon, TODOs: `report`, 
+*Note:* More permissions contexts to be documented soon. 
 
 ## Permission contexts hierarchy
 
@@ -62,20 +66,24 @@ Permission context IDs are connected to the one of the following contexts:
     - `system_info`
     - `extension`
     - `audit`
+    - `reports`
     - `account`
       - `account.ACCOUNT_ID`
         - `extension.account.ACCOUNT_ID`
         - `audit.account.ACCOUNT_ID`
+        - `reports.account.ACCOUNT_ID`
         - `organization`
           - `organization.ORGANIZATION_ID`
             - `extension.organization.ORGANIZATION_ID`
             - `audit.organization.ORGANIZATION_ID`
+            - `reports.organization.ORGANIZATION_ID`
             - `team`
               - `team.TEAM_ID`
             - `project`
               - `project.PROJECT_ID`
                 - `extension.project.PROJECT_ID`
                 - `audit.project.PROJECT_ID`
+                - `reports.project.PROJECT_ID`
 
 *Note:* More permissions context hierarchy to be documented soon.
 
