@@ -33,33 +33,41 @@ Permission IDs are connected to the one of the following permissions (with each 
 
 Permission context IDs are connected to the one of the following contexts:
 
-- `node`:                           Access to all nodes
-- `node.NODE_ID`:                   Access to the node
-- `system_info`:                    Access to the system information for the particular node
-- `account`:                        Access to the accounts
-- `account.ACCOUNT_ID`:             Access to the account
-- `organization`:                   Access to the organizations (requires access to the account)
-- `organization.ORGANIZATION_ID`:   Access to the organization (requires access to the account)
-- `team`:                           Access to the teams (requires access to the organization)
-- `team.TEAM_ID`:                   Access to the team (requires access to the organization)
-- `project`:                        Access to the projects (requires access to the organization)
-- `project.PROJECT_ID`:             Access to the project (requires access to the organization)
+- `node`:                                     Access to all nodes
+- `node.NODE_ID`:                             Access to the node
+- `system_info`:                              Access to the system information for the particular node
+- `extension`                                 Access to the system's extensions
+- `account`:                                  Access to the accounts
+- `account.ACCOUNT_ID`:                       Access to the account
+- `extension.account.ACCOUNT_ID`              Access to the accounts's extensions
+- `organization`:                             Access to the organizations (requires access to the account)
+- `organization.ORGANIZATION_ID`:             Access to the organization (requires access to the account)
+- `extension.organization.ORGANIZATION_ID`    Access to the organization's extensions
+- `team`:                                     Access to the teams (requires access to the organization)
+- `team.TEAM_ID`:                             Access to the team (requires access to the organization)
+- `project`:                                  Access to the projects (requires access to the organization)
+- `project.PROJECT_ID`:                       Access to the project (requires access to the organization)
+- `extension.project.PROJECT_ID`              Access to the project's extensions
 
-*Note:* More permissions contexts to be documented soon, TODOs: `audit`, `report`, `extension`, `system_info`
+*Note:* More permissions contexts to be documented soon, TODOs: `audit`, `report`, 
 
 ## Permission contexts hierarchy
 
 - `node`
   - `node.NODE_ID`
     - `system_info`
+    - `extension`
     - `account`
       - `account.ACCOUNT_ID`
+        - `extension.account.ACCOUNT_ID`
         - `organization`
           - `organization.ORGANIZATION_ID`
+            - `extension.organization.ORGANIZATION_ID`
             - `team`
               - `team.TEAM_ID`
             - `project`
               - `project.PROJECT_ID`
+                - `extension.project.PROJECT_ID`
 
 *Note:* More permissions context hierarchy to be documented soon.
 
