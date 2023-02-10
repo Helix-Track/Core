@@ -27,6 +27,8 @@ Permission IDs are connected to the one of the following permissions (with each 
 - `DELETE`: Allowed removal of the context,                     access level = 5
 - `ALL`   : Allowed to perform all operations on the context    access level = 5
 
+*Note:* The `DELETE` and `ALL` permissions are the same one with the different naming.
+
 ## Permission context ID
 
 Permission context IDs are connected to the one of the following contexts:
