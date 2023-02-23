@@ -57,8 +57,6 @@ Permission context IDs are connected to the one of the following contexts:
 - `audit.project.PROJECT_ID`                  Access to the project's audit data
 - `reports.project.PROJECT_ID`                Access to the project's reports
 
-*Note:* More permissions contexts to be documented soon. 
-
 ## Permission contexts hierarchy
 
 - `node`
@@ -85,8 +83,6 @@ Permission context IDs are connected to the one of the following contexts:
                 - `audit.project.PROJECT_ID`
                 - `reports.project.PROJECT_ID`
 
-*Note:* More permissions context hierarchy to be documented soon.
-
 ## How do the user permissions work?
 
 For each context where we want to perform certain operation we will verify if that operation is possible to perform by evaluating the following rules:
@@ -98,3 +94,7 @@ For each context where we want to perform certain operation we will verify if th
 - Do I have propper permission access level? Each operation that we want to execute requires certain level. Let's say that we want to read the content of the context. We need level >= 1. User has the level of 2 (creation granted). That means that it is allowed to read as well.
   - No, reject.
   - Yes, perform the desired operation.
+
+# Permissions engine
+
+Tbd.
