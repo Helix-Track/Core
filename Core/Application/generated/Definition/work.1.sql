@@ -119,6 +119,14 @@ CREATE TABLE component
     created     INTEGER NOT NULL,
     modified    INTEGER NOT NULL,
     deleted     BOOLEAN NOT NULL);
+CREATE TABLE account
+(
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL);
 CREATE TABLE organization
 (
     id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
@@ -269,6 +277,14 @@ CREATE INDEX ticket_relationships_get_by_child_ticket_id_and_child_ticket_id
     ON ticket_relationship (ticket_id, child_ticket_id);
 CREATE INDEX ticket_relationships_get_by_ticket_relationship_type_id
     ON ticket_relationship (ticket_relationship_type_id);
+CREATE TABLE organization_account_mapping
+(
+    id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    organization_id TEXT    NOT NULL,
+    account_id      TEXT    NOT NULL,
+    created         INTEGER NOT NULL,
+    modified        INTEGER NOT NULL,
+    deleted         BOOLEAN NOT NULL);
 CREATE TABLE team_organization_mapping
 (
     id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
