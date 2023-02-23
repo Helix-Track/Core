@@ -15,6 +15,7 @@
 */
 
 DROP TABLE IF EXISTS system_info;
+DROP TABLE IF EXISTS account;
 DROP TABLE IF EXISTS organization;
 DROP TABLE IF EXISTS team;
 DROP TABLE IF EXISTS team_organization_mapping;
@@ -185,6 +186,13 @@ DROP INDEX IF EXISTS organizations_get_by_created;
 DROP INDEX IF EXISTS organizations_get_by_deleted;
 DROP INDEX IF EXISTS organizations_get_by_modified;
 DROP INDEX IF EXISTS organizations_get_by_created_and_modified;
+DROP INDEX IF EXISTS accounts_get_by_title;
+DROP INDEX IF EXISTS accounts_get_by_description;
+DROP INDEX IF EXISTS accounts_get_by_title_and_description;
+DROP INDEX IF EXISTS accounts_get_by_created;
+DROP INDEX IF EXISTS accounts_get_by_deleted;
+DROP INDEX IF EXISTS accounts_get_by_modified;
+DROP INDEX IF EXISTS accounts_get_by_created_and_modified;
 DROP INDEX IF EXISTS teams_get_by_title;
 DROP INDEX IF EXISTS teams_get_by_description;
 DROP INDEX IF EXISTS teams_get_by_title_and_description;
@@ -314,6 +322,12 @@ DROP INDEX IF EXISTS ticket_relationships_get_by_deleted;
 DROP INDEX IF EXISTS ticket_relationships_get_by_created;
 DROP INDEX IF EXISTS ticket_relationships_get_by_modified;
 DROP INDEX IF EXISTS ticket_relationships_get_by_created_and_modified;
+DROP INDEX IF EXISTS org_acc_mappings_get_by_account_id;
+DROP INDEX IF EXISTS org_acc_mappings_get_by_organization_id;
+DROP INDEX IF EXISTS org_acc_mappings_get_by_deleted;
+DROP INDEX IF EXISTS org_acc_mappings_et_by_created;
+DROP INDEX IF EXISTS org_acc_mappings_get_by_modified;
+DROP INDEX IF EXISTS org_acc_mappings_get_by_created_and_modified;
 DROP INDEX IF EXISTS team_organization_mappings_get_by_team_id;
 DROP INDEX IF EXISTS team_organization_mappings_get_by_organization_id;
 DROP INDEX IF EXISTS team_organization_mappings_get_by_deleted;
@@ -887,6 +901,28 @@ CREATE INDEX components_get_by_modified ON component (modified);
 CREATE INDEX components_get_by_created_modified ON component (created, modified);
 
 /*
+    The account definition. Account is the owner of the organizatin.
+*/
+CREATE TABLE account
+(
+
+    id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    title       TEXT    NOT NULL UNIQUE,
+    description TEXT,
+    created     INTEGER NOT NULL,
+    modified    INTEGER NOT NULL,
+    deleted     BOOLEAN NOT NULL
+);
+
+CREATE INDEX accounts_get_by_title ON account (title);
+CREATE INDEX accounts_get_by_description ON account (description);
+CREATE INDEX accounts_get_by_title_and_description ON account (title, description);
+CREATE INDEX accounts_get_by_created ON account (created);
+CREATE INDEX accounts_get_by_deleted ON account (deleted);
+CREATE INDEX accounts_get_by_modified ON account (modified);
+CREATE INDEX accounts_get_by_created_and_modified ON account (created, modified);
+
+/*
     The organization definition. Organization is the owner of the project.
 */
 CREATE TABLE organization
@@ -1374,6 +1410,28 @@ CREATE INDEX ticket_relationships_get_by_deleted ON ticket_relationship (deleted
 CREATE INDEX ticket_relationships_get_by_created ON ticket_relationship (created);
 CREATE INDEX ticket_relationships_get_by_modified ON ticket_relationship (modified);
 CREATE INDEX ticket_relationships_get_by_created_and_modified ON ticket_relationship (created, modified);
+
+/*
+    Organizations belongs to the account. Multiple organizations can belong to one account.
+*/
+CREATE TABLE organization_account_mapping
+(
+
+    id              TEXT    NOT NULL PRIMARY KEY UNIQUE,
+    organization_id TEXT    NOT NULL,
+    account_id      TEXT    NOT NULL,
+    created         INTEGER NOT NULL,
+    modified        INTEGER NOT NULL,
+    deleted         BOOLEAN NOT NULL,
+    UNIQUE (organization_id, account_id)
+);
+
+CREATE INDEX org_acc_mappings_get_by_account_id ON organization_account_mapping (account_id);
+CREATE INDEX org_acc_mappings_get_by_organization_id ON organization_account_mapping (organization_id);
+CREATE INDEX org_acc_mappings_get_by_deleted ON organization_account_mapping (deleted);
+CREATE INDEX org_acc_mappings_et_by_created ON organization_account_mapping (created);
+CREATE INDEX org_acc_mappings_get_by_modified ON organization_account_mapping (modified);
+CREATE INDEX org_acc_mappings_get_by_created_and_modified ON organization_account_mapping (created, modified);
 
 /*
     Team belongs to the organization. Multiple teams can belong to one organization.
