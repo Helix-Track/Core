@@ -97,4 +97,19 @@ For each context where we want to perform certain operation we will verify if th
 
 # Permissions engine
 
+Each core operation must be verified against the permissions engine. For example, executing the operation for obtaining the list of projects:
+
+- Method start
+- Obtain the list of permissions
+- Request the approval from the permissions engine
+- Obtaining the result: success or failure
+- If success, execute and return the result
+- If failure, abort the executiom.
+
+## Obtaining the list of permissions
+
+Tbd.
+
+## Evaluating the permissions
+
 Tbd.
