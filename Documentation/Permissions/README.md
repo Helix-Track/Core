@@ -106,10 +106,27 @@ Each core operation must be verified against the permissions engine. For example
 - If success, execute and return the result
 - If failure, abort the executiom.
 
-## Obtaining the list of permissions
-
-Tbd.
-
 ## Evaluating the permissions
 
-Tbd.
+To evaluate the permission for the operation the name of the system entity, access level and the JWT token is provided:
+
+```yaml
+{
+  "entity": "project",
+  "access_level": 1,
+  "jwt": "jwt_token_value"
+}
+```
+
+Each system entity is mapped to the proper permission context. For example, the `project` system entity is mapped to the `project` permissions context.
+The permissions engine has the information about all system mappings. If the evaluation completes with success the proper payload is returened:
+
+```yaml
+{
+  "code":                   -1,
+  "errorMessage":           "string",
+  "errorMessageLocalised":  "string"
+}
+```
+
+For success the code with value of `0` is returned.
