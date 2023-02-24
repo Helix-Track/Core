@@ -85,7 +85,9 @@ Permission contexts belong to the one of the following contexts:
 
 ## How do the user permissions work?
 
-For each context where we want to perform certain operation we will verify if that operation is possible to perform by evaluating the following rules:
+Each system operation is related to the proper context. Based on the information from the JWT token the Permissions engine is checking if user has the access rights to the certain context and the proper access level.
+
+For each context we will verify if the operation is possible to be performed by evaluating the following rules:
 
 - Do I have access to the context? If we have access to the context or to a parent context (higher in the hierarchy) the access is granted.
   - No, reject.
@@ -97,13 +99,13 @@ For each context where we want to perform certain operation we will verify if th
 
 # Permissions engine
 
-Each core operation must be verified against the permissions engine. For example, executing the operation for obtaining the list of projects:
+Each HelixTrack Core operation must be verified against the Permissions engine. For example, obtaining the list of projects operation:
 
-- Method start
-- Request the approval from the permissions engine
-- Result is returned: success or failure
-- If success, execute the operation and return the result
-- If failure, abort the executiom.
+- Operation (API method) start
+- Request the approval from the Permissions engine
+- The permissions result is returned: success or failure
+- If it is success, the operation is executed and its result returned
+- If it is failure, the operation is aborted and error returned
 
 ## Evaluating the permissions
 
@@ -118,7 +120,7 @@ To evaluate the permission for the operation the name of the system entity, acce
 ```
 
 Each system entity is mapped to the proper permission context. For example, the `project` system entity is mapped to the `project` permissions context.
-The permissions engine has the information about all system mappings. If the evaluation completes with success the proper payload is returened:
+The permissions engine has the information about all system mappings. When the evaluation completes the proper result payload is returened:
 
 ```yaml
 {
@@ -128,4 +130,4 @@ The permissions engine has the information about all system mappings. If the eva
 }
 ```
 
-For success the code with value of `0` is returned.
+For success code with value of `0` is returned.
