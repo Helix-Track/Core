@@ -10,16 +10,16 @@ Each user will have a list of permissions. The following example illustrates reg
 {
   "permissions": [
     {
-      "permission_id":         "string",
-      "permission_context_id": "string"
+      "context":          "string"
+      "value":            "string",
     }
   ]
 }
 ```
 
-## Permission ID
+## Permission value
 
-Permission IDs are connected to the one of the following permissions (with each the proper access level numeric value is associated):
+Permission value is connected to the one of the following permissions (with each the proper access level numeric value is associated):
 
 - `READ`  : Allowed reading of the context,                     access level = 1
 - `CREATE`: Allowed insertion into the context,                 access level = 2
@@ -27,11 +27,11 @@ Permission IDs are connected to the one of the following permissions (with each 
 - `DELETE`: Allowed removal of the context,                     access level = 5
 - `ALL`   : Allowed to perform all operations on the context    access level = 5
 
-*Note:* The `DELETE` and `ALL` permissions are the same one with the different naming.
+*Note:* The `DELETE` and `ALL` permission values are the same one with the different naming.
 
-## Permission context ID
+## Permission context
 
-Permission context IDs are connected to the one of the following contexts:
+Permission contexts belong to the one of the following contexts:
 
 - `node`:                                     Access to all nodes
 - `node.NODE_ID`:                             Access to the node
@@ -100,10 +100,9 @@ For each context where we want to perform certain operation we will verify if th
 Each core operation must be verified against the permissions engine. For example, executing the operation for obtaining the list of projects:
 
 - Method start
-- Obtain the list of permissions
 - Request the approval from the permissions engine
-- Obtaining the result: success or failure
-- If success, execute and return the result
+- Result is returned: success or failure
+- If success, execute the operation and return the result
 - If failure, abort the executiom.
 
 ## Evaluating the permissions
@@ -112,9 +111,9 @@ To evaluate the permission for the operation the name of the system entity, acce
 
 ```yaml
 {
-  "entity": "project",
-  "access_level": 1,
-  "jwt": "jwt_token_value"
+  "entity":          "project",
+  "access_level":    1,
+  "jwt":            "jwt_token_value"
 }
 ```
 
