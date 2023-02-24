@@ -130,4 +130,4 @@ The permissions engine has the information about all system mappings. When the e
 }
 ```
 
-For success code with value of `0` is returned.
+For success code with value of 0 (zero) is returned.
