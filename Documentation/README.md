@@ -3,4 +3,4 @@
 - [API calls](API)
 - [User roles and permissions](Permissions)
 - [Run scripts](Run)
-- [Servcies](Services) and project structure
+- [Services](Services) and project structure
