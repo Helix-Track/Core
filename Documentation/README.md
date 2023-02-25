@@ -1,6 +1,6 @@
 # Project documentation
 
-- [API calls](API) documentation
-- [User roles and permissions](Permissions) documentation
-- [Run scripts](Run) documentation
-- [Servcies](Services) documentation
+- [API calls](API)
+- [User roles and permissions](Permissions)
+- [Run scripts](Run)
+- [Servcies](Services) and project structure
