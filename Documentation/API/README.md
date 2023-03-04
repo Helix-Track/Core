@@ -27,7 +27,7 @@ Table of contents
 
 - endpoint: `/do`
 - method: `POST`
-- payload: 
+- payload:
   ```yaml
   {
     "action":     "authenticate"   /* mandatory */

@@ -1,4 +1,9 @@
-# User permissions
+# Permissions
+
+- [User permissions](#User-permissions)
+- [Permissions engine](#Permissions-engine)
+
+## User permissions
 
 After user is authenticated with success and got the information about the particular HelixTrack Core
 instance that it belongs to, permissions information is obtained from that HelixTrack Core instance and returned 
@@ -17,7 +22,7 @@ Each user will have a list of permissions. The following example illustrates reg
 }
 ```
 
-## Permission value
+### Permission value
 
 Permission value is connected to the one of the following permissions (with each the proper access level numeric value is associated):
 
@@ -29,7 +34,7 @@ Permission value is connected to the one of the following permissions (with each
 
 *Note:* The `DELETE` and `ALL` permission values are the same one with the different naming.
 
-## Permission context
+### Permission context
 
 Permission contexts belong to the one of the following contexts:
 
@@ -57,7 +62,7 @@ Permission contexts belong to the one of the following contexts:
 - `audit.project.PROJECT_ID`                  Access to the project's audit data
 - `reports.project.PROJECT_ID`                Access to the project's reports
 
-## Permission contexts hierarchy
+### Permission contexts hierarchy
 
 - `node`
   - `node.NODE_ID`
@@ -83,7 +88,7 @@ Permission contexts belong to the one of the following contexts:
                 - `audit.project.PROJECT_ID`
                 - `reports.project.PROJECT_ID`
 
-## How do the user permissions work?
+### How do the user permissions work?
 
 Each system operation is related to the proper context. Based on the information from the JWT token the Permissions engine is checking if user has the access rights to the certain context and the proper access level.
 
@@ -97,7 +102,7 @@ For each context we will verify if the operation is possible to be performed by 
   - No, reject.
   - Yes, perform the desired operation.
 
-# Permissions engine
+## Permissions engine
 
 Each HelixTrack Core operation must be verified against the Permissions engine. For example, obtaining the list of projects operation:
 
@@ -107,7 +112,7 @@ Each HelixTrack Core operation must be verified against the Permissions engine. 
 - If it is success, the operation is executed and its result returned
 - If it is failure, the operation is aborted and error returned
 
-## Evaluating the permissions
+### Evaluating the permissions
 
 To evaluate the permission for the operation the name of the system entity, access level and the JWT token is provided:
 

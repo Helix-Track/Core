@@ -10,7 +10,7 @@ The following list represents supported HelixTrack Services:
 - Documents             (optional,  extension                                )
 - Chats                 (optional,  extension                                )
 
-# Services project structure
+## Services project structure
 
 The services listed above fit in the following project structure:
 
