@@ -15,26 +15,28 @@ The following list represents supported HelixTrack Services:
 The services listed above fit in the following project structure:
 
 - `Core`, Main project directory
-    - `Assets`, Various assets
+    - `Run`, Run scripts
     - `Core`, HelixTrack Core
+    - `Assets`, Various assets
     - `Documentation`, Project documentation
     - `Propriatery`, The propriatery implementations
-    - `Run`, Run scripts
-    - `Authentication`, Authentication extension
-        - `API`, Open-source API
-        - `Implementation`, The propriatery implementation
-    - `Permissions`, Permissions engine
-        - `API`, Open-source API
-        - `Implementation`, The propriatery implementation
-    - `Lokalisation`, Lokalisation extension
-        - `API`, Open-source API
-        - `Implementation`, The propriatery implementation
-    - `Times`, Times extension
-        - `API`, Open-source API
-        - `Implementation`, The propriatery implementation
-    - `Documents`, Times extension
-        - `API`, Open-source API
-        - `Implementation`, The propriatery implementation
-    - `Chats`, Times extension
-        - `API`, Open-source API
-        - `Implementation`, The propriatery implementation
+    - `Services`, Services directory
+        - `Authentication`, Authentication extension
+            - `API`, Open-source API
+            - `Implementation`, The propriatery implementation
+        - `Permissions`, Permissions engine
+            - `API`, Open-source API
+            - `Implementation`, The propriatery implementation
+        - `Lokalisation`, Lokalisation extension
+            - `API`, Open-source API
+            - `Implementation`, The propriatery implementation
+    - `Extensions`, Extensions directory
+        - `Times`, Times extension
+            - `API`, Open-source API
+            - `Implementation`, The propriatery implementation
+        - `Documents`, Times extension
+            - `API`, Open-source API
+            - `Implementation`, The propriatery implementation
+        - `Chats`, Times extension
+            - `API`, Open-source API
+            - `Implementation`, The propriatery implementation
