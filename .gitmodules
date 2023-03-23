@@ -23,3 +23,6 @@
 	path = Services-Toolkit
 	url = git@github.com:red-elf/Services-Toolkit.git
 
+[submodule "Core/Testable"]
+	path = Core/Testable
+	url = git@github.com:red-elf/Testable.git
