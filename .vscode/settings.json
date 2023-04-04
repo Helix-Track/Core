@@ -5,5 +5,5 @@
         "system_error": "cpp",
         "typeinfo": "cpp"
     },
-    "markdown-pdf.convertOnSave": true
+    "markdown-pdf.convertOnSave": true,
 }
