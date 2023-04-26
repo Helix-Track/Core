@@ -1,4 +1,10 @@
 {
+    "workbench.colorTheme": "Visual Studio 2017 Dark - C++",
+    "workbench.startupEditor": "none",
+    "cmake.configureOnOpen": true,
+    "[python]": {
+        "editor.formatOnType": true
+    },
     "files.associations": {
         "*.tcc": "cpp",
         "streambuf": "cpp",
@@ -6,4 +12,7 @@
         "typeinfo": "cpp"
     },
     "markdown-pdf.convertOnSave": true,
+    "sonarlint.analyzerProperties": {
+    
+    },
 }
