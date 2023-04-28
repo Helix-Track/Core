@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PARAM_SONARQUBE_NAME="SonarQube"
+PARAM_SONARQUBE_NAME="Core"
