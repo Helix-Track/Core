@@ -11,7 +11,13 @@ The HelixTrack Core has been developed and tested on [Alt Linux](https://alt-lin
 
 ## Before you start
 
-TBD: Executing init. scripts.
+Clone the project, then, initialize and update the Git submodules.
+
+*Note:* Some subprojects (submodules) may be dependant on its own Git submodules. For those, it is required to do the init and update as well.
+
+### Executing inititialisation scripts
+
+Tbd.
 
 ## Database
 
