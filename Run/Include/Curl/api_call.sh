@@ -28,7 +28,7 @@ if [ -n "$3" ]; then
   UTIL_PORT="$3"
 fi
 
-function API_CALL {
+API_CALL() {
 
   if [ -z "$4" ]; then
 
