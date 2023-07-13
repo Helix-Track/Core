@@ -26,3 +26,6 @@
 [submodule "Core/Testable"]
 	path = Core/Testable
 	url = git@github.com:red-elf/Testable.git
+[submodule "Project"]
+	path = Project
+	url = git@github.com:red-elf/Project.git
