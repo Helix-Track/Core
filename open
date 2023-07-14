@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SCRIPT="Run/Project/open.sh"
+
+if ! test -e; then
+
+    echo "ERROR: Script not found at $SCRIPT"
+    exit 1
+fi
+
+sh "$SCRIPT"

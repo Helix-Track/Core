@@ -15,4 +15,5 @@
     "sonarlint.analyzerProperties": {
     
     },
+    "cmake.sourceDirectory": "/home/milosvasic/Projects/HelixTrack/Core/Core/_Dependencies/Cache/Argparse/Library/test",
 }
