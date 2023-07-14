@@ -3,7 +3,7 @@
 
 # HelixTrack Core
 
-Core module for the Helix Track.
+The Core module for the Helix Track.
 
 ## Development
 
@@ -18,6 +18,16 @@ Clone the project, then, initialize and update the Git submodules.
 ### Executing inititialisation scripts
 
 Tbd.
+
+### Opening the project
+
+From the root of the project execute:
+
+```shell
+./open
+```
+
+*Note:* The `open` command expects that Visual Studio Code is present on the system and available though the `code` command.
 
 ## Database
 
