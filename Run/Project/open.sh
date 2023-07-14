@@ -3,5 +3,5 @@
 HERE="$(pwd)"
 PROJECT="$HERE"
 
-sh "Project/open_project_vscode.sh" "$PROJECT"
+sh "Project/open.sh" code "$PROJECT"
 
