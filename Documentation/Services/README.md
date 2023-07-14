@@ -16,10 +16,12 @@ The services listed above fit in the following project structure:
 
 - `Core`, Main project directory
     - `Run`, Run scripts
-    - `Core`, HelixTrack Core
     - `Assets`, Various assets
+    - `Recipes`, Various [Software Toolkit](https://github.com/red-elf/Software-Toolkit) recipes
     - `Documentation`, Project documentation
+    - `Core`, HelixTrack Core implementation
     - `Propriatery`, The propriatery implementations
+        - `Recipes`, Various [Software Toolkit](https://github.com/red-elf/Software-Toolkit) recipes
         - `Services`, Services directory
             - `Authentication`, Authentication extension
                 - `Implementation`, The propriatery implementation
