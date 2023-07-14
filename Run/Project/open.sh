@@ -1,7 +1,7 @@
 #!/bin/bash
 
-HERE="$PWD"
+HERE="$(pwd)"
 PROJECT="$HERE"
 
-sh "$HERE/Core/Toolkit/Utils/Project/open_project_vscode.sh" "$PROJECT"
+sh "Project/open_project_vscode.sh" "$PROJECT"
 
