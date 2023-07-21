@@ -1,10 +1,6 @@
 {
     "workbench.colorTheme": "Visual Studio 2017 Dark - C++",
     "workbench.startupEditor": "none",
-    "cmake.configureOnOpen": true,
-    "[python]": {
-        "editor.formatOnType": true
-    },
     "files.associations": {
         "*.tcc": "cpp",
         "streambuf": "cpp",
@@ -15,5 +11,4 @@
     "sonarlint.analyzerProperties": {
     
     },
-    "cmake.sourceDirectory": "/home/milosvasic/Projects/HelixTrack/Core/Core/_Dependencies/Cache/Argparse/Library/test",
 }
