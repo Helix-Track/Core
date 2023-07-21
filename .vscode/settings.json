@@ -11,4 +11,5 @@
     "sonarlint.analyzerProperties": {
     
     },
+    "cmake.configureOnOpen": false
 }
