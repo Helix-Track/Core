@@ -2,7 +2,7 @@
 
 SCRIPT="Run/Project/open.sh"
 
-if ! test -e; then
+if ! test -e "$SCRIPT"; then
 
     echo "ERROR: Script not found at $SCRIPT"
     exit 1

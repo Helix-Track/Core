@@ -1,0 +1,18 @@
+#!/bin/bash
+
+SCRIPT_TEST_CORE="Run/Test/core.sh"
+SCRIPT_TEST_PROPRIATERY="Run/Test/propriatery.sh"
+
+if ! test -e "$SCRIPT_TEST_CORE"; then
+
+    echo "ERROR: Script not found at $SCRIPT_TEST_CORE"
+    exit 1
+fi
+
+if ! test -e "$SCRIPT_TEST_PROPRIATERY"; then
+
+    echo "ERROR: Script not found at $SCRIPT_TEST_PROPRIATERY"
+    exit 1
+fi
+
+sh "$SCRIPT_TEST_CORE" && sh "$SCRIPT_TEST_PROPRIATERY"
