@@ -29,6 +29,16 @@ From the root of the project execute:
 
 *Note:* The `open` command expects that Visual Studio Code is present on the system and available though the `code` command.
 
+### Testing the project
+
+From the root of the project execute:
+
+```shell
+./test
+```
+
+It will execute all the [Testable](https://github.com/red-elf/Testable) system components.
+
 ## Database
 
 The system database
