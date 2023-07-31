@@ -4,14 +4,5 @@
     "markdown-pdf.convertOnSave": true,
     "cmake.configureOnOpen": false,
     "update.showReleaseNotes": false,
-    "redhat.telemetry.enabled": false,
-    "sonarlint.connectedMode.connections.sonarqube": [
-        {
-            "serverUrl": "http://milosvasic-standard-pc-q35-ich9-2009.local:9102",
-            "connectionId": "http-milosvasic-standard-pc-q35-ich9-2009-local-9102"
-        }
-    ],
-    "sonarlint.analyzerProperties": {
-
-    }
+    "redhat.telemetry.enabled": false
 }
