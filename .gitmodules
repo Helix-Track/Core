@@ -29,3 +29,6 @@
 [submodule "Project"]
 	path = Project
 	url = git@github.com:red-elf/Project.git
+[submodule "Toolkit"]
+	path = Toolkit
+	url = git@github.com:red-elf/Software-Toolkit.git
