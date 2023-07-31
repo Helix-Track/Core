@@ -1,15 +1,10 @@
 {
     "workbench.colorTheme": "Visual Studio 2017 Dark - C++",
     "workbench.startupEditor": "none",
-    "files.associations": {
-        "*.tcc": "cpp",
-        "streambuf": "cpp",
-        "system_error": "cpp",
-        "typeinfo": "cpp"
-    },
     "markdown-pdf.convertOnSave": true,
-    "sonarlint.analyzerProperties": {
-    
-    },
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "sonarlint.connectedMode.project": {
+        "connectionId": "",
+        "projectKey": ""
+    }
 }
