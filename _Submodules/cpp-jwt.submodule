@@ -1,0 +1,4 @@
+#!/bin/bash
+
+NAME="cpp-jwt"
+REPO="git@github.com:arun11299/cpp-jwt.git"

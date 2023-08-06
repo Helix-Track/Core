@@ -1,0 +1,4 @@
+#!/bin/bash
+
+NAME="argparse"
+REPO="git@github.com:p-ranav/argparse.git"

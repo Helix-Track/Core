@@ -1,0 +1,4 @@
+#!/bin/bash
+
+NAME="Installable"
+REPO="git@github.com:red-elf/Installable.git"

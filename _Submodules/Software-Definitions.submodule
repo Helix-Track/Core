@@ -1,0 +1,4 @@
+#!/bin/bash
+
+NAME="Software-Definitions"
+REPO="git@github.com:Server-Factory/Software-Definitions.git"

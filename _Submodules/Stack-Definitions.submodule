@@ -1,0 +1,4 @@
+#!/bin/bash
+
+NAME="Stack-Definitions"
+REPO="git@github.com:Server-Factory/Stack-Definitions.git"

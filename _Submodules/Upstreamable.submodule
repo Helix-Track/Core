@@ -1,0 +1,4 @@
+#!/bin/bash
+
+NAME="Upstreamable"
+REPO="git@github.com:red-elf/Upstreamable.git"

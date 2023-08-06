@@ -1,0 +1,4 @@
+#!/bin/bash
+
+NAME="Propriatery"
+REPO="git@github.com:Helix-Track/Propriatery.git"
