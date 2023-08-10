@@ -62,9 +62,6 @@
 [submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/trantor"]
 	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/trantor
 	url = https://github.com/an-tao/trantor.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/drogon"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/drogon
-	url = git@github.com:drogonframework/drogon.git
 [submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/json"]
 	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/json
 	url = git@github.com:nlohmann/json.git
@@ -77,9 +74,6 @@
 [submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/cpp-jwt"]
 	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/cpp-jwt
 	url = git@github.com:arun11299/cpp-jwt.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/argparse"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/argparse
-	url = git@github.com:p-ranav/argparse.git
 [submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Propriatery"]
 	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Propriatery
 	url = git@github.com:Helix-Track/Propriatery.git
