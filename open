@@ -1,5 +1,16 @@
 #!/bin/bash
 
+HERE="$(pwd)"
+SUBMODULES_LOAD_ENVIRONMENT="$HERE/load_environment.sh"
+
+if test -e "$SUBMODULES_LOAD_ENVIRONMENT"; then
+
+    echo "Loading the environment"
+    
+    # shellcheck disable=SC1090
+    . "$SUBMODULES_LOAD_ENVIRONMENT"
+fi
+
 SCRIPT="Run/Project/open.sh"
 
 if ! test -e "$SCRIPT"; then

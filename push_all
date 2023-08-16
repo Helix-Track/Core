@@ -1,0 +1,35 @@
+#!/bin/bash
+
+HERE="$(pwd)"
+SUBMODULES_LOAD_ENVIRONMENT="$HERE/load_environment.sh"
+
+if test -e "$SUBMODULES_LOAD_ENVIRONMENT"; then
+
+    echo "Loading the environment"
+    
+    # shellcheck disable=SC1090
+    . "$SUBMODULES_LOAD_ENVIRONMENT"
+fi
+
+SCRIPT_PUSH_ALL="$SUBMODULES_HOME/Upstreamable/push_all.sh"
+
+DIR_UPSTREAMS="Upstreams"
+
+if [ -n "$1" ]; then
+
+    DIR_UPSTREAMS="$1"
+fi
+
+if test -e "$SCRIPT_PUSH_ALL"; then
+
+  if ! sh "$SCRIPT_PUSH_ALL" "$DIR_UPSTREAMS"; then
+
+    echo "ERROR: Push all failure"
+    exit 1  
+  fi
+
+else
+
+  echo "ERROR: Script not found '$SCRIPT_PUSH_ALL'"
+  exit 1
+fi
