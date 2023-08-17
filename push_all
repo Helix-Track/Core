@@ -20,9 +20,11 @@ if [ -n "$1" ]; then
     DIR_UPSTREAMS="$1"
 fi
 
+HOOK_SCRIPT="$HERE/Recipes/push_all_hook.sh"
+
 if test -e "$SCRIPT_PUSH_ALL"; then
 
-  if ! sh "$SCRIPT_PUSH_ALL" "$DIR_UPSTREAMS"; then
+  if ! sh "$SCRIPT_PUSH_ALL" "$DIR_UPSTREAMS" "$HOOK_SCRIPT"; then
 
     echo "ERROR: Push all failure"
     exit 1  
