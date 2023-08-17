@@ -3,6 +3,46 @@
 HERE="$(pwd)"
 SUBMODULES_LOAD_ENVIRONMENT="$HERE/load_environment.sh"
 
+DIR_HOME=$(eval echo ~"$USER")
+FILE_ZSH_RC="$DIR_HOME/.zshrc"
+FILE_BASH_RC="$DIR_HOME/.bashrc"
+
+FILE_RC=""
+    
+if test -e "$FILE_ZSH_RC"; then
+
+  FILE_RC="$FILE_ZSH_RC"
+
+else
+
+    if test -e "$FILE_BASH_RC"; then
+
+      FILE_RC="$FILE_BASH_RC"
+
+    else
+
+      echo "ERROR: No '$FILE_ZSH_RC' or '$FILE_BASH_RC' found on the system"
+      exit 1
+    fi
+fi
+
+# shellcheck disable=SC2002
+if cat "$FILE_RC" | grep ". $SUBMODULES_LOAD_ENVIRONMENT"; then
+
+    echo "Load environment variable is already present in '$FILE_RC' configuration"
+
+else
+
+    if echo "" >> "$FILE_RC" && echo ". $SUBMODULES_LOAD_ENVIRONMENT" >> "$FILE_RC"; then
+
+        echo "Load environment variable is added into '$FILE_RC' configuration"
+
+    else
+
+        echo "WARNING: Load environment variable was not added into '$FILE_RC' configuration"
+    fi
+fi
+
 if test -e "$SUBMODULES_LOAD_ENVIRONMENT"; then
 
     echo "Loading the environment"
