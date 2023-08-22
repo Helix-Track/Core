@@ -20,7 +20,14 @@ if [ -n "$1" ]; then
     DIR_UPSTREAMS="$1"
 fi
 
-HOOK_SCRIPT="$HERE/Recipes/push_all_hook.sh"
+if [ "$2" = "NO_HOOK" ]; then
+
+  echo "Hook script disabled"
+  
+else
+
+  HOOK_SCRIPT="$HERE/Recipes/push_all_hook.sh"
+fi
 
 if test -e "$SCRIPT_PUSH_ALL"; then
 
