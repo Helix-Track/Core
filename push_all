@@ -20,14 +20,23 @@ if [ -n "$1" ]; then
     DIR_UPSTREAMS="$1"
 fi
 
-if [ "$2" = "NO_HOOK" ]; then
+if [ -n "$2" ]; then
 
-  echo "Hook script disabled"
-  
+  if [ "$2" = "NO_HOOK" ]; then
+
+    echo "Hook script disabled"
+    
+  else
+
+    echo "ERROR: Unsupported parameter '$2'"
+    exit 1    
+  fi
+
 else
 
   HOOK_SCRIPT="$HERE/Recipes/push_all_hook.sh"
 fi
+
 
 if test -e "$SCRIPT_PUSH_ALL"; then
 
