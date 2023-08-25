@@ -20,23 +20,30 @@ if [ -n "$1" ]; then
     DIR_UPSTREAMS="$1"
 fi
 
-# TODO: Make sure that there are two options: HOOK and NO_HOOK. NO_HOOK to be the default one.
+OPT_HOOK="HOOK"
+OPT_NO_HOOK="NO_HOOK"
+OPT_HOOK_VALUE="$OPT_NO_HOOK"
 
 if [ -n "$2" ]; then
 
-  if [ "$2" = "NO_HOOK" ]; then
+  OPT_HOOK_VALUE="$2"
+fi
 
-    echo "Hook script disabled"
-    
-  else
+if [ "$OPT_HOOK_VALUE" = "$OPT_NO_HOOK" ]; then
 
-    echo "ERROR: Unsupported parameter '$2'"
-    exit 1    
-  fi
-
+  echo "Hook script disabled"
+  
 else
 
-  HOOK_SCRIPT="$HERE/Recipes/push_all_hook.sh"
+  if [ "$OPT_HOOK_VALUE" = "$OPT_HOOK" ]; then
+
+    HOOK_SCRIPT="$HERE/Recipes/push_all_hook.sh"
+
+  else
+
+    echo "ERROR: Unsupported parameter '$OPT_HOOK_VALUE'"
+    exit 1
+  fi
 fi
 
 
