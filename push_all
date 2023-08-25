@@ -20,6 +20,8 @@ if [ -n "$1" ]; then
     DIR_UPSTREAMS="$1"
 fi
 
+# TODO: Make sure that there are two options: HOOK and NO_HOOK. NO_HOOK to be the default one.
+
 if [ -n "$2" ]; then
 
   if [ "$2" = "NO_HOOK" ]; then
