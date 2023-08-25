@@ -23,8 +23,20 @@ fi
 
 SCRIPT_FLAGS="$SUBMODULES_HOME/Software-Toolkit/Utils/Git/gather_submodules_flags.sh"
 SCRIPT_GATHER_SUBMODULES="$SUBMODULES_HOME/Software-Toolkit/Utils/Git/gather_submodules.sh"
+SCRIPT_PUSH__SUBMODULES="$SUBMODULES_HOME/Software-Toolkit/Utils/Git/push_all_submodules_head_positions.sh"
 
-if test -e "$SCRIPT_GATHER_SUBMODULES"; then
+if ! test -e "$SCRIPT_GATHER_SUBMODULES"; then
+
+    echo "ERROR: Script not found '$SCRIPT_GATHER_SUBMODULES'"
+    exit 1    
+
+else
+
+    if ! test -e "$SCRIPT_PUSH__SUBMODULES"; then
+
+        echo "ERROR: Script not found '$SCRIPT_PUSH__SUBMODULES'"
+        exit 1    
+    fi
 
     if test -e "$SCRIPT_FLAGS"; then
 
@@ -42,9 +54,4 @@ if test -e "$SCRIPT_GATHER_SUBMODULES"; then
     FLAGS="FLAGS=[${F_UPDATE_ONLY}]"
 
     sh "$SCRIPT_GATHER_SUBMODULES" "$FLAGS"
-
-else
-
-  echo "ERROR: Script not found '$SCRIPT_GATHER_SUBMODULES'"
-  exit 1
 fi
