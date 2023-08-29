@@ -1,7 +1,6 @@
 #!/bin/bash
 
 HERE="$(pwd)"
-PROJECT="$HERE"
 
 SCRIPT_CORE_RECIPE_PRE_OPEN="$HERE/Core/Recipes/project_pre_open.sh"
 SCRIPT_PROPRIATERY_RECIPE_PRE_OPEN="$HERE/Propriatery/Recipes/project_pre_open.sh"
