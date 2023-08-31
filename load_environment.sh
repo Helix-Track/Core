@@ -1,11 +1,14 @@
 #!/bin/bash
 
-HERE="$(pwd)"
-SUBMODULES_PATH="$HERE/_Submodules"
+if [ -z "$SUBMODULES_HOME" ]; then
 
-if test -e "$SUBMODULES_PATH"; then
+    HERE="$(pwd)"
+    SUBMODULES_PATH="$HERE/_Submodules"
 
-    echo "Exporting the submodules path: $SUBMODULES_PATH"
-    
-    export SUBMODULES_HOME="$SUBMODULES_PATH"
+    if test -e "$SUBMODULES_PATH"; then
+
+        echo "Exporting the submodules path: $SUBMODULES_PATH"
+        
+        export SUBMODULES_HOME="$SUBMODULES_PATH"
+    fi
 fi
