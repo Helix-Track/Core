@@ -8,7 +8,7 @@ if test -e "$SUBMODULES_LOAD_ENVIRONMENT"; then
     echo "Loading the environment"
     
     # shellcheck disable=SC1090
-    . "$SUBMODULES_LOAD_ENVIRONMENT"
+    . "$SUBMODULES_LOAD_ENVIRONMENT" >/dev/null 2>&1
 fi
 
 SCRIPT_PUSH_ALL="$SUBMODULES_HOME/Upstreamable/push_all.sh"
