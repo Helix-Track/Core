@@ -58,15 +58,9 @@ LINK_MODULE() {
 
     if test -e "$DIR_SOURCE"; then
 
-        echo "Linking: $DIR_SOURCE -> $DIR_DESTINATION"
-
         if test -e "$DIR_DESTINATION"; then
 
-            if rm -f "$DIR_DESTINATION"; then
-
-                echo "Link removed"
-
-            else
+            if ! rm -f "$DIR_DESTINATION"; then
 
                 echo "ERROR: Link failed to remove '$DIR_DESTINATION'"
                 exit 1
@@ -75,11 +69,12 @@ LINK_MODULE() {
 
         if ln -s "$DIR_SOURCE" "$DIR_DESTINATION" && test -e "$DIR_DESTINATION"; then
 
-            echo "Linking success"
+            echo "Linked '$DIR_SOURCE' -> '$DIR_DESTINATION'"
 
         else
 
             echo "ERROR: Could not create symbolic link '$DIR_DESTINATION'"
+            exit 1
         fi
 
     else
