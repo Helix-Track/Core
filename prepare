@@ -1,0 +1,96 @@
+#!/bin/bash
+
+HERE="$(pwd)"
+SUBMODULES_LOAD_ENVIRONMENT="$HERE/load_environment.sh"
+
+DIR_HOME=$(eval echo ~"$USER")
+FILE_ZSH_RC="$DIR_HOME/.zshrc"
+FILE_BASH_RC="$DIR_HOME/.bashrc"
+
+FILE_RC=""
+    
+if test -e "$FILE_ZSH_RC"; then
+
+  FILE_RC="$FILE_ZSH_RC"
+
+else
+
+    if test -e "$FILE_BASH_RC"; then
+
+      FILE_RC="$FILE_BASH_RC"
+
+    else
+
+      echo "ERROR: No '$FILE_ZSH_RC' or '$FILE_BASH_RC' found on the system"
+      exit 1
+    fi
+fi
+
+# shellcheck disable=SC2002
+if cat "$FILE_RC" | grep ". $SUBMODULES_LOAD_ENVIRONMENT" >/dev/null 2>&1; then
+
+    echo "Load environment variable is already present in '$FILE_RC' configuration"
+
+else
+
+    if echo "" >> "$FILE_RC" && echo ". $SUBMODULES_LOAD_ENVIRONMENT" >> "$FILE_RC"; then
+
+        echo "Load environment variable is added into '$FILE_RC' configuration"
+
+    else
+
+        echo "WARNING: Load environment variable was not added into '$FILE_RC' configuration"
+    fi
+fi
+
+if test -e "$SUBMODULES_LOAD_ENVIRONMENT"; then
+
+    echo "Loading the environment"
+    
+    # shellcheck disable=SC1090
+    . "$SUBMODULES_LOAD_ENVIRONMENT" >/dev/null 2>&1
+fi
+
+DIR_MODULE_UPSTREAMABLE="$SUBMODULES_HOME/Upstreamable"
+
+ADD_TO_PATH() {
+
+    if [ -z "$1" ]; then
+
+        echo "ERROR: RC file path is mandatory parameter"
+        exit 1
+    fi
+
+    if [ -z "$2" ]; then
+
+        echo "ERROR: Directory is mandatory parameter"
+        exit 1
+    fi
+
+    FILE_RC="$1"
+    DIR_PATH="$2"
+
+    # shellcheck disable=SC2002
+    if cat "$FILE_RC" | grep "$DIR_PATH" >/dev/null 2>&1; then
+
+        echo "Module path '$DIR_PATH' is already present in '$FILE_RC' configuration"
+
+    else
+
+        LINE_TO_ADD="export PATH=${PATH}:$DIR_PATH"
+
+        if echo "" >> "$FILE_RC" && echo "$LINE_TO_ADD" >> "$FILE_RC"; then
+
+            echo "Module path '$DIR_PATH' is added into '$FILE_RC' configuration"
+            
+            # shellcheck disable=SC1090
+            . "$FILE_RC" >/dev/null 2>&1
+
+        else
+
+            echo "WARNING: Module path '$DIR_PATH' was not added intp '$FILE_RC' configuration"
+        fi
+    fi
+}
+
+ADD_TO_PATH "$FILE_RC" "$DIR_MODULE_UPSTREAMABLE"
