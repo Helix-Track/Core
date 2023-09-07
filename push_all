@@ -1,14 +1,11 @@
 #!/bin/bash
 
 HERE="$(pwd)"
-SUBMODULES_LOAD_ENVIRONMENT="$HERE/load_environment.sh"
 
-if test -e "$SUBMODULES_LOAD_ENVIRONMENT"; then
+if [ -z "$SUBMODULES_HOME" ]; then
 
-    echo "Loading the environment"
-    
-    # shellcheck disable=SC1090
-    . "$SUBMODULES_LOAD_ENVIRONMENT" >/dev/null 2>&1
+  echo "ERROR: SUBMODULES_HOME not available"
+  exit 1
 fi
 
 SCRIPT_PUSH_ALL="$SUBMODULES_HOME/Upstreamable/push_all.sh"
