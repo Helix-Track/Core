@@ -47,12 +47,21 @@ LINK_MODULE() {
     MODULE_SOURCE="$1"
     MODULE_DESTINATION="${PREFIX}$2"
 
-    DIR_SOURCE="$HERE/$MODULE_SOURCE"
+    DIR_SUBMODULES="_SUBMODULES"
+    DIR_SOURCE="$HERE/$DIR_SUBMODULES/$MODULE_SOURCE"
     DIR_DESTINATION="$HERE/$MODULE_DESTINATION"
 
-    echo "Linking: $DIR_SOURCE -> $DIR_DESTINATION"
+    if test -e "$DIR_SOURCE"; then
 
-    # TODO: Implement linking
+        # TODO: Implement linking
+
+        echo "Linking: $DIR_SOURCE -> $DIR_DESTINATION"
+
+    else
+
+        echo "ERROR: Source linking directory does not exist '$DIR_SOURCE'"
+        exit 1
+    fi
 }
 
 PREFIX="module_"
