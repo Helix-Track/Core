@@ -93,6 +93,10 @@ PREFIX="module_"
 
 LINK_MODULE "Upstreamable" "Upstreamable" "$PREFIX"
 LINK_MODULE "Software-Toolkit" "Toolkit" "$PREFIX"
+LINK_MODULE "Dependable" "Dependable" "$PREFIX"
+LINK_MODULE "Docker-Definitions" "Definitions_Docker" "$PREFIX"
+LINK_MODULE "Software-Definitions" "Definitions_Software" "$PREFIX"
+LINK_MODULE "Stack-Definitions" "Definitions_Stack" "$PREFIX"
 
 EXECUTE_RECIPE "$SCRIPT_CORE_RECIPE_PRE_OPEN"
 EXECUTE_RECIPE "$SCRIPT_PROPRIATERY_RECIPE_PRE_OPEN"
