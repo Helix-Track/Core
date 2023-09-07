@@ -25,11 +25,7 @@ else
 fi
 
 # shellcheck disable=SC2002
-if cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
-
-    echo "SUBMODULES_HOME is already present in '$FILE_RC' configuration"
-
-else
+if ! cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
 
     if echo "" >> "$FILE_RC" && echo "export SUBMODULES_HOME=$HERE/_Submodules" >> "$FILE_RC"; then
 
@@ -69,11 +65,7 @@ ADD_TO_PATH() {
     DIR_PATH="$2"
 
     # shellcheck disable=SC2002
-    if cat "$FILE_RC" | grep "$DIR_PATH" >/dev/null 2>&1; then
-
-        echo "Module path '$DIR_PATH' is already present in '$FILE_RC' configuration"
-
-    else
+    if ! cat "$FILE_RC" | grep "$DIR_PATH" >/dev/null 2>&1; then
 
         LINE_TO_ADD="export PATH=\${PATH}:$DIR_PATH"
 
