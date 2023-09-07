@@ -11,11 +11,16 @@ EXECUTE_RECIPE() {
 
     if test -e "$SCRIPT"; then
 
-        if ! sh "$SCRIPT"; then
+        if sh "$SCRIPT" >/dev/null 2>&1; then
 
-            echo "ERROR: Recipe failed, $SCRIPT"
+            echo "Recipe executed with success: '$SCRIPT'"
+
+        else
+
+            echo "ERROR: Recipe failed, '$SCRIPT'"
             exit 1
         fi
+
     else
 
         echo "WARNING: No recipe found at $SCRIPT"
