@@ -1,6 +1,3 @@
-[submodule "Propriatery"]
-	path = Propriatery
-	url = git@github.com:Helix-Track/Propriatery.git
 [submodule "Core/Installable"]
 	path = Core/Installable
 	url = git@github.com:red-elf/Installable.git
