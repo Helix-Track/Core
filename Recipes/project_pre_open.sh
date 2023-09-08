@@ -97,6 +97,7 @@ LINK_MODULE "Project" "Project" "$PREFIX"
 LINK_MODULE "Services-Toolkit" "Toolkit_Services" "$PREFIX"
 LINK_MODULE "Testable" "Testable" "$PREFIX"
 LINK_MODULE "Versionable" "Versionable" "$PREFIX"
+LINK_MODULE "Propriatery" "Propriatery"
 
 EXECUTE_RECIPE "$SCRIPT_CORE_RECIPE_PRE_OPEN"
 EXECUTE_RECIPE "$SCRIPT_PROPRIATERY_RECIPE_PRE_OPEN"
