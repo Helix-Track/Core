@@ -1,21 +1,3 @@
-[submodule "Core/Installable"]
-	path = Core/Installable
-	url = git@github.com:red-elf/Installable.git
-[submodule "Core/Dependable"]
-	path = Core/Dependable
-	url = git@github.com:red-elf/Dependable.git
-[submodule "Core/Versionable"]
-	path = Core/Versionable
-	url = git@github.com:red-elf/Versionable.git
-[submodule "Core/Toolkit"]
-	path = Core/Toolkit
-	url = git@github.com:red-elf/Software-Toolkit.git
-[submodule "Core/Upstreamable"]
-	path = Core/Upstreamable
-	url = git@github.com:red-elf/Upstreamable.git
-[submodule "Core/Testable"]
-	path = Core/Testable
-	url = git@github.com:red-elf/Testable.git
 [submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Upstreamable"]
 	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Upstreamable
 	url = git@github.com:red-elf/Upstreamable.git
