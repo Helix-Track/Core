@@ -1,7 +1,6 @@
 #!/bin/bash
 
 HERE="$(pwd)"
-PLUGINS="Application/plugins"
 GENERATED="Application/generated"
 
 if test -e "$GENERATED"; then
@@ -31,21 +30,6 @@ else
     exit 1
 fi
 
-if test -e "$PLUGINS"; then
-
-  if ! rm -rf "$PLUGINS"; then
-
-    echo "ERROR: Could not remove '$PLUGINS'"
-    exit 1
-  fi
-fi
-
-if ! mkdir -p "$PLUGINS"; then
-
-  echo "ERROR: Could not create '$PLUGINS'"
-  exit 1
-fi
-
 if [ -z "$DEPENDABLE_DEPENDENCIES_HOME" ]; then
 
   DEPENDABLE_DEPENDENCIES_HOME="$HERE"
@@ -56,12 +40,3 @@ echo "The dependencies home directory: '$DEPENDABLE_DEPENDENCIES_HOME'"
 DEPENDENCIES_WORKING_DIRECTORY="$DEPENDABLE_DEPENDENCIES_HOME/_Dependencies"
 
 echo "The dependencies working directory: '$DEPENDENCIES_WORKING_DIRECTORY'"
-
-if cp "$DEPENDENCIES_WORKING_DIRECTORY/Cache/JWT-Drogon/Library/JWT"* "$PLUGINS"; then
-
-  echo "Drogon JWT plugin copied"
-else
-
-  echo "ERROR: Drogon JWT plugin copied not copied"
-  exit 1
-fi
