@@ -2,4 +2,4 @@
 
 HERE="$(pwd)"
 
-cd "$HERE/Core" && sh Testable/test.sh
+sh "$HERE/module_Testable/test.sh"
