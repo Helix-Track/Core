@@ -1,5 +1,12 @@
 #!/bin/bash
 
-HERE="$(pwd)"
+if [ -z "$SUBMODULES_HOME" ]; then
 
-sh "$HERE/Toolkit/Utils/VSCode/install.sh" "$HERE/Recipes/vscode_installation_params.sh"
+  echo "ERROR: The SUBMODULES_HOME is not defined"
+  exit 1
+fi
+
+HERE="$(pwd)"
+DIR_TOOLKIT="$SUBMODULES_HOME/Software-Toolkit"
+
+sh "$DIR_TOOLKIT/Utils/VSCode/install.sh" "$HERE/Recipes/vscode_installation_params.sh"
