@@ -25,21 +25,6 @@
 [submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Testable"]
 	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Testable
 	url = git@github.com:red-elf/Testable.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/trantor"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/trantor
-	url = https://github.com/an-tao/trantor.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/json"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/json
-	url = git@github.com:nlohmann/json.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/googletest"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/googletest
-	url = git@github.com:google/googletest.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/JWT-drogon"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/JWT-drogon
-	url = https://github.com/roq3/JWT-drogon
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/cpp-jwt"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/cpp-jwt
-	url = git@github.com:arun11299/cpp-jwt.git
 [submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Propriatery"]
 	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Propriatery
 	url = git@github.com:Helix-Track/Propriatery.git

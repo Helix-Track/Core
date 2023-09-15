@@ -1,4 +1,0 @@
-#!/bin/bash
-
-NAME="googletest"
-REPO="git@github.com:google/googletest.git"

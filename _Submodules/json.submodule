@@ -1,4 +1,0 @@
-#!/bin/bash
-
-NAME="json"
-REPO="git@github.com:nlohmann/json.git"
