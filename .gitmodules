@@ -13,9 +13,6 @@
 [submodule "_Submodules/Installable"]
 	path = _Submodules/Installable
 	url = git@github.com:red-elf/Installable.git
-[submodule "_Submodules/Dependable"]
-	path = _Submodules/Dependable
-	url = git@github.com:red-elf/Dependable.git
 [submodule "_Submodules/Versionable"]
 	path = _Submodules/Versionable
 	url = git@github.com:red-elf/Versionable.git
@@ -34,3 +31,6 @@
 [submodule "_Submodules/Project"]
 	path = _Submodules/Project
 	url = git@github.com:red-elf/Project.git
+[submodule "_Submodules/Dependable"]
+	path = _Submodules/Dependable
+	url = git@github.com:red-elf/Dependable.git
