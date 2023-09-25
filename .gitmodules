@@ -1,36 +1,36 @@
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Upstreamable"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Upstreamable
+[submodule "_Submodules/Upstreamable"]
+	path = _Submodules/Upstreamable
 	url = git@github.com:red-elf/Upstreamable.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Stack-Definitions"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Stack-Definitions
+[submodule "_Submodules/Stack-Definitions"]
+	path = _Submodules/Stack-Definitions
 	url = git@github.com:Server-Factory/Stack-Definitions.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Docker-Definitions"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Docker-Definitions
+[submodule "_Submodules/Docker-Definitions"]
+	path = _Submodules/Docker-Definitions
 	url = git@github.com:Server-Factory/Docker-Definitions.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Software-Definitions"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Software-Definitions
+[submodule "_Submodules/Software-Definitions"]
+	path = _Submodules/Software-Definitions
 	url = git@github.com:Server-Factory/Software-Definitions.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Installable"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Installable
+[submodule "_Submodules/Installable"]
+	path = _Submodules/Installable
 	url = git@github.com:red-elf/Installable.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Dependable"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Dependable
+[submodule "_Submodules/Dependable"]
+	path = _Submodules/Dependable
 	url = git@github.com:red-elf/Dependable.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Versionable"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Versionable
+[submodule "_Submodules/Versionable"]
+	path = _Submodules/Versionable
 	url = git@github.com:red-elf/Versionable.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Software-Toolkit"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Software-Toolkit
+[submodule "_Submodules/Software-Toolkit"]
+	path = _Submodules/Software-Toolkit
 	url = git@github.com:red-elf/Software-Toolkit.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Testable"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Testable
+[submodule "_Submodules/Testable"]
+	path = _Submodules/Testable
 	url = git@github.com:red-elf/Testable.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Propriatery"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Propriatery
+[submodule "_Submodules/Propriatery"]
+	path = _Submodules/Propriatery
 	url = git@github.com:Helix-Track/Propriatery.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Services-Toolkit"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Services-Toolkit
+[submodule "_Submodules/Services-Toolkit"]
+	path = _Submodules/Services-Toolkit
 	url = git@github.com:red-elf/Services-Toolkit.git
-[submodule "/home/milosvasic/Projects/HelixTrack/Core/_Submodules/Project"]
-	path = /home/milosvasic/Projects/HelixTrack/Core/_Submodules/Project
+[submodule "_Submodules/Project"]
+	path = _Submodules/Project
 	url = git@github.com:red-elf/Project.git
