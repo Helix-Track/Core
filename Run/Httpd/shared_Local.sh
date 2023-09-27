@@ -6,7 +6,7 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-SCRIPT_GET_HTTPD="$SUBMODULES_HOME/Software-Toolkit/Utils/Httpd/get_httpd"
+SCRIPT_GET_HTTPD="$SUBMODULES_HOME/Software-Toolkit/Utils/Httpd/get_httpd.sh"
 
 if ! test -e "$SCRIPT_GET_HTTPD"; then
 
