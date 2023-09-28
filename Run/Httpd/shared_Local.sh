@@ -14,7 +14,7 @@ if ! test -e "$SCRIPT_GET_HTTPD"; then
     exit 1
 fi
 
-if [ -z HTTPD_WEB_ROOT_SHARED ]; then
+if [ -z "$HTTPD_WEB_ROOT_SHARED" ]; then
 
     echo "ERROR: Env. variable not defined 'HTTPD_WEB_ROOT_SHARED'"
     exit 1
