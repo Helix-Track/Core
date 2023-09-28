@@ -99,5 +99,17 @@ LINK_MODULE "Testable" "Testable" "$PREFIX"
 LINK_MODULE "Versionable" "Versionable" "$PREFIX"
 LINK_MODULE "Propriatery" "Propriatery"
 
+if [ -z "$GENERAL_SERVER" ]; then
+
+    echo "ERROR: 'GENERAL_SERVER' variable is not set"
+    exit 1
+fi
+
+if ! ping -c 2 "$GENERAL_SERVER"; then
+
+    echo "ERROR: '$GENERAL_SERVER' is not accessible"
+    exit 1
+fi
+
 EXECUTE_RECIPE "$SCRIPT_CORE_RECIPE_PRE_OPEN"
 EXECUTE_RECIPE "$SCRIPT_PROPRIATERY_RECIPE_PRE_OPEN"
