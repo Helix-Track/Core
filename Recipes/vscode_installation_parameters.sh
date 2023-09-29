@@ -9,8 +9,7 @@ if [ -z "$SHARES_SERVER" ]; then
 fi
 
 # shellcheck disable=SC2034
-# DIR_INSTALLATION_HOME="$DIR_HOME/Yandex.Disk/Workspace/VSCode/Linux/VSCode"
-DIR_INSTALLATION_HOME="$DIR_HOME/Documents/Temp/VSCode"
+DIR_INSTALLATION_HOME="$DIR_HOME/Yandex.Disk/Workspace/VSCode/Linux/VSCode"
 
 # shellcheck disable=SC2034
 DOWNLOAD_URL_EXTENSIONS="http://$SHARES_SERVER:8081/extensions.1.0.0.tar.gz"
