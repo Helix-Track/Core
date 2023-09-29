@@ -9,4 +9,4 @@ fi
 HERE="$(pwd)"
 DIR_TOOLKIT="$SUBMODULES_HOME/Software-Toolkit"
 
-sh "$DIR_TOOLKIT/Utils/VSCode/install.sh" "$HERE/Recipes/vscode_installation_params.sh"
+sh "$DIR_TOOLKIT/Utils/VSCode/install.sh" "$HERE/Recipes/vscode_installation_parameters.sh"
