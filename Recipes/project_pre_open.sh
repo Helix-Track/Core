@@ -107,9 +107,6 @@ fi
 
 if ! ping -c 2 "$GENERAL_SERVER"; then
 
-    # TODO: Try to boot it if possible, make sure that this is possible to do with recipes mechanism
-    # TODO: Trigger the post script when VSCode is closed to termina (or ask) the server - or some other esources
-
     echo "ERROR: '$GENERAL_SERVER' is not accessible"
     exit 1
 fi
