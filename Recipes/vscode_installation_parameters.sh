@@ -9,11 +9,14 @@ if [ -z "$SHARES_SERVER" ]; then
 fi
 
 # shellcheck disable=SC2034
+DATA_VERSION="1.0.1"
+
+# shellcheck disable=SC2034
 DIR_INSTALLATION_HOME="$DIR_HOME/Yandex.Disk/Workspace/VSCode/Linux/VSCode"
 
 # shellcheck disable=SC2034
-DOWNLOAD_URL_EXTENSIONS="http://$SHARES_SERVER:8081/extensions.1.0.0.tar.gz"
+DOWNLOAD_URL_EXTENSIONS="http://$SHARES_SERVER:8081/extensions.$DATA_VERSION.tar.gz"
 
 # shellcheck disable=SC2034
-DOWNLOAD_URL_USER_DATA="http://$SHARES_SERVER:8081/user-data.1.0.0.tar.gz"
+DOWNLOAD_URL_USER_DATA="http://$SHARES_SERVER:8081/user-data.$DATA_VERSION.tar.gz"
 
