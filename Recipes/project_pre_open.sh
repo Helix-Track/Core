@@ -105,6 +105,8 @@ if [ -z "$GENERAL_SERVER" ]; then
     exit 1
 fi
 
+echo "Checking the server availability: '$GENERAL_SERVER'"
+
 if ! ping -c 2 "$GENERAL_SERVER"; then
 
     echo "ERROR: '$GENERAL_SERVER' is not accessible"
