@@ -4,5 +4,9 @@
     "markdown-pdf.convertOnSave": true,
     "cmake.configureOnOpen": false,
     "update.showReleaseNotes": false,
-    "redhat.telemetry.enabled": false
+    "redhat.telemetry.enabled": false,
+    "sonarlint.connectedMode.project": {
+        "connectionId": "http-general-server-local-9102",
+        "projectKey": "Core"
+    }
 }
