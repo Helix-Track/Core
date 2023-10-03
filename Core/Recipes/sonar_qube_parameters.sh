@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# shellcheck disable=SC2034
 SONARQUBE_NAME="Core"
 SONARQUBE_PORT="9102"
 
