@@ -12,7 +12,7 @@ fi
 DATA_VERSION="1.0.3"
 
 # shellcheck disable=SC2034
-DIR_INSTALLATION_HOME="$DIR_HOME/home/milosvasic/Workspaces/VSCode/Linux/VSCode"
+DIR_INSTALLATION_HOME="$DIR_HOME/Workspaces/VSCode/Linux/VSCode"
 
 # shellcheck disable=SC2034
 DOWNLOAD_URL_EXTENSIONS="http://$SHARES_SERVER:8081/extensions.$DATA_VERSION.tar.gz"
