@@ -14,7 +14,7 @@ if git submodule init && git submodule update; then
     exit 1
   fi
 
-  sh "$SCRIPT_PUSH_ALL" HOOK
+  sh "$SCRIPT_PUSH_ALL" "$HERE" HOOK
 
 else
 
