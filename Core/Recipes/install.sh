@@ -1,8 +1,13 @@
 #!/bin/bash
 
-HERE="$(pwd)"
-VERSIONABLE_BUILD_SCRIPT="$HERE/Versionable/versionable_build.sh"
-VERSIONABLE_INSTALL_SCRIPT="$HERE/Versionable/versionable_install.sh"
+if [ -z "$SUBMODULES_HOME" ]; then
+
+  echo "ERROR: SUBMODULES_HOME not available"
+  exit 1
+fi
+
+VERSIONABLE_BUILD_SCRIPT="$SUBMODULES_HOME/Versionable/versionable_build.sh"
+VERSIONABLE_INSTALL_SCRIPT="$SUBMODULES_HOME/Versionable/versionable_install.sh"
 
 if ! test -e "$VERSIONABLE_BUILD_SCRIPT"; then
 
