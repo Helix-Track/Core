@@ -4,7 +4,7 @@
 
 HERE="$(pwd)"
 
-if git init && git update; then
+if git submodule init && git submodule update; then
 
   SCRIPT_PUSH_ALL="$HERE/push_all"
 
