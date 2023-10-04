@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#!/bin/bash
+
+HERE="$(pwd)"
+
+if git init && git update; then
+
+  SCRIPT_PUSH_ALL="$HERE/push_all"
+
+  if ! test -e "$SCRIPT_PUSH_ALL"; then
+
+    echo "ERROR: Script not found '$SCRIPT_PUSH_ALL'"
+    exit 1
+  fi
+
+  sh "$SCRIPT_PUSH_ALL" HOOK
+
+else
+
+  echo "ERROR: Could not update submodules"
+  exit 1
+fi
