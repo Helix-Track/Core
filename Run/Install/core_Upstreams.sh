@@ -1,5 +1,9 @@
 #!/bin/bash
 
-HERE="$(pwd)"
+if [ -z "$SUBMODULES_HOME" ]; then
 
-cd "$HERE/Core" && Upstreamable/install_upstreams.sh
+  echo "ERROR: The SUBMODULES_HOME is not defined"
+  exit 1
+fi
+
+sh "$SUBMODULES_HOME/Upstreamable/install_upstreams.sh"
