@@ -21,4 +21,6 @@ if ! test -e "$VERSIONABLE_INSTALL_SCRIPT"; then
   exit 1
 fi
 
-cd "$HERE" && sh "$VERSIONABLE_BUILD_SCRIPT" Application .. &&  sh "$VERSIONABLE_INSTALL_SCRIPT" Application
+# TODO: Migration to Go Lang
+#
+# cd "$HERE" && sh "$VERSIONABLE_BUILD_SCRIPT" Application .. &&  sh "$VERSIONABLE_INSTALL_SCRIPT" Application
