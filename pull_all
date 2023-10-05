@@ -1,23 +1,7 @@
 #!/bin/bash
 
-#!/bin/bash
+if ! git fetch && git pull && git submodule init && git submodule update; then
 
-HERE="$(pwd)"
-
-if git fetch && git pull && git submodule init && git submodule update; then
-
-  SCRIPT_PUSH_ALL="$HERE/push_all"
-
-  if ! test -e "$SCRIPT_PUSH_ALL"; then
-
-    echo "ERROR: Script not found '$SCRIPT_PUSH_ALL'"
-    exit 1
-  fi
-
-  cd "$HERE" && sh "$SCRIPT_PUSH_ALL" . HOOK
-
-else
-
-  echo "ERROR: Could not update submodules"
+  echo "ERROR: Could not update"
   exit 1
 fi
