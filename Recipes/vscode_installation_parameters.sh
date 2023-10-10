@@ -9,7 +9,7 @@ if [ -z "$SHARES_SERVER" ]; then
 fi
 
 # shellcheck disable=SC2034
-DATA_VERSION="1.0.6"
+DATA_VERSION="1.0.7"
 
 # shellcheck disable=SC2034
 DIR_INSTALLATION_HOME="$DIR_HOME/Workspaces/VSCode/Linux/VSCode"

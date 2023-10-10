@@ -1,3 +1,4 @@
 {
-    "cmake.configureOnOpen": false
+  "cmake.configureOnOpen": false,
+  "markdown-pdf.convertOnSave": true
 }
