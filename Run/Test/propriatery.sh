@@ -2,4 +2,4 @@
 
 HERE="$(pwd)"
 
-sh "$HERE/module_Testable/test.sh" "$HERE/Propriatery"
+sh "$HERE/module_Testable/test.sh" "$HERE/Recipes" "$HERE/Propriatery"
