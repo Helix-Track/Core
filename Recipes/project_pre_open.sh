@@ -67,16 +67,6 @@ LINK_MODULE() {
             fi
         fi
 
-        if ln -s "$DIR_SOURCE" "$DIR_DESTINATION" && test -e "$DIR_DESTINATION"; then
-
-            echo "Linked '$DIR_SOURCE' -> '$DIR_DESTINATION'"
-
-        else
-
-            echo "ERROR: Could not create symbolic link '$DIR_DESTINATION'"
-            exit 1
-        fi
-
     else
 
         echo "ERROR: Source linking directory does not exist '$DIR_SOURCE'"
@@ -97,6 +87,8 @@ LINK_MODULE "Project" "Project" "$PREFIX"
 LINK_MODULE "Services-Toolkit" "Toolkit_Services" "$PREFIX"
 LINK_MODULE "Testable" "Testable" "$PREFIX"
 LINK_MODULE "Versionable" "Versionable" "$PREFIX"
+
+# Propriatery becomes independent from clasic .git submodules since it is optional
 LINK_MODULE "Propriatery" "Propriatery"
 
 if [ -z "$GENERAL_SERVER" ]; then
