@@ -64,7 +64,9 @@ All SQL scripts are executed by the shell and the `Definition.sqlite` is created
 
 Tbd.
 
-All scripts and tools required for the system to initialize (database, generated code, etc.) - Tbd.
+All scripts and tools required for the system to initialize (database, generated code, etc.)
+
+Tbd.
 
 ## Developers documentation
 
