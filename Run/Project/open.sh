@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: Add the check for the new versions of extensions and user-data while opening the project.
+
 HERE="$(pwd)"
 PROJECT="$HERE"
 DIR_HOME=$(eval echo ~"$USER")
