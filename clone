@@ -11,7 +11,7 @@ fi
 
 # TODO: Pickup information from the Version
 #
-echo "We are about to clone the HelixTrack project"
+echo "We are about to clone the HelixTrack project into: '$HERE'"
 
 echo "ERROR: Clone not implemented"
 exit 1
