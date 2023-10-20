@@ -1,5 +1,14 @@
 #!/bin/bash
 
+HERE=$(pwd)
+
+if git status >/dev/null 2>&1; then
+
+    echo "ERROR: Not empty directory '$HERE'"
+    echo "Please clone into the empty direcotry!"
+    exit 1
+fi
+
 # TODO: Pickup information from the Version
 #
 echo "We are about to clone the HelixTrack project"
