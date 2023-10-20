@@ -23,6 +23,8 @@ To do this automatically execute the following:
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Helix-Track/Core/main/clone)"
 ```
 
+*TODO:* Port to wget instead of curl.
+
 ### Executing inititialisation scripts
 
 Tbd.
