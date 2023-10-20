@@ -15,6 +15,14 @@ Clone the project, then, initialize and update the Git submodules.
 
 *Note:* Some subprojects (submodules) may be dependant on its own Git submodules. For those, it is required to do the init and update as well.
 
+### Using the `clone` script
+
+To do this automatically execute the following:
+
+```shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Helix-Track/Core/main/clone)"
+```
+
 ### Executing inititialisation scripts
 
 Tbd.
