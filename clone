@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# TODO: Pickup information from the Version
+#
+echo "We are about to clone the HelixTrack project"
+
+echo "ERROR: Clone not implemented"
+exit 1
