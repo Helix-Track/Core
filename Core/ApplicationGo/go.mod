@@ -1,3 +1,3 @@
-module example/hello
+module exercise/sonarQube
 
-go 1.18
+go 1.20
