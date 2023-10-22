@@ -23,6 +23,8 @@ To do this automatically execute the following:
 (test -e ./clone || wget https://raw.githubusercontent.com/Helix-Track/Core/main/clone -O clone) && chmod +x ./clone && ./clone
 ```
 
+*Note:* It is required to execute the script from empty directory where you whish to clone the HelixTrack project.
+
 ### Executing inititialisation scripts
 
 Tbd.
