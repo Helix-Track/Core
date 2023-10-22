@@ -20,7 +20,7 @@ Clone the project, then, initialize and update the Git submodules.
 To do this automatically execute the following:
 
 ```shell
-wget https://raw.githubusercontent.com/Helix-Track/Core/main/clone -O clone && chmod +x ./clone && ./clone
+(test -e ./clone || wget https://raw.githubusercontent.com/Helix-Track/Core/main/clone -O clone) && chmod +x ./clone && ./clone
 ```
 
 ### Executing inititialisation scripts
