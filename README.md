@@ -20,10 +20,8 @@ Clone the project, then, initialize and update the Git submodules.
 To do this automatically execute the following:
 
 ```shell
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Helix-Track/Core/main/clone)"
+wget https://raw.githubusercontent.com/Helix-Track/Core/main/clone -O clone && chmod +x ./clone && ./clone
 ```
-
-*TODO:* Port to wget instead of curl.
 
 ### Executing inititialisation scripts
 
