@@ -28,13 +28,13 @@ echo "Cloning from remote repository '$REPO' into '$DESTINATION'"
 
 if git clone "$REPO" "$DESTINATION"; then
 
-    echo "Clone ok"
+    cd "$DESTINATION" && echo "Clone ok"
 
     if git submodule init; then
 
         if git submodule update; then
 
-            echo "Submodules are ready" && cd "$DESTINATION" && echo "We are here: $(pwd)" && ls -lF
+            echo "Submodules are ready" && echo "We are here: $(pwd)" && ls -lF
 
         else
 
