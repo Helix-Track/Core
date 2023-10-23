@@ -34,7 +34,7 @@ if git clone "$REPO" "$DESTINATION"; then
 
         if git submodule update; then
 
-            echo "Submodules are ready" && echo "We are here: $(pwd)" && ls -lF
+            echo "Submodules are ready" && echo "Cloned project structure:" && ls -lF
 
         else
 
