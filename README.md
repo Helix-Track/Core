@@ -34,7 +34,7 @@ or via [GitFlic](https://gitflic.ru/) fallback:
 
 *Note:* It is required to execute the script from empty directory where you whish to clone the HelixTrack project.
 
-### Executing inititialisation scripts
+### Executing the inititialisation scripts
 
 Tbd.
 
