@@ -20,13 +20,15 @@ Clone the project, then, initialize and update the Git submodules.
 To do this automatically execute the following:
 
 ```shell
-(test -e ./clone || wget https://raw.githubusercontent.com/Helix-Track/Core/main/clone -O clone) && chmod +x ./clone && ./clone git@github.com:Helix-Track/Core.git
+(test -e ./clone || wget --no-cache --no-cookies https://raw.githubusercontent.com/Helix-Track/Core/main/clone -O clone) && \
+    chmod +x ./clone && ./clone git@github.com:Helix-Track/Core.git
 ```
 
 or via [GitFlic](https://gitflic.ru/) fallback:
 
 ```shell
-(test -e ./clone || wget "https://gitflic.ru/project/helix-track/core/blob/raw?file=clone&inline=false" -O clone) && chmod +x ./clone && ./clone git@gitflic.ru:helix-track/core.git
+(test -e ./clone || wget --no-cache --no-cookies "https://gitflic.ru/project/helix-track/core/blob/raw?file=clone&inline=false" -O clone) && \
+    chmod +x ./clone && ./clone git@gitflic.ru:helix-track/core.git
 ```
 
 *Note:* It is required to execute the script from empty directory where you whish to clone the HelixTrack project.

@@ -19,7 +19,7 @@ REPO="$1"
 
 echo "Cloning from remote repository: $REPO"
 
-if git clone "$REPO" "."; then
+if git clone "$REPO"; then
 
     echo "Clone ok"
 
