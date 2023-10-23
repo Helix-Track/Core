@@ -13,7 +13,7 @@ The HelixTrack Core has been developed and tested on [AltBase Linux distribution
 
 Clone the project, then, initialize and update the Git submodules.
 
-*Note:* Some subprojects (submodules) may be dependant on its own Git submodules. For those, it is required to do the init and update as well.
+*Note:* We strongly suggest you to use the `clone` script for this. See next section.
 
 ### Using the `clone` script
 
@@ -21,16 +21,15 @@ To do this automatically execute the following:
 
 ```shell
 (test -e ./clone || wget "https://raw.githubusercontent.com/Helix-Track/Core/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
-    chmod +x ./clone && ./clone git@github.com:Helix-Track/Core.git
+    chmod +x ./clone && ./clone git@github.com:Helix-Track/Core.git ./Core
 ```
 
 or via [GitFlic](https://gitflic.ru/) fallback:
 
 ```shell
 (test -e ./clone || \
-    wget --no-cache --no-cookies \
-    "https://gitflic.ru/project/helix-track/core/blob/raw?file=clone&inline=false?append="$(($(date +%s%N)/1000000)) -O clone) && \
-    chmod +x ./clone && ./clone git@gitflic.ru:helix-track/core.git
+    wget "https://raw.githubusercontent.com/Helix-Track/Core/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
+    chmod +x ./clone && ./clone git@gitflic.ru:helix-track/core.git ./Core
 ```
 
 *Note:* It is required to execute the script from empty directory where you whish to clone the HelixTrack project.

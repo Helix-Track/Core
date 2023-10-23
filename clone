@@ -15,11 +15,18 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+if [ -z "$2" ]; then
+
+    echo "ERROR: Destination parameter is mandatory"
+    exit 1
+fi
+
 REPO="$1"
+DESTINATION="$2"
 
-echo "Cloning from remote repository: $REPO"
+echo "Cloning from remote repository '$REPO' into '$DESTINATION'"
 
-if git clone "$REPO"; then
+if git clone "$REPO" "$DESTINATION"; then
 
     echo "Clone ok"
 
