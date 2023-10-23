@@ -46,7 +46,11 @@ From the root of the project execute:
 ./open
 ```
 
-*Note:* The `open` command expects that Visual Studio Code is present on the system and available though the `code` command.
+*Note:* The `open` command will open the project. Command will perform all the setup work for the project:
+
+- Check if VSCode is available. If it is not, it will download it, and configure it with all mandatory development dependencies,
+- Execute all prepare scripts
+- Finally, will open the project.
 
 ### Testing the project
 
