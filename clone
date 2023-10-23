@@ -9,9 +9,38 @@ if git status >/dev/null 2>&1; then
     exit 1
 fi
 
-# TODO: Pickup information from the Version
-#
-echo "We are about to clone the HelixTrack project into: '$HERE'"
+if [ -z "$1" ]; then
 
-echo "ERROR: Clone not implemented"
-exit 1
+    echo "ERROR: Repository parameter is mandatory"
+    exit 1
+fi
+
+REPO="$1"
+
+if git clone "$REPO" .; then
+
+    echo "Clone ok"
+
+    if git submodule init; then
+
+        if git submodule update; then
+
+            echo "Submodules are ready"
+
+        else
+
+            echo "ERROR: Submodules update failed"
+            exit 1
+        fi
+
+    else
+
+        echo "ERROR: Submodules init failed"
+        exit 1
+    fi
+
+else
+
+    echo "Clone operation failed"
+    exit 1
+fi
