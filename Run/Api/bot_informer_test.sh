@@ -28,4 +28,10 @@ if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
     exit 1
 fi
 
-sh "$BOT_SCRIPT" "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$MESSAGE"
+if [ -z "$TELEGRAM_CHAT_ID" ]; then
+
+    echo "ERROR: The 'TELEGRAM_CHAT_ID' env. variable is not defined"
+    exit 1
+fi
+
+sh "$BOT_SCRIPT" "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$TELEGRAM_CHAT_ID" "$MESSAGE"

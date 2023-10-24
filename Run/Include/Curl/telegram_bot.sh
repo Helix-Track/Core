@@ -10,14 +10,20 @@ if [ -z "$2" ]; then
     echo "ERROR: The Bot token parameter is mandatory"
 fi
 
-if [ -z "$3" ]; then
+if [ -z "$4" ]; then
+
+    echo "ERROR: Chat ID parameter is mandatory"
+fi
+
+if [ -z "$4" ]; then
 
     echo "ERROR: Message parameter is mandatory"
 fi
 
 BOT="$1"
 TOKEN="$2"
-MESSAGE="$3"
+CHAT_ID="$3"
+MESSAGE="$4"
 
 DIR="$(dirname "$0")"
 
@@ -39,4 +45,4 @@ echo "We are about to trigger the API for the Telegram Bot: $BOT"
 PORT="80"
 HOST="127.0.0.1"
 
-API_CALL "https" "$HOST" "$PORT" version
+API_CALL "https" "$HOST" "$PORT" "bot$TOKEN/sendMessage?chat_id=$CHAT_ID&text=$MESSAGE"
