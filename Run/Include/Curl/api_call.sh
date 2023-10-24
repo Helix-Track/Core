@@ -19,22 +19,22 @@ else
   exit 1
 fi
 
-if [ -n "$1" ]; then
-
-  UTIL_PROTOCOL="$1"
-fi
-
-if [ -n "$2" ]; then
-
-  UTIL_HOST="$2"
-fi
-
-if [ -n "$3" ]; then
-
-  UTIL_PORT="$3"
-fi
-
 API_CALL() {
+
+  if [ -n "$1" ]; then
+
+    UTIL_PROTOCOL="$1"
+  fi
+
+  if [ -n "$2" ]; then
+
+    UTIL_HOST="$2"
+  fi
+
+  if [ -n "$3" ]; then
+
+    UTIL_PORT="$3"
+  fi
 
   if [ -z "$4" ]; then
 

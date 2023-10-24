@@ -45,4 +45,4 @@ echo "We are about to trigger the API for the Telegram Bot: $BOT"
 PORT="80"
 HOST="127.0.0.1"
 
-API_CALL "https" "$HOST" "$PORT" "bot$TOKEN/sendMessage?chat_id=$CHAT_ID&text=$MESSAGE"
+API_CALL "https" "$HOST" "$PORT" "bot$TOKEN/sendMessage?chat_id=$CHAT_ID&text=\"$MESSAGE\""
