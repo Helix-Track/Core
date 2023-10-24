@@ -28,7 +28,15 @@ echo "Cloning from remote repository '$REPO' into '$DESTINATION'"
 
 if git clone "$REPO" "$DESTINATION"; then
 
-    cd "$DESTINATION" && echo "Clone ok"
+    if cd "$DESTINATION" && git checkout main && echo "Clone ok"; then
+
+        echo "The main branch is ready"
+
+    else
+
+        echo "ERROR: Could not set the main branch"
+        exit 1
+    fi
 
     if git submodule init; then
 
