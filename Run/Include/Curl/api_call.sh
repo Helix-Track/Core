@@ -1,6 +1,12 @@
 #!/bin/bash
 
-CURL="Core/Toolkit/Utils/curl.sh"
+if [ -z "$SUBMODULES_HOME" ]; then
+
+  echo "ERROR: SUBMODULES_HOME not available"
+  exit 1
+fi
+
+CURL="$SUBMODULES_HOME/Software-Toolkit/Utils/curl.sh"
 
 if test -e "$CURL"; then
 
