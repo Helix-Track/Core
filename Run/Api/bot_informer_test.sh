@@ -1,8 +1,13 @@
 #!/bin/bash
 
-HERE="$(pwd)"
-
 MESSAGE="Hello from $USER"
+BOT_SCRIPT="$HERE/Run/Include/Curl/telegram_bot.sh"
+
+if ! test -e "$BOT_SCRIPT"; then
+
+    echo "ERROR: Script not found '$BOT_SCRIPT'"
+    exit 1
+fi
 
 if [ -n "$1" ]; then
 
@@ -21,4 +26,4 @@ if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
     exit 1
 fi
 
-cd "$HERE" && sh Run/Include/Curl/telegram_bot.sh "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$MESSAGE"
+sh "$BOT_SCRIPT" "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$MESSAGE"
