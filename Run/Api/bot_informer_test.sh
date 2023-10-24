@@ -2,6 +2,20 @@
 
 HERE=$(pwd)
 
+if [ -z "$SUBMODULES_HOME" ]; then
+
+  echo "ERROR: SUBMODULES_HOME not available"
+  exit 1
+fi
+
+SCRIPT_GET_JQ="$SUBMODULES_HOME/Software-Toolkit/Utils/Sys/Programs/get_jq.sh"
+
+if ! test -e "$SCRIPT_GET_JQ"; then
+
+    echo "ERROR: Script not found '$SCRIPT_GET_JQ'"
+    exit 1
+fi
+
 MESSAGE="Hello!"
 BOT_SCRIPT="$HERE/Run/Include/Curl/telegram_bot.sh"
 
@@ -34,4 +48,14 @@ if [ -z "$TELEGRAM_CHAT_ID" ]; then
     exit 1
 fi
 
-sh "$BOT_SCRIPT" "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$TELEGRAM_CHAT_ID" "$MESSAGE"
+if sh "$SCRIPT_GET_JQ" >/dev/null 2>&1; then
+
+    ENCODED_MESSAGE=$(jq -rn --arg x "$MESSAGE" '$x|@uri')
+
+    sh "$BOT_SCRIPT" "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$TELEGRAM_CHAT_ID" "$ENCODED_MESSAGE"
+
+else
+
+    echo "ERROR: JQ not available"
+    exit 1
+fi
