@@ -2,13 +2,29 @@ package main
 
 import "fmt"
 
+func printMe(word, secondWord string) {
+
+	fmt.Println("Word: " + word + ", " + secondWord)
+}
+
+func getWords() (string, string) {
+
+	return "Why", "Me"
+}
+
 func main() {
 
 	var word string = "Hello"
+	secondWord := "World"
 
-	fmt.Println("Word: " + word)
+	printMe(word, secondWord)
 
 	word = "World"
+	secondWord = "Hello"
 
-	fmt.Println("Word: " + word)
+	printMe(word, secondWord)
+
+	word, secondWord = getWords()
+
+	printMe(word, secondWord)
 }
