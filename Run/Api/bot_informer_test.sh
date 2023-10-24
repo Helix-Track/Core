@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MESSAGE="Hello from $USER"
+MESSAGE="Hello from '$USER'"
 BOT_SCRIPT="$HERE/Run/Include/Curl/telegram_bot.sh"
 
 if ! test -e "$BOT_SCRIPT"; then
