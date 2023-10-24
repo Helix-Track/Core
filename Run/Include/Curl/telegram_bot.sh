@@ -21,21 +21,22 @@ MESSAGE="$3"
 
 DIR="$(dirname "$0")"
 
-API_CALL="$DIR/api_call.sh"
+SCRIPT_API_CALL="$DIR/api_call.sh"
 
-if test -e "$API_CALL"; then
+if test -e "$SCRIPT_API_CALL"; then
 
   # shellcheck disable=SC1090
-  . "$API_CALL"
+  . "$SCRIPT_API_CALL"
 
 else
 
-  echo "ERROR: '$API_CALL' not found"
+  echo "ERROR: '$SCRIPT_API_CALL' not found"
   exit 1
 fi
 
 echo "We are about to trigger the API for the Telegram Bot: $BOT"
 
-# TODO:
-#
-# API_CALL "$UTIL_PROTOCOL" "$UTIL_HOST" "$UTIL_PORT" version
+PORT="80"
+HOST="127.0.0.1"
+
+API_CALL "https" "$HOST" "$PORT" version
