@@ -1,5 +1,7 @@
 #!/bin/bash
 
+HERE=$(pwd)
+
 MESSAGE="Hello from '$USER'"
 BOT_SCRIPT="$HERE/Run/Include/Curl/telegram_bot.sh"
 
