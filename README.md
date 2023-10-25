@@ -24,12 +24,21 @@ To do this automatically execute the following:
     chmod +x ./clone && ./clone git@github.com:Helix-Track/Core.git ./Core
 ```
 
-or via [GitFlic](https://gitflic.ru/) fallback:
+or via one of the mirror repositories:
+
+- [GitFlic](https://gitflic.ru/):
 
 ```shell
 (test -e ./clone || \
     wget "https://raw.githubusercontent.com/Helix-Track/Core/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
     chmod +x ./clone && ./clone git@gitflic.ru:helix-track/core.git ./Core
+```
+
+- [Gitee](https://gitee.com/):
+
+```shell
+(test -e ./clone || wget "https://raw.githubusercontent.com/Helix-Track/Core/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
+    chmod +x ./clone && ./clone git@gitee.com:Kvetch_Godspeed_b073/Core.git ./Core
 ```
 
 *Note:* It is required to execute the script from empty directory where you whish to clone the HelixTrack project.
