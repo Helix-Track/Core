@@ -1,3 +1,3 @@
-module play_4
+module play_6
 
 go 1.20
