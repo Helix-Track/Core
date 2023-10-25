@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# TODO: Pull and push all changes
+
+echo "ERROR: Not yet implemented"
+exit 1
