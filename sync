@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if sh pull_all && sh push_all; then
+if sh pull_all && sh push_all . HOOK; then
 
     echo "Sync ok"
 
