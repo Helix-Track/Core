@@ -1,6 +1,11 @@
 #!/bin/bash
 
-# TODO: Pull and push all changes
+if sh pull_all && sh push_all; then
 
-echo "ERROR: Not yet implemented"
-exit 1
+    echo "Sync ok"
+
+else
+
+    echo "ERROR: Sync failed"
+    exit 1
+fi
