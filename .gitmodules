@@ -22,9 +22,6 @@
 [submodule "_Submodules/Testable"]
 	path = _Submodules/Testable
 	url = git@github.com:red-elf/Testable.git
-[submodule "_Submodules/Propriatery"]
-	path = _Submodules/Propriatery
-	url = git@github.com:Helix-Track/Propriatery.git
 [submodule "_Submodules/Services-Toolkit"]
 	path = _Submodules/Services-Toolkit
 	url = git@github.com:red-elf/Services-Toolkit.git
