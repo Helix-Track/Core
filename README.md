@@ -15,6 +15,12 @@ Clone the project, then, initialize and update the Git submodules.
 
 *Note:* We strongly suggest you to use the `clone` script for this. See next section.
 
+After you have cloned the project execute the `sync` script:
+
+```shell
+./sync
+```
+
 ### Using the `clone` script
 
 To do this automatically execute the following:

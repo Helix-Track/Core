@@ -88,9 +88,6 @@ LINK_MODULE "Services-Toolkit" "Toolkit_Services" "$PREFIX"
 LINK_MODULE "Testable" "Testable" "$PREFIX"
 LINK_MODULE "Versionable" "Versionable" "$PREFIX"
 
-# Propriatery becomes independent from clasic .git submodules since it is optional
-LINK_MODULE "Propriatery" "Propriatery"
-
 if [ -z "$GENERAL_SERVER" ]; then
 
     echo "ERROR: 'GENERAL_SERVER' variable is not set"
