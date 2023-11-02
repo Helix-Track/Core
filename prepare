@@ -84,3 +84,11 @@ ADD_TO_PATH "$FILE_RC" "$DIR_MODULE_UPSTREAMABLE"
 
 # shellcheck disable=SC1090
 . "$FILE_RC"
+
+if [ -n "$SUBMODULES_PRIVATE_HOME" ]; then
+    
+    echo "Checking and installing private modules from: '$SUBMODULES_PRIVATE_HOME'"
+
+    # TODO: Implement and support
+    
+fi
