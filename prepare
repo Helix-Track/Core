@@ -85,10 +85,19 @@ ADD_TO_PATH "$FILE_RC" "$DIR_MODULE_UPSTREAMABLE"
 # shellcheck disable=SC1090
 . "$FILE_RC"
 
-if [ -n "$SUBMODULES_PRIVATE_HOME" ]; then
+if [ -n "$SUBMODULES_PRIVATE_HOME" ] && [ -n "$SUBMODULES_PRIVATE_RECIPES" ]; then
     
-    echo "Checking and installing private modules from: '$SUBMODULES_PRIVATE_HOME'"
+    SCRIPT_INSTALL_PRIVATE_MODULES="$SUBMODULES_HOME/Software-Toolkit/Utils/Git/install_private_submodules.sh"
 
-    # TODO: Implement and support
-    
+    if ! test -e "$SCRIPT_INSTALL_PRIVATE_MODULES"; then
+
+        echo "ERROR: Script not found '$SCRIPT_INSTALL_PRIVATE_MODULES'"
+        exit 1
+    fi
+
+    if ! sh "$SCRIPT_INSTALL_PRIVATE_MODULES" "$SUBMODULES_PRIVATE_HOME" "$SUBMODULES_PRIVATE_RECIPES"; then
+
+        echo "ERROR: Private modules installation failed"
+        exit 1
+    fi
 fi
