@@ -21,6 +21,12 @@ After you have cloned the project execute the `sync` script:
 ./sync
 ```
 
+*Note:* If your Git account does not have the push permissions given by the administrator, instead of the `sync` script do execute `pull_all`:
+
+```shell
+./pull_all
+```
+
 ### Using the `clone` script
 
 To do this automatically execute the following:
