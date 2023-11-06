@@ -6,8 +6,8 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-VERSIONABLE_BUILD_SCRIPT="$SUBMODULES_HOME/Versionable/versionable_build.sh"
-VERSIONABLE_INSTALL_SCRIPT="$SUBMODULES_HOME/Versionable/versionable_install.sh"
+VERSIONABLE_BUILD_SCRIPT="$SUBMODULES_HOME/Versionable/versionable_build_go.sh"
+VERSIONABLE_INSTALL_SCRIPT="$SUBMODULES_HOME/Versionable/versionable_install_go.sh"
 
 if ! test -e "$VERSIONABLE_BUILD_SCRIPT"; then
 
@@ -21,6 +21,4 @@ if ! test -e "$VERSIONABLE_INSTALL_SCRIPT"; then
   exit 1
 fi
 
-# TODO: Migration to Go Lang
-#
-# cd "$HERE" && sh "$VERSIONABLE_BUILD_SCRIPT" Application .. &&  sh "$VERSIONABLE_INSTALL_SCRIPT" Application
+cd "$HERE" && sh "$VERSIONABLE_BUILD_SCRIPT" Application .. &&  sh "$VERSIONABLE_INSTALL_SCRIPT" Application
