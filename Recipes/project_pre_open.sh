@@ -3,7 +3,10 @@
 HERE="$(pwd)"
 
 SCRIPT_CORE_RECIPE_PRE_OPEN="$HERE/Core/Recipes/project_pre_open.sh"
-SCRIPT_PROPRIATERY_RECIPE_PRE_OPEN="$HERE/Propriatery/Recipes/project_pre_open.sh"
+
+# TODO: Reconnect
+#
+# SCRIPT_PROPRIATERY_RECIPE_PRE_OPEN="$HERE/Propriatery/Recipes/project_pre_open.sh"
 
 EXECUTE_RECIPE() {
 
