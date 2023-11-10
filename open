@@ -20,4 +20,11 @@ if ! test -e "$SCRIPT"; then
     exit 1
 fi
 
+ASCII_ART="$HERE/Assets/ASCII_Art.txt"
+
+if test -e "$ASCII_ART"; then
+
+    echo && cat "$ASCII_ART" && echo
+fi
+
 sh "$SCRIPT"
