@@ -26,16 +26,10 @@ if [ -z "$DEFAULT_DATA_VERSION" ]; then
     exit 1
 fi
 
-if [ -z "$DEFAULT_DATA_VERSION_ENDPOINT" ]; then
-
-    echo "The 'DEFAULT_DATA_VERSION_ENDPOINT' is not defined"
-    exit 1
-fi
-
 # shellcheck disable=SC2034
 DATA_VERSION="$DEFAULT_DATA_VERSION"
 
-OBTAINED_DATA_VERSION=$(curl "http://$SHARES_SERVER:8081/$DEFAULT_DATA_VERSION_ENDPOINT")
+OBTAINED_DATA_VERSION=$(curl "http://$SHARES_SERVER:8081/data_version.txt")
 
 # shellcheck disable=SC2002
 if ! echo "$OBTAINED_DATA_VERSION" | grep "404 Not Found" >/dev/null 2>&1; then
