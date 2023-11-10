@@ -31,3 +31,6 @@
 [submodule "_Submodules/Dependable"]
 	path = _Submodules/Dependable
 	url = git@github.com:red-elf/Dependable.git
+[submodule "_Submodules/Iconic"]
+	path = _Submodules/Iconic
+	url = git@github.com:red-elf/Iconic.git
