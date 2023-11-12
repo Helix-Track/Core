@@ -70,7 +70,12 @@ NAME="$VERSIONABLE_NAME DEV"
 # shellcheck disable=SC2034
 DESCRIPTION="The $VERSIONABLE_NAME development IDE."
 
-# shellcheck disable=SC2034
 DESKTOP_ICON=true
+
+if [ -n "$HELIXTRACK_LAUNCHER_DESKTOP" ]; then
+
+    # shellcheck disable=SC2034
+    DESKTOP_ICON="$HELIXTRACK_LAUNCHER_DESKTOP"
+fi
 
 # TODO: Re-organise Recipes by adding proper subdirectories
