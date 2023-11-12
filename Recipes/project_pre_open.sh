@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HERE="$(pwd)"
+HERE=$(pwd)
 
 SCRIPT_CORE_RECIPE_PRE_OPEN="$HERE/Core/Recipes/project_pre_open.sh"
 

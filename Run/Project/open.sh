@@ -2,7 +2,7 @@
 
 # TODO: Add the check for the new versions of extensions and user-data while opening the project.
 
-HERE="$(pwd)"
+HERE=$(pwd)
 PROJECT="$HERE"
 DIR_HOME=$(eval echo ~"$USER")
 FILE_ZSH_RC="$DIR_HOME/.zshrc"

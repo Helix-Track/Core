@@ -1,6 +1,13 @@
 #!/bin/bash
 
-HERE="$(pwd)"
+HERE=$(pwd)
+
+if [ -z "$SUBMODULES_HOME" ]; then
+
+  echo "ERROR: The SUBMODULES_HOME is not defined !!!"
+  exit 1
+fi
+
 SCRIPT_PREPARE="$HERE/prepare"
 
 if ! test -e "$SCRIPT_PREPARE"; then
