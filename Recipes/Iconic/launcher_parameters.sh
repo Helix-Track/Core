@@ -8,6 +8,7 @@ BIN="$HERE/open"
 # shellcheck disable=SC2034
 LAUNCHER="$HERE/Assets/Launcher.svg"
 
+# shellcheck disable=SC2034
 DESKTOP_FILE_NAME="helix_track_core_deve.desktop"
 
 SCRIPT_VERSION="$HERE/Core/Version/version.sh"
@@ -55,10 +56,10 @@ fi
 VERSION="$VERSIONABLE_VERSION_PRIMARY.$VERSIONABLE_VERSION_SECONDARY.$VERSIONABLE_VERSION_PATCH"
 
 # shellcheck disable=SC2034
-NAME="$VERSIONABLE_NAME"
+NAME="$VERSIONABLE_NAME DEV"
 
 # shellcheck disable=SC2034
-DESCRIPTION="$VERSIONABLE_DESCRIPTION"
+DESCRIPTION="The $VERSIONABLE_NAME VSCode development IDE."
 
 
 
