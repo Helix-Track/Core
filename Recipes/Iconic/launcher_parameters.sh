@@ -67,7 +67,7 @@ NAME="$VERSIONABLE_NAME DEV"
 # shellcheck disable=SC2034
 DESCRIPTION="The $VERSIONABLE_NAME development IDE."
 
-
-
+# shellcheck disable=SC2034
+DESKTOP_ICON=true
 
 # TODO: Re-organise Recipes by adding proper subdirectories
