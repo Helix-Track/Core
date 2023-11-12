@@ -9,7 +9,10 @@ fi
 HERE="$(dirname "$SUBMODULES_HOME")"
 
 # shellcheck disable=SC2034
-BIN="$HERE/open"
+CMD_PATH="$HERE"
+
+# shellcheck disable=SC2034
+CMD="open"
 
 # shellcheck disable=SC2034
 LAUNCHER="$HERE/Assets/Launcher.svg"
