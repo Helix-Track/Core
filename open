@@ -13,10 +13,17 @@ fi
 . "$SCRIPT_PREPARE"
 
 SCRIPT="$HERE/Run/Project/open.sh"
+ICONIFY="$HERE/Run/Iconic/iconify.sh"
 
 if ! test -e "$SCRIPT"; then
 
-    echo "ERROR: Script not found at $SCRIPT"
+    echo "ERROR: Script not found at '$SCRIPT'"
+    exit 1
+fi
+
+if ! test -e "$ICONIFY"; then
+
+    echo "ERROR: Script not found at '$ICONIFY'"
     exit 1
 fi
 
@@ -27,4 +34,5 @@ if test -e "$ASCII_ART"; then
     echo && cat "$ASCII_ART" && echo
 fi
 
+sh "$ICONIFY"
 sh "$SCRIPT"
