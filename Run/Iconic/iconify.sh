@@ -14,5 +14,12 @@ if ! test -e "$SCRIPT_ICONIFY"; then
     exit 1
 fi
 
-sh "$SCRIPT_ICONIFY"
+PARAMS=""
+
+if [ -n "$1" ]; then
+
+  PARAMS="$1"
+fi
+
+sh "$SCRIPT_ICONIFY" "$PARAMS"
 
