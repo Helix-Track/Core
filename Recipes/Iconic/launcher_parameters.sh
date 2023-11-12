@@ -8,6 +8,8 @@ BIN="$HERE/open"
 # shellcheck disable=SC2034
 LAUNCHER="$HERE/Assets/Launcher.svg"
 
+DESKTOP_FILE_NAME="helix_track_core_deve.desktop"
+
 SCRIPT_VERSION="$HERE/Core/Version/version.sh"
 
 if ! test -e "$SCRIPT_VERSION"; then
