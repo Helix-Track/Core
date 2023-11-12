@@ -34,5 +34,4 @@ if test -e "$ASCII_ART"; then
     echo && cat "$ASCII_ART" && echo
 fi
 
-sh "$ICONIFY"
-sh "$SCRIPT"
+sh "$ICONIFY" && sh "$SCRIPT"

@@ -1,6 +1,12 @@
 #!/bin/bash
 
-HERE=$(pwd)
+if [ -z "$SUBMODULES_HOME" ]; then
+
+  echo "ERROR: The SUBMODULES_HOME is not defined"
+  exit 1
+fi
+
+HERE="$(dirname "$SUBMODULES_HOME")"
 
 # shellcheck disable=SC2034
 BIN="$HERE/open"
@@ -59,7 +65,7 @@ VERSION="$VERSIONABLE_VERSION_PRIMARY.$VERSIONABLE_VERSION_SECONDARY.$VERSIONABL
 NAME="$VERSIONABLE_NAME DEV"
 
 # shellcheck disable=SC2034
-DESCRIPTION="The $VERSIONABLE_NAME VSCode development IDE."
+DESCRIPTION="The $VERSIONABLE_NAME development IDE."
 
 
 
