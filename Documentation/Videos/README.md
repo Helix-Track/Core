@@ -23,6 +23,6 @@ We have incorporated launcher capability for fast development start. Launcher wi
 Watch video at:
 
 - [YouTube](https://www.youtube.com/watch?v=-WcaAJfEJow)
-- [RuTube](https://rutube.ru/video/24be88acf0e937e0fcf49fc443a2d1a4/?r=wd)
+- [RuTube](https://rutube.ru/video/24be88acf0e937e0fcf49fc443a2d1a4/)
 - [VK Video](https://vk.com/video550783935_456239122)
 - [Telegram](https://t.me/helixtrackdev/43)
