@@ -34,7 +34,7 @@ else
 
   if [ "$OPT_HOOK_VALUE" = "$OPT_HOOK" ]; then
 
-    HOOK_SCRIPT="$HERE/Recipes/push_all_hook.sh"
+    HOOK_SCRIPT="$HERE/Recipes/Hooks/push_all_hook.sh"
 
   else
 
