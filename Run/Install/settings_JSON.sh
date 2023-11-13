@@ -9,7 +9,7 @@ if [ -z "$SUBMODULES_HOME" ]; then
 fi
 
 DIR_TOOLKIT="$SUBMODULES_HOME/Software-Toolkit"
-RECIPE_SETTINGS_JSON="$HERE/Recipes/settings.json.sh"
+RECIPE_SETTINGS_JSON="$HERE/Recipes/VSCode/settings.json.sh"
 SCRIPT_GET_PROGRAM="$DIR_TOOLKIT/Utils/Sys/Programs/get_program.sh"
 SCRIPT_EXTEND_JSON="$DIR_TOOLKIT/Utils/Sys/JSON/merge_jsons.sh"
 
