@@ -15,3 +15,14 @@ Watch video at:
 - [RuTube](https://rutube.ru/video/c26c03a07af8ba812b346bea6e32858d/?r=wd)
 - [VK Video](https://vk.com/video550783935_456239120)
 - [Telegram](https://t.me/helixtrackdev/42)
+
+## Dekstop launcher
+
+We have incorporated launcher capability for fast development start. Launcher will execute all mandatory recipes and bring up the IDE.
+
+Watch video at:
+
+- [YouTube](https://www.youtube.com/watch?v=-WcaAJfEJow)
+- [RuTube](https://rutube.ru/video/24be88acf0e937e0fcf49fc443a2d1a4/?r=wd)
+- [VK Video](https://vk.com/video550783935_456239122)
+- [Telegram](https://t.me/helixtrackdev/43)
