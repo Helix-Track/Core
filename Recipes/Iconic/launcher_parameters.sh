@@ -78,4 +78,5 @@ if [ -n "$HELIXTRACK_LAUNCHER_DESKTOP" ]; then
     DESKTOP_ICON="$HELIXTRACK_LAUNCHER_DESKTOP"
 fi
 
+# TODO: Remove all unused submodules
 # TODO: Re-organise Recipes by adding proper subdirectories
