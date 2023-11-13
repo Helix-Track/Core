@@ -2,4 +2,4 @@
 
 HERE="$(pwd)"
 
-cd "$HERE/Propriatery" && sh Recipes/prepare.sh
+cd "$HERE/Propriatery" && sh Recipes/Installable/prepare.sh

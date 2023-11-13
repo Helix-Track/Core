@@ -2,4 +2,4 @@
 
 HERE="$(pwd)"
 
-cd "$HERE/Core" && sh Recipes/prepare.sh
+cd "$HERE/Core" && sh Recipes/Installable/prepare.sh
