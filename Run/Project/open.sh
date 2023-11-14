@@ -56,6 +56,7 @@ else
 fi
 
 # TODO: Move under the Software-Toolkit responsibility and make it reusable; Incorporate it into the iconify script
+# TODO: Change the SUBMODULES_HOME variable into: PROJECT_TOOLKIT_HOME; Leave SUBMODULES_HOME where it makes sense - work with submodules.
 #
 RUN_IN_TERMINAL() {
 
