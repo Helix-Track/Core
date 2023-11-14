@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Install Software-Toolkit if not available - Via Dependable?
+
+if [ -z "$SUBMODULES_HOME" ]; then
+
+  echo "ERROR: The SUBMODULES_HOME is not defined !!!"
+  exit 1
+fi
+
+# TODO: Execute Project's prepare
+
+# TODO: Move all below to the Project module, then include here
+# TODO: Check submodules home handling below - is it obsolete?
+
 HERE="$(dirname -- "$0")"
 DIR_HOME=$(eval echo ~"$USER")
 FILE_ZSH_RC="$DIR_HOME/.zshrc"
