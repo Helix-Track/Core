@@ -1,36 +1,3 @@
-[submodule "_Submodules/Upstreamable"]
-	path = _Submodules/Upstreamable
-	url = git@github.com:red-elf/Upstreamable.git
-[submodule "_Submodules/Stack-Definitions"]
-	path = _Submodules/Stack-Definitions
-	url = git@github.com:Server-Factory/Stack-Definitions.git
-[submodule "_Submodules/Docker-Definitions"]
-	path = _Submodules/Docker-Definitions
-	url = git@github.com:Server-Factory/Docker-Definitions.git
-[submodule "_Submodules/Software-Definitions"]
-	path = _Submodules/Software-Definitions
-	url = git@github.com:Server-Factory/Software-Definitions.git
-[submodule "_Submodules/Installable"]
-	path = _Submodules/Installable
-	url = git@github.com:red-elf/Installable.git
-[submodule "_Submodules/Versionable"]
-	path = _Submodules/Versionable
-	url = git@github.com:red-elf/Versionable.git
-[submodule "_Submodules/Software-Toolkit"]
-	path = _Submodules/Software-Toolkit
-	url = git@github.com:red-elf/Software-Toolkit.git
-[submodule "_Submodules/Testable"]
-	path = _Submodules/Testable
-	url = git@github.com:red-elf/Testable.git
 [submodule "_Submodules/Services-Toolkit"]
 	path = _Submodules/Services-Toolkit
 	url = git@github.com:red-elf/Services-Toolkit.git
-[submodule "_Submodules/Project"]
-	path = _Submodules/Project
-	url = git@github.com:red-elf/Project.git
-[submodule "_Submodules/Dependable"]
-	path = _Submodules/Dependable
-	url = git@github.com:red-elf/Dependable.git
-[submodule "_Submodules/Iconic"]
-	path = _Submodules/Iconic
-	url = git@github.com:red-elf/Iconic.git
