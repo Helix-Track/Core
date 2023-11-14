@@ -6,7 +6,7 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-HERE="$(dirname "$SUBMODULES_HOME")"
+HERE="$(pwd)"
 
 # shellcheck disable=SC2034
 CMD_PATH="$HERE"
