@@ -12,3 +12,4 @@ VersionInfo.*
 cmake-build-*
 Build
 pull_all
+push_all
