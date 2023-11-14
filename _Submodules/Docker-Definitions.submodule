@@ -1,4 +1,0 @@
-#!/bin/bash
-
-NAME="Docker-Definitions"
-REPO="git@github.com:Server-Factory/Docker-Definitions.git"

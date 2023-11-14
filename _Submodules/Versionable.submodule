@@ -1,4 +1,0 @@
-#!/bin/bash
-
-NAME="Versionable"
-REPO="git@github.com:red-elf/Versionable.git"
