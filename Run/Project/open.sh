@@ -42,5 +42,7 @@ if ! test -e "$SCRIPT_OPEN"; then
     exit 1
 fi
 
-sh "$SCRIPT_OPEN" code "$PROJECT"
+IDE="code"
+
+sh "$SCRIPT_OPEN" "$IDE" "$PROJECT" && sh "$SCRIPT_OPEN" "$IDE" "$SUBMODULES_HOME"
 
