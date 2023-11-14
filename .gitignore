@@ -3,3 +3,11 @@ build
 module_*
 Propriatery
 .scannerwork
+_Databases
+_Dependencies
+_Volumes
+BuildConfig.*
+Version.*
+VersionInfo.*
+cmake-build-*
+Build

@@ -1,5 +1,9 @@
 #!/bin/bash
 
-HERE="$(pwd)"
+if [ -z "$SUBMODULES_HOME" ]; then
 
-cd "$HERE" && Core/Toolkit/Utils/Sys/os_check.sh
+  echo "ERROR: The SUBMODULES_HOME is not defined !!!"
+  exit 1
+fi
+
+sh "$SUBMODULES_HOME/Software-Toolkit/Utils/Sys/os_check.sh"

@@ -20,7 +20,7 @@ LAUNCHER="$HERE/Assets/Launcher.svg"
 # shellcheck disable=SC2034
 DESKTOP_FILE_NAME="helixtrack_core_dev.desktop"
 
-SCRIPT_VERSION="$HERE/Core/Version/version.sh"
+SCRIPT_VERSION="$HERE/Version/version.sh"
 
 if ! test -e "$SCRIPT_VERSION"; then
 
