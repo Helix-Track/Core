@@ -8,10 +8,29 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-# TODO: Execute Project's prepare
+SCRIPT_PREPARE="$SUBMODULES_HOME/Project/prepare.sh"
+
+if ! test  -e "$SCRIPT_PREPARE"; then
+
+    echo "ERROR: Prepare script not found '$SCRIPT_PREPARE'"
+    exit 1
+fi
+
+HERE=$(dirname "$(realpath "$0")")
+
+if ! sh "$SCRIPT_PREPARE" "$HERE"; then
+
+    echo "ERROR: Project prepare failed"
+    exit 1
+fi
+
+# TODO: Remove this line(s) !!!!
+echo "ERROR: Blocked here"
+exit 1
 
 # TODO: Move all below to the Project module, then include here
-# TODO: Check submodules home handling below - is it obsolete?
+# TODO: Check submodules home handling below - is it obsolete? Adding it into the .rs file to be moved into
+#       the Project Toolkit's installation recipe
 
 HERE="$(dirname -- "$0")"
 DIR_HOME=$(eval echo ~"$USER")
