@@ -18,3 +18,11 @@ clone
 test
 prepare
 open
+
+Run/Test/main.sh
+Run/Project/open.sh
+Run/Iconic/iconify.sh
+
+Recipes/Iconic/launcher_parameters.sh
+Recipes/Project/pre_open.sh
+Recipes/Project/project_pre_open.sh
