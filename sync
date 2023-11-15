@@ -1,11 +1,1 @@
-#!/bin/bash
-
-if sh pull_all && sh push_all . HOOK; then
-
-    echo "Sync ok"
-
-else
-
-    echo "ERROR: Sync failed"
-    exit 1
-fi
+/home/milosvasic/Projects/HelixTrack/Project-Toolkit/sync
