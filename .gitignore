@@ -16,3 +16,4 @@ push_all
 sync
 clone
 test
+prepare
