@@ -24,10 +24,6 @@ if ! sh "$SCRIPT_PREPARE" "$HERE"; then
     exit 1
 fi
 
-# TODO: Remove this line(s) !!!!
-echo "ERROR: Blocked here"
-exit 1
-
 # TODO: Move all below to the Project module, then include here
 # TODO: Check submodules home handling below - is it obsolete? Adding it into the .rs file to be moved into
 #       the Project Toolkit's installation recipe
