@@ -13,3 +13,5 @@ cmake-build-*
 Build
 pull_all
 push_all
+sync
+clone
