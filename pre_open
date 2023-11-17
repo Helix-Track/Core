@@ -67,6 +67,8 @@ if [ "$FILES_COUNT" == 0 ]; then
 
     else
 
+      rm -f ./clone >/dev/null 2>&1
+
       echo "ERROR: Project Toolkit is not installed to '$SUBMODULES_HOME' (2)"
       exit 1
     fi
