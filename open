@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "Opening the HelixTrack Core"
+
+HERE=$(pwd)
+
+SCRIPT_DO_OPEN="$HERE/do_open"
+
+if test -e "$SCRIPT_DO_OPEN"; then
+
+  sh "$SCRIPT_DO_OPEN"
+fi

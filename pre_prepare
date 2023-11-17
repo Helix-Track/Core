@@ -1,65 +1,7 @@
 #!/bin/bash
 
 echo "Pre-preparing the HelixTrack Core"
+#!/bin/bash
 
-DIR_HOME=$(eval echo ~"$USER")
-FILE_ZSH_RC="$DIR_HOME/.zshrc"
-FILE_BASH_RC="$DIR_HOME/.bashrc"
-
-FILE_RC=""
-    
-if test -e "$FILE_ZSH_RC"; then
-
-  FILE_RC="$FILE_ZSH_RC"
-
-else
-
-    if test -e "$FILE_BASH_RC"; then
-
-      FILE_RC="$FILE_BASH_RC"
-
-    else
-
-      echo "ERROR: No '$FILE_ZSH_RC' or '$FILE_BASH_RC' found on the system"
-      exit 1
-    fi
-fi
-
-if [ -z "$SUBMODULES_HOME" ]; then
-
-  # shellcheck disable=SC2002
-  if ! cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
-
-      export SUBMODULES_HOME="$DIR_HOME/Apps/Project-Toolkit"
-      
-      if echo "" >> "$FILE_RC" && echo "export SUBMODULES_HOME=$SUBMODULES_HOME" >> "$FILE_RC"; then
-
-          echo "SUBMODULES_HOME is added into '$FILE_RC' configuration"
-
-      else
-
-          echo "WARNING: SUBMODULES_HOME was not added into '$FILE_RC' configuration"
-      fi
-  fi  
-fi
-
-# shellcheck disable=SC2012
-FILES_COUNT=$(ls "$SUBMODULES_HOME" -1 | wc -l)
-
-if [ "$FILES_COUNT" == 0 ]; then
-
-  if (test -e ./clone || wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
-    chmod +x ./clone && ./clone git@github.com:red-elf/Project-Toolkit.git /tmp; then
-
-    echo "Project Toolkit is installed to '$SUBMODULES_HOME'"
-
-  else
-
-    echo "ERROR: Project Toolkit is not installed to '$SUBMODULES_HOME'"
-    exit 1
-  fi
-
-else
-
-  echo "Project Toolkit is available at '$SUBMODULES_HOME'"
-fi
+echo "Pre-preparing the HelixTrack Core"
+echo "Nothing to be done here"

@@ -17,7 +17,7 @@ sync
 clone
 test
 prepare
-open
+do_open
 
 Run/Test/main.sh
 Run/Project/open.sh
