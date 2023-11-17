@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Post-preparing the HelixTrack Core"
+echo "Nothing to be done here, for now!"
