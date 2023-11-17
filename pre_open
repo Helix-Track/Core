@@ -1,5 +1,6 @@
 #!/bin/bash
 
+HERE=$(pwd)
 DIR_HOME=$(eval echo ~"$USER")
 FILE_ZSH_RC="$DIR_HOME/.zshrc"
 FILE_BASH_RC="$DIR_HOME/.bashrc"
@@ -51,23 +52,27 @@ fi
 
 if [ "$FILES_COUNT" == 0 ]; then
 
-  rm -f ./clone >/dev/null 2>&1
+  SESSION=$(($(date +%s%N)/1000000))
+  DIR_TMP="/tmp/$SESSION"
 
-  # FIXME: Has to be executed in empty temporarely directory
+  if ! test "$DIR_TMP"; then
 
-  if wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone; then
+    if ! mkdir -p "$DIR_TMP"; then
+
+      echo "ERROR: Could not create tmp directory '$DIR_TMP'"
+      exit 1
+    fi
+  fi
+
+  if cd "$DIR_TMP" && wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone; then
   
     echo "Clone script is ready"
 
-    if chmod +x ./clone && ./clone git@github.com:red-elf/Project-Toolkit.git /tmp; then
+    if chmod +x ./clone && ./clone git@github.com:red-elf/Project-Toolkit.git ./Toolkit; then
 
-      echo "Project Toolkit is installed to '$SUBMODULES_HOME'"
-
-      rm -f ./clone >/dev/null 2>&1
+      cd "$HERE" && echo "Project Toolkit is installed to '$SUBMODULES_HOME'"
 
     else
-
-      rm -f ./clone >/dev/null 2>&1
 
       echo "ERROR: Project Toolkit is not installed to '$SUBMODULES_HOME' (2)"
       exit 1
