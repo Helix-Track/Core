@@ -53,6 +53,15 @@ fi
 
 if [ "$FILES_COUNT" == 0 ]; then
 
+  if test -e ./clone;
+
+    if ! rm -f ./clone; then
+
+      echo "ERROR: Clone script was not cleaned up"
+      exit 1
+    fi
+  fi
+
   if (test -e ./clone || wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
     chmod +x ./clone && ./clone git@github.com:red-elf/Project-Toolkit.git /tmp; then
 
