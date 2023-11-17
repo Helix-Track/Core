@@ -55,7 +55,7 @@ if [ "$FILES_COUNT" == 0 ]; then
   SESSION=$(($(date +%s%N)/1000000))
   DIR_TMP="$HERE/_Tmp/$SESSION"
 
-  if ! test "$DIR_TMP"; then
+  if ! test -e "$DIR_TMP"; then
 
     if ! mkdir -p "$DIR_TMP"; then
 
