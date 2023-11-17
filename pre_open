@@ -55,6 +55,8 @@ if [ "$FILES_COUNT" == 0 ]; then
 
   rm -f ./clone >/dev/null 2>&1
 
+  # FIXME: Has to be executed in empty temporarely directory
+
   if wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone; then
   
     echo "Clone script is ready"
