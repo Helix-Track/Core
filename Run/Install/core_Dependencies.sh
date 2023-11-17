@@ -6,6 +6,4 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-HERE="$(pwd)"
-
-cd "$HERE/Core" && sh "$SUBMODULES_HOME/Dependable/install_dependencies.sh"
+sh "$SUBMODULES_HOME/Dependable/install_dependencies.sh"
