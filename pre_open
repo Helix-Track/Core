@@ -70,7 +70,7 @@ if [ "$FILES_COUNT" == 0 ]; then
 
     if chmod +x ./clone && ./clone git@github.com:red-elf/Project-Toolkit.git ./Toolkit; then
 
-      cd "$HERE" && echo "Project Toolkit is installed to '$SUBMODULES_HOME'"
+      cd "$HERE" && echo "Project Toolkit is installed to '$SUBMODULES_HOME' && rm -rf $DIR_TMP"
 
     else
 
