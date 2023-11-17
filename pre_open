@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Pre-preparing the HelixTrack Core"
+echo "Pre-opening the HelixTrack Core"
 
 DIR_HOME=$(eval echo ~"$USER")
 FILE_ZSH_RC="$DIR_HOME/.zshrc"

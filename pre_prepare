@@ -1,7 +1,4 @@
 #!/bin/bash
 
 echo "Pre-preparing the HelixTrack Core"
-#!/bin/bash
-
-echo "Pre-preparing the HelixTrack Core"
 echo "Nothing to be done here"
