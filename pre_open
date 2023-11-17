@@ -53,7 +53,7 @@ fi
 
 if [ "$FILES_COUNT" == 0 ]; then
 
-  if test -e ./clone;
+  if test -e ./clone; then
 
     if ! rm -f ./clone; then
 
