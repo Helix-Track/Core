@@ -43,8 +43,13 @@ if [ -z "$SUBMODULES_HOME" ]; then
   fi  
 fi
 
-# shellcheck disable=SC2012
-FILES_COUNT=$(ls "$SUBMODULES_HOME" -1 | wc -l)
+FILES_COUNT=0
+
+if test -e "$SUBMODULES_HOME"; then
+
+  # shellcheck disable=SC2012
+  FILES_COUNT=$(ls "$SUBMODULES_HOME" -1 | wc -l)
+fi
 
 if [ "$FILES_COUNT" == 0 ]; then
 
