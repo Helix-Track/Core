@@ -62,7 +62,7 @@ if [ "$FILES_COUNT" == 0 ]; then
     fi
   fi
 
-  if (test -e ./clone || wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
+  if (wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
     chmod +x ./clone && ./clone git@github.com:red-elf/Project-Toolkit.git /tmp; then
 
     echo "Project Toolkit is installed to '$SUBMODULES_HOME'"
