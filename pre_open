@@ -63,6 +63,8 @@ if [ "$FILES_COUNT" == 0 ]; then
 
       echo "Project Toolkit is installed to '$SUBMODULES_HOME'"
 
+      rm -f ./clone >/dev/null 2>&1
+
     else
 
       echo "ERROR: Project Toolkit is not installed to '$SUBMODULES_HOME' (2)"
