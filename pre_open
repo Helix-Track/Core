@@ -1,11 +1,10 @@
 #!/bin/bash
 
+FILE_RC=""
 HERE=$(pwd)
 DIR_HOME=$(eval echo ~"$USER")
 FILE_ZSH_RC="$DIR_HOME/.zshrc"
 FILE_BASH_RC="$DIR_HOME/.bashrc"
-
-FILE_RC=""
     
 if test -e "$FILE_ZSH_RC"; then
 
