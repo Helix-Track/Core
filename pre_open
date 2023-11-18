@@ -24,22 +24,46 @@ else
     fi
 fi
 
+if [ -n "$SUBMODULES_HOME" ]; then
+
+  echo "The 'SUBMODULES_HOME' variable is defined: '$SUBMODULES_HOME'"
+
+else
+
+  echo "WARNING: The 'SUBMODULES_HOME' variable is not defined"  
+
+  export SUBMODULES_HOME="$DIR_HOME/Apps/Project-Toolkit"
+
+  echo "The 'SUBMODULES_HOME' variable is exported: '$SUBMODULES_HOME'"
+fi
+
 if [ -z "$SUBMODULES_HOME" ]; then
 
-  # shellcheck disable=SC2002
-  if ! cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
+  echo "ERROR: The 'SUBMODULES_HOME' variable is not defined"  
+  exit 1
+fi
 
-      export SUBMODULES_HOME="$DIR_HOME/Apps/Project-Toolkit"
-      
-      if echo "" >> "$FILE_RC" && echo "export SUBMODULES_HOME=$SUBMODULES_HOME" >> "$FILE_RC"; then
+# shellcheck disable=SC2002
+if cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
 
-          echo "SUBMODULES_HOME is added into '$FILE_RC' configuration"
+  echo "'SUBMODULES_HOME' has been exported in '$FILE_RC'"
 
-      else
+else
 
-          echo "WARNING: SUBMODULES_HOME was not added into '$FILE_RC' configuration"
-      fi
-  fi  
+  echo "No 'SUBMODULES_HOME' has been exported in '$FILE_RC'"
+  
+  if echo "" >> "$FILE_RC" && echo "export SUBMODULES_HOME=$SUBMODULES_HOME" >> "$FILE_RC"; then
+
+      echo "SUBMODULES_HOME is added into '$FILE_RC' configuration"
+
+      # shellcheck disable=SC1090
+      . "$FILE_RC"
+
+  else
+
+      echo "ERROR: SUBMODULES_HOME was not added into '$FILE_RC' configuration"
+      exit 1
+  fi
 fi
 
 FILES_COUNT=0
