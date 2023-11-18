@@ -46,7 +46,7 @@ fi
 # shellcheck disable=SC2002
 if cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
 
-  echo "The 'SUBMODULES_HOME' has been exported in '$FILE_RC'"
+  echo "The 'SUBMODULES_HOME' has been exported in: '$FILE_RC'"
 
 else
 
