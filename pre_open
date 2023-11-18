@@ -26,7 +26,7 @@ fi
 
 if [ -n "$SUBMODULES_HOME" ]; then
 
-  echo "The 'SUBMODULES_HOME' variable is defined: '$SUBMODULES_HOME'"
+  echo "The 'SUBMODULES_HOME' variable is defined in '$SUBMODULES_HOME'"
 
 else
 
