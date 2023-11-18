@@ -32,7 +32,7 @@ After you have cloned the project execute the `sync` script:
 To do this automatically execute the following:
 
 ```shell
-(test -e ./clone || wget "https://raw.githubusercontent.com/Helix-Track/Core/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
+(test -e ./clone || wget "https://raw.githubusercontent.com/red-elf/Project-Toolkit/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
     chmod +x ./clone && ./clone git@github.com:Helix-Track/Core.git ./Core
 ```
 
@@ -42,14 +42,14 @@ or via one of the mirror repositories:
 
 ```shell
 (test -e ./clone || \
-    wget "https://raw.githubusercontent.com/Helix-Track/Core/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
+    wget "https://gitflic.ru/project/red-elf/project-toolkit/blob/raw?file=clone&inline=false&append="$(($(date +%s%N)/1000000)) -O clone) && \
     chmod +x ./clone && ./clone git@gitflic.ru:helix-track/core.git ./Core
 ```
 
 - [Gitee](https://gitee.com/):
 
 ```shell
-(test -e ./clone || wget "https://raw.githubusercontent.com/Helix-Track/Core/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
+(test -e ./clone || wget "https://gitee.com/Kvetch_Godspeed_b073/Project-Toolkit/raw/main/clone?append="$(($(date +%s%N)/1000000)) -O clone) && \
     chmod +x ./clone && ./clone git@gitee.com:Kvetch_Godspeed_b073/Core.git ./Core
 ```
 
