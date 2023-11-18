@@ -73,7 +73,7 @@ if test -e "$SUBMODULES_HOME"; then
   FILES_COUNT=$(ls "$SUBMODULES_HOME" -1 | wc -l)
 fi
 
-if [ "$FILES_COUNT" == 0 ]; then
+if [ "$FILES_COUNT" == "0" ]; then
 
   SESSION=$(($(date +%s%N)/1000000))
   DIR_TMP="$HERE/_Tmp/$SESSION"
