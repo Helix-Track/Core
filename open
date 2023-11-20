@@ -17,9 +17,32 @@ if test -e "$SCRIPT_PRE_OPEN"; then
     fi
 fi
 
+
+SCRIPT_PREPARE_LOCAL="$HERE/prepare"
+
+if ! test -e "$SCRIPT_PREPARE_LOCAL" || ! test -e "$SCRIPT_DO_OPEN"; then
+
+    SCRIPT_PREPARE_TOOLKIT="$SUBMODULES_HOME/prepare"
+
+    if test -e "$SCRIPT_PREPARE_TOOLKIT"; then
+
+        if ! sh "$SCRIPT_PREPARE_TOOLKIT"; then
+
+            echo "ERROR: Script failed '$SCRIPT_PREPARE_TOOLKIT'"
+            exit 1
+        fi
+
+    else
+
+        echo "ERROR: Script not found '$SCRIPT_PREPARE_TOOLKIT'"
+        exit 1
+    fi
+fi
+
 if test -e "$SCRIPT_DO_OPEN"; then
 
   sh "$SCRIPT_DO_OPEN"
+
 fi
 
 if test -e "$SCRIPT_POST_OPEN"; then
