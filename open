@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: Clone script to download the opening files and scripts that are not the part of Project Toolkit
-
 HERE=$(pwd)
 SCRIPT_DO_OPEN="$HERE/do_open"
 SCRIPT_PRE_OPEN="$HERE/pre_open"
