@@ -42,6 +42,15 @@ if ! test -e "$SCRIPT_PREPARE_LOCAL" || ! test -e "$SCRIPT_DO_OPEN"; then
     fi
 fi
 
+if test -e "$SCRIPT_PREPARE_LOCAL"; then
+
+    if ! sh "$SCRIPT_PREPARE_LOCAL"; then
+
+        echo "ERROR: Local prepare script failed"
+        exit 1
+    fi
+fi
+
 if test -e "$SCRIPT_DO_OPEN"; then
 
   sh "$SCRIPT_DO_OPEN"
