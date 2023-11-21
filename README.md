@@ -91,7 +91,7 @@ For the development purposes it is possible to work with the propriatery modules
 
 ```shell
 export SUBMODULES_PRIVATE_HOME=/path/to/propriatery/modules/home
-export SUBMODULES_PRIVATE_RECIPES=//path/to/propriatery/modules/recipes
+export SUBMODULES_PRIVATE_RECIPES=/path/to/propriatery/modules/recipes
 ```
 
 - Add the recipe(s) into the reipes directory. For example `Some_Propriatery_Module.submodule`:
