@@ -105,6 +105,8 @@ REPO="git@github.com:Something/Some_Propriatery_Module.git"
 
 This will instruct the `open` script to clone and link the propriatery module with the project.
 
+The cloned propriatery module will be linked under the `_Private` directory of the project under the modules name: `_Private\Some_Propriatery_Module`.
+
 ## Database
 
 The system database
