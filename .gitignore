@@ -7,6 +7,7 @@ _Tmp
 _Databases
 _Dependencies
 _Volumes
+_Private
 BuildConfig.*
 Version.*
 VersionInfo.*
