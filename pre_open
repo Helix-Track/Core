@@ -23,11 +23,7 @@ else
     fi
 fi
 
-if [ -n "$SUBMODULES_HOME" ]; then
-
-  echo "The 'SUBMODULES_HOME' variable is defined and set to the value of: '$SUBMODULES_HOME'"
-
-else
+if [ -z "$SUBMODULES_HOME" ]; then
 
   echo "WARNING: The 'SUBMODULES_HOME' variable is not defined"  
 
@@ -43,11 +39,7 @@ if [ -z "$SUBMODULES_HOME" ]; then
 fi
 
 # shellcheck disable=SC2002
-if cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
-
-  echo "The 'SUBMODULES_HOME' has been exported in: '$FILE_RC'"
-
-else
+if ! cat "$FILE_RC" | grep "SUBMODULES_HOME=" >/dev/null 2>&1; then
 
   echo "The 'SUBMODULES_HOME' has not been exported in '$FILE_RC'"
   
