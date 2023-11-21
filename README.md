@@ -83,6 +83,28 @@ From the root of the project execute:
 
 It will execute all the [Testable](https://github.com/red-elf/Testable) system components.
 
+## Propriatery submodules
+
+For the development purposes it is possible to work with the propriatery modules. To clone and link propriatery submodule do the following steps:
+
+- Export the following environment variables:
+
+```shell
+export SUBMODULES_PRIVATE_HOME=/path/to/propriatery/modules/home
+export SUBMODULES_PRIVATE_RECIPES=//path/to/propriatery/modules/recipes
+```
+
+- Add the recipe(s) into the reipes directory. For example `Some_Propriatery_Module.submodule`:
+
+```shell
+#!/bin/bash
+
+NAME="Some_Propriatery_Module"
+REPO="git@github.com:Something/Some_Propriatery_Module.git"
+```
+
+This will instruct the `open` script to clone and link the propriatery module with the project.
+
 ## Database
 
 The system database
