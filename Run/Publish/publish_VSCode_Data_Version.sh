@@ -1,5 +1,7 @@
 #!/bin/bash
 
+HERE=$(pwd)
+
 if [ -z "$SUBMODULES_HOME" ]; then
 
   echo "ERROR: The SUBMODULES_HOME is not defined"
