@@ -23,6 +23,8 @@ do_open
 
 Run/Test/main.sh
 Run/Project/open.sh
+Run/Install/fonts.sh
+Run/Install/vscode.sh
 Run/Iconic/iconify.sh
 
 Recipes/Iconic/launcher_parameters.sh
