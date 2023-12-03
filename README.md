@@ -3,7 +3,7 @@
 
 # HelixTrack Core
 
-The Core module for the Helix Track.
+The Core module (micro-service) for the Helix Track.
 
 ## Development
 
