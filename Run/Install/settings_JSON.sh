@@ -71,7 +71,8 @@ if sh "$SCRIPT_GET_PROGRAM" code >/dev/null 2>&1; then
     exit 1
   fi
 
-  if sh "$SCRIPT_EXTEND_JSON" "$SETTINGS_JSON" "$RECIPE_SETTINGS_JSON" "$SETTINGS_JSON"; then
+  # shellcheck disable=SC1090
+  if . "$SCRIPT_EXTEND_JSON" "$SETTINGS_JSON" "$RECIPE_SETTINGS_JSON" "$SETTINGS_JSON"; then
 
     echo "Settings JSON has been extended with success"
 
