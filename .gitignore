@@ -31,3 +31,5 @@ Run/Iconic/do_branding.sh
 Recipes/Iconic/launcher_parameters.sh
 Recipes/Project/pre_open.sh
 Recipes/Project/project_pre_open.sh
+
+Formatted.*.json
