@@ -20,4 +20,4 @@ if [ -z "$HTTPD_WEB_ROOT_SHARED" ]; then
     exit 1
 fi
 
-sh "$SCRIPT_GET_HTTPD" "httpd.Shared" "$HTTPD_WEB_ROOT_SHARED" 8081
+sh "$SCRIPT_GET_HTTPD" "httpd.$(hostname)" "$HTTPD_WEB_ROOT_SHARED" 8081
