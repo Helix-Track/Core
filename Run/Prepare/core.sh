@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Preparing the HelixTrack Core"
+echo "Preparing the helix track Core"
 
 HERE="$(pwd)"
 

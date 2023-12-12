@@ -1,6 +1,6 @@
-# HelixTrack Services
+# helix track Services
 
-The following list represents supported HelixTrack Services:
+The following list represents supported helix track Services:
 
 - Core                  (mandatory, main,       opensource                   )
 - Authentication        (mandatory, main,       propriatery, provides the API)
@@ -19,7 +19,7 @@ The services listed above fit in the following project structure:
     - `Assets`, Various assets
     - `Recipes`, Various [Software Toolkit](https://github.com/red-elf/Software-Toolkit) recipes
     - `Documentation`, Project documentation
-    - `Core`, HelixTrack Core implementation
+    - `Core`, helix track Core implementation
     - `Propriatery`, The propriatery implementations
         - `Recipes`, Various [Software Toolkit](https://github.com/red-elf/Software-Toolkit) recipes
         - `Services`, Services directory

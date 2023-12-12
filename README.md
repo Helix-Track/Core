@@ -1,13 +1,16 @@
-![JWT Compatible](https://jwt.io/img/badge-compatible.svg)
+# helix track Core
+
+![Quality Gate Status](Assets/Generated_SonarQube_Measure.svg)
+
 ![JIRA alternative for the free world!](Assets/Wide_Black.png)
 
-# HelixTrack Core
+![JWT Compatible](https://jwt.io/img/badge-compatible.svg)
 
 The Core module (micro-service) for the Helix Track.
 
 ## Development
 
-The HelixTrack Core has been developed and tested on [AltBase Linux distribution](https://www.basealt.ru/).
+The helix track Core has been developed and tested on [AltBase Linux distribution](https://www.basealt.ru/).
 
 ## Before you start
 
@@ -53,7 +56,7 @@ or via one of the mirror repositories:
     chmod +x ./clone && ./clone git@gitee.com:Kvetch_Godspeed_b073/Core.git ./Core && cd ./Core && ./open
 ```
 
-*Note:* It is required to execute the script from empty directory where you whish to clone the HelixTrack project.
+*Note:* It is required to execute the script from empty directory where you whish to clone the helix track project.
 
 ### Executing the inititialisation scripts
 

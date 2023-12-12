@@ -5,9 +5,8 @@
 
 ## User permissions
 
-After user is authenticated with success and got the information about the particular HelixTrack Core
-instance that it belongs to, permissions information is obtained from that HelixTrack Core instance and returned 
-as the part of JWT token's payload.
+After user is authenticated with success and got the information about the particular helix track Core
+instance that it belongs to, permissions information is obtained from that v Core instance and returned as the part of JWT token's payload.
 
 Each user will have a list of permissions. The following example illustrates regular user with its permissions:
 
@@ -104,7 +103,7 @@ For each context we will verify if the operation is possible to be performed by 
 
 ## Permissions engine
 
-Each HelixTrack Core operation must be verified against the Permissions engine. For example, obtaining the list of projects operation:
+Each helix track Core operation must be verified against the Permissions engine. For example, obtaining the list of projects operation:
 
 - Operation (API method) start
 - Request the approval from the Permissions engine

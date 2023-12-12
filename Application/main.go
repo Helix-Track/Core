@@ -4,5 +4,5 @@ import "fmt"
 
 func main() {
 
-	fmt.Println("HelixTrack Core")
+	fmt.Println("helix track Core")
 }

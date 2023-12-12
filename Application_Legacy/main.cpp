@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     program.add_argument("-c", "--configurationFile")
             .required()
             .default_value(std::string(defaultConfigurationFile))
-            .help("Path to the HelixTrack core configuration file");
+            .help("Path to the helix track core configuration file");
 
     std::string epilog("Project homepage: ");
     epilog.append(getHomepage());

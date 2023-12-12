@@ -1,25 +1,26 @@
-# HelixTrack Core REST API documentation
+# helix track Core REST API documentation
 
-The following sections list all the HeliXTrack API calls specifications.
+The following sections list all the helix track API calls specifications.
 
 Table of contents
 
-- [Authentication API](#Authentication-API)
-  - [Authenticate the user](#Authenticate-the-user)
-    - [The JWT payload](#The-JWT-payload)
-  - [Sign out the user from the system](#Sign-out-the-user-from-the-system)
-  - [Obtain the version of the authentication API service](#Obtain-the-version-of-the-authentication-API-service)
-- [Core API](#Core-API)
-  - [JWT capability check](#JWT-capability-check)
-  - [Database capability check](#Database-capability-check)
-  - [System health](#System-health)
-  - [Obtain the version of the HelixTrack Core API service](#Obtain-the-version-of-the-HelixTrack-Core-API-service)
-  - [Perform the entity CRUD operations](#Perform-the-entity-CRUD-operations)
-- [API response error codes](#API-response-error-codes)
-  - [Request related error codes](#Request-related-error-codes)
-  - [System related error codes](#System-related-error-codes)
-  - [Entity related error codes](#Entity-related-error-codes)
-- [HashiCorp Vault API](#HashiCorp-Vault-API)
+- [helix track Core REST API documentation](#helix-track-core-rest-api-documentation)
+  - [Authentication API](#authentication-api)
+    - [Authenticate the user](#authenticate-the-user)
+      - [The JWT payload](#the-jwt-payload)
+    - [Sign out the user from the system](#sign-out-the-user-from-the-system)
+    - [Obtain the version of the authentication API service](#obtain-the-version-of-the-authentication-api-service)
+  - [Core API](#core-api)
+    - [JWT capability check](#jwt-capability-check)
+    - [Database capability check](#database-capability-check)
+    - [System health](#system-health)
+    - [Obtain the version of the helix track Core API service](#obtain-the-version-of-the-helix-track-core-api-service)
+    - [Perform the entity CRUD operations](#perform-the-entity-crud-operations)
+  - [API response error codes](#api-response-error-codes)
+    - [Request related error codes](#request-related-error-codes)
+    - [System related error codes](#system-related-error-codes)
+    - [Entity related error codes](#entity-related-error-codes)
+  - [HashiCorp Vault API](#hashicorp-vault-api)
 
 ## Authentication API
 
@@ -168,7 +169,7 @@ Table of contents
   }
   ```
 
-### Obtain the version of the HelixTrack Core API service
+### Obtain the version of the helix track Core API service
 
 - endpoint: `/do`
 - method: `POST`
