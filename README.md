@@ -18,13 +18,7 @@ Clone the project, then, initialize and update the Git submodules.
 
 *Note:* We strongly suggest you to use the `clone` script for this. See next section.
 
-After you have cloned the project execute the `sync` script:
-
-```shell
-./sync
-```
-
-*Note:* If your Git account does not have the push permissions given by the administrator, instead of the `sync` script do execute `pull_all`:
+After you have cloned the project execute the `pull_all` script:
 
 ```shell
 ./pull_all
