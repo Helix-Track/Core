@@ -8,4 +8,4 @@ fi
 
 DIR_TOOLKIT="$SUBMODULES_HOME/Software-Toolkit"
 
-sh "$DIR_TOOLKIT/Utils/SonarQube/configure_sonar_lint.sh"
+bash "$DIR_TOOLKIT/Utils/SonarQube/configure_sonar_lint.sh"

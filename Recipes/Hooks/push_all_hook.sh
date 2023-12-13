@@ -37,5 +37,5 @@ else
         exit 1    
     fi
 
-    sh "$SCRIPT_GATHER_SUBMODULES" && sh "$SCRIPT_PUSH_SUBMODULES" "$DIR_ROOT"
+    bash "$SCRIPT_GATHER_SUBMODULES" && bash "$SCRIPT_PUSH_SUBMODULES" "$DIR_ROOT"
 fi

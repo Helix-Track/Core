@@ -25,7 +25,7 @@ if ! test -e "$SCRIPT_EXTEND_JSON"; then
   exit 1
 fi
 
-if sh "$SCRIPT_GET_PROGRAM" code >/dev/null 2>&1; then
+if bash "$SCRIPT_GET_PROGRAM" code >/dev/null 2>&1; then
 
   CODE_PATH=$(which code)
 
@@ -72,7 +72,7 @@ if sh "$SCRIPT_GET_PROGRAM" code >/dev/null 2>&1; then
   fi
 
   # shellcheck disable=SC1090
-  if sh "$SCRIPT_EXTEND_JSON" "$SETTINGS_JSON" "$RECIPE_SETTINGS_JSON" "$SETTINGS_JSON"; then
+  if bash "$SCRIPT_EXTEND_JSON" "$SETTINGS_JSON" "$RECIPE_SETTINGS_JSON" "$SETTINGS_JSON"; then
 
     echo "Settings JSON has been extended with success"
 

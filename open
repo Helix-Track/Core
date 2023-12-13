@@ -29,7 +29,7 @@ if ! test -e "$SCRIPT_PREPARE_LOCAL" || ! test -e "$SCRIPT_DO_OPEN"; then
 
     if test -e "$SCRIPT_PREPARE_TOOLKIT"; then
 
-        if ! sh "$SCRIPT_PREPARE_TOOLKIT" >/dev/null 2>&1; then
+        if ! bash "$SCRIPT_PREPARE_TOOLKIT" >/dev/null 2>&1; then
 
             echo "ERROR: Script failed '$SCRIPT_PREPARE_TOOLKIT'"
             exit 1
@@ -44,7 +44,7 @@ fi
 
 if test -e "$SCRIPT_PREPARE_LOCAL"; then
 
-    if ! sh "$SCRIPT_PREPARE_LOCAL" >/dev/null 2>&1; then
+    if ! bash "$SCRIPT_PREPARE_LOCAL" >/dev/null 2>&1; then
 
         echo "ERROR: Local prepare script failed"
         exit 1
@@ -53,13 +53,13 @@ fi
 
 if test -e "$SCRIPT_DO_OPEN"; then
 
-  sh "$SCRIPT_DO_OPEN"
+  bash "$SCRIPT_DO_OPEN"
 
 fi
 
 if test -e "$SCRIPT_POST_OPEN"; then
 
-    if ! sh "$SCRIPT_POST_OPEN"; then
+    if ! bash "$SCRIPT_POST_OPEN"; then
 
         echo "ERROR: Post-open failed"
         exit 1

@@ -2,4 +2,4 @@
 
 HERE="$(pwd)"
 
-cd "$HERE" && sh Run/Include/Docker/container_bash_sonarqube.sh Core
+cd "$HERE" && bash Run/Include/Docker/container_bash_sonarqube.sh Core

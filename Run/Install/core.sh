@@ -6,4 +6,4 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-sh "$SUBMODULES_HOME/Installable/install.sh"
+bash "$SUBMODULES_HOME/Installable/install.sh"

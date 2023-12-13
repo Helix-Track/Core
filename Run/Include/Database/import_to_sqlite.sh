@@ -6,4 +6,4 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-sh "$SUBMODULES_HOME/Software-Toolkit/Utils/Db/import_to_sqlite.sh Database/Definition.sqlite" "$1"
+bash "$SUBMODULES_HOME/Software-Toolkit/Utils/Db/import_to_sqlite.sh Database/Definition.sqlite" "$1"

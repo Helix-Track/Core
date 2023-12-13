@@ -48,11 +48,11 @@ if [ -z "$TELEGRAM_CHAT_ID" ]; then
     exit 1
 fi
 
-if sh "$SCRIPT_GET_JQ" >/dev/null 2>&1; then
+if bash "$SCRIPT_GET_JQ" >/dev/null 2>&1; then
 
     ENCODED_MESSAGE=$(jq -rn --arg x "$MESSAGE" '$x|@uri')
 
-    sh "$BOT_SCRIPT" "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$TELEGRAM_CHAT_ID" "$ENCODED_MESSAGE"
+    bash "$BOT_SCRIPT" "$TELEGRAM_BOT" "$TELEGRAM_BOT_TOKEN" "$TELEGRAM_CHAT_ID" "$ENCODED_MESSAGE"
 
 else
 

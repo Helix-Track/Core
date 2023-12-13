@@ -10,7 +10,7 @@ if [ -n "$1" ]; then
 
   HERE="$(pwd)"
 
-  cd "$HERE" && sh "$SUBMODULES_HOME"/Software-Toolkit/Utils/Docker/get_container_terminal.sh "postgres.$1"
+  cd "$HERE" && bash "$SUBMODULES_HOME"/Software-Toolkit/Utils/Docker/get_container_terminal.sh "postgres.$1"
 
 else
 

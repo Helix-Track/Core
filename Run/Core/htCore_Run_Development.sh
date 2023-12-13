@@ -3,4 +3,4 @@
 HERE="$(pwd)"
 
 cd "$HERE/Core" &&
-    sh Versionable/versionable_build.sh Application .. true && Application/Build/htCore -l -c Configurations/dev.json
+    bash Versionable/versionable_build.sh Application .. true && Application/Build/htCore -l -c Configurations/dev.json

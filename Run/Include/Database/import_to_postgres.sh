@@ -6,4 +6,4 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-sh "$SUBMODULES_HOME/Software-Toolkit/Utils/Db/import_to_postgres.sh" Definition "$1" "postgres" "Test12345" _Databases/Postgres
+bash "$SUBMODULES_HOME/Software-Toolkit/Utils/Db/import_to_postgres.sh" Definition "$1" "postgres" "Test12345" _Databases/Postgres

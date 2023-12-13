@@ -6,4 +6,4 @@ if [ -z "$SUBMODULES_HOME" ]; then
   exit 1
 fi
 
-sh "$SUBMODULES_HOME/Software-Toolkit/Utils/Sys/Programs/get_docker.sh"
+bash "$SUBMODULES_HOME/Software-Toolkit/Utils/Sys/Programs/get_docker.sh"
