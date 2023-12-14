@@ -133,6 +133,6 @@ All scripts and tools required for the system to initialize (database, generated
 
 Tbd.
 
-## Developers documentation
+## Development documentation
 
 Documentation can be found [here](Documentation).
