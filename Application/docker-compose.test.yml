@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  # Test PostgreSQL Database
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: helixtrack-postgres-test
+    hostname: postgres-test
+    environment:
+      - POSTGRES_DB=helixtrack_test
+      - POSTGRES_USER=helixtrack_test
+      - POSTGRES_PASSWORD=test_password
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helixtrack_test -d helixtrack_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - helixtrack-test-network
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  # Test Core with SQLite
+  helixtrack-core-sqlite-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.parametrized
+      args:
+        BUILD_VERSION: test
+        BUILD_DATE: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        BUILD_COMMIT: test
+    container_name: helixtrack-core-sqlite-test
+    hostname: helixtrack-core-sqlite
+    env_file:
+      - .env.test
+    environment:
+      - DB_TYPE=sqlite
+      - DB_PATH=/app/Database/test.db
+      - SERVER_PORT=8080
+      - LOG_LEVEL=debug
+      - ENVIRONMENT=test
+      - TEST_MODE=true
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    volumes:
+      - ./logs/test-sqlite:/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - helixtrack-test-network
+    profiles:
+      - sqlite-test
+
+  # Test Core with PostgreSQL
+  helixtrack-core-postgres-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.parametrized
+      args:
+        BUILD_VERSION: test
+        BUILD_DATE: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        BUILD_COMMIT: test
+    container_name: helixtrack-core-postgres-test
+    hostname: helixtrack-core-postgres
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    env_file:
+      - .env.test
+    environment:
+      - DB_TYPE=postgresql
+      - DB_HOST=postgres-test
+      - DB_PORT=5432
+      - DB_NAME=helixtrack_test
+      - DB_USER=helixtrack_test
+      - DB_PASSWORD=test_password
+      - DB_SSLMODE=disable
+      - SERVER_PORT=8081
+      - LOG_LEVEL=debug
+      - ENVIRONMENT=test
+      - TEST_MODE=true
+    ports:
+      - "8081:8081"
+      - "9091:9090"
+    volumes:
+      - ./logs/test-postgres:/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - helixtrack-test-network
+    profiles:
+      - postgres-test
+
+  # AI QA Test Runner
+  ai-qa-test-runner:
+    build:
+      context: ./tests/ai-qa
+      dockerfile: Dockerfile
+    container_name: helixtrack-ai-qa-runner
+    depends_on:
+      - helixtrack-core-sqlite-test
+      - helixtrack-core-postgres-test
+    environment:
+      - SQLITE_API_URL=http://helixtrack-core-sqlite:8080
+      - POSTGRES_API_URL=http://helixtrack-core-postgres:8081
+      - TEST_TIMEOUT=300
+      - VERBOSE=true
+    volumes:
+      - ./tests/ai-qa:/tests
+      - ./test-results:/test-results
+    networks:
+      - helixtrack-test-network
+    command: ["python3", "/tests/run_all_tests.py"]
+    profiles:
+      - ai-qa-test
+
+networks:
+  helixtrack-test-network:
+    driver: bridge
+    name: helixtrack-test-network
+
+volumes:
+  postgres-test-data:
+    name: helixtrack-postgres-test-data

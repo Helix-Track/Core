@@ -1,0 +1,104 @@
+# Multi-stage Dockerfile for HelixTrack Core
+# Supports both SQLite and PostgreSQL with full parametrization
+
+# Build stage
+FROM golang:1.22-alpine AS builder
+
+ARG BUILD_VERSION=dev
+ARG BUILD_DATE
+ARG BUILD_COMMIT=unknown
+
+# Install build dependencies
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    sqlite-dev \
+    postgresql-dev \
+    git
+
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the application with version information
+RUN CGO_ENABLED=1 GOOS=linux go build \
+    -ldflags="-X 'main.Version=${BUILD_VERSION}' \
+              -X 'main.BuildDate=${BUILD_DATE}' \
+              -X 'main.GitCommit=${BUILD_COMMIT}' \
+              -w -s" \
+    -o htCore main.go
+
+# Runtime stage
+FROM alpine:latest
+
+# Install runtime dependencies for both SQLite and PostgreSQL
+RUN apk add --no-cache \
+    ca-certificates \
+    tzdata \
+    sqlite-libs \
+    libpq
+
+# Create non-root user
+RUN addgroup -g 1000 helixtrack && \
+    adduser -D -u 1000 -G helixtrack helixtrack
+
+# Create necessary directories
+RUN mkdir -p /app/Database /app/Configurations /app/logs && \
+    chown -R helixtrack:helixtrack /app
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /app/htCore .
+COPY --from=builder /app/Configurations ./Configurations/
+
+# Set ownership
+RUN chown -R helixtrack:helixtrack /app
+
+# Switch to non-root user
+USER helixtrack
+
+# Environment variables with defaults
+ENV DB_TYPE=sqlite \
+    DB_PATH=/app/Database/helixtrack.db \
+    DB_HOST=localhost \
+    DB_PORT=5432 \
+    DB_NAME=helixtrack \
+    DB_USER=helixtrack \
+    DB_PASSWORD= \
+    DB_SSLMODE=disable \
+    SERVER_HOST=0.0.0.0 \
+    SERVER_PORT=8080 \
+    LOG_LEVEL=info \
+    LOG_PATH=/app/logs \
+    LOG_MAX_SIZE=100 \
+    LOG_MAX_BACKUPS=3 \
+    LOG_MAX_AGE=28 \
+    HEALTH_CHECK_INTERVAL=60s \
+    HEALTH_CHECK_TIMEOUT=10s \
+    HEALTH_FAILURE_THRESHOLD=3 \
+    FAILOVER_STABILITY_COUNT=3 \
+    FAILBACK_DELAY=5m \
+    ADMIN_TOKEN_MIN_LENGTH=32 \
+    SERVICE_ROTATION_MIN_AGE=5m \
+    AUTH_SERVICE_ENABLED=false \
+    AUTH_SERVICE_URL= \
+    AUTH_SERVICE_TIMEOUT=30 \
+    PERM_SERVICE_ENABLED=false \
+    PERM_SERVICE_URL= \
+    PERM_SERVICE_TIMEOUT=30
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${SERVER_PORT}/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Run the application
+CMD ["./htCore"]
