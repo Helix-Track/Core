@@ -31,14 +31,80 @@ func (r *Request) IsCRUDOperation() bool {
 
 // Action constants
 const (
+	// System actions
 	ActionAuthenticate = "authenticate"
 	ActionVersion      = "version"
 	ActionJWTCapable   = "jwtCapable"
 	ActionDBCapable    = "dbCapable"
 	ActionHealth       = "health"
-	ActionCreate       = "create"
-	ActionModify       = "modify"
-	ActionRemove       = "remove"
-	ActionRead         = "read"
-	ActionList         = "list"
+
+	// Generic CRUD actions
+	ActionCreate = "create"
+	ActionModify = "modify"
+	ActionRemove = "remove"
+	ActionRead   = "read"
+	ActionList   = "list"
+
+	// Priority actions
+	ActionPriorityCreate = "priorityCreate"
+	ActionPriorityRead   = "priorityRead"
+	ActionPriorityList   = "priorityList"
+	ActionPriorityModify = "priorityModify"
+	ActionPriorityRemove = "priorityRemove"
+
+	// Resolution actions
+	ActionResolutionCreate = "resolutionCreate"
+	ActionResolutionRead   = "resolutionRead"
+	ActionResolutionList   = "resolutionList"
+	ActionResolutionModify = "resolutionModify"
+	ActionResolutionRemove = "resolutionRemove"
+
+	// Version actions
+	ActionVersionCreate  = "versionCreate"
+	ActionVersionRead    = "versionRead"
+	ActionVersionList    = "versionList"
+	ActionVersionModify  = "versionModify"
+	ActionVersionRemove  = "versionRemove"
+	ActionVersionRelease = "versionRelease" // Mark version as released
+	ActionVersionArchive = "versionArchive" // Archive a version
+
+	// Version mapping actions
+	ActionVersionAddAffected    = "versionAddAffected"    // Add affected version to ticket
+	ActionVersionRemoveAffected = "versionRemoveAffected" // Remove affected version from ticket
+	ActionVersionListAffected   = "versionListAffected"   // List affected versions for ticket
+	ActionVersionAddFix         = "versionAddFix"         // Add fix version to ticket
+	ActionVersionRemoveFix      = "versionRemoveFix"      // Remove fix version from ticket
+	ActionVersionListFix        = "versionListFix"        // List fix versions for ticket
+
+	// Watcher actions
+	ActionWatcherAdd    = "watcherAdd"    // Start watching a ticket
+	ActionWatcherRemove = "watcherRemove" // Stop watching a ticket
+	ActionWatcherList   = "watcherList"   // List watchers for a ticket
+
+	// Filter actions
+	ActionFilterSave   = "filterSave"   // Create or update a saved filter
+	ActionFilterLoad   = "filterLoad"   // Load a saved filter
+	ActionFilterList   = "filterList"   // List user's filters
+	ActionFilterShare  = "filterShare"  // Share a filter
+	ActionFilterModify = "filterModify" // Modify a filter
+	ActionFilterRemove = "filterRemove" // Delete a filter
+
+	// Custom field actions
+	ActionCustomFieldCreate = "customFieldCreate"
+	ActionCustomFieldRead   = "customFieldRead"
+	ActionCustomFieldList   = "customFieldList"
+	ActionCustomFieldModify = "customFieldModify"
+	ActionCustomFieldRemove = "customFieldRemove"
+
+	// Custom field option actions
+	ActionCustomFieldOptionCreate = "customFieldOptionCreate"
+	ActionCustomFieldOptionModify = "customFieldOptionModify"
+	ActionCustomFieldOptionRemove = "customFieldOptionRemove"
+	ActionCustomFieldOptionList   = "customFieldOptionList"
+
+	// Custom field value actions (for tickets)
+	ActionCustomFieldValueSet    = "customFieldValueSet"    // Set custom field value for a ticket
+	ActionCustomFieldValueGet    = "customFieldValueGet"    // Get custom field value for a ticket
+	ActionCustomFieldValueList   = "customFieldValueList"   // List all custom field values for a ticket
+	ActionCustomFieldValueRemove = "customFieldValueRemove" // Remove custom field value from a ticket
 )
