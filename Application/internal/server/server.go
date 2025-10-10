@@ -1,0 +1,224 @@
+package server
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"helixtrack.ru/core/internal/config"
+	"helixtrack.ru/core/internal/database"
+	"helixtrack.ru/core/internal/handlers"
+	"helixtrack.ru/core/internal/logger"
+	"helixtrack.ru/core/internal/middleware"
+	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/services"
+)
+
+// Server represents the HTTP server
+type Server struct {
+	config      *config.Config
+	router      *gin.Engine
+	httpServer  *http.Server
+	db          database.Database
+	authService services.AuthService
+	permService services.PermissionService
+}
+
+// NewServer creates a new server instance
+func NewServer(cfg *config.Config) (*Server, error) {
+	// Initialize database
+	db, err := database.NewDatabase(cfg.Database)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize database: %w", err)
+	}
+
+	// Initialize services
+	authService := services.NewAuthService(
+		cfg.Services.Authentication.URL,
+		cfg.Services.Authentication.Timeout,
+		cfg.Services.Authentication.Enabled,
+	)
+
+	permService := services.NewPermissionService(
+		cfg.Services.Permissions.URL,
+		cfg.Services.Permissions.Timeout,
+		cfg.Services.Permissions.Enabled,
+	)
+
+	server := &Server{
+		config:      cfg,
+		db:          db,
+		authService: authService,
+		permService: permService,
+	}
+
+	server.setupRouter()
+
+	return server, nil
+}
+
+// setupRouter configures the Gin router with all routes and middleware
+func (s *Server) setupRouter() {
+	// Set Gin mode based on configuration
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+
+	// Add middleware
+	router.Use(gin.Recovery())
+	router.Use(s.loggingMiddleware())
+	router.Use(s.corsMiddleware())
+
+	// Create handler
+	handler := handlers.NewHandler(s.db, s.authService, s.permService, s.config.Version)
+
+	// Public routes (no JWT required)
+	router.POST("/do", func(c *gin.Context) {
+		// Parse request to check if authentication is required
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		// If authentication is required, validate JWT
+		if req.IsAuthenticationRequired() {
+			if req.JWT == "" {
+				c.JSON(http.StatusUnauthorized, models.NewErrorResponse(
+					models.ErrorCodeMissingJWT,
+					"JWT token is required for this action",
+					"",
+				))
+				return
+			}
+
+			// Create JWT middleware and validate
+			jwtMiddleware := middleware.NewJWTMiddleware(s.authService, "")
+			claims, err := jwtMiddleware.ValidateToken(c.Request.Context(), req.JWT)
+			if err != nil {
+				c.JSON(http.StatusUnauthorized, models.NewErrorResponse(
+					models.ErrorCodeInvalidJWT,
+					"Invalid or expired JWT token",
+					"",
+				))
+				return
+			}
+
+			// Store claims in context
+			c.Set("claims", claims)
+			c.Set("username", claims.Username)
+		}
+
+		// Restore request body for handler
+		c.Set("request", &req)
+
+		// Call handler
+		handler.DoAction(c)
+	})
+
+	// Health check endpoint
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+		})
+	})
+
+	s.router = router
+}
+
+// loggingMiddleware logs HTTP requests
+func (s *Server) loggingMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		path := c.Request.URL.Path
+
+		c.Next()
+
+		latency := time.Since(start)
+		statusCode := c.Writer.Status()
+
+		logger.Info("HTTP Request",
+			zap.String("method", c.Request.Method),
+			zap.String("path", path),
+			zap.Int("status", statusCode),
+			zap.Duration("latency", latency),
+			zap.String("client_ip", c.ClientIP()),
+		)
+	}
+}
+
+// corsMiddleware adds CORS headers
+func (s *Server) corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+
+		c.Next()
+	}
+}
+
+// Start starts the HTTP server
+func (s *Server) Start() error {
+	addr := s.config.GetListenerAddress()
+
+	s.httpServer = &http.Server{
+		Addr:         addr,
+		Handler:      s.router,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	logger.Info("Starting HTTP server", zap.String("address", addr))
+
+	listener := s.config.GetPrimaryListener()
+	if listener != nil && listener.HTTPS {
+		logger.Info("Starting HTTPS server",
+			zap.String("cert", listener.CertFile),
+			zap.String("key", listener.KeyFile),
+		)
+		return s.httpServer.ListenAndServeTLS(listener.CertFile, listener.KeyFile)
+	}
+
+	return s.httpServer.ListenAndServe()
+}
+
+// Shutdown gracefully shuts down the server
+func (s *Server) Shutdown(ctx context.Context) error {
+	logger.Info("Shutting down server...")
+
+	if s.httpServer != nil {
+		if err := s.httpServer.Shutdown(ctx); err != nil {
+			logger.Error("Error shutting down HTTP server", zap.Error(err))
+			return err
+		}
+	}
+
+	if s.db != nil {
+		if err := s.db.Close(); err != nil {
+			logger.Error("Error closing database", zap.Error(err))
+			return err
+		}
+	}
+
+	logger.Info("Server shutdown complete")
+	return nil
+}
+
+// GetRouter returns the Gin router (useful for testing)
+func (s *Server) GetRouter() *gin.Engine {
+	return s.router
+}

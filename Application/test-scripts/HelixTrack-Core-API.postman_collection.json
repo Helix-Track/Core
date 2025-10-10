@@ -1,0 +1,281 @@
+{
+  "info": {
+    "name": "HelixTrack Core API",
+    "description": "Complete API collection for HelixTrack Core service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "helixtrack-core-1.0.0"
+  },
+  "item": [
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"version\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Get API version information"
+          },
+          "response": []
+        },
+        {
+          "name": "JWT Capable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"jwtCapable\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Check if JWT authentication is available"
+          },
+          "response": []
+        },
+        {
+          "name": "DB Capable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"dbCapable\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Check if database is available and healthy"
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check (via /do)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"health\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Get health status of the service"
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check (dedicated endpoint)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Simple health check endpoint"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Authenticate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"authenticate\",\n  \"data\": {\n    \"username\": \"testuser\",\n    \"password\": \"testpass\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Authenticate user and receive JWT token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CRUD Operations",
+      "item": [
+        {
+          "name": "Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"create\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"object\": \"project\",\n  \"data\": {\n    \"name\": \"New Project\",\n    \"description\": \"Project description\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Create a new entity (requires JWT authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Modify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"modify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"object\": \"project\",\n  \"data\": {\n    \"id\": \"123\",\n    \"name\": \"Updated Project\",\n    \"description\": \"Updated description\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Modify an existing entity (requires JWT authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"remove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"object\": \"project\",\n  \"data\": {\n    \"id\": \"123\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Remove an entity (requires JWT authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"read\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"123\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "Read an entity (requires JWT authentication)"
+          },
+          "response": []
+        },
+        {
+          "name": "List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"list\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"filter\": {},\n    \"limit\": 50,\n    \"offset\": 0\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": ["{{base_url}}"],
+              "path": ["do"]
+            },
+            "description": "List entities (requires JWT authentication)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
