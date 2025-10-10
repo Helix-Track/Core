@@ -107,4 +107,267 @@ const (
 	ActionCustomFieldValueGet    = "customFieldValueGet"    // Get custom field value for a ticket
 	ActionCustomFieldValueList   = "customFieldValueList"   // List all custom field values for a ticket
 	ActionCustomFieldValueRemove = "customFieldValueRemove" // Remove custom field value from a ticket
+
+	// Workflow actions
+	ActionWorkflowCreate = "workflowCreate"
+	ActionWorkflowRead   = "workflowRead"
+	ActionWorkflowList   = "workflowList"
+	ActionWorkflowModify = "workflowModify"
+	ActionWorkflowRemove = "workflowRemove"
+
+	// Workflow step actions
+	ActionWorkflowStepCreate = "workflowStepCreate"
+	ActionWorkflowStepRead   = "workflowStepRead"
+	ActionWorkflowStepList   = "workflowStepList"
+	ActionWorkflowStepModify = "workflowStepModify"
+	ActionWorkflowStepRemove = "workflowStepRemove"
+
+	// Ticket status actions
+	ActionTicketStatusCreate = "ticketStatusCreate"
+	ActionTicketStatusRead   = "ticketStatusRead"
+	ActionTicketStatusList   = "ticketStatusList"
+	ActionTicketStatusModify = "ticketStatusModify"
+	ActionTicketStatusRemove = "ticketStatusRemove"
+
+	// Ticket type actions
+	ActionTicketTypeCreate        = "ticketTypeCreate"
+	ActionTicketTypeRead          = "ticketTypeRead"
+	ActionTicketTypeList          = "ticketTypeList"
+	ActionTicketTypeModify        = "ticketTypeModify"
+	ActionTicketTypeRemove        = "ticketTypeRemove"
+	ActionTicketTypeAssign        = "ticketTypeAssign"        // Assign type to project
+	ActionTicketTypeUnassign      = "ticketTypeUnassign"      // Unassign type from project
+	ActionTicketTypeListByProject = "ticketTypeListByProject" // List types assigned to a project
+
+	// Board actions
+	ActionBoardCreate = "boardCreate"
+	ActionBoardRead   = "boardRead"
+	ActionBoardList   = "boardList"
+	ActionBoardModify = "boardModify"
+	ActionBoardRemove = "boardRemove"
+
+	// Board ticket assignment
+	ActionBoardAddTicket    = "boardAddTicket"
+	ActionBoardRemoveTicket = "boardRemoveTicket"
+	ActionBoardListTickets  = "boardListTickets"
+
+	// Board metadata
+	ActionBoardSetMetadata    = "boardSetMetadata"
+	ActionBoardGetMetadata    = "boardGetMetadata"
+	ActionBoardListMetadata   = "boardListMetadata"
+	ActionBoardRemoveMetadata = "boardRemoveMetadata"
+
+	// Cycle actions (Sprint/Milestone/Release management)
+	ActionCycleCreate = "cycleCreate"
+	ActionCycleRead   = "cycleRead"
+	ActionCycleList   = "cycleList"
+	ActionCycleModify = "cycleModify"
+	ActionCycleRemove = "cycleRemove"
+
+	// Cycle-project mapping
+	ActionCycleAssignProject   = "cycleAssignProject"   // Assign cycle to project
+	ActionCycleUnassignProject = "cycleUnassignProject" // Unassign cycle from project
+	ActionCycleListProjects    = "cycleListProjects"    // List projects assigned to cycle
+
+	// Cycle-ticket mapping
+	ActionCycleAddTicket    = "cycleAddTicket"    // Add ticket to cycle
+	ActionCycleRemoveTicket = "cycleRemoveTicket" // Remove ticket from cycle
+	ActionCycleListTickets  = "cycleListTickets"  // List tickets in cycle
+
+	// Account actions (Multi-tenancy support)
+	ActionAccountCreate = "accountCreate"
+	ActionAccountRead   = "accountRead"
+	ActionAccountList   = "accountList"
+	ActionAccountModify = "accountModify"
+	ActionAccountRemove = "accountRemove"
+
+	// Organization actions
+	ActionOrganizationCreate        = "organizationCreate"
+	ActionOrganizationRead          = "organizationRead"
+	ActionOrganizationList          = "organizationList"
+	ActionOrganizationModify        = "organizationModify"
+	ActionOrganizationRemove        = "organizationRemove"
+	ActionOrganizationAssignAccount = "organizationAssignAccount" // Assign organization to account
+	ActionOrganizationListAccounts  = "organizationListAccounts"  // List accounts for organization
+
+	// Team actions
+	ActionTeamCreate              = "teamCreate"
+	ActionTeamRead                = "teamRead"
+	ActionTeamList                = "teamList"
+	ActionTeamModify              = "teamModify"
+	ActionTeamRemove              = "teamRemove"
+	ActionTeamAssignOrganization  = "teamAssignOrganization"  // Assign team to organization
+	ActionTeamUnassignOrganization = "teamUnassignOrganization" // Unassign team from organization
+	ActionTeamListOrganizations   = "teamListOrganizations"   // List organizations for team
+	ActionTeamAssignProject       = "teamAssignProject"       // Assign team to project
+	ActionTeamUnassignProject     = "teamUnassignProject"     // Unassign team from project
+	ActionTeamListProjects        = "teamListProjects"        // List projects for team
+
+	// User-Organization mapping
+	ActionUserAssignOrganization = "userAssignOrganization" // Assign user to organization
+	ActionUserListOrganizations  = "userListOrganizations"  // List organizations for user
+	ActionOrganizationListUsers  = "organizationListUsers"  // List users in organization
+
+	// User-Team mapping
+	ActionUserAssignTeam = "userAssignTeam" // Assign user to team
+	ActionUserListTeams  = "userListTeams"  // List teams for user
+	ActionTeamListUsers  = "teamListUsers"  // List users in team
+
+	// Component actions
+	ActionComponentCreate = "componentCreate"
+	ActionComponentRead   = "componentRead"
+	ActionComponentList   = "componentList"
+	ActionComponentModify = "componentModify"
+	ActionComponentRemove = "componentRemove"
+
+	// Component-ticket mapping
+	ActionComponentAddTicket    = "componentAddTicket"    // Add component to ticket
+	ActionComponentRemoveTicket = "componentRemoveTicket" // Remove component from ticket
+	ActionComponentListTickets  = "componentListTickets"  // List tickets for component
+
+	// Component metadata
+	ActionComponentSetMetadata    = "componentSetMetadata"    // Set component metadata
+	ActionComponentGetMetadata    = "componentGetMetadata"    // Get component metadata
+	ActionComponentListMetadata   = "componentListMetadata"   // List all metadata for component
+	ActionComponentRemoveMetadata = "componentRemoveMetadata" // Remove component metadata
+
+	// Label actions
+	ActionLabelCreate = "labelCreate"
+	ActionLabelRead   = "labelRead"
+	ActionLabelList   = "labelList"
+	ActionLabelModify = "labelModify"
+	ActionLabelRemove = "labelRemove"
+
+	// Label category actions
+	ActionLabelCategoryCreate = "labelCategoryCreate"
+	ActionLabelCategoryRead   = "labelCategoryRead"
+	ActionLabelCategoryList   = "labelCategoryList"
+	ActionLabelCategoryModify = "labelCategoryModify"
+	ActionLabelCategoryRemove = "labelCategoryRemove"
+
+	// Label-ticket mapping
+	ActionLabelAddTicket    = "labelAddTicket"    // Add label to ticket
+	ActionLabelRemoveTicket = "labelRemoveTicket" // Remove label from ticket
+	ActionLabelListTickets  = "labelListTickets"  // List tickets for label
+
+	// Label-category mapping
+	ActionLabelAssignCategory   = "labelAssignCategory"   // Assign label to category
+	ActionLabelUnassignCategory = "labelUnassignCategory" // Unassign label from category
+	ActionLabelListCategories   = "labelListCategories"   // List categories for label
+
+	// Asset actions
+	ActionAssetCreate = "assetCreate"
+	ActionAssetRead   = "assetRead"
+	ActionAssetList   = "assetList"
+	ActionAssetModify = "assetModify"
+	ActionAssetRemove = "assetRemove"
+
+	// Asset-ticket mapping
+	ActionAssetAddTicket    = "assetAddTicket"    // Add asset to ticket
+	ActionAssetRemoveTicket = "assetRemoveTicket" // Remove asset from ticket
+	ActionAssetListTickets  = "assetListTickets"  // List tickets for asset
+
+	// Asset-comment mapping
+	ActionAssetAddComment    = "assetAddComment"    // Add asset to comment
+	ActionAssetRemoveComment = "assetRemoveComment" // Remove asset from comment
+	ActionAssetListComments  = "assetListComments"  // List comments for asset
+
+	// Asset-project mapping
+	ActionAssetAddProject    = "assetAddProject"    // Add asset to project
+	ActionAssetRemoveProject = "assetRemoveProject" // Remove asset from project
+	ActionAssetListProjects  = "assetListProjects"  // List projects for asset
+
+	// Permission actions
+	ActionPermissionCreate = "permissionCreate"
+	ActionPermissionRead   = "permissionRead"
+	ActionPermissionList   = "permissionList"
+	ActionPermissionModify = "permissionModify"
+	ActionPermissionRemove = "permissionRemove"
+
+	// Permission context actions
+	ActionPermissionContextCreate = "permissionContextCreate"
+	ActionPermissionContextRead   = "permissionContextRead"
+	ActionPermissionContextList   = "permissionContextList"
+	ActionPermissionContextModify = "permissionContextModify"
+	ActionPermissionContextRemove = "permissionContextRemove"
+
+	// Permission-user mapping actions
+	ActionPermissionAssignUser   = "permissionAssignUser"   // Assign permission to user
+	ActionPermissionUnassignUser = "permissionUnassignUser" // Unassign permission from user
+
+	// Permission-team mapping actions
+	ActionPermissionAssignTeam   = "permissionAssignTeam"   // Assign permission to team
+	ActionPermissionUnassignTeam = "permissionUnassignTeam" // Unassign permission from team
+
+	// Permission query action
+	ActionPermissionCheck = "permissionCheck" // Check if user has permission
+
+	// Audit actions
+	ActionAuditCreate  = "auditCreate"  // Create audit entry
+	ActionAuditRead    = "auditRead"    // Read audit entry
+	ActionAuditList    = "auditList"    // List audit entries
+	ActionAuditQuery   = "auditQuery"   // Query audit entries with filters
+	ActionAuditAddMeta = "auditAddMeta" // Add metadata to audit entry
+
+	// Report actions
+	ActionReportCreate  = "reportCreate"  // Create report
+	ActionReportRead    = "reportRead"    // Read report
+	ActionReportList    = "reportList"    // List reports
+	ActionReportModify  = "reportModify"  // Modify report
+	ActionReportRemove  = "reportRemove"  // Remove report
+	ActionReportExecute = "reportExecute" // Execute/run report
+
+	// Report metadata actions
+	ActionReportSetMetadata    = "reportSetMetadata"    // Set report metadata
+	ActionReportGetMetadata    = "reportGetMetadata"    // Get report metadata
+	ActionReportRemoveMetadata = "reportRemoveMetadata" // Remove report metadata
+
+	// Extension actions
+	ActionExtensionCreate  = "extensionCreate"  // Create/register extension
+	ActionExtensionRead    = "extensionRead"    // Read extension
+	ActionExtensionList    = "extensionList"    // List extensions
+	ActionExtensionModify  = "extensionModify"  // Modify extension
+	ActionExtensionRemove  = "extensionRemove"  // Remove extension
+	ActionExtensionEnable  = "extensionEnable"  // Enable extension
+	ActionExtensionDisable = "extensionDisable" // Disable extension
+
+	// Extension metadata actions
+	ActionExtensionSetMetadata = "extensionSetMetadata" // Set extension metadata
+
+	// Repository actions
+	ActionRepositoryCreate = "repositoryCreate"
+	ActionRepositoryRead   = "repositoryRead"
+	ActionRepositoryList   = "repositoryList"
+	ActionRepositoryModify = "repositoryModify"
+	ActionRepositoryRemove = "repositoryRemove"
+
+	// Repository type actions
+	ActionRepositoryTypeCreate = "repositoryTypeCreate"
+	ActionRepositoryTypeRead   = "repositoryTypeRead"
+	ActionRepositoryTypeList   = "repositoryTypeList"
+	ActionRepositoryTypeModify = "repositoryTypeModify"
+	ActionRepositoryTypeRemove = "repositoryTypeRemove"
+
+	// Repository-project mapping
+	ActionRepositoryAssignProject   = "repositoryAssignProject"   // Assign repository to project
+	ActionRepositoryUnassignProject = "repositoryUnassignProject" // Unassign repository from project
+	ActionRepositoryListProjects    = "repositoryListProjects"    // List projects for repository
+
+	// Repository-commit-ticket mapping
+	ActionRepositoryAddCommit    = "repositoryAddCommit"    // Add commit to ticket
+	ActionRepositoryRemoveCommit = "repositoryRemoveCommit" // Remove commit from ticket
+	ActionRepositoryListCommits  = "repositoryListCommits"  // List commits for ticket
+	ActionRepositoryGetCommit    = "repositoryGetCommit"    // Get commit details
+
+	// Ticket relationship type actions
+	ActionTicketRelationshipTypeCreate = "ticketRelationshipTypeCreate"
+	ActionTicketRelationshipTypeRead   = "ticketRelationshipTypeRead"
+	ActionTicketRelationshipTypeList   = "ticketRelationshipTypeList"
+	ActionTicketRelationshipTypeModify = "ticketRelationshipTypeModify"
+	ActionTicketRelationshipTypeRemove = "ticketRelationshipTypeRemove"
+
+	// Ticket relationship actions
+	ActionTicketRelationshipCreate = "ticketRelationshipCreate" // Create relationship between tickets
+	ActionTicketRelationshipRemove = "ticketRelationshipRemove" // Remove relationship between tickets
+	ActionTicketRelationshipList   = "ticketRelationshipList"   // List relationships for a ticket
 )

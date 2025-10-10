@@ -435,6 +435,149 @@ List entities.
 }
 ```
 
+### V2.0 Features - Complete API Coverage
+
+HelixTrack Core V2.0 provides comprehensive API coverage with **235 total endpoints** across all major features. The basic endpoints shown above are just a small subset.
+
+**For complete API documentation with all 235 endpoints**, see [API_REFERENCE_COMPLETE.md](API_REFERENCE_COMPLETE.md).
+
+#### Feature Summary
+
+**Public & Authentication** (6 actions):
+- System health and capability checks
+- User authentication
+
+**Generic CRUD** (5 actions):
+- Create, Read, Update, Delete, List operations for any entity
+
+**Phase 1 - JIRA Parity** (45 actions):
+- Priority Management (5 actions) - Lowest to Highest priority levels
+- Resolution Management (5 actions) - Done, Won't Fix, Duplicate, etc.
+- Version Management (13 actions) - Release tracking with affected/fix versions
+- Watcher Management (3 actions) - Subscribe to ticket notifications
+- Filter Management (6 actions) - Save and share custom filters
+- Custom Field Management (13 actions) - 11 field types (text, number, date, select, etc.)
+
+**Workflow Engine** (23 actions):
+- Workflow Management (5 actions) - Define ticket workflows
+- Workflow Step Management (5 actions) - Configure workflow transitions
+- Ticket Status Management (5 actions) - Open, In Progress, Resolved, Closed, etc.
+- Ticket Type Management (8 actions) - Bug, Task, Story, Epic, etc.
+
+**Agile/Scrum Support** (23 actions):
+- Board Management (12 actions) - Kanban/Scrum boards with metadata
+- Cycle Management (11 actions) - Sprints, Milestones, Releases
+
+**Multi-Tenancy** (28 actions):
+- Account Management (5 actions) - Top-level tenant management
+- Organization Management (7 actions) - Department/division hierarchy
+- Team Management (10 actions) - Team creation and project assignment
+- User Mappings (6 actions) - User-organization and user-team relationships
+
+**Supporting Systems** (42 actions):
+- Component Management (12 actions) - Project components with metadata
+- Label Management (16 actions) - Color-coded labels with categories
+- Asset Management (14 actions) - File attachments for tickets, comments, projects
+
+**Git Integration** (17 actions):
+- Repository Management - Git, SVN, Mercurial, Perforce support
+- Commit Tracking - Link commits to tickets
+- Repository Types and Project Mapping
+
+**Ticket Relationships** (8 actions):
+- Relationship Types - Blocks, Duplicates, Relates To, Parent/Child
+- Relationship Management - Create and manage ticket relationships
+
+**System Infrastructure** (37 actions):
+- Permission Management (15 actions) - Hierarchical permission system
+- Audit Management (5 actions) - Complete audit logging
+- Report Management (9 actions) - Custom report builder
+- Extension Management (8 actions) - Extension registry (Times, Documents, Chats)
+
+#### Quick Reference
+
+| Action Pattern | Description | Example |
+|---------------|-------------|---------|
+| `{feature}Create` | Create new entity | `priorityCreate`, `boardCreate` |
+| `{feature}Read` | Read entity by ID | `versionRead`, `cycleRead` |
+| `{feature}List` | List all entities | `resolutionList`, `teamList` |
+| `{feature}Modify` | Update entity | `customFieldModify`, `labelModify` |
+| `{feature}Remove` | Soft-delete entity | `workflowRemove`, `assetRemove` |
+| `{feature}Add{Item}` | Add item to entity | `boardAddTicket`, `versionAddAffected` |
+| `{feature}Remove{Item}` | Remove item from entity | `boardRemoveTicket`, `versionRemoveFix` |
+| `{feature}List{Items}` | List items for entity | `boardListTickets`, `teamListProjects` |
+
+#### Example: Working with Priorities
+
+```bash
+# Create a priority
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "priorityCreate",
+    "jwt": "your-jwt-token",
+    "data": {
+      "title": "Critical",
+      "level": 5,
+      "color": "#FF0000"
+    }
+  }'
+
+# List all priorities
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "priorityList",
+    "jwt": "your-jwt-token",
+    "data": {}
+  }'
+```
+
+#### Example: Working with Boards
+
+```bash
+# Create a board
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "boardCreate",
+    "jwt": "your-jwt-token",
+    "data": {
+      "title": "Sprint Board",
+      "description": "Main development board"
+    }
+  }'
+
+# Add ticket to board
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "boardAddTicket",
+    "jwt": "your-jwt-token",
+    "data": {
+      "boardId": "board-id",
+      "ticketId": "PROJ-123"
+    }
+  }'
+
+# List tickets on board
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "boardListTickets",
+    "jwt": "your-jwt-token",
+    "data": {
+      "boardId": "board-id"
+    }
+  }'
+```
+
+#### Testing Resources
+
+- **Postman Collection**: `test-scripts/HelixTrack-Core-Complete.postman_collection.json` (235 endpoints)
+- **Curl Test Scripts**: `test-scripts/test-*.sh` (29 test scripts covering all features)
+- **Master Test Runner**: `test-scripts/test-all.sh` (runs all tests)
+
 ### Error Codes
 
 | Code | Range | Description |
@@ -636,6 +779,8 @@ Switch between databases by changing configuration - no code changes required.
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-10-10
+**Version:** 2.0.0
+**Last Updated:** 2025-10-11
+**API Endpoints:** 235
 **License:** See LICENSE file
+**Complete API Reference:** [API_REFERENCE_COMPLETE.md](API_REFERENCE_COMPLETE.md)

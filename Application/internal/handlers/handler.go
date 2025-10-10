@@ -65,6 +65,7 @@ func (h *Handler) DoAction(c *gin.Context) {
 
 	// Route to appropriate handler based on action
 	switch req.Action {
+	// System actions
 	case models.ActionVersion:
 		h.handleVersion(c, req)
 	case models.ActionJWTCapable:
@@ -75,6 +76,8 @@ func (h *Handler) DoAction(c *gin.Context) {
 		h.handleHealth(c, req)
 	case models.ActionAuthenticate:
 		h.handleAuthenticate(c, req)
+
+	// Generic CRUD actions
 	case models.ActionCreate:
 		h.handleCreate(c, req)
 	case models.ActionModify:
@@ -85,6 +88,461 @@ func (h *Handler) DoAction(c *gin.Context) {
 		h.handleRead(c, req)
 	case models.ActionList:
 		h.handleList(c, req)
+
+	// Priority actions
+	case models.ActionPriorityCreate:
+		h.handlePriorityCreate(c, req)
+	case models.ActionPriorityRead:
+		h.handlePriorityRead(c, req)
+	case models.ActionPriorityList:
+		h.handlePriorityList(c, req)
+	case models.ActionPriorityModify:
+		h.handlePriorityModify(c, req)
+	case models.ActionPriorityRemove:
+		h.handlePriorityRemove(c, req)
+
+	// Resolution actions
+	case models.ActionResolutionCreate:
+		h.handleResolutionCreate(c, req)
+	case models.ActionResolutionRead:
+		h.handleResolutionRead(c, req)
+	case models.ActionResolutionList:
+		h.handleResolutionList(c, req)
+	case models.ActionResolutionModify:
+		h.handleResolutionModify(c, req)
+	case models.ActionResolutionRemove:
+		h.handleResolutionRemove(c, req)
+
+	// Watcher actions
+	case models.ActionWatcherAdd:
+		h.handleWatcherAdd(c, req)
+	case models.ActionWatcherRemove:
+		h.handleWatcherRemove(c, req)
+	case models.ActionWatcherList:
+		h.handleWatcherList(c, req)
+
+	// Version actions
+	case models.ActionVersionCreate:
+		h.handleVersionCreate(c, req)
+	case models.ActionVersionRead:
+		h.handleVersionRead(c, req)
+	case models.ActionVersionList:
+		h.handleVersionList(c, req)
+	case models.ActionVersionModify:
+		h.handleVersionModify(c, req)
+	case models.ActionVersionRemove:
+		h.handleVersionRemove(c, req)
+	case models.ActionVersionRelease:
+		h.handleVersionRelease(c, req)
+	case models.ActionVersionArchive:
+		h.handleVersionArchive(c, req)
+	case models.ActionVersionAddAffected:
+		h.handleVersionAddAffected(c, req)
+	case models.ActionVersionRemoveAffected:
+		h.handleVersionRemoveAffected(c, req)
+	case models.ActionVersionListAffected:
+		h.handleVersionListAffected(c, req)
+	case models.ActionVersionAddFix:
+		h.handleVersionAddFix(c, req)
+	case models.ActionVersionRemoveFix:
+		h.handleVersionRemoveFix(c, req)
+	case models.ActionVersionListFix:
+		h.handleVersionListFix(c, req)
+
+	// Filter actions
+	case models.ActionFilterSave:
+		h.handleFilterSave(c, req)
+	case models.ActionFilterLoad:
+		h.handleFilterLoad(c, req)
+	case models.ActionFilterList:
+		h.handleFilterList(c, req)
+	case models.ActionFilterShare:
+		h.handleFilterShare(c, req)
+	case models.ActionFilterModify:
+		h.handleFilterModify(c, req)
+	case models.ActionFilterRemove:
+		h.handleFilterRemove(c, req)
+
+	// Custom field actions
+	case models.ActionCustomFieldCreate:
+		h.handleCustomFieldCreate(c, req)
+	case models.ActionCustomFieldRead:
+		h.handleCustomFieldRead(c, req)
+	case models.ActionCustomFieldList:
+		h.handleCustomFieldList(c, req)
+	case models.ActionCustomFieldModify:
+		h.handleCustomFieldModify(c, req)
+	case models.ActionCustomFieldRemove:
+		h.handleCustomFieldRemove(c, req)
+
+	// Custom field option actions
+	case models.ActionCustomFieldOptionCreate:
+		h.handleCustomFieldOptionCreate(c, req)
+	case models.ActionCustomFieldOptionModify:
+		h.handleCustomFieldOptionModify(c, req)
+	case models.ActionCustomFieldOptionRemove:
+		h.handleCustomFieldOptionRemove(c, req)
+	case models.ActionCustomFieldOptionList:
+		h.handleCustomFieldOptionList(c, req)
+
+	// Custom field value actions
+	case models.ActionCustomFieldValueSet:
+		h.handleCustomFieldValueSet(c, req)
+	case models.ActionCustomFieldValueGet:
+		h.handleCustomFieldValueGet(c, req)
+	case models.ActionCustomFieldValueList:
+		h.handleCustomFieldValueList(c, req)
+	case models.ActionCustomFieldValueRemove:
+		h.handleCustomFieldValueRemove(c, req)
+
+	// Board actions
+	case models.ActionBoardCreate:
+		h.handleBoardCreate(c, req)
+	case models.ActionBoardRead:
+		h.handleBoardRead(c, req)
+	case models.ActionBoardList:
+		h.handleBoardList(c, req)
+	case models.ActionBoardModify:
+		h.handleBoardModify(c, req)
+	case models.ActionBoardRemove:
+		h.handleBoardRemove(c, req)
+
+	// Board ticket assignment
+	case models.ActionBoardAddTicket:
+		h.handleBoardAddTicket(c, req)
+	case models.ActionBoardRemoveTicket:
+		h.handleBoardRemoveTicket(c, req)
+	case models.ActionBoardListTickets:
+		h.handleBoardListTickets(c, req)
+
+	// Board metadata
+	case models.ActionBoardSetMetadata:
+		h.handleBoardSetMetadata(c, req)
+	case models.ActionBoardGetMetadata:
+		h.handleBoardGetMetadata(c, req)
+	case models.ActionBoardListMetadata:
+		h.handleBoardListMetadata(c, req)
+	case models.ActionBoardRemoveMetadata:
+		h.handleBoardRemoveMetadata(c, req)
+
+	// Cycle actions
+	case models.ActionCycleCreate:
+		h.handleCycleCreate(c, req)
+	case models.ActionCycleRead:
+		h.handleCycleRead(c, req)
+	case models.ActionCycleList:
+		h.handleCycleList(c, req)
+	case models.ActionCycleModify:
+		h.handleCycleModify(c, req)
+	case models.ActionCycleRemove:
+		h.handleCycleRemove(c, req)
+
+	// Cycle-project mapping
+	case models.ActionCycleAssignProject:
+		h.handleCycleAssignProject(c, req)
+	case models.ActionCycleUnassignProject:
+		h.handleCycleUnassignProject(c, req)
+	case models.ActionCycleListProjects:
+		h.handleCycleListProjects(c, req)
+
+	// Cycle-ticket mapping
+	case models.ActionCycleAddTicket:
+		h.handleCycleAddTicket(c, req)
+	case models.ActionCycleRemoveTicket:
+		h.handleCycleRemoveTicket(c, req)
+	case models.ActionCycleListTickets:
+		h.handleCycleListTickets(c, req)
+
+	// Workflow actions
+	case models.ActionWorkflowCreate:
+		h.handleWorkflowCreate(c, req)
+	case models.ActionWorkflowRead:
+		h.handleWorkflowRead(c, req)
+	case models.ActionWorkflowList:
+		h.handleWorkflowList(c, req)
+	case models.ActionWorkflowModify:
+		h.handleWorkflowModify(c, req)
+	case models.ActionWorkflowRemove:
+		h.handleWorkflowRemove(c, req)
+
+	// Workflow step actions
+	case models.ActionWorkflowStepCreate:
+		h.handleWorkflowStepCreate(c, req)
+	case models.ActionWorkflowStepRead:
+		h.handleWorkflowStepRead(c, req)
+	case models.ActionWorkflowStepList:
+		h.handleWorkflowStepList(c, req)
+	case models.ActionWorkflowStepModify:
+		h.handleWorkflowStepModify(c, req)
+	case models.ActionWorkflowStepRemove:
+		h.handleWorkflowStepRemove(c, req)
+
+	// Ticket status actions
+	case models.ActionTicketStatusCreate:
+		h.handleTicketStatusCreate(c, req)
+	case models.ActionTicketStatusRead:
+		h.handleTicketStatusRead(c, req)
+	case models.ActionTicketStatusList:
+		h.handleTicketStatusList(c, req)
+	case models.ActionTicketStatusModify:
+		h.handleTicketStatusModify(c, req)
+	case models.ActionTicketStatusRemove:
+		h.handleTicketStatusRemove(c, req)
+
+	// Ticket type actions
+	case models.ActionTicketTypeCreate:
+		h.handleTicketTypeCreate(c, req)
+	case models.ActionTicketTypeRead:
+		h.handleTicketTypeRead(c, req)
+	case models.ActionTicketTypeList:
+		h.handleTicketTypeList(c, req)
+	case models.ActionTicketTypeModify:
+		h.handleTicketTypeModify(c, req)
+	case models.ActionTicketTypeRemove:
+		h.handleTicketTypeRemove(c, req)
+	case models.ActionTicketTypeAssign:
+		h.handleTicketTypeAssign(c, req)
+	case models.ActionTicketTypeUnassign:
+		h.handleTicketTypeUnassign(c, req)
+	case models.ActionTicketTypeListByProject:
+		h.handleTicketTypeListByProject(c, req)
+
+	// Account actions (Multi-tenancy support)
+	case models.ActionAccountCreate:
+		h.AccountCreate(c, req)
+	case models.ActionAccountRead:
+		h.AccountRead(c, req)
+	case models.ActionAccountList:
+		h.AccountList(c, req)
+	case models.ActionAccountModify:
+		h.AccountModify(c, req)
+	case models.ActionAccountRemove:
+		h.AccountRemove(c, req)
+
+	// Organization actions
+	case models.ActionOrganizationCreate:
+		h.OrganizationCreate(c, req)
+	case models.ActionOrganizationRead:
+		h.OrganizationRead(c, req)
+	case models.ActionOrganizationList:
+		h.OrganizationList(c, req)
+	case models.ActionOrganizationModify:
+		h.OrganizationModify(c, req)
+	case models.ActionOrganizationRemove:
+		h.OrganizationRemove(c, req)
+	case models.ActionOrganizationAssignAccount:
+		h.OrganizationAssignAccount(c, req)
+	case models.ActionOrganizationListAccounts:
+		h.OrganizationListAccounts(c, req)
+
+	// Team actions
+	case models.ActionTeamCreate:
+		h.TeamCreate(c, req)
+	case models.ActionTeamRead:
+		h.TeamRead(c, req)
+	case models.ActionTeamList:
+		h.TeamList(c, req)
+	case models.ActionTeamModify:
+		h.TeamModify(c, req)
+	case models.ActionTeamRemove:
+		h.TeamRemove(c, req)
+	case models.ActionTeamAssignOrganization:
+		h.TeamAssignOrganization(c, req)
+	case models.ActionTeamUnassignOrganization:
+		h.TeamUnassignOrganization(c, req)
+	case models.ActionTeamListOrganizations:
+		h.TeamListOrganizations(c, req)
+	case models.ActionTeamAssignProject:
+		h.TeamAssignProject(c, req)
+	case models.ActionTeamUnassignProject:
+		h.TeamUnassignProject(c, req)
+	case models.ActionTeamListProjects:
+		h.TeamListProjects(c, req)
+
+	// User-Organization mapping
+	case models.ActionUserAssignOrganization:
+		h.UserAssignOrganization(c, req)
+	case models.ActionUserListOrganizations:
+		h.UserListOrganizations(c, req)
+	case models.ActionOrganizationListUsers:
+		h.OrganizationListUsers(c, req)
+
+	// User-Team mapping
+	case models.ActionUserAssignTeam:
+		h.UserAssignTeam(c, req)
+	case models.ActionUserListTeams:
+		h.UserListTeams(c, req)
+	case models.ActionTeamListUsers:
+		h.TeamListUsers(c, req)
+
+	// Component actions
+	case models.ActionComponentCreate:
+		h.handleComponentCreate(c, req)
+	case models.ActionComponentRead:
+		h.handleComponentRead(c, req)
+	case models.ActionComponentList:
+		h.handleComponentList(c, req)
+	case models.ActionComponentModify:
+		h.handleComponentModify(c, req)
+	case models.ActionComponentRemove:
+		h.handleComponentRemove(c, req)
+
+	// Component-ticket mapping
+	case models.ActionComponentAddTicket:
+		h.handleComponentAddTicket(c, req)
+	case models.ActionComponentRemoveTicket:
+		h.handleComponentRemoveTicket(c, req)
+	case models.ActionComponentListTickets:
+		h.handleComponentListTickets(c, req)
+
+	// Component metadata
+	case models.ActionComponentSetMetadata:
+		h.handleComponentSetMetadata(c, req)
+	case models.ActionComponentGetMetadata:
+		h.handleComponentGetMetadata(c, req)
+	case models.ActionComponentListMetadata:
+		h.handleComponentListMetadata(c, req)
+	case models.ActionComponentRemoveMetadata:
+		h.handleComponentRemoveMetadata(c, req)
+
+	// Label actions
+	case models.ActionLabelCreate:
+		h.handleLabelCreate(c, req)
+	case models.ActionLabelRead:
+		h.handleLabelRead(c, req)
+	case models.ActionLabelList:
+		h.handleLabelList(c, req)
+	case models.ActionLabelModify:
+		h.handleLabelModify(c, req)
+	case models.ActionLabelRemove:
+		h.handleLabelRemove(c, req)
+
+	// Label category actions
+	case models.ActionLabelCategoryCreate:
+		h.handleLabelCategoryCreate(c, req)
+	case models.ActionLabelCategoryRead:
+		h.handleLabelCategoryRead(c, req)
+	case models.ActionLabelCategoryList:
+		h.handleLabelCategoryList(c, req)
+	case models.ActionLabelCategoryModify:
+		h.handleLabelCategoryModify(c, req)
+	case models.ActionLabelCategoryRemove:
+		h.handleLabelCategoryRemove(c, req)
+
+	// Label-ticket mapping
+	case models.ActionLabelAddTicket:
+		h.handleLabelAddTicket(c, req)
+	case models.ActionLabelRemoveTicket:
+		h.handleLabelRemoveTicket(c, req)
+	case models.ActionLabelListTickets:
+		h.handleLabelListTickets(c, req)
+
+	// Label-category mapping
+	case models.ActionLabelAssignCategory:
+		h.handleLabelAssignCategory(c, req)
+	case models.ActionLabelUnassignCategory:
+		h.handleLabelUnassignCategory(c, req)
+	case models.ActionLabelListCategories:
+		h.handleLabelListCategories(c, req)
+
+	// Asset actions
+	case models.ActionAssetCreate:
+		h.handleAssetCreate(c, req)
+	case models.ActionAssetRead:
+		h.handleAssetRead(c, req)
+	case models.ActionAssetList:
+		h.handleAssetList(c, req)
+	case models.ActionAssetModify:
+		h.handleAssetModify(c, req)
+	case models.ActionAssetRemove:
+		h.handleAssetRemove(c, req)
+
+	// Asset-ticket mapping
+	case models.ActionAssetAddTicket:
+		h.handleAssetAddTicket(c, req)
+	case models.ActionAssetRemoveTicket:
+		h.handleAssetRemoveTicket(c, req)
+	case models.ActionAssetListTickets:
+		h.handleAssetListTickets(c, req)
+
+	// Asset-comment mapping
+	case models.ActionAssetAddComment:
+		h.handleAssetAddComment(c, req)
+	case models.ActionAssetRemoveComment:
+		h.handleAssetRemoveComment(c, req)
+	case models.ActionAssetListComments:
+		h.handleAssetListComments(c, req)
+
+	// Asset-project mapping
+	case models.ActionAssetAddProject:
+		h.handleAssetAddProject(c, req)
+	case models.ActionAssetRemoveProject:
+		h.handleAssetRemoveProject(c, req)
+	case models.ActionAssetListProjects:
+		h.handleAssetListProjects(c, req)
+
+	// Repository actions
+	case models.ActionRepositoryCreate:
+		h.handleRepositoryCreate(c, req)
+	case models.ActionRepositoryRead:
+		h.handleRepositoryRead(c, req)
+	case models.ActionRepositoryList:
+		h.handleRepositoryList(c, req)
+	case models.ActionRepositoryModify:
+		h.handleRepositoryModify(c, req)
+	case models.ActionRepositoryRemove:
+		h.handleRepositoryRemove(c, req)
+
+	// Repository type actions
+	case models.ActionRepositoryTypeCreate:
+		h.handleRepositoryTypeCreate(c, req)
+	case models.ActionRepositoryTypeRead:
+		h.handleRepositoryTypeRead(c, req)
+	case models.ActionRepositoryTypeList:
+		h.handleRepositoryTypeList(c, req)
+	case models.ActionRepositoryTypeModify:
+		h.handleRepositoryTypeModify(c, req)
+	case models.ActionRepositoryTypeRemove:
+		h.handleRepositoryTypeRemove(c, req)
+
+	// Repository-project mapping
+	case models.ActionRepositoryAssignProject:
+		h.handleRepositoryAssignProject(c, req)
+	case models.ActionRepositoryUnassignProject:
+		h.handleRepositoryUnassignProject(c, req)
+	case models.ActionRepositoryListProjects:
+		h.handleRepositoryListProjects(c, req)
+
+	// Repository-commit-ticket mapping
+	case models.ActionRepositoryAddCommit:
+		h.handleRepositoryAddCommit(c, req)
+	case models.ActionRepositoryRemoveCommit:
+		h.handleRepositoryRemoveCommit(c, req)
+	case models.ActionRepositoryListCommits:
+		h.handleRepositoryListCommits(c, req)
+	case models.ActionRepositoryGetCommit:
+		h.handleRepositoryGetCommit(c, req)
+
+	// Ticket relationship type actions
+	case models.ActionTicketRelationshipTypeCreate:
+		h.handleTicketRelationshipTypeCreate(c, req)
+	case models.ActionTicketRelationshipTypeRead:
+		h.handleTicketRelationshipTypeRead(c, req)
+	case models.ActionTicketRelationshipTypeList:
+		h.handleTicketRelationshipTypeList(c, req)
+	case models.ActionTicketRelationshipTypeModify:
+		h.handleTicketRelationshipTypeModify(c, req)
+	case models.ActionTicketRelationshipTypeRemove:
+		h.handleTicketRelationshipTypeRemove(c, req)
+
+	// Ticket relationship actions
+	case models.ActionTicketRelationshipCreate:
+		h.handleTicketRelationshipCreate(c, req)
+	case models.ActionTicketRelationshipRemove:
+		h.handleTicketRelationshipRemove(c, req)
+	case models.ActionTicketRelationshipList:
+		h.handleTicketRelationshipList(c, req)
+
 	default:
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidAction,

@@ -1,0 +1,6497 @@
+{
+  "info": {
+    "name": "HelixTrack Core API - Complete",
+    "description": "Complete API collection for HelixTrack Core with all 234+ endpoints organized by feature",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "helixtrack-core-2.0.0"
+  },
+  "item": [
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"version\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Get API version"
+          },
+          "response": []
+        },
+        {
+          "name": "jwtCapable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"jwtCapable\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Check JWT capability"
+          },
+          "response": []
+        },
+        {
+          "name": "dbCapable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"dbCapable\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Check database capability"
+          },
+          "response": []
+        },
+        {
+          "name": "health",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"health\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Health status"
+          },
+          "response": []
+        },
+        {
+          "name": "Health (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "authenticate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"authenticate\",\n  \"data\": {\n    \"username\": \"test\",\n    \"password\": \"pass\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Authenticate user"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Generic CRUD Operations",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"create\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"New\",\n    \"description\": \"Desc\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create entity"
+          },
+          "response": []
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"read\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read entity"
+          },
+          "response": []
+        },
+        {
+          "name": "list",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"list\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List entities"
+          },
+          "response": []
+        },
+        {
+          "name": "modify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"modify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify entity"
+          },
+          "response": []
+        },
+        {
+          "name": "remove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"remove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove entity"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 - Priority",
+      "item": [
+        {
+          "name": "priorityCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"priorityCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"title\": \"High\",\n    \"level\": 4,\n    \"color\": \"#FF0000\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create priority"
+          },
+          "response": []
+        },
+        {
+          "name": "priorityRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"priorityRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read priority"
+          },
+          "response": []
+        },
+        {
+          "name": "priorityList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"priorityList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List priorities"
+          },
+          "response": []
+        },
+        {
+          "name": "priorityModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"priorityModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"title\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify priority"
+          },
+          "response": []
+        },
+        {
+          "name": "priorityRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"priorityRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove priority"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 - Resolution",
+      "item": [
+        {
+          "name": "resolutionCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"resolutionCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"title\": \"Done\",\n    \"description\": \"Completed\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create resolution"
+          },
+          "response": []
+        },
+        {
+          "name": "resolutionRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"resolutionRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read resolution"
+          },
+          "response": []
+        },
+        {
+          "name": "resolutionList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"resolutionList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List resolutions"
+          },
+          "response": []
+        },
+        {
+          "name": "resolutionModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"resolutionModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"title\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify resolution"
+          },
+          "response": []
+        },
+        {
+          "name": "resolutionRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"resolutionRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove resolution"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 - Version",
+      "item": [
+        {
+          "name": "versionCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"v1.0\",\n    \"releaseDate\": 1696118400\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List versions"
+          },
+          "response": []
+        },
+        {
+          "name": "versionModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"v1.1\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionRelease",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionRelease\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Release version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionArchive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionArchive\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Archive version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionAddAffected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionAddAffected\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"versionId\": \"vid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add affected version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionRemoveAffected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionRemoveAffected\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"versionId\": \"vid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove affected version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionListAffected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionListAffected\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List affected versions"
+          },
+          "response": []
+        },
+        {
+          "name": "versionAddFix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionAddFix\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"versionId\": \"vid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add fix version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionRemoveFix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionRemoveFix\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"versionId\": \"vid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove fix version"
+          },
+          "response": []
+        },
+        {
+          "name": "versionListFix",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"versionListFix\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List fix versions"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 - Watcher",
+      "item": [
+        {
+          "name": "watcherAdd",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"watcherAdd\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"userId\": \"uid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add watcher"
+          },
+          "response": []
+        },
+        {
+          "name": "watcherRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"watcherRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"userId\": \"uid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove watcher"
+          },
+          "response": []
+        },
+        {
+          "name": "watcherList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"watcherList\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List watchers"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 - Filter",
+      "item": [
+        {
+          "name": "filterSave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"filterSave\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"My Filter\",\n    \"criteria\": {\n      \"status\": \"open\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Save filter"
+          },
+          "response": []
+        },
+        {
+          "name": "filterLoad",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"filterLoad\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Load filter"
+          },
+          "response": []
+        },
+        {
+          "name": "filterList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"filterList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List filters"
+          },
+          "response": []
+        },
+        {
+          "name": "filterShare",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"filterShare\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"userIds\": [\n      \"u1\"\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Share filter"
+          },
+          "response": []
+        },
+        {
+          "name": "filterModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"filterModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify filter"
+          },
+          "response": []
+        },
+        {
+          "name": "filterRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"filterRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove filter"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Phase 1 - Custom Fields",
+      "item": [
+        {
+          "name": "customFieldCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Points\",\n    \"fieldType\": \"number\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create field"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read field"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List fields"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify field"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove field"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldOptionCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldOptionCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"customFieldId\": \"fid\",\n    \"value\": \"Opt1\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create option"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldOptionModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldOptionModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"value\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify option"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldOptionRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldOptionRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove option"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldOptionList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldOptionList\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"customFieldId\": \"fid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List options"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldValueSet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldValueSet\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"customFieldId\": \"fid\",\n    \"value\": \"val\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Set value"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldValueGet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldValueGet\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"customFieldId\": \"fid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Get value"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldValueList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldValueList\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List values"
+          },
+          "response": []
+        },
+        {
+          "name": "customFieldValueRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"customFieldValueRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"customFieldId\": \"fid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove value"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Workflow Engine - Workflow",
+      "item": [
+        {
+          "name": "workflowCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Dev Flow\",\n    \"description\": \"Workflow\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create workflow"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read workflow"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List workflows"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify workflow"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove workflow"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Workflow Engine - Workflow Step",
+      "item": [
+        {
+          "name": "workflowStepCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowStepCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"workflowId\": \"wid\",\n    \"name\": \"Step\",\n    \"fromStatusId\": \"s1\",\n    \"toStatusId\": \"s2\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create step"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowStepRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowStepRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read step"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowStepList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowStepList\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"workflowId\": \"wid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List steps"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowStepModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowStepModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify step"
+          },
+          "response": []
+        },
+        {
+          "name": "workflowStepRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"workflowStepRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove step"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Workflow Engine - Ticket Status",
+      "item": [
+        {
+          "name": "ticketStatusCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketStatusCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"In Progress\",\n    \"color\": \"#0000FF\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create status"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketStatusRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketStatusRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read status"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketStatusList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketStatusList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List statuses"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketStatusModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketStatusModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify status"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketStatusRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketStatusRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove status"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Workflow Engine - Ticket Type",
+      "item": [
+        {
+          "name": "ticketTypeCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Bug\",\n    \"icon\": \"bug\",\n    \"color\": \"#FF0000\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketTypeRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketTypeList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List types"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketTypeModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketTypeRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketTypeAssign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeAssign\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketTypeId\": \"tid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign to project"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketTypeUnassign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeUnassign\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketTypeId\": \"tid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign from project"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketTypeListByProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketTypeListByProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List types by project"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Agile - Board",
+      "item": [
+        {
+          "name": "boardCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"title\": \"Kanban Board\",\n    \"description\": \"Board\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create board"
+          },
+          "response": []
+        },
+        {
+          "name": "boardRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read board"
+          },
+          "response": []
+        },
+        {
+          "name": "boardList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List boards"
+          },
+          "response": []
+        },
+        {
+          "name": "boardModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"title\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify board"
+          },
+          "response": []
+        },
+        {
+          "name": "boardRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove board"
+          },
+          "response": []
+        },
+        {
+          "name": "boardAddTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardAddTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"boardId\": \"bid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "boardRemoveTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardRemoveTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"boardId\": \"bid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "boardListTickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardListTickets\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"boardId\": \"bid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List tickets"
+          },
+          "response": []
+        },
+        {
+          "name": "boardSetMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardSetMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"boardId\": \"bid\",\n    \"key\": \"columns\",\n    \"value\": \"[]\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Set metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "boardGetMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardGetMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"boardId\": \"bid\",\n    \"key\": \"columns\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Get metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "boardListMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardListMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"boardId\": \"bid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "boardRemoveMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"boardRemoveMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"boardId\": \"bid\",\n    \"key\": \"columns\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove metadata"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Agile - Cycle",
+      "item": [
+        {
+          "name": "cycleCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Sprint 1\",\n    \"type\": \"sprint\",\n    \"startDate\": 1696118400,\n    \"endDate\": 1697328000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create cycle"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read cycle"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List cycles"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify cycle"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove cycle"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleAssignProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleAssignProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"cycleId\": \"cid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign project"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleUnassignProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleUnassignProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"cycleId\": \"cid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign project"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleListProjects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleListProjects\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"cycleId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List projects"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleAddTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleAddTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"cycleId\": \"cid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleRemoveTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleRemoveTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"cycleId\": \"cid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "cycleListTickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"cycleListTickets\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"cycleId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List tickets"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Multi-Tenancy - Account",
+      "item": [
+        {
+          "name": "accountCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accountCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Acme Corp\",\n    \"tier\": \"enterprise\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create account"
+          },
+          "response": []
+        },
+        {
+          "name": "accountRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accountRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read account"
+          },
+          "response": []
+        },
+        {
+          "name": "accountList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accountList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List accounts"
+          },
+          "response": []
+        },
+        {
+          "name": "accountModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accountModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify account"
+          },
+          "response": []
+        },
+        {
+          "name": "accountRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accountRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove account"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Multi-Tenancy - Organization",
+      "item": [
+        {
+          "name": "organizationCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Engineering\",\n    \"description\": \"Eng Org\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create organization"
+          },
+          "response": []
+        },
+        {
+          "name": "organizationRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read organization"
+          },
+          "response": []
+        },
+        {
+          "name": "organizationList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List organizations"
+          },
+          "response": []
+        },
+        {
+          "name": "organizationModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify organization"
+          },
+          "response": []
+        },
+        {
+          "name": "organizationRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove organization"
+          },
+          "response": []
+        },
+        {
+          "name": "organizationAssignAccount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationAssignAccount\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"organizationId\": \"oid\",\n    \"accountId\": \"aid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign account"
+          },
+          "response": []
+        },
+        {
+          "name": "organizationListAccounts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationListAccounts\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"organizationId\": \"oid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List accounts"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Multi-Tenancy - Team",
+      "item": [
+        {
+          "name": "teamCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Dev Team\",\n    \"description\": \"Development\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create team"
+          },
+          "response": []
+        },
+        {
+          "name": "teamRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read team"
+          },
+          "response": []
+        },
+        {
+          "name": "teamList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List teams"
+          },
+          "response": []
+        },
+        {
+          "name": "teamModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify team"
+          },
+          "response": []
+        },
+        {
+          "name": "teamRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove team"
+          },
+          "response": []
+        },
+        {
+          "name": "teamAssignOrganization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamAssignOrganization\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"teamId\": \"tid\",\n    \"organizationId\": \"oid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign organization"
+          },
+          "response": []
+        },
+        {
+          "name": "teamUnassignOrganization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamUnassignOrganization\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"teamId\": \"tid\",\n    \"organizationId\": \"oid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign organization"
+          },
+          "response": []
+        },
+        {
+          "name": "teamListOrganizations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamListOrganizations\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"teamId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List organizations"
+          },
+          "response": []
+        },
+        {
+          "name": "teamAssignProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamAssignProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"teamId\": \"tid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign project"
+          },
+          "response": []
+        },
+        {
+          "name": "teamUnassignProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamUnassignProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"teamId\": \"tid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign project"
+          },
+          "response": []
+        },
+        {
+          "name": "teamListProjects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamListProjects\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"teamId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List projects"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Multi-Tenancy - User Mappings",
+      "item": [
+        {
+          "name": "userAssignOrganization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"userAssignOrganization\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"userId\": \"uid\",\n    \"organizationId\": \"oid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign user to org"
+          },
+          "response": []
+        },
+        {
+          "name": "userListOrganizations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"userListOrganizations\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"userId\": \"uid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List user's orgs"
+          },
+          "response": []
+        },
+        {
+          "name": "organizationListUsers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"organizationListUsers\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"organizationId\": \"oid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List org's users"
+          },
+          "response": []
+        },
+        {
+          "name": "userAssignTeam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"userAssignTeam\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"userId\": \"uid\",\n    \"teamId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign user to team"
+          },
+          "response": []
+        },
+        {
+          "name": "userListTeams",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"userListTeams\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"userId\": \"uid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List user's teams"
+          },
+          "response": []
+        },
+        {
+          "name": "teamListUsers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"teamListUsers\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"teamId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List team's users"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Supporting - Component",
+      "item": [
+        {
+          "name": "componentCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"API\",\n    \"description\": \"API Component\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create component"
+          },
+          "response": []
+        },
+        {
+          "name": "componentRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read component"
+          },
+          "response": []
+        },
+        {
+          "name": "componentList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List components"
+          },
+          "response": []
+        },
+        {
+          "name": "componentModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify component"
+          },
+          "response": []
+        },
+        {
+          "name": "componentRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove component"
+          },
+          "response": []
+        },
+        {
+          "name": "componentAddTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentAddTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"componentId\": \"cid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "componentRemoveTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentRemoveTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"componentId\": \"cid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "componentListTickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentListTickets\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"componentId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List tickets"
+          },
+          "response": []
+        },
+        {
+          "name": "componentSetMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentSetMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"componentId\": \"cid\",\n    \"key\": \"key\",\n    \"value\": \"val\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Set metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "componentGetMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentGetMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"componentId\": \"cid\",\n    \"key\": \"key\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Get metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "componentListMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentListMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"componentId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "componentRemoveMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"componentRemoveMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"componentId\": \"cid\",\n    \"key\": \"key\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove metadata"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Supporting - Label",
+      "item": [
+        {
+          "name": "labelCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"bug\",\n    \"color\": \"#FF0000\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create label"
+          },
+          "response": []
+        },
+        {
+          "name": "labelRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read label"
+          },
+          "response": []
+        },
+        {
+          "name": "labelList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List labels"
+          },
+          "response": []
+        },
+        {
+          "name": "labelModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify label"
+          },
+          "response": []
+        },
+        {
+          "name": "labelRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove label"
+          },
+          "response": []
+        },
+        {
+          "name": "labelCategoryCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelCategoryCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Priority Labels\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create category"
+          },
+          "response": []
+        },
+        {
+          "name": "labelCategoryRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelCategoryRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read category"
+          },
+          "response": []
+        },
+        {
+          "name": "labelCategoryList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelCategoryList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List categories"
+          },
+          "response": []
+        },
+        {
+          "name": "labelCategoryModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelCategoryModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify category"
+          },
+          "response": []
+        },
+        {
+          "name": "labelCategoryRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelCategoryRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove category"
+          },
+          "response": []
+        },
+        {
+          "name": "labelAddTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelAddTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"labelId\": \"lid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add to ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "labelRemoveTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelRemoveTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"labelId\": \"lid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove from ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "labelListTickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelListTickets\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"labelId\": \"lid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List tickets"
+          },
+          "response": []
+        },
+        {
+          "name": "labelAssignCategory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelAssignCategory\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"labelId\": \"lid\",\n    \"categoryId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign category"
+          },
+          "response": []
+        },
+        {
+          "name": "labelUnassignCategory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelUnassignCategory\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"labelId\": \"lid\",\n    \"categoryId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign category"
+          },
+          "response": []
+        },
+        {
+          "name": "labelListCategories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"labelListCategories\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"labelId\": \"lid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List categories"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Supporting - Asset",
+      "item": [
+        {
+          "name": "assetCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"filename\": \"file.pdf\",\n    \"mimeType\": \"application/pdf\",\n    \"size\": 1024\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create asset"
+          },
+          "response": []
+        },
+        {
+          "name": "assetRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read asset"
+          },
+          "response": []
+        },
+        {
+          "name": "assetList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List assets"
+          },
+          "response": []
+        },
+        {
+          "name": "assetModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"filename\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify asset"
+          },
+          "response": []
+        },
+        {
+          "name": "assetRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove asset"
+          },
+          "response": []
+        },
+        {
+          "name": "assetAddTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetAddTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add to ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "assetRemoveTicket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetRemoveTicket\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\",\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove from ticket"
+          },
+          "response": []
+        },
+        {
+          "name": "assetListTickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetListTickets\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List tickets"
+          },
+          "response": []
+        },
+        {
+          "name": "assetAddComment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetAddComment\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\",\n    \"commentId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add to comment"
+          },
+          "response": []
+        },
+        {
+          "name": "assetRemoveComment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetRemoveComment\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\",\n    \"commentId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove from comment"
+          },
+          "response": []
+        },
+        {
+          "name": "assetListComments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetListComments\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List comments"
+          },
+          "response": []
+        },
+        {
+          "name": "assetAddProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetAddProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add to project"
+          },
+          "response": []
+        },
+        {
+          "name": "assetRemoveProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetRemoveProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove from project"
+          },
+          "response": []
+        },
+        {
+          "name": "assetListProjects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"assetListProjects\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"assetId\": \"aid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List projects"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Git Integration - Repository",
+      "item": [
+        {
+          "name": "repositoryCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"core-repo\",\n    \"url\": \"https://github.com/user/repo.git\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create repository"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read repository"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List repositories"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify repository"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove repository"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryTypeCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryTypeCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Git\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create type"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryTypeRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryTypeRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read type"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryTypeList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryTypeList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List types"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryTypeModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryTypeModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify type"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryTypeRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryTypeRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove type"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryAssignProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryAssignProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"repositoryId\": \"rid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign project"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryUnassignProject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryUnassignProject\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"repositoryId\": \"rid\",\n    \"projectId\": \"pid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign project"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryListProjects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryListProjects\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"repositoryId\": \"rid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List projects"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryAddCommit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryAddCommit\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"commitHash\": \"abc123\",\n    \"message\": \"Fix bug\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add commit"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryRemoveCommit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryRemoveCommit\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\",\n    \"commitId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove commit"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryListCommits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryListCommits\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List commits"
+          },
+          "response": []
+        },
+        {
+          "name": "repositoryGetCommit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"repositoryGetCommit\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"commitId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Get commit"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ticket Relationships",
+      "item": [
+        {
+          "name": "ticketRelationshipTypeCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipTypeCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Blocks\",\n    \"reverseType\": \"Is Blocked By\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketRelationshipTypeRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipTypeRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketRelationshipTypeList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipTypeList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List types"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketRelationshipTypeModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipTypeModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketRelationshipTypeRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipTypeRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove type"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketRelationshipCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"t1\",\n    \"relatedTicketId\": \"t2\",\n    \"typeId\": \"type\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create relationship"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketRelationshipRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove relationship"
+          },
+          "response": []
+        },
+        {
+          "name": "ticketRelationshipList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ticketRelationshipList\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"ticketId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List relationships"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System - Permission",
+      "item": [
+        {
+          "name": "permissionCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"ticket.create\",\n    \"value\": 2\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create permission"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read permission"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List permissions"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"value\": 3\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify permission"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove permission"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionContextCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionContextCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"project\",\n    \"parent\": \"account\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create context"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionContextRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionContextRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read context"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionContextList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionContextList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List contexts"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionContextModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionContextModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify context"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionContextRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionContextRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove context"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionAssignUser",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionAssignUser\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"permissionId\": \"pid\",\n    \"userId\": \"uid\",\n    \"contextId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign to user"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionUnassignUser",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionUnassignUser\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"permissionId\": \"pid\",\n    \"userId\": \"uid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign from user"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionAssignTeam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionAssignTeam\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"permissionId\": \"pid\",\n    \"teamId\": \"tid\",\n    \"contextId\": \"cid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Assign to team"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionUnassignTeam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionUnassignTeam\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"permissionId\": \"pid\",\n    \"teamId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Unassign from team"
+          },
+          "response": []
+        },
+        {
+          "name": "permissionCheck",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"permissionCheck\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"userId\": \"uid\",\n    \"resource\": \"ticket\",\n    \"action\": \"create\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Check permission"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System - Audit",
+      "item": [
+        {
+          "name": "auditCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"auditCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"userId\": \"uid\",\n    \"action\": \"ticket.create\",\n    \"entityId\": \"tid\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create audit entry"
+          },
+          "response": []
+        },
+        {
+          "name": "auditRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"auditRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read audit entry"
+          },
+          "response": []
+        },
+        {
+          "name": "auditList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"auditList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List audit entries"
+          },
+          "response": []
+        },
+        {
+          "name": "auditQuery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"auditQuery\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"userId\": \"uid\",\n    \"startDate\": 1696118400,\n    \"endDate\": 1697328000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Query audit"
+          },
+          "response": []
+        },
+        {
+          "name": "auditAddMeta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"auditAddMeta\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"auditId\": \"aid\",\n    \"key\": \"ip\",\n    \"value\": \"192.168.1.1\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Add metadata"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System - Report",
+      "item": [
+        {
+          "name": "reportCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Ticket Report\",\n    \"query\": \"SELECT * FROM tickets\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Create report"
+          },
+          "response": []
+        },
+        {
+          "name": "reportRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read report"
+          },
+          "response": []
+        },
+        {
+          "name": "reportList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List reports"
+          },
+          "response": []
+        },
+        {
+          "name": "reportModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify report"
+          },
+          "response": []
+        },
+        {
+          "name": "reportRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove report"
+          },
+          "response": []
+        },
+        {
+          "name": "reportExecute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportExecute\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"parameters\": {}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Execute report"
+          },
+          "response": []
+        },
+        {
+          "name": "reportSetMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportSetMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"reportId\": \"rid\",\n    \"key\": \"chart\",\n    \"value\": \"bar\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Set metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "reportGetMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportGetMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"reportId\": \"rid\",\n    \"key\": \"chart\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Get metadata"
+          },
+          "response": []
+        },
+        {
+          "name": "reportRemoveMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reportRemoveMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"reportId\": \"rid\",\n    \"key\": \"chart\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove metadata"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System - Extension",
+      "item": [
+        {
+          "name": "extensionCreate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionCreate\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"name\": \"Times\",\n    \"version\": \"1.0.0\",\n    \"url\": \"http://times.local\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Register extension"
+          },
+          "response": []
+        },
+        {
+          "name": "extensionRead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionRead\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Read extension"
+          },
+          "response": []
+        },
+        {
+          "name": "extensionList",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionList\",\n  \"jwt\": \"{{jwt_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "List extensions"
+          },
+          "response": []
+        },
+        {
+          "name": "extensionModify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionModify\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\",\n    \"name\": \"Updated\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Modify extension"
+          },
+          "response": []
+        },
+        {
+          "name": "extensionRemove",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionRemove\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Remove extension"
+          },
+          "response": []
+        },
+        {
+          "name": "extensionEnable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionEnable\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Enable extension"
+          },
+          "response": []
+        },
+        {
+          "name": "extensionDisable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionDisable\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"id\": \"id\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Disable extension"
+          },
+          "response": []
+        },
+        {
+          "name": "extensionSetMetadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"extensionSetMetadata\",\n  \"jwt\": \"{{jwt_token}}\",\n  \"data\": {\n    \"extensionId\": \"eid\",\n    \"key\": \"config\",\n    \"value\": \"{}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/do",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "do"
+              ]
+            },
+            "description": "Set metadata"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
