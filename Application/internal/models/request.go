@@ -12,7 +12,7 @@ type Request struct {
 // IsAuthenticationRequired returns true if the action requires JWT authentication
 func (r *Request) IsAuthenticationRequired() bool {
 	switch r.Action {
-	case ActionVersion, ActionJWTCapable, ActionDBCapable, ActionHealth:
+	case ActionVersion, ActionJWTCapable, ActionDBCapable, ActionHealth, ActionAuthenticate:
 		return false
 	default:
 		return true

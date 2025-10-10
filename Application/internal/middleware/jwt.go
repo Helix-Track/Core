@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -70,30 +71,36 @@ func (m *JWTMiddleware) Validate() gin.HandlerFunc {
 	}
 }
 
+// ValidateToken is a public method to validate JWT tokens
+func (m *JWTMiddleware) ValidateToken(ctx context.Context, tokenString string) (*models.JWTClaims, error) {
+	return m.validateToken(ctx, tokenString)
+}
+
 // validateToken validates the JWT token using either the auth service or local validation
-func (m *JWTMiddleware) validateToken(ctx gin.Context, tokenString string) (*models.JWTClaims, error) {
+func (m *JWTMiddleware) validateToken(ctx context.Context, tokenString string) (*models.JWTClaims, error) {
 	// If auth service is enabled, use it for validation
 	if m.authService != nil && m.authService.IsEnabled() {
 		return m.authService.ValidateToken(ctx, tokenString)
 	}
 
-	// Otherwise, validate locally if secret key is provided
-	if m.secretKey != "" {
-		return m.validateTokenLocally(tokenString)
-	}
-
-	// If neither is available, we can't validate
-	return nil, jwt.ErrTokenUnverifiable
+	// Otherwise, validate locally (always available with default or provided secret key)
+	return m.validateTokenLocally(tokenString)
 }
 
 // validateTokenLocally validates the JWT token locally using the secret key
 func (m *JWTMiddleware) validateTokenLocally(tokenString string) (*models.JWTClaims, error) {
+	// Use default secret key if not provided
+	secretKey := m.secretKey
+	if secretKey == "" {
+		secretKey = "helix-track-default-secret-key-change-in-production"
+	}
+
 	token, err := jwt.ParseWithClaims(tokenString, &models.JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Validate the signing method
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
-		return []byte(m.secretKey), nil
+		return []byte(secretKey), nil
 	})
 
 	if err != nil {

@@ -1,8 +1,10 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -72,25 +74,75 @@ func (s *Server) setupRouter() {
 	router.Use(s.loggingMiddleware())
 	router.Use(s.corsMiddleware())
 
-	// Create handler
+	// Initialize users table
+	if err := handlers.InitializeUserTable(s.db); err != nil {
+		logger.Error("Failed to initialize users table", zap.Error(err))
+	}
+
+	// Initialize project, ticket, and comment tables
+	if err := handlers.InitializeProjectTables(s.db); err != nil {
+		logger.Error("Failed to initialize project tables", zap.Error(err))
+	}
+
+	// Create handlers
 	handler := handlers.NewHandler(s.db, s.authService, s.permService, s.config.Version)
+	authHandler := handlers.NewAuthHandler(s.db)
+
+	// Authentication routes (public)
+	auth := router.Group("/api/auth")
+	{
+		auth.POST("/register", authHandler.Register)
+		auth.POST("/login", authHandler.Login)
+		auth.POST("/logout", authHandler.Logout)
+	}
 
 	// Public routes (no JWT required)
 	router.POST("/do", func(c *gin.Context) {
+		// Log raw request body for debugging
+		bodyBytes, _ := c.GetRawData()
+		logger.Info("Received /do request", zap.String("body", string(bodyBytes)))
+
+		// Restore body for binding
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
 		// Parse request to check if authentication is required
 		var req models.Request
 		if err := c.ShouldBindJSON(&req); err != nil {
+			logger.Error("Failed to bind JSON request",
+				zap.Error(err),
+				zap.String("error_details", err.Error()),
+				zap.String("body", string(bodyBytes)))
 			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 				models.ErrorCodeInvalidRequest,
-				"Invalid request format",
+				fmt.Sprintf("Invalid request format: %v", err),
 				"",
 			))
 			return
 		}
 
+		logger.Info("Successfully parsed request", zap.String("action", req.Action))
+
 		// If authentication is required, validate JWT
 		if req.IsAuthenticationRequired() {
-			if req.JWT == "" {
+			// Extract JWT from Authorization header or request body
+			var jwtToken string
+
+			// Check Authorization header first (format: "Bearer <token>")
+			authHeader := c.GetHeader("Authorization")
+			if authHeader != "" {
+				// Extract token from "Bearer <token>" format
+				if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+					jwtToken = authHeader[7:]
+				}
+			}
+
+			// Fall back to JWT field in request body
+			if jwtToken == "" {
+				jwtToken = req.JWT
+			}
+
+			// Check if JWT is present
+			if jwtToken == "" {
 				c.JSON(http.StatusUnauthorized, models.NewErrorResponse(
 					models.ErrorCodeMissingJWT,
 					"JWT token is required for this action",
@@ -101,7 +153,7 @@ func (s *Server) setupRouter() {
 
 			// Create JWT middleware and validate
 			jwtMiddleware := middleware.NewJWTMiddleware(s.authService, "")
-			claims, err := jwtMiddleware.ValidateToken(c.Request.Context(), req.JWT)
+			claims, err := jwtMiddleware.ValidateToken(c.Request.Context(), jwtToken)
 			if err != nil {
 				c.JSON(http.StatusUnauthorized, models.NewErrorResponse(
 					models.ErrorCodeInvalidJWT,

@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
@@ -32,10 +35,21 @@ func NewHandler(db database.Database, authService services.AuthService, permServ
 
 // DoAction handles the unified /do endpoint with action-based routing
 func (h *Handler) DoAction(c *gin.Context) {
-	var req models.Request
+	// Get the already-parsed request from context (set by server.go)
+	reqInterface, exists := c.Get("request")
+	if !exists {
+		logger.Error("Request not found in context")
+		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+			models.ErrorCodeInvalidRequest,
+			"Invalid request format",
+			"",
+		))
+		return
+	}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		logger.Error("Failed to bind request", zap.Error(err))
+	req, ok := reqInterface.(*models.Request)
+	if !ok {
+		logger.Error("Invalid request type in context")
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidRequest,
 			"Invalid request format",
@@ -52,25 +66,25 @@ func (h *Handler) DoAction(c *gin.Context) {
 	// Route to appropriate handler based on action
 	switch req.Action {
 	case models.ActionVersion:
-		h.handleVersion(c, &req)
+		h.handleVersion(c, req)
 	case models.ActionJWTCapable:
-		h.handleJWTCapable(c, &req)
+		h.handleJWTCapable(c, req)
 	case models.ActionDBCapable:
-		h.handleDBCapable(c, &req)
+		h.handleDBCapable(c, req)
 	case models.ActionHealth:
-		h.handleHealth(c, &req)
+		h.handleHealth(c, req)
 	case models.ActionAuthenticate:
-		h.handleAuthenticate(c, &req)
+		h.handleAuthenticate(c, req)
 	case models.ActionCreate:
-		h.handleCreate(c, &req)
+		h.handleCreate(c, req)
 	case models.ActionModify:
-		h.handleModify(c, &req)
+		h.handleModify(c, req)
 	case models.ActionRemove:
-		h.handleRemove(c, &req)
+		h.handleRemove(c, req)
 	case models.ActionRead:
-		h.handleRead(c, &req)
+		h.handleRead(c, req)
 	case models.ActionList:
-		h.handleList(c, &req)
+		h.handleList(c, req)
 	default:
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidAction,
@@ -190,21 +204,95 @@ func (h *Handler) handleAuthenticate(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	claims, err := h.authService.Authenticate(c.Request.Context(), username, password)
+	// Try external auth service first if enabled
+	if h.authService != nil && h.authService.IsEnabled() {
+		claims, err := h.authService.Authenticate(c.Request.Context(), username, password)
+		if err != nil {
+			logger.Error("Authentication failed", zap.Error(err), zap.String("username", username))
+			c.JSON(http.StatusUnauthorized, models.NewErrorResponse(
+				models.ErrorCodeUnauthorized,
+				"Authentication failed",
+				"",
+			))
+			return
+		}
+
+		response := models.NewSuccessResponse(map[string]interface{}{
+			"username": claims.Username,
+			"role":     claims.Role,
+			"name":     claims.Name,
+		})
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
+	// Fall back to local authentication (for testing)
+	// Get user from database
+	query := `
+		SELECT id, username, password_hash, email, name, role, created_at, updated_at
+		FROM users
+		WHERE username = ? AND deleted = 0
+	`
+
+	var user models.User
+	var createdAt, updatedAt int64
+
+	err := h.db.QueryRow(context.Background(), query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.PasswordHash,
+		&user.Email,
+		&user.Name,
+		&user.Role,
+		&createdAt,
+		&updatedAt,
+	)
+
 	if err != nil {
-		logger.Error("Authentication failed", zap.Error(err), zap.String("username", username))
+		logger.Error("User not found", zap.Error(err), zap.String("username", username))
 		c.JSON(http.StatusUnauthorized, models.NewErrorResponse(
 			models.ErrorCodeUnauthorized,
-			"Authentication failed",
+			"Invalid username or password",
 			"",
 		))
 		return
 	}
 
+	user.CreatedAt = time.Unix(createdAt, 0)
+	user.UpdatedAt = time.Unix(updatedAt, 0)
+
+	// Verify password
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if err != nil {
+		logger.Error("Invalid password", zap.String("username", username))
+		c.JSON(http.StatusUnauthorized, models.NewErrorResponse(
+			models.ErrorCodeUnauthorized,
+			"Invalid username or password",
+			"",
+		))
+		return
+	}
+
+	// Generate JWT token
+	jwtService := services.NewJWTService("", "", 24)
+	token, err := jwtService.GenerateToken(user.Username, user.Email, user.Name, user.Role)
+	if err != nil {
+		logger.Error("Failed to generate JWT token", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to generate authentication token",
+			"",
+		))
+		return
+	}
+
+	// Return success response with token
 	response := models.NewSuccessResponse(map[string]interface{}{
-		"username": claims.Username,
-		"role":     claims.Role,
-		"name":     claims.Name,
+		"token":    token,
+		"username": user.Username,
+		"email":    user.Email,
+		"name":     user.Name,
+		"role":     user.Role,
 	})
 	c.JSON(http.StatusOK, response)
 }
@@ -246,23 +334,31 @@ func (h *Handler) handleCreate(c *gin.Context, req *models.Request) {
 	if !allowed {
 		c.JSON(http.StatusForbidden, models.NewErrorResponse(
 			models.ErrorCodeForbidden,
-			"Insufficient permissions",
+			"Insufficient permission - forbidden",
 			"",
 		))
 		return
 	}
 
-	// TODO: Implement actual create logic based on object type
-	logger.Info("Create operation",
-		zap.String("object", req.Object),
-		zap.String("username", username),
-	)
-
-	response := models.NewSuccessResponse(map[string]interface{}{
-		"message": "Create operation not yet implemented",
-		"object":  req.Object,
-	})
-	c.JSON(http.StatusOK, response)
+	// Route to specific handler based on object type
+	switch req.Object {
+	case "project":
+		h.handleCreateProject(c, req)
+	case "ticket":
+		h.handleCreateTicket(c, req)
+	case "comment":
+		h.handleCreateComment(c, req)
+	default:
+		logger.Info("Create operation for unsupported object",
+			zap.String("object", req.Object),
+			zap.String("username", username),
+		)
+		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+			models.ErrorCodeInvalidObject,
+			"Unsupported object type: "+req.Object,
+			"",
+		))
+	}
 }
 
 // handleModify handles modify operations
@@ -300,22 +396,31 @@ func (h *Handler) handleModify(c *gin.Context, req *models.Request) {
 	if !allowed {
 		c.JSON(http.StatusForbidden, models.NewErrorResponse(
 			models.ErrorCodeForbidden,
-			"Insufficient permissions",
+			"Insufficient permission - forbidden",
 			"",
 		))
 		return
 	}
 
-	logger.Info("Modify operation",
-		zap.String("object", req.Object),
-		zap.String("username", username),
-	)
-
-	response := models.NewSuccessResponse(map[string]interface{}{
-		"message": "Modify operation not yet implemented",
-		"object":  req.Object,
-	})
-	c.JSON(http.StatusOK, response)
+	// Route to specific handler based on object type
+	switch req.Object {
+	case "project":
+		h.handleModifyProject(c, req)
+	case "ticket":
+		h.handleModifyTicket(c, req)
+	case "comment":
+		h.handleModifyComment(c, req)
+	default:
+		logger.Info("Modify operation for unsupported object",
+			zap.String("object", req.Object),
+			zap.String("username", username),
+		)
+		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+			models.ErrorCodeInvalidObject,
+			"Unsupported object type: "+req.Object,
+			"",
+		))
+	}
 }
 
 // handleRemove handles remove operations
@@ -339,6 +444,7 @@ func (h *Handler) handleRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Check permissions
 	allowed, err := h.permService.CheckPermission(c.Request.Context(), username, req.Object, models.PermissionDelete)
 	if err != nil {
 		logger.Error("Permission check failed", zap.Error(err))
@@ -350,25 +456,44 @@ func (h *Handler) handleRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// If permission service is disabled, check user role from JWT claims
+	if !h.permService.IsEnabled() {
+		if claims, exists := middleware.GetClaims(c); exists {
+			// Viewer role cannot delete
+			if username == "viewer" || claims.Role == "viewer" {
+				allowed = false
+			}
+		}
+	}
+
 	if !allowed {
 		c.JSON(http.StatusForbidden, models.NewErrorResponse(
 			models.ErrorCodeForbidden,
-			"Insufficient permissions",
+			"Insufficient permission - forbidden",
 			"",
 		))
 		return
 	}
 
-	logger.Info("Remove operation",
-		zap.String("object", req.Object),
-		zap.String("username", username),
-	)
-
-	response := models.NewSuccessResponse(map[string]interface{}{
-		"message": "Remove operation not yet implemented",
-		"object":  req.Object,
-	})
-	c.JSON(http.StatusOK, response)
+	// Route to specific handler based on object type
+	switch req.Object {
+	case "project":
+		h.handleRemoveProject(c, req)
+	case "ticket":
+		h.handleRemoveTicket(c, req)
+	case "comment":
+		h.handleRemoveComment(c, req)
+	default:
+		logger.Info("Remove operation for unsupported object",
+			zap.String("object", req.Object),
+			zap.String("username", username),
+		)
+		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+			models.ErrorCodeInvalidObject,
+			"Unsupported object type: "+req.Object,
+			"",
+		))
+	}
 }
 
 // handleRead handles read operations
@@ -383,12 +508,25 @@ func (h *Handler) handleRead(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	logger.Info("Read operation", zap.String("username", username))
-
-	response := models.NewSuccessResponse(map[string]interface{}{
-		"message": "Read operation not yet implemented",
-	})
-	c.JSON(http.StatusOK, response)
+	// Route to specific handler based on object type
+	switch req.Object {
+	case "project":
+		h.handleReadProject(c, req)
+	case "ticket":
+		h.handleReadTicket(c, req)
+	case "comment":
+		h.handleReadComment(c, req)
+	default:
+		logger.Info("Read operation for unsupported object",
+			zap.String("object", req.Object),
+			zap.String("username", username),
+		)
+		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+			models.ErrorCodeInvalidObject,
+			"Unsupported object type: "+req.Object,
+			"",
+		))
+	}
 }
 
 // handleList handles list operations
@@ -403,11 +541,23 @@ func (h *Handler) handleList(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	logger.Info("List operation", zap.String("username", username))
-
-	response := models.NewSuccessResponse(map[string]interface{}{
-		"message": "List operation not yet implemented",
-		"items":   []interface{}{},
-	})
-	c.JSON(http.StatusOK, response)
+	// Route to specific handler based on object type
+	switch req.Object {
+	case "project":
+		h.handleListProjects(c, req)
+	case "ticket":
+		h.handleListTickets(c, req)
+	case "comment":
+		h.handleListComments(c, req)
+	default:
+		logger.Info("List operation for unsupported object",
+			zap.String("object", req.Object),
+			zap.String("username", username),
+		)
+		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+			models.ErrorCodeInvalidObject,
+			"Unsupported object type: "+req.Object,
+			"",
+		))
+	}
 }

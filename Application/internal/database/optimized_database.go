@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	_ "github.com/mutecomm/go-sqlcipher/v4" // SQLCipher driver (SQLite with encryption)
-	_ "github.com/lib/pq"                    // PostgreSQL driver
+	_ "github.com/mattn/go-sqlite3" // SQLite driver
+	_ "github.com/lib/pq"           // PostgreSQL driver
 	"helixtrack.ru/core/internal/config"
 )
 
