@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Discovery - User Manual</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        code {
+            background-color: #f8f8f8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            color: #ecf0f1;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #555;
+            background-color: #f0f8ff;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 5px 0;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #888;
+        }
+        @media print {
+            body {
+                background-color: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+<h1>Service Discovery and Failover - User Manual</h1>
+
+<strong>Version:</strong> 1.0.0
+<strong>Date:</strong> 2025-10-10
+<strong>Audience:</strong> System Administrators, DevOps Engineers, Operators
+
+<h2>Table of Contents</h2>
+
+<li>[Introduction](#introduction)</li>
+<li>[Getting Started](#getting-started)</li>
+<li>[Registering a Service](#registering-a-service)</li>
+<li>[Managing Services](#managing-services)</li>
+<li>[Understanding Failover](#understanding-failover)</li>
+<li>[Service Rotation](#service-rotation)</li>
+<li>[Monitoring](#monitoring)</li>
+<li>[Best Practices](#best-practices)</li>
+<li>[FAQs](#faqs)</li>
+<li>[Troubleshooting Guide](#troubleshooting-guide)</li>
+
+---
+
+<h2>Introduction</h2>
+
+<h3>What is Service Discovery?</h3>
+
+Service Discovery is a system that allows microservices to find and communicate with each other automatically. Instead of hardcoding service locations, services can register themselves and discover other services dynamically.
+
+<h3>What is Failover?</h3>
+
+Failover is the automatic process of switching to a backup service when the primary service fails. When the primary service recovers, the system automatically switches back (failback).
+
+<h3>Why Do We Need This?</h3>
+
+<strong>Without Service Discovery:</strong>
+<li>Manual configuration of service locations</li>
+<li>Difficult to scale services</li>
+<li>Downtime during service updates</li>
+<li>Manual failover procedures</li>
+
+<strong>With Service Discovery:</strong>
+<li>Automatic service registration</li>
+<li>Dynamic scaling</li>
+<li>Zero-downtime deployments</li>
+<li>Automatic failover/failback</li>
+<li>Complete audit trail</li>
+
+---
+
+<h2>Getting Started</h2>
+
+<h3>Prerequisites</h3>
+
+<li><strong>Admin Token</strong>: Obtain a secure admin token (minimum 32 characters) from your security team</li>
+<li><strong>Service Details</strong>: Know your service's URL and health check endpoint</li>
+<li><strong>Network Access</strong>: Ensure your service can be accessed from the core server</li>
+<li><strong>TLS Certificate</strong> (optional but recommended): For secure communication</li>
+
+<h3>Quick Start Guide</h3>
+
+<strong>Step 1: Verify Core Service is Running</strong>
+<code></code>`bash
+curl http://localhost:8080/health
+<code></code>`
+Expected response: <code>{"status": "healthy"}</code>
+
+<strong>Step 2: Register Your Service</strong>
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Auth Service",
+    "type": "authentication",
+    "version": "1.0.0",
+    "url": "http://my-auth:8081",
+    "health_check_url": "http://my-auth:8081/health",
+    "role": "primary",
+    "priority": 10,
+    "admin_token": "your-secure-admin-token-here"
+  }'
+<code></code>`
+
+<strong>Step 3: Verify Registration</strong>
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/discover \
+  -H "Content-Type: application/json" \
+  -d '{"type": "authentication", "only_healthy": true}'
+<code></code>`
+
+---
+
+<h2>Registering a Service</h2>
+
+<h3>Basic Registration</h3>
+
+To register a service, you need to provide:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| name | Friendly name for your service | "Auth Service Primary" |
+| type | Service type | "authentication" |
+| version | Semantic version | "1.0.0" |
+| url | Base URL of your service | "http://auth:8081" |
+| health_check_url | Health check endpoint | "http://auth:8081/health" |
+| role | Primary or backup | "primary" |
+| priority | Higher = preferred (0-100) | 10 |
+| admin_token | Your admin token | "secure-token-32-chars-min" |
+
+<h3>Service Types</h3>
+
+<li><code>authentication</code> - Authentication services</li>
+<li><code>permissions</code> - Permission/authorization services</li>
+<li><code>lokalisation</code> - Localization services</li>
+<li><code>extension</code> - Extension services</li>
+
+<h3>Service Roles</h3>
+
+<strong>Primary:</strong>
+<li>Main service handling production traffic</li>
+<li>Active by default</li>
+<li>Will failover to backup if unhealthy</li>
+
+<strong>Backup:</strong>
+<li>Standby service</li>
+<li>Inactive by default</li>
+<li>Automatically activated during failover</li>
+
+<h3>Priority Levels</h3>
+
+Priority determines which service is preferred when multiple services are available:
+
+<li><strong>High Priority (50-100):</strong> Production services</li>
+<li><strong>Medium Priority (20-49):</strong> Staging services</li>
+<li><strong>Low Priority (0-19):</strong> Development services</li>
+
+<h3>Complete Registration Example</h3>
+
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Auth Service Primary",
+    "type": "authentication",
+    "version": "1.2.0",
+    "url": "http://auth-primary:8081",
+    "health_check_url": "http://auth-primary:8081/health",
+    "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBg...",
+    "role": "primary",
+    "failover_group": "auth-group-1",
+    "priority": 75,
+    "metadata": "{\"region\": \"us-east-1\", \"datacenter\": \"dc1\"}",
+    "admin_token": "your-secure-admin-token-at-least-32-characters"
+  }'
+<code></code>`
+
+<h3>Response</h3>
+
+<strong>Success (201 Created):</strong>
+<code></code>`json
+{
+  "errorCode": -1,
+  "errorMessage": "",
+  "data": {
+    "service_id": "abc-123-def-456",
+    "status": "registering",
+    "registered_at": "2025-10-10T10:00:00Z"
+  }
+}
+<code></code>`
+
+<strong>Error (400 Bad Request):</strong>
+<code></code>`json
+{
+  "errorCode": 1001,
+  "errorMessage": "Admin token must be at least 32 characters",
+  "data": null
+}
+<code></code>`
+
+---
+
+<h2>Managing Services</h2>
+
+<h3>Discovering Services</h3>
+
+Find services by type:
+
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/discover \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "authentication",
+    "only_healthy": true
+  }'
+<code></code>`
+
+<strong>Response:</strong>
+<code></code>`json
+{
+  "services": [
+    {
+      "id": "service-123",
+      "name": "Auth Service Primary",
+      "type": "authentication",
+      "version": "1.2.0",
+      "url": "http://auth-primary:8081",
+      "status": "healthy",
+      "role": "primary",
+      "is_active": true,
+      "priority": 75,
+      "last_health_check": "2025-10-10T10:05:00Z"
+    }
+  ],
+  "total_count": 1,
+  "timestamp": "2025-10-10T10:06:00Z"
+}
+<code></code>`
+
+<h3>Listing All Services</h3>
+
+<code></code>`bash
+curl http://localhost:8080/api/services/list
+<code></code>`
+
+<h3>Checking Service Health</h3>
+
+<code></code>`bash
+curl http://localhost:8080/api/services/health/service-123
+<code></code>`
+
+<strong>Response:</strong>
+<code></code>`json
+{
+  "service_id": "service-123",
+  "current_status": "healthy",
+  "last_check": "2025-10-10T10:14:00Z",
+  "health_check_count": 150,
+  "failed_health_count": 0,
+  "recent_checks": [
+    {
+      "timestamp": "2025-10-10T10:14:00Z",
+      "status": "healthy",
+      "response_time": 45,
+      "status_code": 200
+    }
+  ]
+}
+<code></code>`
+
+<h3>Updating Service Details</h3>
+
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/update \
+  -H "Content-Type: application/json" \
+  -d '{
+    "service_id": "service-123",
+    "priority": 80,
+    "metadata": "{\"region\": \"us-west-2\"}",
+    "admin_token": "your-admin-token"
+  }'
+<code></code>`
+
+<h3>Decommissioning a Service</h3>
+
+When a service is no longer needed:
+
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/decommission \
+  -H "Content-Type: application/json" \
+  -d '{
+    "service_id": "service-123",
+    "reason": "Service migrated to new platform",
+    "admin_token": "your-admin-token"
+  }'
+<code></code>`
+
+<strong>What happens:</strong>
+<li>Service status changes to "decommissioned"</li>
+<li>Service no longer appears in discovery results</li>
+<li>Health checks stop</li>
+<li>Service can be reactivated if needed</li>
+
+---
+
+<h2>Understanding Failover</h2>
+
+<h3>What is Failover?</h3>
+
+Failover is the automatic process of switching from a failed primary service to a healthy backup service.
+
+<h3>How It Works</h3>
+
+<code></code>`
+┌──────────────────────────────────────────────────────┐
+│ Normal Operation: Primary service is active          │
+│                                                       │
+│  [Primary] ✓ active ────► Clients                   │
+│  [Backup]  ✗ inactive                                │
+└──────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────┐
+│ Failure Detected: Primary becomes unhealthy          │
+│                                                       │
+│  [Primary] ✗ unhealthy                               │
+│  [Backup]  ✓ becoming active...                      │
+└──────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────┐
+│ Failover Complete: Backup now serves traffic         │
+│                                                       │
+│  [Primary] ✗ inactive (recovering)                   │
+│  [Backup]  ✓ active ────► Clients                   │
+└──────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────┐
+│ Failback: Primary recovered and stable               │
+│                                                       │
+│  [Primary] ✓ active ────► Clients                   │
+│  [Backup]  ✗ inactive                                │
+└──────────────────────────────────────────────────────┘
+<code></code>`
+
+<h3>Failover Configuration</h3>
+
+<strong>Failure Threshold:</strong> 3 consecutive failed health checks
+<strong>Stability Requirement:</strong> 3 consecutive successful health checks
+<strong>Failback Delay:</strong> 5 minutes minimum after failover
+<strong>Health Check Interval:</strong> Every 1 minute
+
+<h3>Setting Up Failover</h3>
+
+<strong>Step 1: Register Primary Service</strong>
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Auth Service Primary",
+    "type": "authentication",
+    "url": "http://auth-primary:8081",
+    "health_check_url": "http://auth-primary:8081/health",
+    "role": "primary",
+    "failover_group": "auth-group-1",
+    "priority": 10,
+    "admin_token": "your-token"
+  }'
+<code></code>`
+
+<strong>Step 2: Register Backup Service</strong>
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Auth Service Backup",
+    "type": "authentication",
+    "url": "http://auth-backup:8082",
+    "health_check_url": "http://auth-backup:8082/health",
+    "role": "backup",
+    "failover_group": "auth-group-1",
+    "priority": 5,
+    "admin_token": "your-token"
+  }'
+<code></code>`
+
+<strong>Important:</strong> Both services must have the same <code>failover_group</code> and <code>type</code>.
+
+<h3>Monitoring Failover Events</h3>
+
+Check recent failover activity:
+
+<code></code>`bash
+<h1>Get failover history (via database)</h1>
+sqlite3 /app/Database/service_discovery.db \
+  "SELECT * FROM service_failover_events ORDER BY timestamp DESC LIMIT 10;"
+<code></code>`
+
+<strong>Sample Output:</strong>
+<code></code>`
+id|failover_group|service_type|old_service_id|new_service_id|failover_reason|failover_type|timestamp|automatic
+evt-1|auth-group-1|authentication|primary-123|backup-456|Primary unhealthy|failover|1696934400|1
+evt-2|auth-group-1|authentication|backup-456|primary-123|Primary recovered|failback|1696938000|1
+<code></code>`
+
+---
+
+<h2>Service Rotation</h2>
+
+<h3>What is Service Rotation?</h3>
+
+Service rotation is the process of replacing one service with another. Common use cases:
+
+<li><strong>Upgrading:</strong> Replace v1.0 with v2.0</li>
+<li><strong>Security:</strong> Replace potentially compromised service</li>
+<li><strong>Migration:</strong> Move to new infrastructure</li>
+<li><strong>Configuration Change:</strong> Apply new settings</li>
+
+<h3>When to Rotate</h3>
+
+✅ <strong>Good Reasons to Rotate:</strong>
+<li>New version available</li>
+<li>Security vulnerability fixed</li>
+<li>Performance improvements</li>
+<li>Infrastructure migration</li>
+
+❌ <strong>Bad Reasons to Rotate:</strong>
+<li>Service temporarily slow (wait for recovery)</li>
+<li>Testing changes (use development environment)</li>
+<li>Frequent changes (causes instability)</li>
+
+<h3>Rotation Process</h3>
+
+<strong>Step 1: Prepare New Service</strong>
+<li>Deploy new service</li>
+<li>Verify health check works</li>
+<li>Wait at least 5 minutes after deployment</li>
+<li>Ensure service is marked healthy</li>
+
+<strong>Step 2: Perform Rotation</strong>
+<code></code>`bash
+curl -X POST http://localhost:8080/api/services/rotate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "current_service_id": "old-service-123",
+    "new_service": {
+      "name": "Auth Service v2",
+      "type": "authentication",
+      "version": "2.0.0",
+      "url": "http://auth-v2:8083",
+      "health_check_url": "http://auth-v2:8083/health",
+      "public_key": "-----BEGIN PUBLIC KEY-----\n...",
+      "status": "healthy",
+      "role": "primary",
+      "priority": 10,
+      "metadata": "{}",
+      "registered_at": "2025-10-10T09:50:00Z"
+    },
+    "reason": "Upgrade to version 2.0.0",
+    "requested_by": "admin@example.com",
+    "admin_token": "your-admin-token",
+    "verification_code": "optional-code"
+  }'
+<code></code>`
+
+<strong>Step 3: Verify Rotation</strong>
+<code></code>`bash
+<h1>Check new service is active</h1>
+curl -X POST http://localhost:8080/api/services/discover \
+  -d '{"type": "authentication", "only_healthy": true}'
+
+<h1>Check old service is decommissioned</h1>
+curl http://localhost:8080/api/services/health/old-service-123
+<code></code>`
+
+<h3>Rotation Safety Checks</h3>
+
+The system performs these checks before allowing rotation:
+
+<li>✓ Old service exists and can be rotated</li>
+<li>✓ New service has valid cryptographic signature</li>
+<li>✓ Admin token is valid</li>
+<li>✓ Service types match (can't replace auth with permissions)</li>
+<li>✓ New service is healthy</li>
+<li>✓ At least 5 minutes since new service registered</li>
+
+If any check fails, rotation is blocked.
+
+<h3>Rollback Plan</h3>
+
+If rotation causes issues:
+
+<li><strong>Immediate:</strong> Decommission new service</li>
+<li><strong>Reactivate:</strong> Register old service again</li>
+<li><strong>Investigate:</strong> Check logs for errors</li>
+<li><strong>Fix:</strong> Address issues before retrying</li>
+
+---
+
+<h2>Monitoring</h2>
+
+<h3>Health Check Dashboard</h3>
+
+<strong>Check Service Health:</strong>
+<code></code>`bash
+<h1>Single service</h1>
+curl http://localhost:8080/api/services/health/service-123
+
+<h1>All services</h1>
+curl http://localhost:8080/api/services/list
+<code></code>`
+
+<h3>Key Metrics to Monitor</h3>
+
+<strong>1. Service Availability</strong>
+<li>Total registered services</li>
+<li>Healthy vs unhealthy count</li>
+<li>Average response time</li>
+
+<strong>2. Failover Activity</strong>
+<li>Failover events in last 24 hours</li>
+<li>Average failover duration</li>
+<li>Failback success rate</li>
+
+<strong>3. Health Check Status</strong>
+<li>Success rate</li>
+<li>Average response time</li>
+<li>Failed checks</li>
+
+<h3>Setting Up Alerts</h3>
+
+<strong>Recommended Alerts:</strong>
+
+<strong>Critical:</strong>
+<li>Service unhealthy for > 5 minutes</li>
+<li>Failover occurred</li>
+<li>No backup service available</li>
+<li>Rotation failed</li>
+
+<strong>Warning:</strong>
+<li>Service response time > 1 second</li>
+<li>Failed health check (1-2 failures)</li>
+<li>Low number of healthy services</li>
+
+<strong>Info:</strong>
+<li>Service registered</li>
+<li>Service decommissioned</li>
+<li>Failback completed</li>
+
+<h3>Example Alert Configuration (Prometheus)</h3>
+
+<code></code>`yaml
+groups:
+<li>name: service_discovery</li>
+  rules:
+  - alert: ServiceUnhealthy
+    expr: service_discovery_unhealthy_services > 0
+    for: 5m
+    annotations:
+      summary: "Service {{ $labels.service_name }} is unhealthy"
+
+  - alert: FailoverOccurred
+    expr: increase(service_discovery_failover_events_total[5m]) > 0
+    annotations:
+      summary: "Failover occurred in group {{ $labels.failover_group }}"
+<code></code>`
+
+---
+
+<h2>Best Practices</h2>
+
+<h3>Service Registration</h3>
+
+✅ <strong>DO:</strong>
+<li>Use descriptive service names</li>
+<li>Set appropriate priorities</li>
+<li>Provide complete metadata</li>
+<li>Use semantic versioning</li>
+<li>Include health check endpoints</li>
+
+❌ <strong>DON'T:</strong>
+<li>Register duplicate services</li>
+<li>Use production tokens in development</li>
+<li>Skip health check endpoints</li>
+<li>Use generic names</li>
+
+<h3>Health Check Endpoints</h3>
+
+Your service should implement a <code>/health</code> endpoint that returns:
+
+<code></code>`json
+{
+  "status": "healthy",
+  "timestamp": "2025-10-10T10:00:00Z",
+  "version": "1.0.0",
+  "dependencies": {
+    "database": "connected",
+    "cache": "connected"
+  }
+}
+<code></code>`
+
+<strong>Requirements:</strong>
+<li>Response time < 1 second</li>
+<li>HTTP 200 status code when healthy</li>
+<li>HTTP 503 status code when unhealthy</li>
+<li>Include dependency status</li>
+<li>No authentication required</li>
+
+<h3>Failover Groups</h3>
+
+<strong>Best Practices:</strong>
+<li>One primary + one or more backups per group</li>
+<li>Backups in different availability zones</li>
+<li>Similar capacity between primary and backup</li>
+<li>Test failover regularly</li>
+<li>Monitor failover events</li>
+
+<strong>Example Configuration:</strong>
+<code></code>`
+failover_group: "auth-prod"
+├── auth-primary (priority: 100, zone: us-east-1a)
+├── auth-backup-1 (priority: 50, zone: us-east-1b)
+└── auth-backup-2 (priority: 25, zone: us-west-2a)
+<code></code>`
+
+<h3>Security</h3>
+
+<strong>Admin Tokens:</strong>
+<li>Minimum 32 characters</li>
+<li>Rotate every 90 days</li>
+<li>Store securely (e.g., HashiCorp Vault)</li>
+<li>Limit access</li>
+<li>Audit all usage</li>
+
+<strong>Service Authentication:</strong>
+<li>Use TLS/HTTPS in production</li>
+<li>Implement service-to-service authentication</li>
+<li>Rotate service certificates regularly</li>
+<li>Monitor for suspicious activity</li>
+
+<h3>Operational Procedures</h3>
+
+<strong>Daily:</strong>
+<li>Check service health dashboard</li>
+<li>Review failed health checks</li>
+<li>Monitor response times</li>
+
+<strong>Weekly:</strong>
+<li>Review failover events</li>
+<li>Check backup service health</li>
+<li>Verify monitoring alerts work</li>
+
+<strong>Monthly:</strong>
+<li>Test failover scenarios</li>
+<li>Review and update priorities</li>
+<li>Audit admin token usage</li>
+<li>Update documentation</li>
+
+---
+
+<h2>FAQs</h2>
+
+<h3>Q: How long does failover take?</h3>
+
+<strong>A:</strong> Typically 1-3 minutes:
+<li>3 minutes for health checks to detect failure (3 failures × 1 minute interval)</li>
+<li>< 1 second for failover execution</li>
+<li>Clients may experience brief errors during transition</li>
+
+<h3>Q: Can I have multiple backup services?</h3>
+
+<strong>A:</strong> Yes! Register multiple backup services in the same failover group. The system will choose the highest priority healthy backup.
+
+<h3>Q: What happens if both primary and backup fail?</h3>
+
+<strong>A:</strong> The system will:
+<li>Mark both as unhealthy</li>
+<li>Remove from discovery results</li>
+<li>Log critical alert</li>
+<li>Require manual intervention</li>
+
+<h3>Q: Can I manually trigger failover?</h3>
+
+<strong>A:</strong> Yes, decommission the primary service and the system will automatically failover to the backup.
+
+<h3>Q: How do I test failover without affecting production?</h3>
+
+<strong>A:</strong>
+<li>Create a test failover group</li>
+<li>Register test services</li>
+<li>Simulate failures by stopping services</li>
+<li>Observe automatic failover</li>
+<li>Verify failback after recovery</li>
+
+<h3>Q: Can services in different data centers failover?</h3>
+
+<strong>A:</strong> Yes! As long as:
+<li>Both services have the same failover group</li>
+<li>Network connectivity exists between data centers</li>
+<li>Health check endpoint is accessible</li>
+
+<h3>Q: What happens during service rotation?</h3>
+
+<strong>A:</strong>
+<li>Old service is decommissioned</li>
+<li>New service is registered with same group</li>
+<li>Active state is transferred (if applicable)</li>
+<li>Clients discover new service</li>
+<li>Old service is removed from discovery</li>
+
+<h3>Q: How do I rollback a service rotation?</h3>
+
+<strong>A:</strong> Rotate again, specifying the old service as the "new" service.
+
+<h3>Q: Can I pause health checks?</h3>
+
+<strong>A:</strong> No, health checks run continuously. To prevent failover, set the service to maintenance mode (decommission temporarily).
+
+<h3>Q: How long are health check records kept?</h3>
+
+<strong>A:</strong> By default, all health check records are kept indefinitely. Consider implementing data retention policies based on your requirements.
+
+---
+
+<h2>Troubleshooting Guide</h2>
+
+<h3>Problem: Service Registration Fails</h3>
+
+<strong>Symptoms:</strong>
+<li><code>400 Bad Request</code> response</li>
+<li><code>401 Unauthorized</code> response</li>
+
+<strong>Solutions:</strong>
+
+<li><strong>Check admin token:</strong></li>
+<code></code>`bash
+<h1>Token must be at least 32 characters</h1>
+echo "your-token" | wc -c
+<code></code>`
+
+<li><strong>Verify JSON format:</strong></li>
+<code></code>`bash
+<h1>Validate JSON</h1>
+cat registration.json | jq .
+<code></code>`
+
+<li><strong>Check required fields:</strong></li>
+<li>name, type, version, url, health_check_url, admin_token</li>
+
+---
+
+<h3>Problem: Service Not Discovered</h3>
+
+<strong>Symptoms:</strong>
+<li>Service registered but not in discovery results</li>
+<li>Empty service list</li>
+
+<strong>Solutions:</strong>
+
+<li><strong>Check service status:</strong></li>
+<code></code>`bash
+curl http://localhost:8080/api/services/health/service-123
+<code></code>`
+
+<li><strong>Verify service is healthy:</strong></li>
+<code></code>`bash
+<h1>Test health endpoint directly</h1>
+curl http://your-service:port/health
+<code></code>`
+
+<li><strong>Check if service is active:</strong></li>
+<code></code>`bash
+<h1>Look for is_active: true</h1>
+curl http://localhost:8080/api/services/list
+<code></code>`
+
+---
+
+<h3>Problem: Failover Doesn't Happen</h3>
+
+<strong>Symptoms:</strong>
+<li>Primary service unhealthy</li>
+<li>Backup service not activated</li>
+<li>Clients still seeing errors</li>
+
+<strong>Solutions:</strong>
+
+<li><strong>Check backup service exists:</strong></li>
+<code></code>`bash
+curl http://localhost:8080/api/services/list | grep backup
+<code></code>`
+
+<li><strong>Verify failover group matches:</strong></li>
+<code></code>`bash
+<h1>Primary and backup must have same failover_group</h1>
+curl http://localhost:8080/api/services/list | jq '.services[] | {name, failover_group, role}'
+<code></code>`
+
+<li><strong>Check failure count:</strong></li>
+<code></code>`bash
+<h1>Must reach 3 failures for failover</h1>
+curl http://localhost:8080/api/services/health/primary-service-123
+<code></code>`
+
+<li><strong>Verify backup is healthy:</strong></li>
+<code></code>`bash
+curl http://backup-service:port/health
+<code></code>`
+
+---
+
+<h3>Problem: Failback Doesn't Happen</h3>
+
+<strong>Symptoms:</strong>
+<li>Primary service recovered</li>
+<li>Still using backup service</li>
+
+<strong>Solutions:</strong>
+
+<li><strong>Check stability count:</strong></li>
+   - Primary must be healthy for 3 consecutive checks (3 minutes)
+
+<li><strong>Check time since failover:</strong></li>
+   - Must be at least 5 minutes since failover
+   <code></code>`bash
+   # Check failover_events table
+   sqlite3 /app/Database/service_discovery.db \
+     "SELECT * FROM service_failover_events WHERE failover_group='your-group' ORDER BY timestamp DESC LIMIT 1;"
+   <code></code>`
+
+<li><strong>Verify primary role:</strong></li>
+<code></code>`bash
+<h1>Service must have role="primary"</h1>
+curl http://localhost:8080/api/services/list | jq '.services[] | select(.id=="primary-service-123")'
+<code></code>`
+
+---
+
+<h3>Problem: Service Rotation Fails</h3>
+
+<strong>Symptoms:</strong>
+<li><code>400 Bad Request</code> during rotation</li>
+<li>Error message about validation</li>
+
+<strong>Solutions:</strong>
+
+<li><strong>Check new service age:</strong></li>
+<code></code>`bash
+<h1>Must be registered for at least 5 minutes</h1>
+<h1>Check registered_at field</h1>
+curl http://localhost:8080/api/services/health/new-service-123
+<code></code>`
+
+<li><strong>Verify service types match:</strong></li>
+<code></code>`bash
+<h1>Old and new service must have same type</h1>
+curl http://localhost:8080/api/services/list | \
+  jq '.services[] | select(.id=="old-service-123" or .id=="new-service-123") | {id, type}'
+<code></code>`
+
+<li><strong>Check new service signature:</strong></li>
+   - Ensure new service was properly signed before rotation
+
+<li><strong>Verify admin token:</strong></li>
+   - Must be at least 32 characters
+   - Must be valid and not expired
+
+---
+
+<h3>Problem: High Response Times</h3>
+
+<strong>Symptoms:</strong>
+<li>Health checks timing out</li>
+<li>Slow service discovery</li>
+
+<strong>Solutions:</strong>
+
+<li><strong>Check network latency:</strong></li>
+<code></code>`bash
+ping your-service-hostname
+<code></code>`
+
+<li><strong>Test health endpoint directly:</strong></li>
+<code></code>`bash
+time curl http://your-service:port/health
+<code></code>`
+
+<li><strong>Check service logs</strong> for performance issues</li>
+
+<li><strong>Verify database performance:</strong></li>
+<code></code>`bash
+<h1>Check database size</h1>
+ls -lh /app/Database/service_discovery.db
+
+<h1>Vacuum if needed</h1>
+sqlite3 /app/Database/service_discovery.db "VACUUM;"
+<code></code>`
+
+---
+
+<h3>Getting Help</h3>
+
+<strong>Documentation:</strong>
+<li>Technical Documentation: <code>ServiceDiscovery_Technical.md</code></li>
+<li>API Reference: See Technical Documentation Section 4</li>
+
+<strong>Support:</strong>
+<li>GitHub Issues: https://github.com/helixtrack/core/issues</li>
+<li>Email: support@helixtrack.ru</li>
+<li>Documentation: https://docs.helixtrack.ru</li>
+
+<strong>Emergency Contact:</strong>
+<li>On-call: [Your on-call rotation]</li>
+<li>Slack: #helixtrack-support</li>
+<li>Phone: [Emergency phone number]</li>
+
+---
+
+<strong>End of User Manual</strong>
+    <div class="footer">
+        <p>Generated on 2025-10-10 21:02:24</p>
+        <p>&copy; 2025 HelixTrack Core - Service Discovery Documentation</p>
+    </div>
+    </div>
+</body>
+</html>

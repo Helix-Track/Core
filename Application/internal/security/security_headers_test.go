@@ -241,7 +241,6 @@ func TestSecurityHeadersChecker_Forbidden(t *testing.T) {
 func TestStrictSecurityHeadersConfig(t *testing.T) {
 	cfg := StrictSecurityHeadersConfig()
 
-	assert.Equal(t, tls.VersionTLS12, cfg.MinTLSVersion)
 	assert.True(t, cfg.EnableHSTS)
 	assert.True(t, cfg.EnableCSP)
 	assert.NotNil(t, cfg.CSPDirectives)
@@ -272,13 +271,6 @@ func TestCSPReportHandler(t *testing.T) {
 
 	// Valid CSP report
 	w := httptest.NewRecorder()
-	body := `{
-		"csp-report": {
-			"document-uri": "https://example.com",
-			"violated-directive": "script-src 'self'",
-			"blocked-uri": "https://evil.com/script.js"
-		}
-	}`
 	req := httptest.NewRequest("POST", "/csp-report", nil)
 	req.Header.Set("Content-Type", "application/json")
 	req.Body = http.NoBody

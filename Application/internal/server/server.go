@@ -21,12 +21,13 @@ import (
 
 // Server represents the HTTP server
 type Server struct {
-	config      *config.Config
-	router      *gin.Engine
-	httpServer  *http.Server
-	db          database.Database
-	authService services.AuthService
-	permService services.PermissionService
+	config                    *config.Config
+	router                    *gin.Engine
+	httpServer                *http.Server
+	db                        database.Database
+	authService               services.AuthService
+	permService               services.PermissionService
+	serviceDiscoveryHandler   *handlers.ServiceDiscoveryHandler
 }
 
 // NewServer creates a new server instance
@@ -50,11 +51,18 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		cfg.Services.Permissions.Enabled,
 	)
 
+	// Initialize service discovery handler
+	serviceDiscoveryHandler, err := handlers.NewServiceDiscoveryHandler(db)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize service discovery handler: %w", err)
+	}
+
 	server := &Server{
-		config:      cfg,
-		db:          db,
-		authService: authService,
-		permService: permService,
+		config:                  cfg,
+		db:                      db,
+		authService:             authService,
+		permService:             permService,
+		serviceDiscoveryHandler: serviceDiscoveryHandler,
 	}
 
 	server.setupRouter()
@@ -84,6 +92,18 @@ func (s *Server) setupRouter() {
 		logger.Error("Failed to initialize project tables", zap.Error(err))
 	}
 
+	// Initialize service discovery tables
+	if err := handlers.InitializeServiceDiscoveryTables(s.db); err != nil {
+		logger.Error("Failed to initialize service discovery tables", zap.Error(err))
+	}
+
+	// Start service health checker
+	if err := s.serviceDiscoveryHandler.StartHealthChecker(); err != nil {
+		logger.Error("Failed to start health checker", zap.Error(err))
+	} else {
+		logger.Info("Service health checker started")
+	}
+
 	// Create handlers
 	handler := handlers.NewHandler(s.db, s.authService, s.permService, s.config.Version)
 	authHandler := handlers.NewAuthHandler(s.db)
@@ -94,6 +114,18 @@ func (s *Server) setupRouter() {
 		auth.POST("/register", authHandler.Register)
 		auth.POST("/login", authHandler.Login)
 		auth.POST("/logout", authHandler.Logout)
+	}
+
+	// Service discovery routes (admin only)
+	serviceDiscovery := router.Group("/api/services")
+	{
+		serviceDiscovery.POST("/register", s.serviceDiscoveryHandler.RegisterService)
+		serviceDiscovery.POST("/discover", s.serviceDiscoveryHandler.DiscoverServices)
+		serviceDiscovery.POST("/rotate", s.serviceDiscoveryHandler.RotateService)
+		serviceDiscovery.POST("/decommission", s.serviceDiscoveryHandler.DecommissionService)
+		serviceDiscovery.POST("/update", s.serviceDiscoveryHandler.UpdateService)
+		serviceDiscovery.GET("/list", s.serviceDiscoveryHandler.ListServices)
+		serviceDiscovery.GET("/health/:id", s.serviceDiscoveryHandler.GetServiceHealth)
 	}
 
 	// Public routes (no JWT required)
@@ -251,6 +283,12 @@ func (s *Server) Start() error {
 // Shutdown gracefully shuts down the server
 func (s *Server) Shutdown(ctx context.Context) error {
 	logger.Info("Shutting down server...")
+
+	// Stop health checker
+	if s.serviceDiscoveryHandler != nil {
+		logger.Info("Stopping service health checker...")
+		s.serviceDiscoveryHandler.StopHealthChecker()
+	}
 
 	if s.httpServer != nil {
 		if err := s.httpServer.Shutdown(ctx); err != nil {

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Discovery - Technical Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        code {
+            background-color: #f8f8f8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            color: #ecf0f1;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #555;
+            background-color: #f0f8ff;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 5px 0;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #888;
+        }
+        @media print {
+            body {
+                background-color: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+<h1>Service Discovery and Failover System - Technical Documentation</h1>
+
+<strong>Version:</strong> 1.0.0
+<strong>Date:</strong> 2025-10-10
+<strong>Status:</strong> Production Ready
+
+<h2>Table of Contents</h2>
+
+<li>[Overview](#overview)</li>
+<li>[Architecture](#architecture)</li>
+<li>[Security Model](#security-model)</li>
+<li>[API Reference](#api-reference)</li>
+<li>[Database Schema](#database-schema)</li>
+<li>[Failover Mechanism](#failover-mechanism)</li>
+<li>[Health Checking](#health-checking)</li>
+<li>[Service Rotation](#service-rotation)</li>
+<li>[Configuration](#configuration)</li>
+<li>[Deployment](#deployment)</li>
+<li>[Monitoring](#monitoring)</li>
+<li>[Troubleshooting](#troubleshooting)</li>
+
+---
+
+<h2>Overview</h2>
+
+The Service Discovery and Failover System provides a production-ready solution for dynamic service registration, health monitoring, automatic failover/failback, and secure service rotation in distributed microservice architectures.
+
+<h3>Key Features</h3>
+
+<li><strong>Dynamic Service Registration:</strong> Services can register themselves at runtime with cryptographic verification</li>
+<li><strong>Automatic Health Monitoring:</strong> Background process continuously monitors service health</li>
+<li><strong>Automatic Failover:</strong> Primary services automatically fail over to backup services when unhealthy</li>
+<li><strong>Automatic Failback:</strong> Primary services automatically resume operation when recovered and stable</li>
+<li><strong>Secure Service Rotation:</strong> Multi-layer security prevents malicious service injection</li>
+<li><strong>Audit Logging:</strong> Complete audit trail for all service operations</li>
+<li><strong>Priority-Based Selection:</strong> Services are selected based on priority and health metrics</li>
+
+<h3>Supported Service Types</h3>
+
+<li><code>authentication</code> - Authentication service</li>
+<li><code>permissions</code> - Permissions/authorization service</li>
+<li><code>lokalisation</code> - Localization service</li>
+<li><code>extension</code> - Extension services</li>
+
+---
+
+<h2>Architecture</h2>
+
+<h3>Component Overview</h3>
+
+<code></code>`
+┌─────────────────────────────────────────────────────────────────┐
+│                     API Layer (Gin Framework)                    │
+│  /api/services/register | discover | rotate | decommission      │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────────┐
+│              ServiceDiscoveryHandler                             │
+│  - Handles all API requests                                      │
+│  - Validates input                                               │
+│  - Coordinates with other components                             │
+└──────────────────┬───────────────────────┬──────────────────────┘
+                   │                       │
+        ┌──────────▼──────────┐  ┌────────▼─────────┐
+        │  ServiceSigner      │  │  HealthChecker   │
+        │  - RSA 2048-bit     │  │  - Background    │
+        │  - Sign/Verify      │  │  - HTTP checks   │
+        │  - Multi-layer      │  │  - Parallel      │
+        └──────────┬──────────┘  └────────┬─────────┘
+                   │                       │
+                   │             ┌─────────▼──────────┐
+                   │             │  FailoverManager   │
+                   │             │  - Auto failover   │
+                   │             │  - Auto failback   │
+                   │             │  - Stability checks│
+                   │             └─────────┬──────────┘
+                   │                       │
+        ┌──────────▼───────────────────────▼──────────┐
+        │         SQLite/PostgreSQL Database           │
+        │  service_registry | service_health_check     │
+        │  service_failover_events | audit logs        │
+        └──────────────────────────────────────────────┘
+<code></code>`
+
+<h3>Data Flow</h3>
+
+<strong>1. Service Registration:</strong>
+<code></code>`
+Client → Handler → ServiceSigner (sign) → Database → HealthChecker (immediate check)
+<code></code>`
+
+<strong>2. Service Discovery:</strong>
+<code></code>`
+Client → Handler → Database (query by type, health, priority) → Client
+<code></code>`
+
+<strong>3. Health Monitoring (Background):</strong>
+<code></code>`
+HealthChecker (every 1 min) → HTTP GET to service → Database (record)
+  → FailoverManager (check if failover/failback needed) → Database (update active state)
+<code></code>`
+
+<strong>4. Service Rotation:</strong>
+<code></code>`
+Client → Handler → Verify old service → ServiceSigner (verify new)
+  → Verify admin token → Decommission old → Register new → Database
+<code></code>`
+
+---
+
+<h2>Security Model</h2>
+
+<h3>Cryptographic Signatures</h3>
+
+All services must be cryptographically signed using RSA 2048-bit keys.
+
+<strong>Signature Process:</strong>
+<li>Generate RSA 2048-bit key pair</li>
+<li>Create signature data: <code>ID|Name|Type|Version|URL|PublicKey|RegisteredAt</code></li>
+<li>Hash data using SHA-256</li>
+<li>Sign hash using RSA PKCS#1 v1.5</li>
+<li>Base64 encode signature</li>
+
+<strong>Verification Process:</strong>
+<li>Parse public key from service registration</li>
+<li>Decode base64 signature</li>
+<li>Recompute data hash</li>
+<li>Verify signature using RSA public key</li>
+
+<h3>Admin Token Verification</h3>
+
+Admin operations require tokens with minimum 32 characters. In production, integrate with:
+<li>JWT service for user authentication</li>
+<li>Role-based access control (RBAC)</li>
+<li>Audit logging for all admin operations</li>
+
+<h3>Service Rotation Security Layers</h3>
+
+<li><strong>Service State Verification:</strong> Old service must not be rotating or decommissioned</li>
+<li><strong>Signature Verification:</strong> New service must have valid cryptographic signature</li>
+<li><strong>Admin Token Verification:</strong> Token must be valid and have sufficient permissions</li>
+<li><strong>Type Matching:</strong> New service must match old service type</li>
+<li><strong>Health Verification:</strong> New service must be healthy</li>
+<li><strong>Time Constraints:</strong> Service must be registered for at least 5 minutes</li>
+
+<h3>Attack Prevention</h3>
+
+<li><strong>Malicious Service Injection:</strong> Prevented by cryptographic signatures</li>
+<li><strong>Man-in-the-Middle:</strong> Prevented by signature verification</li>
+<li><strong>Replay Attacks:</strong> Prevented by timestamp validation</li>
+<li><strong>Rapid Rotation:</strong> Prevented by 5-minute minimum registration time</li>
+<li><strong>Unauthorized Operations:</strong> Prevented by admin token verification</li>
+
+---
+
+<h2>API Reference</h2>
+
+<h3>1. Register Service</h3>
+
+<strong>Endpoint:</strong> <code>POST /api/services/register</code>
+
+<strong>Request Body:</strong>
+<code></code>`json
+{
+  "name": "Auth Service Primary",
+  "type": "authentication",
+  "version": "1.0.0",
+  "url": "http://auth-primary:8081",
+  "health_check_url": "http://auth-primary:8081/health",
+  "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBg...",
+  "certificate": "-----BEGIN CERTIFICATE-----\nMIIDXTCCA...",
+  "role": "primary",
+  "failover_group": "auth-group-1",
+  "priority": 10,
+  "metadata": "{}",
+  "admin_token": "secure-admin-token-at-least-32-characters"
+}
+<code></code>`
+
+<strong>Response (201 Created):</strong>
+<code></code>`json
+{
+  "errorCode": -1,
+  "errorMessage": "",
+  "data": {
+    "service_id": "uuid-generated-id",
+    "status": "registering",
+    "registered_at": "2025-10-10T10:00:00Z"
+  }
+}
+<code></code>`
+
+<strong>Security:</strong>
+<li>Admin token required (minimum 32 characters)</li>
+<li>Public key must be valid RSA public key in PEM format</li>
+<li>Service will receive immediate health check</li>
+
+---
+
+<h3>2. Discover Services</h3>
+
+<strong>Endpoint:</strong> <code>POST /api/services/discover</code>
+
+<strong>Request Body:</strong>
+<code></code>`json
+{
+  "type": "authentication",
+  "min_version": "1.0.0",
+  "only_healthy": true
+}
+<code></code>`
+
+<strong>Response (200 OK):</strong>
+<code></code>`json
+{
+  "services": [
+    {
+      "id": "service-uuid",
+      "name": "Auth Service Primary",
+      "type": "authentication",
+      "version": "1.1.0",
+      "url": "http://auth-primary:8081",
+      "health_check_url": "http://auth-primary:8081/health",
+      "status": "healthy",
+      "role": "primary",
+      "failover_group": "auth-group-1",
+      "is_active": true,
+      "priority": 10,
+      "last_health_check": "2025-10-10T10:05:00Z"
+    }
+  ],
+  "total_count": 1,
+  "timestamp": "2025-10-10T10:06:00Z"
+}
+<code></code>`
+
+<strong>Notes:</strong>
+<li>Services are ordered by: priority DESC, health_check_count DESC</li>
+<li>Only active services are returned by default</li>
+<li>Version filtering uses semantic versioning</li>
+
+---
+
+<h3>3. Rotate Service</h3>
+
+<strong>Endpoint:</strong> <code>POST /api/services/rotate</code>
+
+<strong>Request Body:</strong>
+<code></code>`json
+{
+  "current_service_id": "old-service-uuid",
+  "new_service": {
+    "name": "Auth Service v2",
+    "type": "authentication",
+    "version": "2.0.0",
+    "url": "http://auth-v2:8082",
+    "health_check_url": "http://auth-v2:8082/health",
+    "public_key": "-----BEGIN PUBLIC KEY-----\n...",
+    "status": "healthy",
+    "role": "primary",
+    "priority": 10,
+    "metadata": "{}",
+    "registered_at": "2025-10-10T09:50:00Z"
+  },
+  "reason": "Upgrade to version 2.0.0",
+  "requested_by": "admin",
+  "admin_token": "secure-admin-token-at-least-32-characters",
+  "verification_code": "optional-verification-code"
+}
+<code></code>`
+
+<strong>Response (200 OK):</strong>
+<code></code>`json
+{
+  "success": true,
+  "old_service_id": "old-service-uuid",
+  "new_service_id": "new-service-uuid",
+  "rotation_time": "2025-10-10T10:10:00Z",
+  "verification_hash": "sha256-hash-for-audit",
+  "message": "Service rotated successfully"
+}
+<code></code>`
+
+<strong>Security Checks:</strong>
+<li>Old service exists and can be rotated</li>
+<li>New service signature is valid</li>
+<li>Admin token is valid</li>
+<li>Service types match</li>
+<li>New service is healthy</li>
+<li>At least 5 minutes since old service registration</li>
+
+---
+
+<h3>4. Decommission Service</h3>
+
+<strong>Endpoint:</strong> <code>POST /api/services/decommission</code>
+
+<strong>Request Body:</strong>
+<code></code>`json
+{
+  "service_id": "service-uuid",
+  "reason": "End of life",
+  "admin_token": "secure-admin-token-at-least-32-characters"
+}
+<code></code>`
+
+<strong>Response (200 OK):</strong>
+<code></code>`json
+{
+  "errorCode": -1,
+  "errorMessage": "",
+  "message": "Service decommissioned successfully"
+}
+<code></code>`
+
+<strong>Effect:</strong>
+<li>Service status changed to <code>decommissioned</code></li>
+<li>Service removed from discovery results</li>
+<li>Health checks continue for audit purposes</li>
+<li>Service can be reactivated if needed</li>
+
+---
+
+<h3>5. Update Service</h3>
+
+<strong>Endpoint:</strong> <code>POST /api/services/update</code>
+
+<strong>Request Body:</strong>
+<code></code>`json
+{
+  "service_id": "service-uuid",
+  "version": "1.0.1",
+  "url": "http://auth-primary-new:8081",
+  "health_check_url": "http://auth-primary-new:8081/health",
+  "priority": 15,
+  "metadata": "{\"region\": \"us-east-1\"}",
+  "admin_token": "secure-admin-token-at-least-32-characters"
+}
+<code></code>`
+
+<strong>Response (200 OK):</strong>
+<code></code>`json
+{
+  "errorCode": -1,
+  "errorMessage": "",
+  "message": "Service updated successfully"
+}
+<code></code>`
+
+<strong>Notes:</strong>
+<li>Only specified fields are updated</li>
+<li>Triggers immediate health check</li>
+<li>Admin token required</li>
+
+---
+
+<h3>6. List All Services</h3>
+
+<strong>Endpoint:</strong> <code>GET /api/services/list</code>
+
+<strong>Query Parameters:</strong>
+<li><code>include_deleted=true</code> - Include soft-deleted services</li>
+<li><code>include_decommissioned=true</code> - Include decommissioned services</li>
+
+<strong>Response (200 OK):</strong>
+<code></code>`json
+{
+  "services": [...],
+  "total_count": 10,
+  "timestamp": "2025-10-10T10:15:00Z"
+}
+<code></code>`
+
+---
+
+<h3>7. Get Service Health</h3>
+
+<strong>Endpoint:</strong> <code>GET /api/services/health/:id</code>
+
+<strong>Query Parameters:</strong>
+<li><code>limit=10</code> - Number of recent health checks to return</li>
+
+<strong>Response (200 OK):</strong>
+<code></code>`json
+{
+  "service_id": "service-uuid",
+  "current_status": "healthy",
+  "last_check": "2025-10-10T10:14:00Z",
+  "health_check_count": 150,
+  "failed_health_count": 0,
+  "recent_checks": [
+    {
+      "id": "check-uuid",
+      "timestamp": "2025-10-10T10:14:00Z",
+      "status": "healthy",
+      "response_time": 45,
+      "status_code": 200,
+      "error_message": ""
+    }
+  ]
+}
+<code></code>`
+
+---
+
+<h2>Database Schema</h2>
+
+<h3>service_registry</h3>
+
+Primary table for service registration.
+
+<code></code>`sql
+CREATE TABLE service_registry (
+  id TEXT PRIMARY KEY,                    -- UUID
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,                     -- authentication, permissions, etc.
+  version TEXT NOT NULL,                  -- Semantic version
+  url TEXT NOT NULL,                      -- Service base URL
+  health_check_url TEXT NOT NULL,         -- Health check endpoint
+  public_key TEXT NOT NULL,               -- RSA public key (PEM)
+  signature TEXT NOT NULL,                -- Service signature (base64)
+  certificate TEXT,                       -- TLS certificate (optional)
+  status TEXT NOT NULL DEFAULT 'registering',  -- healthy, unhealthy, etc.
+  role TEXT NOT NULL DEFAULT 'primary',   -- primary or backup
+  failover_group TEXT,                    -- Failover group identifier
+  is_active INTEGER DEFAULT 1,            -- Currently active (1/0)
+  priority INTEGER DEFAULT 0,             -- Higher = preferred
+  metadata TEXT DEFAULT '{}',             -- JSON metadata
+  registered_by TEXT NOT NULL,            -- Username
+  registered_at INTEGER NOT NULL,         -- Unix timestamp
+  last_health_check INTEGER DEFAULT 0,
+  health_check_count INTEGER DEFAULT 0,
+  failed_health_count INTEGER DEFAULT 0,
+  last_failover_at INTEGER DEFAULT 0,
+  deleted INTEGER DEFAULT 0,              -- Soft delete flag
+  UNIQUE(name, type, url)
+);
+
+CREATE INDEX idx_service_registry_type ON service_registry(type);
+CREATE INDEX idx_service_registry_status ON service_registry(status);
+CREATE INDEX idx_service_registry_deleted ON service_registry(deleted);
+CREATE INDEX idx_service_registry_type_status ON service_registry(type, status, deleted);
+CREATE INDEX idx_service_registry_priority ON service_registry(priority DESC);
+CREATE INDEX idx_service_registry_failover_group ON service_registry(failover_group);
+CREATE INDEX idx_service_registry_is_active ON service_registry(is_active);
+CREATE INDEX idx_service_registry_role ON service_registry(role);
+CREATE INDEX idx_service_registry_group_active ON service_registry(failover_group, is_active, deleted);
+<code></code>`
+
+<h3>service_health_check</h3>
+
+Records all health check results.
+
+<code></code>`sql
+CREATE TABLE service_health_check (
+  id TEXT PRIMARY KEY,
+  service_id TEXT NOT NULL,
+  timestamp INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  response_time INTEGER NOT NULL,    -- Milliseconds
+  status_code INTEGER NOT NULL,      -- HTTP status code
+  error_message TEXT,
+  checked_by TEXT NOT NULL,          -- System or username
+  FOREIGN KEY(service_id) REFERENCES service_registry(id)
+);
+
+CREATE INDEX idx_health_check_service ON service_health_check(service_id);
+CREATE INDEX idx_health_check_timestamp ON service_health_check(timestamp DESC);
+CREATE INDEX idx_health_check_status ON service_health_check(status);
+<code></code>`
+
+<h3>service_failover_events</h3>
+
+Records all failover and failback events.
+
+<code></code>`sql
+CREATE TABLE service_failover_events (
+  id TEXT PRIMARY KEY,
+  failover_group TEXT NOT NULL,
+  service_type TEXT NOT NULL,
+  old_service_id TEXT NOT NULL,
+  new_service_id TEXT NOT NULL,
+  failover_reason TEXT NOT NULL,
+  failover_type TEXT NOT NULL,       -- "failover" or "failback"
+  timestamp INTEGER NOT NULL,
+  automatic INTEGER NOT NULL,        -- 1 for automatic, 0 for manual
+  FOREIGN KEY(old_service_id) REFERENCES service_registry(id),
+  FOREIGN KEY(new_service_id) REFERENCES service_registry(id)
+);
+
+CREATE INDEX idx_failover_events_group ON service_failover_events(failover_group);
+CREATE INDEX idx_failover_events_type ON service_failover_events(service_type);
+CREATE INDEX idx_failover_events_timestamp ON service_failover_events(timestamp DESC);
+<code></code>`
+
+<h3>service_rotation_audit</h3>
+
+Audit trail for service rotations.
+
+<code></code>`sql
+CREATE TABLE service_rotation_audit (
+  id TEXT PRIMARY KEY,
+  old_service_id TEXT NOT NULL,
+  new_service_id TEXT NOT NULL,
+  reason TEXT,
+  requested_by TEXT NOT NULL,
+  rotation_time INTEGER NOT NULL,
+  verification_hash TEXT NOT NULL,
+  success INTEGER NOT NULL,
+  error_message TEXT,
+  FOREIGN KEY(old_service_id) REFERENCES service_registry(id),
+  FOREIGN KEY(new_service_id) REFERENCES service_registry(id)
+);
+
+CREATE INDEX idx_rotation_audit_old_service ON service_rotation_audit(old_service_id);
+CREATE INDEX idx_rotation_audit_new_service ON service_rotation_audit(new_service_id);
+CREATE INDEX idx_rotation_audit_time ON service_rotation_audit(rotation_time DESC);
+<code></code>`
+
+---
+
+<h2>Failover Mechanism</h2>
+
+<h3>Overview</h3>
+
+The failover mechanism ensures high availability by automatically switching to backup services when primary services fail and switching back when primary services recover.
+
+<h3>Configuration</h3>
+
+<strong>Stability Check Count:</strong> 3 consecutive healthy checks required before failback
+<strong>Failback Delay:</strong> Minimum 5 minutes after failover before attempting failback
+<strong>Failure Threshold:</strong> 3 consecutive failures before marking service unhealthy
+
+<h3>Failover Workflow</h3>
+
+<li><strong>Detection:</strong></li>
+   - Health checker detects primary service is unhealthy
+   - Failure count reaches threshold (3 consecutive failures)
+   - Service status changed to <code>unhealthy</code>
+
+<li><strong>Execution:</strong></li>
+   - Find best healthy backup service (by priority, health check count)
+   - Deactivate primary service (<code>is_active = 0</code>)
+   - Activate backup service (<code>is_active = 1</code>)
+   - Record failover event
+   - Log operation
+
+<li><strong>Rollback on Failure:</strong></li>
+   - If backup activation fails, reactivate primary
+   - Log error for manual intervention
+
+<h3>Failback Workflow</h3>
+
+<li><strong>Detection:</strong></li>
+   - Primary service becomes healthy
+   - Stability counter increments for each consecutive healthy check
+   - Stability counter reaches threshold (3 checks)
+   - At least 5 minutes have passed since failover
+
+<li><strong>Execution:</strong></li>
+   - Find currently active backup
+   - Deactivate backup service
+   - Activate primary service
+   - Record failback event
+   - Reset stability counter
+   - Log operation
+
+<li><strong>Rollback on Failure:</strong></li>
+   - If primary activation fails, reactivate backup
+   - Log error for manual intervention
+
+<h3>Failover Groups</h3>
+
+Services in the same failover group share failover responsibility:
+
+<strong>Example Configuration:</strong>
+<code></code>`
+Group: auth-group-1
+├── auth-primary (role: primary, priority: 10, active: true)
+├── auth-backup-1 (role: backup, priority: 5, active: false)
+└── auth-backup-2 (role: backup, priority: 3, active: false)
+<code></code>`
+
+<strong>Failover Priority:</strong>
+<li>Highest priority healthy backup</li>
+<li>If priorities are equal, most healthy service (by health_check_count)</li>
+
+---
+
+<h2>Health Checking</h2>
+
+<h3>Configuration</h3>
+
+<strong>Check Interval:</strong> 1 minute
+<strong>Check Timeout:</strong> 10 seconds
+<strong>Failure Threshold:</strong> 3 consecutive failures
+<strong>Parallelization:</strong> All services checked concurrently
+
+<h3>Health Check Process</h3>
+
+<li>Query all non-deleted, non-decommissioned services from database</li>
+<li>For each service, spawn goroutine to check health in parallel</li>
+<li>HTTP GET request to <code>health_check_url</code> with 10-second timeout</li>
+<li>Evaluate response:</li>
+   - <strong>Healthy:</strong> HTTP 2xx or 3xx status code
+   - <strong>Unhealthy:</strong> HTTP 4xx, 5xx, timeout, or connection error
+<li>Update service status in database</li>
+<li>Record health check result</li>
+<li>Trigger failover check if needed</li>
+
+<h3>Health Check Data</h3>
+
+Each health check records:
+<li>Timestamp</li>
+<li>Status (healthy/unhealthy)</li>
+<li>Response time (milliseconds)</li>
+<li>HTTP status code</li>
+<li>Error message (if unhealthy)</li>
+<li>Checked by (system)</li>
+
+<h3>Failure Count Management</h3>
+
+<li><strong>On Success:</strong> Reset failure count to 0</li>
+<li><strong>On Failure:</strong> Increment failure count</li>
+<li><strong>Threshold:</strong> Mark unhealthy at 3 consecutive failures</li>
+<li><strong>Recovery:</strong> Mark healthy when check succeeds</li>
+
+---
+
+<h2>Service Rotation</h2>
+
+<h3>Use Cases</h3>
+
+<li>Upgrade service to new version</li>
+<li>Replace compromised service</li>
+<li>Change service configuration</li>
+<li>Migrate to new infrastructure</li>
+
+<h3>Prerequisites</h3>
+
+<li>New service must be registered for at least 5 minutes</li>
+<li>New service must be healthy</li>
+<li>New service must have valid cryptographic signature</li>
+<li>Service types must match</li>
+<li>Admin token must be valid</li>
+<li>Old service must not be already rotating or decommissioned</li>
+
+<h3>Rotation Process</h3>
+
+<li><strong>Validation:</strong></li>
+   - Verify admin token
+   - Verify old service exists and can rotate
+   - Verify new service signature
+   - Verify service types match
+   - Verify new service health
+   - Verify time constraints
+
+<li><strong>Execution:</strong></li>
+   - Decommission old service
+   - Register new service with same failover group
+   - Transfer active state if applicable
+   - Record rotation audit event
+
+<li><strong>Post-Rotation:</strong></li>
+   - Immediate health check on new service
+   - Monitor new service for stability
+
+<h3>Security Considerations</h3>
+
+<li>Use strong admin tokens (minimum 32 characters)</li>
+<li>Rotate admin tokens regularly</li>
+<li>Audit all rotation events</li>
+<li>Verify service signatures before rotation</li>
+<li>Implement rate limiting on rotation API</li>
+
+---
+
+<h2>Configuration</h2>
+
+<h3>Environment Variables</h3>
+
+<code></code>`bash
+<h1>Database</h1>
+DB_TYPE=sqlite
+DB_PATH=/app/Database/service_discovery.db
+
+<h1>Health Checking</h1>
+HEALTH_CHECK_INTERVAL=60s
+HEALTH_CHECK_TIMEOUT=10s
+HEALTH_FAILURE_THRESHOLD=3
+
+<h1>Failover</h1>
+FAILOVER_STABILITY_COUNT=3
+FAILBACK_DELAY=5m
+
+<h1>Security</h1>
+ADMIN_TOKEN_MIN_LENGTH=32
+SERVICE_ROTATION_MIN_AGE=5m
+<code></code>`
+
+<h3>Server Configuration</h3>
+
+<code></code>`go
+// internal/server/server.go
+type Server struct {
+    serviceDiscoveryHandler *handlers.ServiceDiscoveryHandler
+    // ...
+}
+
+func NewServer(cfg <em>config.Config) (</em>Server, error) {
+    // Initialize service discovery
+    serviceDiscoveryHandler, err := handlers.NewServiceDiscoveryHandler(db)
+    if err != nil {
+        return nil, err
+    }
+
+    return &Server{
+        serviceDiscoveryHandler: serviceDiscoveryHandler,
+        // ...
+    }, nil
+}
+<code></code>`
+
+---
+
+<h2>Deployment</h2>
+
+<h3>Production Checklist</h3>
+
+<li>[ ] Enable TLS/HTTPS for all communication</li>
+<li>[ ] Configure strong admin tokens</li>
+<li>[ ] Set up database backups</li>
+<li>[ ] Enable audit logging</li>
+<li>[ ] Configure monitoring and alerting</li>
+<li>[ ] Set appropriate health check intervals</li>
+<li>[ ] Configure failover groups correctly</li>
+<li>[ ] Test failover/failback scenarios</li>
+<li>[ ] Document service architecture</li>
+<li>[ ] Set up incident response procedures</li>
+
+<h3>Docker Deployment</h3>
+
+<code></code>`dockerfile
+FROM golang:1.22-alpine AS builder
+RUN apk add --no-cache gcc musl-dev sqlite-dev
+WORKDIR /app
+COPY . .
+RUN CGO_ENABLED=1 go build -o htCore main.go
+
+FROM alpine:latest
+RUN apk add --no-cache sqlite-libs
+COPY --from=builder /app/htCore /app/
+COPY Configurations/ /app/Configurations/
+RUN mkdir -p /app/Database
+EXPOSE 8080
+CMD ["/app/htCore", "-config", "/app/Configurations/default.json"]
+<code></code>`
+
+<h3>Kubernetes Deployment</h3>
+
+<code></code>`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helixtrack-core
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helixtrack-core
+  template:
+    metadata:
+      labels:
+        app: helixtrack-core
+    spec:
+      containers:
+      - name: core
+        image: helixtrack-core:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_TYPE
+          value: "postgresql"
+        - name: HEALTH_CHECK_INTERVAL
+          value: "60s"
+        volumeMounts:
+        - name: config
+          mountPath: /app/Configurations
+      volumes:
+      - name: config
+        configMap:
+          name: helixtrack-config
+<code></code>`
+
+---
+
+<h2>Monitoring</h2>
+
+<h3>Key Metrics</h3>
+
+<strong>Service Health:</strong>
+<li>Total services registered</li>
+<li>Healthy services count</li>
+<li>Unhealthy services count</li>
+<li>Average response time</li>
+<li>Health check success rate</li>
+
+<strong>Failover:</strong>
+<li>Failover events (last hour/day)</li>
+<li>Failback events (last hour/day)</li>
+<li>Average failover duration</li>
+<li>Failover success rate</li>
+
+<strong>API:</strong>
+<li>Request rate (by endpoint)</li>
+<li>Error rate</li>
+<li>Response time</li>
+<li>Registration rate</li>
+
+<h3>Prometheus Metrics</h3>
+
+<code></code>`
+<h1>Service counts</h1>
+service_discovery_total_services{type="authentication"} 2
+service_discovery_healthy_services{type="authentication"} 2
+service_discovery_unhealthy_services{type="authentication"} 0
+
+<h1>Health checks</h1>
+service_discovery_health_checks_total 1500
+service_discovery_health_check_failures_total 5
+
+<h1>Failover</h1>
+service_discovery_failover_events_total 3
+service_discovery_failback_events_total 2
+<code></code>`
+
+<h3>Logging</h3>
+
+All operations are logged with structured logging using Zap:
+
+<code></code>`go
+logger.Info("Service registered",
+    zap.String("service_id", serviceID),
+    zap.String("name", name),
+    zap.String("type", serviceType),
+)
+
+logger.Warn("Service health check failed",
+    zap.String("service_id", serviceID),
+    zap.Int("failure_count", failureCount),
+    zap.String("error", err.Error()),
+)
+
+logger.Error("Failover failed",
+    zap.String("failover_group", group),
+    zap.String("old_service", oldID),
+    zap.Error(err),
+)
+<code></code>`
+
+---
+
+<h2>Troubleshooting</h2>
+
+<h3>Common Issues</h3>
+
+<h4>1. Service Registration Fails</h4>
+
+<strong>Symptom:</strong> <code>400 Bad Request</code> or <code>401 Unauthorized</code>
+
+<strong>Possible Causes:</strong>
+<li>Invalid admin token (too short)</li>
+<li>Invalid public key format</li>
+<li>Missing required fields</li>
+
+<strong>Solution:</strong>
+<li>Verify admin token is at least 32 characters</li>
+<li>Verify public key is valid RSA PEM format</li>
+<li>Check all required fields are provided</li>
+
+<h4>2. Service Not Discovered</h4>
+
+<strong>Symptom:</strong> Service registered but not returned by discovery endpoint
+
+<strong>Possible Causes:</strong>
+<li>Service is unhealthy</li>
+<li>Service is not active (<code>is_active = 0</code>)</li>
+<li>Service is deleted or decommissioned</li>
+
+<strong>Solution:</strong>
+<li>Check service health status: <code>GET /api/services/health/:id</code></li>
+<li>Check service registration: <code>GET /api/services/list</code></li>
+<li>Verify health check endpoint is accessible</li>
+
+<h4>3. Failover Not Triggered</h4>
+
+<strong>Symptom:</strong> Primary service unhealthy but failover doesn't occur
+
+<strong>Possible Causes:</strong>
+<li>No healthy backup service available</li>
+<li>Backup service in different failover group</li>
+<li>Failure threshold not reached yet (< 3 failures)</li>
+
+<strong>Solution:</strong>
+<li>Verify backup service exists and is healthy</li>
+<li>Check failover group configuration</li>
+<li>Check failure count: <code>GET /api/services/health/:id</code></li>
+
+<h4>4. Failback Not Triggered</h4>
+
+<strong>Symptom:</strong> Primary service healthy but doesn't resume operation
+
+<strong>Possible Causes:</strong>
+<li>Stability threshold not reached (< 3 consecutive healthy checks)</li>
+<li>Insufficient time since failover (< 5 minutes)</li>
+<li>Primary service not in <code>primary</code> role</li>
+
+<strong>Solution:</strong>
+<li>Wait for stability checks to complete</li>
+<li>Check time since last failover event</li>
+<li>Verify service role configuration</li>
+
+<h4>5. Service Rotation Fails</h4>
+
+<strong>Symptom:</strong> <code>400 Bad Request</code> during rotation
+
+<strong>Possible Causes:</strong>
+<li>New service registered too recently (< 5 minutes)</li>
+<li>Service type mismatch</li>
+<li>Invalid signature on new service</li>
+<li>Admin token invalid</li>
+
+<strong>Solution:</strong>
+<li>Wait until new service has been registered for 5 minutes</li>
+<li>Verify service types match exactly</li>
+<li>Re-sign new service registration</li>
+<li>Verify admin token</li>
+
+<h3>Debug Commands</h3>
+
+<code></code>`bash
+<h1>Check service status</h1>
+curl http://localhost:8080/api/services/health/$SERVICE_ID
+
+<h1>List all services</h1>
+curl http://localhost:8080/api/services/list
+
+<h1>Check failover history</h1>
+sqlite3 /app/Database/service_discovery.db \
+  "SELECT * FROM service_failover_events ORDER BY timestamp DESC LIMIT 10;"
+
+<h1>Check health check history</h1>
+sqlite3 /app/Database/service_discovery.db \
+  "SELECT * FROM service_health_check WHERE service_id='$SERVICE_ID' ORDER BY timestamp DESC LIMIT 10;"
+
+<h1>Check current active service</h1>
+sqlite3 /app/Database/service_discovery.db \
+  "SELECT * FROM service_registry WHERE failover_group='auth-group-1' AND is_active=1;"
+<code></code>`
+
+<h3>Support</h3>
+
+For additional support:
+<li>GitHub Issues: https://github.com/helixtrack/core/issues</li>
+<li>Documentation: https://docs.helixtrack.ru</li>
+<li>Email: support@helixtrack.ru</li>
+
+---
+
+<strong>End of Technical Documentation</strong>
+    <div class="footer">
+        <p>Generated on 2025-10-10 21:02:24</p>
+        <p>&copy; 2025 HelixTrack Core - Service Discovery Documentation</p>
+    </div>
+    </div>
+</body>
+</html>
