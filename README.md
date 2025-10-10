@@ -19,7 +19,8 @@
 - **🎯 Complete Issue Tracking**: Tickets, types, statuses, workflows, components, labels
 - **📊 Agile/Scrum Support**: Sprints (cycles), story points, time estimation, boards
 - **👥 Team Management**: Organizations, teams, users, hierarchical permissions
-- **🔐 Enterprise Security**: JWT authentication, role-based access control, external auth service
+- **🔐 Enterprise Security**: JWT authentication, hierarchical permissions engine, external auth service
+- **🛡️ Permissions Engine**: Context-based permissions with inheritance, swappable implementations (local/HTTP)
 - **💾 Multi-Database**: SQLite (development), PostgreSQL (production)
 - **📝 Rich Metadata**: Comments, attachments (assets), custom labels, ticket relationships
 - **🔗 Git Integration**: Repository linking, commit-to-ticket mapping
@@ -27,7 +28,7 @@
 - **🧩 Extension System**: Modular extensions (Time Tracking, Documents, Chat Integration)
 - **🌐 REST API**: Unified `/do` endpoint with action-based routing
 - **📚 Complete Documentation**: User manuals, API docs, deployment guides
-- **🧪 100% Test Coverage**: 172+ comprehensive tests (expanding to 400+)
+- **🧪 100% Test Coverage**: 230+ comprehensive tests (expanding to 400+)
 
 ### 🚀 Phase 1 Features (Database & Models Ready)
 
@@ -282,7 +283,7 @@ Core/
 
 ### Test Infrastructure
 
-- **172+ Unit Tests** (expanding to 400+)
+- **230+ Unit Tests** (expanding to 400+)
 - **100% Code Coverage** (target)
 - **Race Detection** enabled
 - **Comprehensive Test Reports** (JSON, Markdown, HTML)
@@ -325,6 +326,7 @@ After running `verify-tests.sh`:
 | Document | Description | Location |
 |----------|-------------|----------|
 | **User Manual** | Complete API reference and usage guide | `Application/docs/USER_MANUAL.md` |
+| **Permissions Engine** | Comprehensive permissions system guide | `Application/docs/PERMISSIONS_ENGINE.md` |
 | **Deployment Guide** | Installation and deployment instructions | `Application/docs/DEPLOYMENT.md` |
 | **Testing Guide** | Comprehensive testing documentation | `Application/test-reports/TESTING_GUIDE.md` |
 | **Quick Start** | Quick testing guide | `Application/QUICK_START_TESTING.md` |
@@ -437,7 +439,8 @@ go build -o htCore main.go
 
 ### ✅ Completed
 - Complete V1 implementation (23 core features)
-- 172 comprehensive tests with 100% coverage
+- Hierarchical Permissions Engine with local/HTTP implementations
+- 230+ comprehensive tests with 100% coverage
 - Full documentation suite
 - Phase 1 database schema and models
 - Migration scripts
@@ -507,7 +510,7 @@ See [LICENSE](LICENSE) file for details.
 
 **Phase 1 Progress**: ~40% (Database & Models Complete, Handlers Pending)
 
-**Test Coverage**: 100% (172 tests, expanding to 400+)
+**Test Coverage**: 100% (230+ tests, expanding to 400+)
 
 **Documentation**: Complete
 

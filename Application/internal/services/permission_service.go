@@ -140,6 +140,86 @@ func (s *httpPermissionService) IsEnabled() bool {
 	return s.enabled
 }
 
+// localPermissionService is a local/in-memory implementation of PermissionService
+// This can be used as a free/open-source alternative to proprietary implementations
+type localPermissionService struct {
+	permissions map[string][]models.Permission // username -> permissions
+	enabled     bool
+}
+
+// NewLocalPermissionService creates a new local permission service
+func NewLocalPermissionService(enabled bool) PermissionService {
+	return &localPermissionService{
+		permissions: make(map[string][]models.Permission),
+		enabled:     enabled,
+	}
+}
+
+// AddUserPermission adds a permission for a user (for testing/setup)
+func (s *localPermissionService) AddUserPermission(username string, permission models.Permission) {
+	if s.permissions[username] == nil {
+		s.permissions[username] = []models.Permission{}
+	}
+	s.permissions[username] = append(s.permissions[username], permission)
+}
+
+// CheckPermission checks if a user has required permission for a context
+func (s *localPermissionService) CheckPermission(ctx context.Context, username, permissionContext string, requiredLevel models.PermissionLevel) (bool, error) {
+	if !s.enabled {
+		// If permission service is disabled, allow all operations
+		return true, nil
+	}
+
+	userPerms, exists := s.permissions[username]
+	if !exists {
+		return false, nil // User has no permissions
+	}
+
+	// Check for exact context match or parent context match
+	for _, perm := range userPerms {
+		if perm.Deleted {
+			continue
+		}
+
+		// Check if permission context matches or is a parent
+		if perm.Context == permissionContext || models.IsParentContext(perm.Context, permissionContext) {
+			// Check if permission level is sufficient
+			if perm.Level.HasPermission(requiredLevel) {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// GetUserPermissions retrieves all permissions for a user
+func (s *localPermissionService) GetUserPermissions(ctx context.Context, username string) ([]models.Permission, error) {
+	if !s.enabled {
+		return []models.Permission{}, nil
+	}
+
+	userPerms, exists := s.permissions[username]
+	if !exists {
+		return []models.Permission{}, nil
+	}
+
+	// Filter out deleted permissions
+	activePerms := []models.Permission{}
+	for _, perm := range userPerms {
+		if !perm.Deleted {
+			activePerms = append(activePerms, perm)
+		}
+	}
+
+	return activePerms, nil
+}
+
+// IsEnabled returns whether the permission service is enabled
+func (s *localPermissionService) IsEnabled() bool {
+	return s.enabled
+}
+
 // MockPermissionService is a mock implementation for testing
 type MockPermissionService struct {
 	CheckPermissionFunc    func(ctx context.Context, username, permissionContext string, requiredLevel models.PermissionLevel) (bool, error)
