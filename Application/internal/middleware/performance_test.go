@@ -323,12 +323,15 @@ func TestRateLimiter_Cleanup(t *testing.T) {
 }
 
 func TestGzipResponseWriter(t *testing.T) {
+	// Use Gin's test context to get a proper ResponseWriter
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
 	buf := &bytes.Buffer{}
 	gz := gzip.NewWriter(buf)
 
-	w := httptest.NewRecorder()
 	gzWriter := &gzipResponseWriter{
-		ResponseWriter: w,
+		ResponseWriter: c.Writer,
 		writer:         gz,
 	}
 

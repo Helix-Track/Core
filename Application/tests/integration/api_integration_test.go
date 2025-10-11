@@ -113,10 +113,10 @@ func TestAPI_HandlerWithJWTMiddleware(t *testing.T) {
 	router := gin.New()
 
 	// Add JWT middleware
-	jwtMiddleware := middleware.JWTMiddleware(authService)
+	jwtMiddleware := middleware.NewJWTMiddleware(authService, "test-secret")
 
 	// Protected endpoint
-	router.POST("/do", jwtMiddleware, handler.DoAction)
+	router.POST("/do", jwtMiddleware.Validate(), handler.DoAction)
 
 	// Test without JWT (should fail)
 	createReq := models.Request{
@@ -143,9 +143,9 @@ func TestAPI_HandlerWithPermissionCheck(t *testing.T) {
 	router := gin.New()
 
 	// Add JWT middleware
-	jwtMiddleware := middleware.JWTMiddleware(authService)
+	jwtMiddleware := middleware.NewJWTMiddleware(authService, "test-secret")
 
-	router.POST("/do", jwtMiddleware, handler.DoAction)
+	router.POST("/do", jwtMiddleware.Validate(), handler.DoAction)
 
 	// Test create operation (requires CREATE permission)
 	createReq := models.Request{
@@ -327,7 +327,8 @@ func TestAPI_MiddlewareChain(t *testing.T) {
 
 	// Add middleware chain
 	router.Use(gin.Recovery())
-	router.Use(middleware.JWTMiddleware(authService))
+	jwtMiddleware := middleware.NewJWTMiddleware(authService, "test-secret")
+	router.Use(jwtMiddleware.Validate())
 
 	router.POST("/do", handler.DoAction)
 

@@ -1,27 +1,15 @@
 package e2e
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"helixtrack.ru/core/internal/cache"
-	"helixtrack.ru/core/internal/config"
-	"helixtrack.ru/core/internal/database"
-	"helixtrack.ru/core/internal/handlers"
-	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
-	"helixtrack.ru/core/internal/security"
-	"helixtrack.ru/core/internal/services"
 )
 
 func init() {
@@ -34,7 +22,6 @@ func TestPM_CompleteProjectSetup(t *testing.T) {
 	app := setupCompleteApplication(t)
 	defer app.cleanup()
 
-	ctx := context.Background()
 	token := "valid-test-token"
 
 	t.Run("Step 1: Create Organization", func(t *testing.T) {
@@ -149,7 +136,6 @@ func TestPM_SprintPlanningAndExecution(t *testing.T) {
 	app := setupCompleteApplication(t)
 	defer app.cleanup()
 
-	ctx := context.Background()
 	token := "valid-test-token"
 
 	var sprintID, ticket1ID, ticket2ID string
@@ -336,7 +322,6 @@ func TestPM_BugTriageWorkflow(t *testing.T) {
 	app := setupCompleteApplication(t)
 	defer app.cleanup()
 
-	ctx := context.Background()
 	token := "valid-test-token"
 
 	var bugID string

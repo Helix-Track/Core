@@ -29,9 +29,9 @@ func TestDatabaseCache_Integration(t *testing.T) {
 	defer db.Close()
 
 	// Setup cache
-	cacheCfg := cache.DefaultConfig()
+	cacheCfg := cache.DefaultCacheConfig()
 	cacheCfg.MaxSize = 100
-	c := cache.NewCache(cacheCfg)
+	c := cache.NewInMemoryCache(cacheCfg)
 
 	ctx := context.Background()
 
@@ -55,7 +55,7 @@ func TestDatabaseCache_Integration(t *testing.T) {
 
 	// First read - from database (cache miss)
 	cacheKey := "user:user-1"
-	cachedData, found := c.Get(cacheKey)
+	cachedData, found := c.Get(ctx, cacheKey)
 	assert.False(t, found)
 	assert.Nil(t, cachedData)
 
@@ -71,10 +71,10 @@ func TestDatabaseCache_Integration(t *testing.T) {
 		"name":  name,
 		"email": email,
 	}
-	c.Set(cacheKey, userData, 5*time.Minute)
+	c.Set(ctx, cacheKey, userData, 5*time.Minute)
 
 	// Second read - from cache (cache hit)
-	cachedData, found = c.Get(cacheKey)
+	cachedData, found = c.Get(ctx, cacheKey)
 	assert.True(t, found)
 	assert.NotNil(t, cachedData)
 
@@ -97,8 +97,8 @@ func TestDatabaseCache_WriteThrough(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	cacheCfg := cache.DefaultConfig()
-	c := cache.NewCache(cacheCfg)
+	cacheCfg := cache.DefaultCacheConfig()
+	c := cache.NewInMemoryCache(cacheCfg)
 
 	ctx := context.Background()
 
@@ -115,10 +115,10 @@ func TestDatabaseCache_WriteThrough(t *testing.T) {
 	require.NoError(t, err)
 
 	// Write to cache
-	c.Set("item:"+itemID, itemValue, 5*time.Minute)
+	c.Set(ctx, "item:"+itemID, itemValue, 5*time.Minute)
 
 	// Read from cache (should be immediate)
-	cached, found := c.Get("item:" + itemID)
+	cached, found := c.Get(ctx, "item:"+itemID)
 	assert.True(t, found)
 	assert.Equal(t, itemValue, cached)
 
@@ -144,8 +144,8 @@ func TestDatabaseCache_CacheInvalidation(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	cacheCfg := cache.DefaultConfig()
-	c := cache.NewCache(cacheCfg)
+	cacheCfg := cache.DefaultCacheConfig()
+	c := cache.NewInMemoryCache(cacheCfg)
 
 	ctx := context.Background()
 
@@ -161,10 +161,10 @@ func TestDatabaseCache_CacheInvalidation(t *testing.T) {
 
 	// Cache the product
 	cacheKey := "product:" + productID
-	c.Set(cacheKey, map[string]interface{}{"name": "Widget", "price": 100}, 5*time.Minute)
+	c.Set(ctx, cacheKey, map[string]interface{}{"name": "Widget", "price": 100}, 5*time.Minute)
 
 	// Verify cache has old data
-	cached, found := c.Get(cacheKey)
+	cached, found := c.Get(ctx, cacheKey)
 	assert.True(t, found)
 	oldData := cached.(map[string]interface{})
 	assert.Equal(t, 100, oldData["price"])
@@ -174,10 +174,10 @@ func TestDatabaseCache_CacheInvalidation(t *testing.T) {
 	require.NoError(t, err)
 
 	// Invalidate cache
-	c.Delete(cacheKey)
+	c.Delete(ctx, cacheKey)
 
 	// Verify cache is empty
-	_, found = c.Get(cacheKey)
+	_, found = c.Get(ctx, cacheKey)
 	assert.False(t, found)
 
 	// Read from database and refresh cache
@@ -189,10 +189,10 @@ func TestDatabaseCache_CacheInvalidation(t *testing.T) {
 	assert.Equal(t, 150, price)
 
 	// Update cache with new data
-	c.Set(cacheKey, map[string]interface{}{"name": name, "price": price}, 5*time.Minute)
+	c.Set(ctx, cacheKey, map[string]interface{}{"name": name, "price": price}, 5*time.Minute)
 
 	// Verify cache has new data
-	cached, found = c.Get(cacheKey)
+	cached, found = c.Get(ctx, cacheKey)
 	assert.True(t, found)
 	newData := cached.(map[string]interface{})
 	assert.Equal(t, 150, newData["price"])
@@ -213,8 +213,8 @@ func TestOptimizedDatabase_WithCache(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	cacheCfg := cache.DefaultConfig()
-	c := cache.NewCache(cacheCfg)
+	cacheCfg := cache.DefaultCacheConfig()
+	c := cache.NewInMemoryCache(cacheCfg)
 
 	ctx := context.Background()
 
@@ -245,7 +245,7 @@ func TestOptimizedDatabase_WithCache(t *testing.T) {
 	// First execution - cache miss
 	startTime := time.Now()
 	cacheKey := "query:query-1"
-	_, found := c.Get(cacheKey)
+	_, found := c.Get(ctx, cacheKey)
 	assert.False(t, found)
 
 	// Execute prepared query
@@ -256,11 +256,11 @@ func TestOptimizedDatabase_WithCache(t *testing.T) {
 	firstDuration := time.Since(startTime)
 
 	// Cache the result
-	c.Set(cacheKey, map[string]string{"query": queryText, "result": result}, 5*time.Minute)
+	c.Set(ctx, cacheKey, map[string]string{"query": queryText, "result": result}, 5*time.Minute)
 
 	// Second execution - cache hit
 	startTime = time.Now()
-	cached, found := c.Get(cacheKey)
+	cached, found := c.Get(ctx, cacheKey)
 	assert.True(t, found)
 	secondDuration := time.Since(startTime)
 
@@ -286,8 +286,8 @@ func TestDatabaseCache_ConcurrentAccess(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	cacheCfg := cache.DefaultConfig()
-	c := cache.NewCache(cacheCfg)
+	cacheCfg := cache.DefaultCacheConfig()
+	c := cache.NewInMemoryCache(cacheCfg)
 
 	ctx := context.Background()
 
@@ -309,7 +309,7 @@ func TestDatabaseCache_ConcurrentAccess(t *testing.T) {
 
 			// Try to get from cache first
 			cacheKey := "counter:counter-1"
-			_, found := c.Get(cacheKey)
+			_, found := c.Get(ctx, cacheKey)
 
 			if !found {
 				// Read from database
@@ -317,7 +317,7 @@ func TestDatabaseCache_ConcurrentAccess(t *testing.T) {
 				var count int
 				if err := row.Scan(&count); err == nil {
 					// Cache the result
-					c.Set(cacheKey, count, 1*time.Second)
+					c.Set(ctx, cacheKey, count, 1*time.Second)
 				}
 			}
 
@@ -332,7 +332,7 @@ func TestDatabaseCache_ConcurrentAccess(t *testing.T) {
 	}
 
 	// Verify cache has the data
-	_, found := c.Get("counter:counter-1")
+	_, found := c.Get(ctx, "counter:counter-1")
 	assert.True(t, found)
 }
 
@@ -350,9 +350,9 @@ func TestDatabaseCache_ExpirationSync(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	cacheCfg := cache.DefaultConfig()
+	cacheCfg := cache.DefaultCacheConfig()
 	cacheCfg.CleanupInterval = 100 * time.Millisecond
-	c := cache.NewCache(cacheCfg)
+	c := cache.NewInMemoryCache(cacheCfg)
 	defer c.Close()
 
 	ctx := context.Background()
@@ -378,10 +378,10 @@ func TestDatabaseCache_ExpirationSync(t *testing.T) {
 
 	// Cache the session with same TTL
 	cacheKey := "session:" + sessionID
-	c.Set(cacheKey, "session data", 1*time.Second)
+	c.Set(ctx, cacheKey, "session data", 1*time.Second)
 
 	// Verify both have the data
-	_, found := c.Get(cacheKey)
+	_, found := c.Get(ctx, cacheKey)
 	assert.True(t, found)
 
 	row := db.QueryRow(ctx, "SELECT data FROM sessions WHERE id = ? AND expires > ?",
@@ -394,7 +394,7 @@ func TestDatabaseCache_ExpirationSync(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Verify cache has expired
-	_, found = c.Get(cacheKey)
+	_, found = c.Get(ctx, cacheKey)
 	assert.False(t, found)
 
 	// Verify database session is also expired
@@ -419,8 +419,8 @@ func TestDatabaseCache_Statistics(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	cacheCfg := cache.DefaultConfig()
-	c := cache.NewCache(cacheCfg)
+	cacheCfg := cache.DefaultCacheConfig()
+	c := cache.NewInMemoryCache(cacheCfg)
 
 	ctx := context.Background()
 
@@ -432,14 +432,14 @@ func TestDatabaseCache_Statistics(t *testing.T) {
 	for i := 1; i <= 50; i++ {
 		// Check cache first
 		cacheKey := "metric:metric-" + string(rune(i))
-		_, found := c.Get(cacheKey)
+		_, found := c.Get(ctx, cacheKey)
 
 		if !found {
 			// Database query (cache miss)
 			row := db.PreparedQueryRow(ctx, "SELECT value FROM metrics WHERE id = ?", "metric-"+string(rune(i)))
 			var value int
 			if err := row.Scan(&value); err == nil {
-				c.Set(cacheKey, value, 5*time.Minute)
+				c.Set(ctx, cacheKey, value, 5*time.Minute)
 			}
 		}
 	}
@@ -451,6 +451,7 @@ func TestDatabaseCache_Statistics(t *testing.T) {
 
 	// Get cache statistics
 	cacheStats := c.GetStats()
-	assert.GreaterOrEqual(t, cacheStats.Gets, uint64(50))
-	assert.Greater(t, cacheStats.Misses, uint64(0))
+	totalAccesses := cacheStats.Hits + cacheStats.Misses
+	assert.GreaterOrEqual(t, totalAccesses, int64(50))
+	assert.Greater(t, cacheStats.Misses, int64(0))
 }

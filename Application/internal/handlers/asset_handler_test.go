@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/models"
 )
 
@@ -108,10 +107,9 @@ func TestAssetHandler_Create_Success(t *testing.T) {
 	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeSuccess, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 
-	dataMap := response.Data.(map[string]interface{})
-	asset := dataMap["asset"].(map[string]interface{})
+	asset := response.Data["asset"].(map[string]interface{})
 	assert.NotEmpty(t, asset["id"])
 	assert.Equal(t, "https://example.com/file.pdf", asset["url"])
 	assert.Equal(t, "Important document", asset["description"])
@@ -227,8 +225,7 @@ func TestAssetHandler_Read_Success(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
-	asset := dataMap["asset"].(map[string]interface{})
+	asset := response.Data["asset"].(map[string]interface{})
 	assert.Equal(t, assetID, asset["id"])
 	assert.Equal(t, "https://example.com/test.pdf", asset["url"])
 }
@@ -307,8 +304,7 @@ func TestAssetHandler_List_EmptyList(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
-	count := int(dataMap["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 0, count)
 }
 
@@ -348,8 +344,7 @@ func TestAssetHandler_List_MultipleAssets(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
-	count := int(dataMap["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 3, count)
 }
 
@@ -394,8 +389,7 @@ func TestAssetHandler_List_ExcludesDeleted(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
-	count := int(dataMap["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 1, count)
 }
 
@@ -728,8 +722,7 @@ func TestAssetHandler_ListTickets_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
-	count := int(dataMap["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 3, count)
 }
 
@@ -856,8 +849,7 @@ func TestAssetHandler_ListComments_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
-	count := int(dataMap["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 2, count)
 }
 
@@ -984,8 +976,7 @@ func TestAssetHandler_ListProjects_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
-	count := int(dataMap["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 4, count)
 }
 
@@ -1016,8 +1007,7 @@ func TestAssetHandler_FullCRUDCycle(t *testing.T) {
 
 	var createResponse models.Response
 	json.Unmarshal(w.Body.Bytes(), &createResponse)
-	dataMap := createResponse.Data.(map[string]interface{})
-	asset := dataMap["asset"].(map[string]interface{})
+	asset := createResponse.Data["asset"].(map[string]interface{})
 	assetID := asset["id"].(string)
 
 	// 2. Read

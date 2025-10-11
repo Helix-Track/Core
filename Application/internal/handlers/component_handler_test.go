@@ -67,6 +67,24 @@ func setupComponentTestHandler(t *testing.T) *Handler {
 	return handler
 }
 
+// performRequest performs an HTTP request to the handler
+func performRequest(handler *Handler, method, path string, reqBody models.Request) *httptest.ResponseRecorder {
+	gin.SetMode(gin.TestMode)
+
+	body, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest(method, path, bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	return w
+}
+
 // ============================================================================
 // Component CRUD Tests
 // ============================================================================
@@ -1177,22 +1195,4 @@ func TestComponentHandler_FullCRUDCycle(t *testing.T) {
 	// 8. Verify component is deleted
 	w = performRequest(handler, "POST", "/do", readReq)
 	assert.Equal(t, http.StatusNotFound, w.Code)
-}
-
-// Helper function to perform HTTP request
-func performComponentRequest(handler *Handler, method, path string, reqBody models.Request) *httptest.ResponseRecorder {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
-	router.POST("/do", func(c *gin.Context) {
-		handler.DoAction(c, &reqBody)
-	})
-
-	body, _ := json.Marshal(reqBody)
-	req, _ := http.NewRequest(method, path, bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
-
-	return w
 }

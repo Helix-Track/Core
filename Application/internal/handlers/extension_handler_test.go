@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
 )
 
@@ -73,7 +72,7 @@ func TestExtensionHandler_Create_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionCreate(c, &reqBody)
 
@@ -104,7 +103,7 @@ func TestExtensionHandler_Create_MissingTitle(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionCreate(c, &reqBody)
 
@@ -138,7 +137,7 @@ func TestExtensionHandler_Read_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionRead(c, &reqBody)
 
@@ -163,7 +162,7 @@ func TestExtensionHandler_Read_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionRead(c, &reqBody)
 
@@ -185,7 +184,7 @@ func TestExtensionHandler_List_EmptyList(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionList(c, &reqBody)
 
@@ -218,7 +217,7 @@ func TestExtensionHandler_List_MultipleExtensions(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionList(c, &reqBody)
 
@@ -228,8 +227,7 @@ func TestExtensionHandler_List_MultipleExtensions(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 3, count)
 }
 
@@ -263,7 +261,7 @@ func TestExtensionHandler_Modify_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionModify(c, &reqBody)
 
@@ -296,7 +294,7 @@ func TestExtensionHandler_Modify_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionModify(c, &reqBody)
 
@@ -330,7 +328,7 @@ func TestExtensionHandler_Remove_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionRemove(c, &reqBody)
 
@@ -370,7 +368,7 @@ func TestExtensionHandler_Enable_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionEnable(c, &reqBody)
 
@@ -401,7 +399,7 @@ func TestExtensionHandler_Enable_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionEnable(c, &reqBody)
 
@@ -435,7 +433,7 @@ func TestExtensionHandler_Disable_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionDisable(c, &reqBody)
 
@@ -477,7 +475,7 @@ func TestExtensionHandler_SetMetadata_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionSetMetadata(c, &reqBody)
 
@@ -509,7 +507,7 @@ func TestExtensionHandler_SetMetadata_MissingExtensionID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionSetMetadata(c, &reqBody)
 
@@ -535,7 +533,7 @@ func TestExtensionHandler_SetMetadata_MissingProperty(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleExtensionSetMetadata(c, &reqBody)
 

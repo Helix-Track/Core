@@ -260,7 +260,7 @@ func TestE2E_CachingLayer(t *testing.T) {
 		cacheKey := "e2e:item-1"
 
 		// First access - cache miss
-		_, found := app.cache.Get(cacheKey)
+		_, found := app.cache.Get(context.Background(), cacheKey)
 		assert.False(t, found)
 
 		// Read from database
@@ -270,10 +270,10 @@ func TestE2E_CachingLayer(t *testing.T) {
 		require.NoError(t, err)
 
 		// Store in cache
-		app.cache.Set(cacheKey, data, 5*time.Minute)
+		app.cache.Set(context.Background(), cacheKey, data, 5*time.Minute)
 
 		// Second access - cache hit
-		cached, found := app.cache.Get(cacheKey)
+		cached, found := app.cache.Get(context.Background(), cacheKey)
 		assert.True(t, found)
 		assert.Equal(t, data, cached)
 	})
@@ -377,7 +377,7 @@ func TestE2E_ErrorHandling(t *testing.T) {
 type Application struct {
 	router      *gin.Engine
 	db          database.Database
-	cache       *cache.Cache
+	cache       cache.Cache
 	authService services.AuthService
 	permService services.PermissionService
 	tmpDir      string
@@ -397,8 +397,8 @@ func setupCompleteApplication(t *testing.T) *Application {
 	require.NoError(t, err)
 
 	// Setup cache
-	cacheCfg := cache.DefaultConfig()
-	c := cache.NewCache(cacheCfg)
+	cacheCfg := cache.DefaultCacheConfig()
+	c := cache.NewInMemoryCache(cacheCfg)
 
 	// Setup mock auth service
 	authService := &services.MockAuthService{
@@ -441,18 +441,19 @@ func setupCompleteApplication(t *testing.T) *Application {
 	router := gin.New()
 
 	// Add security middleware
-	router.Use(security.SecurityHeadersMiddleware())
-	router.Use(security.CSRFProtectionMiddleware("test-secret"))
+	router.Use(security.SecurityHeadersMiddleware(security.DefaultSecurityHeadersConfig()))
+	router.Use(security.CSRFProtectionMiddleware(security.DefaultCSRFProtectionConfig()))
 
-	rateCfg := security.DefaultDDoSConfig()
-	rateCfg.RequestsPerSecond = 10
+	rateCfg := security.DefaultDDoSProtectionConfig()
+	rateCfg.MaxRequestsPerSecond = 10
 	rateCfg.BurstSize = 10
-	router.Use(security.RateLimitMiddleware(rateCfg))
+	router.Use(security.DDoSProtectionMiddleware(rateCfg))
 
-	router.Use(security.InputValidationMiddleware())
+	router.Use(security.InputValidationMiddleware(security.DefaultInputValidationConfig()))
 
 	// Add JWT middleware (optional - doesn't block unauthenticated routes)
-	router.Use(middleware.JWTMiddleware(authService))
+	jwtMiddleware := middleware.NewJWTMiddleware(authService, "test-secret")
+	router.Use(jwtMiddleware.Validate())
 
 	// Setup handler
 	handler := handlers.NewHandler(db, authService, permService, "1.0.0-e2e")

@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
 )
 
@@ -71,7 +70,7 @@ func TestReportHandler_Create_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportCreate(c, &reqBody)
 
@@ -102,7 +101,7 @@ func TestReportHandler_Create_MissingTitle(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportCreate(c, &reqBody)
 
@@ -136,7 +135,7 @@ func TestReportHandler_Read_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportRead(c, &reqBody)
 
@@ -161,7 +160,7 @@ func TestReportHandler_Read_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportRead(c, &reqBody)
 
@@ -183,7 +182,7 @@ func TestReportHandler_List_EmptyList(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportList(c, &reqBody)
 
@@ -216,7 +215,7 @@ func TestReportHandler_List_MultipleReports(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportList(c, &reqBody)
 
@@ -226,8 +225,7 @@ func TestReportHandler_List_MultipleReports(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 3, count)
 }
 
@@ -260,7 +258,7 @@ func TestReportHandler_Modify_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportModify(c, &reqBody)
 
@@ -292,7 +290,7 @@ func TestReportHandler_Modify_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportModify(c, &reqBody)
 
@@ -326,7 +324,7 @@ func TestReportHandler_Remove_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportRemove(c, &reqBody)
 
@@ -366,7 +364,7 @@ func TestReportHandler_Execute_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportExecute(c, &reqBody)
 
@@ -391,7 +389,7 @@ func TestReportHandler_Execute_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportExecute(c, &reqBody)
 
@@ -427,7 +425,7 @@ func TestReportHandler_SetMetadata_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportSetMetadata(c, &reqBody)
 
@@ -468,7 +466,7 @@ func TestReportHandler_GetMetadata_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportGetMetadata(c, &reqBody)
 
@@ -494,7 +492,7 @@ func TestReportHandler_GetMetadata_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportGetMetadata(c, &reqBody)
 
@@ -528,7 +526,7 @@ func TestReportHandler_RemoveMetadata_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportRemoveMetadata(c, &reqBody)
 
@@ -559,7 +557,7 @@ func TestReportHandler_RemoveMetadata_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleReportRemoveMetadata(c, &reqBody)
 

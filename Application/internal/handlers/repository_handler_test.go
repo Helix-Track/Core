@@ -107,7 +107,7 @@ func TestRepositoryHandler_Create_Success(t *testing.T) {
 	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeSuccess, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 }
 
 // TestRepositoryHandler_Create_MissingFields tests creating without required fields
@@ -249,7 +249,7 @@ func TestRepositoryHandler_List_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	count := int(dataMap["count"].(float64))
 	assert.Equal(t, 3, count)
 }
@@ -501,7 +501,7 @@ func TestRepositoryTypeHandler_List_Success(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	count := int(dataMap["count"].(float64))
 	assert.Equal(t, 2, count)
 }
@@ -710,7 +710,7 @@ func TestRepositoryHandler_ListProjects_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	count := int(dataMap["count"].(float64))
 	assert.Equal(t, 3, count)
 }
@@ -892,7 +892,7 @@ func TestRepositoryHandler_ListCommits_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	count := int(dataMap["count"].(float64))
 	assert.Equal(t, 4, count)
 }
@@ -934,7 +934,7 @@ func TestRepositoryHandler_GetCommit_Success(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	commit := dataMap["commit"].(map[string]interface{})
 	assert.Equal(t, commitHash, commit["commitHash"])
 }
@@ -992,7 +992,7 @@ func TestRepositoryHandler_FullCRUDCycle(t *testing.T) {
 
 	var createResponse models.Response
 	json.Unmarshal(w.Body.Bytes(), &createResponse)
-	dataMap := createResponse.Data.(map[string]interface{})
+	dataMap := createResponse.Data
 	repository := dataMap["repository"].(map[string]interface{})
 	repoID := repository["id"].(string)
 

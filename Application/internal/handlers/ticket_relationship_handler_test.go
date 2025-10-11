@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
 )
 
@@ -73,7 +72,7 @@ func TestTicketRelationshipHandler_TypeCreate_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeCreate(c, &reqBody)
 
@@ -104,7 +103,7 @@ func TestTicketRelationshipHandler_TypeCreate_MissingTitle(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeCreate(c, &reqBody)
 
@@ -138,7 +137,7 @@ func TestTicketRelationshipHandler_TypeRead_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeRead(c, &reqBody)
 
@@ -163,7 +162,7 @@ func TestTicketRelationshipHandler_TypeRead_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeRead(c, &reqBody)
 
@@ -185,7 +184,7 @@ func TestTicketRelationshipHandler_TypeList_EmptyList(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeList(c, &reqBody)
 
@@ -218,7 +217,7 @@ func TestTicketRelationshipHandler_TypeList_MultipleTypes(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeList(c, &reqBody)
 
@@ -228,7 +227,7 @@ func TestTicketRelationshipHandler_TypeList_MultipleTypes(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
+	responseData := response.Data
 	count := int(responseData["count"].(float64))
 	assert.Equal(t, 3, count)
 }
@@ -262,7 +261,7 @@ func TestTicketRelationshipHandler_TypeModify_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeModify(c, &reqBody)
 
@@ -294,7 +293,7 @@ func TestTicketRelationshipHandler_TypeModify_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeModify(c, &reqBody)
 
@@ -328,7 +327,7 @@ func TestTicketRelationshipHandler_TypeRemove_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipTypeRemove(c, &reqBody)
 
@@ -374,7 +373,7 @@ func TestTicketRelationshipHandler_Create_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipCreate(c, &reqBody)
 
@@ -406,7 +405,7 @@ func TestTicketRelationshipHandler_Create_MissingTicketID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipCreate(c, &reqBody)
 
@@ -440,7 +439,7 @@ func TestTicketRelationshipHandler_Remove_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipRemove(c, &reqBody)
 
@@ -471,7 +470,7 @@ func TestTicketRelationshipHandler_Remove_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipRemove(c, &reqBody)
 
@@ -496,7 +495,7 @@ func TestTicketRelationshipHandler_List_EmptyList(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipList(c, &reqBody)
 
@@ -535,7 +534,7 @@ func TestTicketRelationshipHandler_List_MultipleRelationships(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipList(c, &reqBody)
 
@@ -545,7 +544,7 @@ func TestTicketRelationshipHandler_List_MultipleRelationships(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
+	responseData := response.Data
 	count := int(responseData["count"].(float64))
 	assert.Equal(t, 2, count)
 }
@@ -582,7 +581,7 @@ func TestTicketRelationshipHandler_List_BidirectionalSearch(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleTicketRelationshipList(c, &reqBody)
 
@@ -592,7 +591,7 @@ func TestTicketRelationshipHandler_List_BidirectionalSearch(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
+	responseData := response.Data
 	count := int(responseData["count"].(float64))
 	assert.Equal(t, 2, count) // Both relationships where ticket-1 is involved
 }

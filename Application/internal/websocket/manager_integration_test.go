@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -15,19 +14,92 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/services"
 )
+
+// mockPermissionService is a mock implementation of services.PermissionService for testing
+type mockPermissionService struct {
+	enabled bool
+}
+
+func (m *mockPermissionService) CheckPermission(ctx context.Context, username, permissionContext string, requiredLevel models.PermissionLevel) (bool, error) {
+	// Allow all permissions in tests
+	return true, nil
+}
+
+func (m *mockPermissionService) GetUserPermissions(ctx context.Context, username string) ([]models.Permission, error) {
+	return []models.Permission{}, nil
+}
+
+func (m *mockPermissionService) IsEnabled() bool {
+	return m.enabled
+}
+
+// createTestConfig creates a default WebSocket configuration for testing
+func createTestConfig() models.WebSocketConfig {
+	return models.WebSocketConfig{
+		Path:              "/ws",
+		MaxClients:        100,
+		ReadBufferSize:    1024,
+		WriteBufferSize:   1024,
+		MaxMessageSize:    512000,
+		WriteWait:         10 * time.Second,
+		PongWait:          60 * time.Second,
+		PingPeriod:        54 * time.Second,
+		HandshakeTimeout:  10 * time.Second,
+		EnableCompression: false,
+		AllowOrigins:      []string{"*"},
+	}
+}
+
+// createMockPermissionService creates a mock permission service for testing
+func createMockPermissionService() services.PermissionService {
+	return &mockPermissionService{enabled: false}
+}
+
+// createTestWebSocketHandler creates a WebSocket handler for testing
+func createTestWebSocketHandler(manager *Manager, username string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get username from query or use default
+		user := c.Query("user")
+		if user == "" {
+			user = username
+		}
+
+		// Upgrade connection
+		upgrader := manager.GetUpgrader()
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to upgrade connection"})
+			return
+		}
+
+		// Create client with mock JWT claims
+		claims := &models.JWTClaims{
+			Username: user,
+			Role:     "user",
+		}
+		client := manager.CreateClient(conn, user, claims)
+
+		// Register client
+		if err := manager.RegisterClient(client); err != nil {
+			conn.Close()
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Failed to register client"})
+			return
+		}
+	}
+}
 
 // TestWebSocketConnection_Integration tests WebSocket connection establishment
 func TestWebSocketConnection_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -42,20 +114,19 @@ func TestWebSocketConnection_Integration(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	// Verify client is connected
-	assert.Equal(t, 1, manager.GetClientCount())
+	assert.Equal(t, 1, manager.GetStats().ActiveConnections)
 }
 
 // TestWebSocketSubscription_Integration tests event subscription
 func TestWebSocketSubscription_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -94,15 +165,14 @@ func TestWebSocketSubscription_Integration(t *testing.T) {
 // TestWebSocketEventDelivery_Integration tests event delivery to subscribed client
 func TestWebSocketEventDelivery_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 	publisher := NewPublisher(manager, true)
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -162,19 +232,14 @@ func TestWebSocketEventDelivery_Integration(t *testing.T) {
 // TestWebSocketMultipleClients_Integration tests event delivery to multiple clients
 func TestWebSocketMultipleClients_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 	publisher := NewPublisher(manager, true)
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		username := c.Query("user")
-		if username == "" {
-			username = "testuser"
-		}
-		c.Set("username", username)
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -210,7 +275,7 @@ func TestWebSocketMultipleClients_Integration(t *testing.T) {
 	time.Sleep(200 * time.Millisecond)
 
 	// Verify all clients connected
-	assert.Equal(t, 3, manager.GetClientCount())
+	assert.Equal(t, 3, manager.GetStats().ActiveConnections)
 
 	// Publish a priority.created event
 	publisher.PublishEntityEvent(
@@ -248,15 +313,14 @@ func TestWebSocketMultipleClients_Integration(t *testing.T) {
 // TestWebSocketEventFiltering_Integration tests that clients only receive subscribed events
 func TestWebSocketEventFiltering_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 	publisher := NewPublisher(manager, true)
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -332,15 +396,14 @@ func TestWebSocketEventFiltering_Integration(t *testing.T) {
 // TestWebSocketUnsubscribe_Integration tests event unsubscription
 func TestWebSocketUnsubscribe_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 	publisher := NewPublisher(manager, true)
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -407,15 +470,14 @@ func TestWebSocketUnsubscribe_Integration(t *testing.T) {
 // TestWebSocketConcurrentEventDelivery_Integration tests concurrent event delivery
 func TestWebSocketConcurrentEventDelivery_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 	publisher := NewPublisher(manager, true)
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -484,14 +546,13 @@ func TestWebSocketConcurrentEventDelivery_Integration(t *testing.T) {
 // TestWebSocketDisconnect_Integration tests client disconnect handling
 func TestWebSocketDisconnect_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -505,7 +566,7 @@ func TestWebSocketDisconnect_Integration(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	// Verify client is connected
-	assert.Equal(t, 1, manager.GetClientCount())
+	assert.Equal(t, 1, manager.GetStats().ActiveConnections)
 
 	// Disconnect client
 	ws.Close()
@@ -514,7 +575,7 @@ func TestWebSocketDisconnect_Integration(t *testing.T) {
 	time.Sleep(200 * time.Millisecond)
 
 	// Verify client is disconnected
-	assert.Equal(t, 0, manager.GetClientCount())
+	assert.Equal(t, 0, manager.GetStats().ActiveConnections)
 }
 
 // TestWebSocketProjectContextFiltering_Integration tests project-based event filtering
@@ -527,14 +588,13 @@ func TestWebSocketProjectContextFiltering_Integration(t *testing.T) {
 // TestWebSocketPingPong_Integration tests WebSocket ping/pong keepalive
 func TestWebSocketPingPong_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -545,13 +605,6 @@ func TestWebSocketPingPong_Integration(t *testing.T) {
 	require.NoError(t, err)
 	defer ws.Close()
 
-	// Set ping handler
-	pongReceived := false
-	ws.SetPongHandler(func(string) error {
-		pongReceived = true
-		return nil
-	})
-
 	// Send ping
 	err = ws.WriteMessage(websocket.PingMessage, []byte{})
 	require.NoError(t, err)
@@ -561,20 +614,19 @@ func TestWebSocketPingPong_Integration(t *testing.T) {
 
 	// Note: gorilla/websocket automatically responds to pings
 	// This test verifies the connection is still alive
-	assert.Equal(t, 1, manager.GetClientCount())
+	assert.Equal(t, 1, manager.GetStats().ActiveConnections)
 }
 
 // TestWebSocketInvalidMessage_Integration tests handling of invalid messages
 func TestWebSocketInvalidMessage_Integration(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-	manager := NewManager()
+	manager := NewManager(createTestConfig(), createMockPermissionService())
+	require.NoError(t, manager.Start())
+	defer manager.Stop()
 
 	// Create test server
 	router := gin.New()
-	router.GET("/ws", func(c *gin.Context) {
-		c.Set("username", "testuser")
-		manager.HandleWebSocket(c)
-	})
+	router.GET("/ws", createTestWebSocketHandler(manager, "testuser"))
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -593,5 +645,5 @@ func TestWebSocketInvalidMessage_Integration(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	// Connection should still be alive (manager should handle errors gracefully)
-	assert.Equal(t, 1, manager.GetClientCount())
+	assert.Equal(t, 1, manager.GetStats().ActiveConnections)
 }

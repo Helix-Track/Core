@@ -6,19 +6,21 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"helixtrack.ru/core/internal/config"
 	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/models"
 )
 
 // setupServiceDiscoveryTestHandler creates test handler with service registry tables
 func setupServiceDiscoveryTestHandler(t *testing.T) *ServiceDiscoveryHandler {
-	db, err := database.NewSQLiteDatabase(":memory:")
+	db, err := database.NewDatabase(config.DatabaseConfig{Type: "sqlite", SQLitePath: ":memory:"})
 	require.NoError(t, err)
 
 	// Create service_registry table
@@ -168,7 +170,7 @@ func TestServiceDiscoveryHandler_DiscoverServices_FilterByType(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	discovery := dataMap["discovery"].(map[string]interface{})
 	totalCount := int(discovery["TotalCount"].(float64))
 	assert.Equal(t, 1, totalCount) // Only authentication service
@@ -191,7 +193,7 @@ func TestServiceDiscoveryHandler_DecommissionService_Success(t *testing.T) {
 	reqBody := models.ServiceDecommissionRequest{
 		ServiceID:  serviceID,
 		Reason:     "Testing decommission",
-		AdminToken: "a".repeat(32), // Valid length
+		AdminToken: strings.Repeat("a", 32), // Valid length
 	}
 
 	body, _ := json.Marshal(reqBody)
@@ -220,7 +222,7 @@ func TestServiceDiscoveryHandler_DecommissionService_NotFound(t *testing.T) {
 	reqBody := models.ServiceDecommissionRequest{
 		ServiceID:  "non-existent-id",
 		Reason:     "Testing",
-		AdminToken: "a".repeat(32),
+		AdminToken: strings.Repeat("a", 32),
 	}
 
 	body, _ := json.Marshal(reqBody)
@@ -297,7 +299,7 @@ func TestServiceDiscoveryHandler_ListServices_EmptyList(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	total := int(dataMap["total"].(float64))
 	assert.Equal(t, 0, total)
 }
@@ -331,7 +333,7 @@ func TestServiceDiscoveryHandler_ListServices_MultipleServices(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	total := int(dataMap["total"].(float64))
 	assert.Equal(t, 3, total)
 }
@@ -344,7 +346,7 @@ func TestServiceDiscoveryHandler_UpdateService_NotFound(t *testing.T) {
 	reqBody := models.ServiceUpdateRequest{
 		ServiceID:  "non-existent-id",
 		Version:    "2.0.0",
-		AdminToken: "a".repeat(32),
+		AdminToken: strings.Repeat("a", 32),
 	}
 
 	body, _ := json.Marshal(reqBody)
@@ -366,7 +368,7 @@ func TestServiceDiscoveryHandler_UpdateService_NoFields(t *testing.T) {
 
 	reqBody := models.ServiceUpdateRequest{
 		ServiceID:  "test-id",
-		AdminToken: "a".repeat(32),
+		AdminToken: strings.Repeat("a", 32),
 		// No fields to update
 	}
 

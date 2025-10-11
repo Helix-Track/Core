@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"helixtrack.ru/core/internal/config"
 	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/handlers"
 	"helixtrack.ru/core/internal/models"
@@ -20,7 +21,11 @@ import (
 
 func setupServiceDiscoveryTest(t *testing.T) (*gin.Engine, database.Database, *security.ServiceSigner) {
 	// Create in-memory database
-	db, err := database.NewSQLiteDatabase(":memory:")
+	dbCfg := config.DatabaseConfig{
+		Type:       "sqlite",
+		SQLitePath: ":memory:",
+	}
+	db, err := database.NewDatabase(dbCfg)
 	require.NoError(t, err)
 
 	// Initialize tables
@@ -102,7 +107,7 @@ func TestServiceDiscovery_RegisterService(t *testing.T) {
 		var response models.Response
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
-		assert.Equal(t, models.ErrorCodeSuccess, response.ErrorCode)
+		assert.Equal(t, -1, response.ErrorCode)
 	})
 
 	t.Run("Reject registration with short admin token", func(t *testing.T) {
@@ -414,7 +419,7 @@ func TestServiceDiscovery_DecommissionService(t *testing.T) {
 		var response models.Response
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
-		assert.Equal(t, models.ErrorCodeSuccess, response.ErrorCode)
+		assert.Equal(t, -1, response.ErrorCode)
 	})
 
 	t.Run("Decommission nonexistent service", func(t *testing.T) {

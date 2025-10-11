@@ -690,7 +690,7 @@ func TestWorkflowHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 	cModify.Set("username", "testuser")
 	handler.DoAction(cModify)
 
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, http.StatusBadRequest, wModify.Code)
 }
 
 // =============================================================================

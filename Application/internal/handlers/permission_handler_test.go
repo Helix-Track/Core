@@ -103,7 +103,7 @@ func TestPermissionHandler_Create_Success(t *testing.T) {
 	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeSuccess, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 }
 
 // TestPermissionHandler_Create_AllPermissionValues tests creating permissions with all valid values
@@ -116,10 +116,10 @@ func TestPermissionHandler_Create_AllPermissionValues(t *testing.T) {
 		title string
 		value int
 	}{
-		{"READ", "Read Permission", models.PermissionRead},
-		{"CREATE", "Create Permission", models.PermissionCreate},
-		{"UPDATE", "Update Permission", models.PermissionUpdate},
-		{"DELETE", "Delete Permission", models.PermissionDelete},
+		{"READ", "Read Permission", int(models.PermissionRead)},
+		{"CREATE", "Create Permission", int(models.PermissionCreate)},
+		{"UPDATE", "Update Permission", int(models.PermissionUpdate)},
+		{"DELETE", "Delete Permission", int(models.PermissionDelete)},
 	}
 
 	for _, tc := range testCases {
@@ -294,7 +294,7 @@ func TestPermissionHandler_List_Success(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	count := int(dataMap["count"].(float64))
 	assert.Equal(t, 2, count)
 }
@@ -558,7 +558,7 @@ func TestPermissionContextHandler_List_Success(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	count := int(dataMap["count"].(float64))
 	assert.Equal(t, 2, count)
 }
@@ -597,10 +597,10 @@ func TestPermissionContextHandler_Modify_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	// Verify change
-	var context string
-	err = handler.db.QueryRow(context.Background(), "SELECT context FROM permission_context WHERE id = ?", contextID).Scan(&context)
+	var ctxValue string
+	err = handler.db.QueryRow(context.Background(), "SELECT context FROM permission_context WHERE id = ?", contextID).Scan(&ctxValue)
 	require.NoError(t, err)
-	assert.Equal(t, "team", context)
+	assert.Equal(t, "team", ctxValue)
 }
 
 // TestPermissionContextHandler_Remove_Success tests soft-deleting a permission context
@@ -831,7 +831,7 @@ func TestPermissionHandler_Check_Allowed(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	allowed := dataMap["allowed"].(bool)
 	assert.True(t, allowed)
 }
@@ -917,7 +917,7 @@ func TestPermissionHandler_FullCRUDCycle(t *testing.T) {
 
 	var createResponse models.Response
 	json.Unmarshal(w.Body.Bytes(), &createResponse)
-	dataMap := createResponse.Data.(map[string]interface{})
+	dataMap := createResponse.Data
 	permission := dataMap["permission"].(map[string]interface{})
 	permID := permission["id"].(string)
 

@@ -6,6 +6,11 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// EventBroadcaster is an interface for broadcasting events to clients
+type EventBroadcaster interface {
+	BroadcastEvent(event *models.Event)
+}
+
 // EventPublisher is an interface for publishing events
 type EventPublisher interface {
 	// PublishEvent publishes an event to all subscribed clients
@@ -20,12 +25,12 @@ type EventPublisher interface {
 
 // Publisher implements the EventPublisher interface
 type Publisher struct {
-	manager *Manager
+	manager EventBroadcaster
 	enabled bool
 }
 
 // NewPublisher creates a new event publisher
-func NewPublisher(manager *Manager, enabled bool) EventPublisher {
+func NewPublisher(manager EventBroadcaster, enabled bool) EventPublisher {
 	return &Publisher{
 		manager: manager,
 		enabled: enabled,

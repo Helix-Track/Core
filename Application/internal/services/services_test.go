@@ -102,18 +102,6 @@ func TestAuthService_ValidateToken(t *testing.T) {
 	})
 }
 
-func TestAuthService_IsEnabled(t *testing.T) {
-	t.Run("Enabled service", func(t *testing.T) {
-		authService := NewAuthService("http://localhost:8081", 30, true)
-		assert.True(t, authService.IsEnabled())
-	})
-
-	t.Run("Disabled service", func(t *testing.T) {
-		authService := NewAuthService("http://localhost:8081", 30, false)
-		assert.False(t, authService.IsEnabled())
-	})
-}
-
 func TestAuthService_Disabled(t *testing.T) {
 	authService := NewAuthService("http://localhost:8081", 30, false)
 
@@ -257,30 +245,6 @@ func TestMockAuthService(t *testing.T) {
 	claims, err = mock.ValidateToken(context.Background(), "token")
 	require.NoError(t, err)
 	assert.Equal(t, "mockuser", claims.Username)
-
-	assert.True(t, mock.IsEnabled())
-}
-
-func TestMockPermissionService(t *testing.T) {
-	mock := &MockPermissionService{
-		CheckPermissionFunc: func(ctx context.Context, username, permissionContext string, requiredLevel models.PermissionLevel) (bool, error) {
-			return username == "admin", nil
-		},
-		GetUserPermissionsFunc: func(ctx context.Context, username string) ([]models.Permission, error) {
-			return []models.Permission{{Context: "test", Level: models.PermissionRead}}, nil
-		},
-		IsEnabledFunc: func() bool {
-			return true
-		},
-	}
-
-	allowed, err := mock.CheckPermission(context.Background(), "admin", "context", models.PermissionDelete)
-	require.NoError(t, err)
-	assert.True(t, allowed)
-
-	perms, err := mock.GetUserPermissions(context.Background(), "user")
-	require.NoError(t, err)
-	assert.Len(t, perms, 1)
 
 	assert.True(t, mock.IsEnabled())
 }

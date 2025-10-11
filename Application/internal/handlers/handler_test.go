@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -27,6 +29,11 @@ func init() {
 		LogSizeLimit: 1000000,
 		Level:        "error",
 	})
+}
+
+// generateTestID generates a unique test ID using current Unix nano timestamp
+func generateTestID() string {
+	return fmt.Sprintf("test-%d", time.Now().UnixNano())
 }
 
 // MockEventPublisher is a mock implementation of websocket.EventPublisher for testing

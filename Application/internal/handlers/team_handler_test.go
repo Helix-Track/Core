@@ -183,7 +183,7 @@ func TestTeamHandler_Remove_Success(t *testing.T) {
 
 	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	assert.Equal(t, true, dataMap["deleted"])
 }
 
@@ -274,7 +274,7 @@ func TestTeamHandler_UnassignOrganization_Success(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	dataMap := response.Data.(map[string]interface{})
+	dataMap := response.Data
 	assert.Equal(t, true, dataMap["unassigned"])
 }
 

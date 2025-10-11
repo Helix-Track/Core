@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
 )
 
@@ -75,7 +74,7 @@ func TestAuditHandler_Create_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditCreate(c, &reqBody)
 
@@ -113,7 +112,7 @@ func TestAuditHandler_Create_MissingAction(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditCreate(c, &reqBody)
 
@@ -145,7 +144,7 @@ func TestAuditHandler_Create_InvalidAction(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditCreate(c, &reqBody)
 
@@ -210,7 +209,7 @@ func TestAuditHandler_Read_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditRead(c, &reqBody)
 
@@ -241,7 +240,7 @@ func TestAuditHandler_Read_NotFound(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditRead(c, &reqBody)
 
@@ -270,7 +269,7 @@ func TestAuditHandler_Read_MissingID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditRead(c, &reqBody)
 
@@ -292,7 +291,7 @@ func TestAuditHandler_List_EmptyList(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditList(c, &reqBody)
 
@@ -330,7 +329,7 @@ func TestAuditHandler_List_MultipleEntries(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditList(c, &reqBody)
 
@@ -342,8 +341,7 @@ func TestAuditHandler_List_MultipleEntries(t *testing.T) {
 
 	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 5, count)
 }
 
@@ -376,7 +374,7 @@ func TestAuditHandler_List_ExcludesDeleted(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditList(c, &reqBody)
 
@@ -386,8 +384,7 @@ func TestAuditHandler_List_ExcludesDeleted(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 1, count) // Only non-deleted entry
 }
 
@@ -423,7 +420,7 @@ func TestAuditHandler_Query_ByUserID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditQuery(c, &reqBody)
 
@@ -433,8 +430,7 @@ func TestAuditHandler_Query_ByUserID(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 1, count) // Only user123's entry
 }
 
@@ -470,7 +466,7 @@ func TestAuditHandler_Query_ByAction(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditQuery(c, &reqBody)
 
@@ -480,8 +476,7 @@ func TestAuditHandler_Query_ByAction(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 1, count) // Only "create" action
 }
 
@@ -517,7 +512,7 @@ func TestAuditHandler_Query_ByTimeRange(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditQuery(c, &reqBody)
 
@@ -527,8 +522,7 @@ func TestAuditHandler_Query_ByTimeRange(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 1, count) // Only recent entry
 }
 
@@ -566,7 +560,7 @@ func TestAuditHandler_Query_MultipleFilters(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditQuery(c, &reqBody)
 
@@ -576,8 +570,7 @@ func TestAuditHandler_Query_MultipleFilters(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	responseData := response.Data.(map[string]interface{})
-	count := int(responseData["count"].(float64))
+	count := int(response.Data["count"].(float64))
 	assert.Equal(t, 1, count) // Only entry matching all filters
 }
 
@@ -610,7 +603,7 @@ func TestAuditHandler_AddMeta_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditAddMeta(c, &reqBody)
 
@@ -648,7 +641,7 @@ func TestAuditHandler_AddMeta_MissingAuditID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditAddMeta(c, &reqBody)
 
@@ -674,7 +667,7 @@ func TestAuditHandler_AddMeta_MissingProperty(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	c.Set(middleware.UsernameKey, "testuser")
+	c.Set("username", "testuser")
 
 	handler.handleAuditAddMeta(c, &reqBody)
 

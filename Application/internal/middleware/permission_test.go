@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 	"helixtrack.ru/core/internal/models"
 	"helixtrack.ru/core/internal/services"
@@ -60,7 +59,7 @@ func TestPermissionMiddleware_NoClaims(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-	var response models.ErrorResponse
+	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, models.ErrorCodeUnauthorized, response.ErrorCode)
@@ -92,7 +91,7 @@ func TestPermissionMiddleware_InvalidClaims(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-	var response models.ErrorResponse
+	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, models.ErrorCodeUnauthorized, response.ErrorCode)
@@ -180,7 +179,7 @@ func TestRequirePermission_NoUsername(t *testing.T) {
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-	var response models.ErrorResponse
+	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, models.ErrorCodeUnauthorized, response.ErrorCode)
@@ -211,7 +210,7 @@ func TestRequirePermission_InvalidUsername(t *testing.T) {
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 
-	var response models.ErrorResponse
+	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, models.ErrorCodeInternalError, response.ErrorCode)
@@ -273,7 +272,7 @@ func TestRequirePermission_PermissionDenied(t *testing.T) {
 
 	assert.Equal(t, http.StatusForbidden, w.Code)
 
-	var response models.ErrorResponse
+	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, models.ErrorCodeForbidden, response.ErrorCode)
@@ -307,7 +306,7 @@ func TestRequirePermission_ServiceError(t *testing.T) {
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 
-	var response models.ErrorResponse
+	var response models.Response
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, models.ErrorCodeInternalError, response.ErrorCode)

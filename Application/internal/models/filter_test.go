@@ -56,7 +56,6 @@ func TestFilter_IsSharedWith(t *testing.T) {
 	userID1 := "user-1"
 	userID2 := "user-2"
 	teamID1 := "team-1"
-	projectID1 := "project-1"
 
 	shares := []FilterShareMapping{
 		{

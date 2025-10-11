@@ -13,13 +13,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
+	"helixtrack.ru/core/internal/config"
 	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/models"
 )
 
 // setupAuthTestHandler creates a test auth handler with in-memory database
 func setupAuthTestHandler(t *testing.T) *AuthHandler {
-	db, err := database.NewSQLiteDatabase(":memory:")
+	db, err := database.NewDatabase(config.DatabaseConfig{
+		Type:       "sqlite",
+		SQLitePath: ":memory:",
+	})
 	require.NoError(t, err, "Failed to create in-memory database")
 
 	// Initialize user table
@@ -60,7 +64,7 @@ func TestAuthHandler_Register_Success(t *testing.T) {
 	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 	assert.NotNil(t, response.Data)
 
-	data := response.Data.(map[string]interface{})
+	data := response.Data
 	assert.Equal(t, "testuser", data["username"])
 	assert.Equal(t, "testuser@test.com", data["email"])
 	assert.Equal(t, "Test User", data["name"])
@@ -384,7 +388,7 @@ func TestAuthHandler_Login_Success(t *testing.T) {
 	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 	assert.NotNil(t, response.Data)
 
-	data := response.Data.(map[string]interface{})
+	data := response.Data
 	assert.Equal(t, "testuser", data["username"])
 	assert.Equal(t, "testuser@test.com", data["email"])
 	assert.Equal(t, "Test User", data["name"])
@@ -577,7 +581,7 @@ func TestAuthHandler_Logout_Success(t *testing.T) {
 	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 	assert.NotNil(t, response.Data)
 
-	data := response.Data.(map[string]interface{})
+	data := response.Data
 	assert.Equal(t, "Successfully logged out", data["message"])
 }
 
@@ -634,7 +638,7 @@ func TestAuthHandler_FullAuthenticationCycle(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, models.ErrorCodeNoError, loginResponse.ErrorCode)
 
-	loginData := loginResponse.Data.(map[string]interface{})
+	loginData := loginResponse.Data
 	assert.NotEmpty(t, loginData["token"])
 
 	// Step 3: Logout
@@ -656,7 +660,10 @@ func TestAuthHandler_FullAuthenticationCycle(t *testing.T) {
 
 // TestInitializeUserTable tests user table initialization
 func TestInitializeUserTable(t *testing.T) {
-	db, err := database.NewSQLiteDatabase(":memory:")
+	db, err := database.NewDatabase(config.DatabaseConfig{
+		Type:       "sqlite",
+		SQLitePath: ":memory:",
+	})
 	require.NoError(t, err, "Failed to create in-memory database")
 
 	// Initialize table
@@ -763,7 +770,7 @@ func TestAuthHandler_Login_JWTTokenGeneration(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	data := response.Data.(map[string]interface{})
+	data := response.Data
 	token := data["token"].(string)
 
 	// Verify token is not empty
