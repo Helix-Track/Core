@@ -145,7 +145,7 @@ func (h *Handler) handleComponentRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Component not found",
 			"",
 		))
@@ -285,7 +285,7 @@ func (h *Handler) handleComponentModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, componentID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Component not found",
 			"",
 		))
@@ -413,7 +413,7 @@ func (h *Handler) handleComponentRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Component not found",
 			"",
 		))
@@ -589,7 +589,7 @@ func (h *Handler) handleComponentRemoveTicket(c *gin.Context, req *models.Reques
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Component-ticket mapping not found",
 			"",
 		))
@@ -831,7 +831,7 @@ func (h *Handler) handleComponentGetMetadata(c *gin.Context, req *models.Request
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Metadata not found",
 			"",
 		))
@@ -1005,7 +1005,7 @@ func (h *Handler) handleComponentRemoveMetadata(c *gin.Context, req *models.Requ
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Metadata not found",
 			"",
 		))

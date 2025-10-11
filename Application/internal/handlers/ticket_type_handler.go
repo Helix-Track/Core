@@ -151,7 +151,7 @@ func (h *Handler) handleTicketTypeRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket type not found",
 			"",
 		))
@@ -293,7 +293,7 @@ func (h *Handler) handleTicketTypeModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, ticketTypeID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket type not found",
 			"",
 		))
@@ -427,7 +427,7 @@ func (h *Handler) handleTicketTypeRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket type not found",
 			"",
 		))
@@ -516,7 +516,7 @@ func (h *Handler) handleTicketTypeAssign(c *gin.Context, req *models.Request) {
 
 	if count > 0 {
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
-			models.ErrorCodeAlreadyExists,
+			models.ErrorCodeEntityAlreadyExists,
 			"Ticket type already assigned to this project",
 			"",
 		))
@@ -638,7 +638,7 @@ func (h *Handler) handleTicketTypeUnassign(c *gin.Context, req *models.Request) 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket type assignment not found",
 			"",
 		))

@@ -229,7 +229,7 @@ func TestResolutionHandler_Read_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestResolutionHandler_List_Empty tests listing resolutions when none exist
@@ -488,7 +488,7 @@ func TestResolutionHandler_Modify_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestResolutionHandler_Remove_Success tests successful resolution deletion
@@ -562,7 +562,7 @@ func TestResolutionHandler_Remove_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestResolutionHandler_CRUD_FullCycle tests complete resolution lifecycle

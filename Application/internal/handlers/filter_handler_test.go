@@ -291,7 +291,7 @@ func TestFilterHandler_Save_UpdateNotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestFilterHandler_Save_UpdateNotOwner(t *testing.T) {
@@ -380,7 +380,7 @@ func TestFilterHandler_Load_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestFilterHandler_Load_PublicFilter(t *testing.T) {

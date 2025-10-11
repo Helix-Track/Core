@@ -181,7 +181,7 @@ func (h *Handler) handleVersionRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Version not found",
 			"",
 		))
@@ -343,7 +343,7 @@ func (h *Handler) handleVersionModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, versionID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Version not found",
 			"",
 		))
@@ -479,7 +479,7 @@ func (h *Handler) handleVersionRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Version not found",
 			"",
 		))
@@ -566,7 +566,7 @@ func (h *Handler) handleVersionRelease(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Version not found",
 			"",
 		))
@@ -645,7 +645,7 @@ func (h *Handler) handleVersionArchive(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Version not found",
 			"",
 		))
@@ -838,7 +838,7 @@ func (h *Handler) handleVersionRemoveAffected(c *gin.Context, req *models.Reques
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Affected version mapping not found",
 			"",
 		))
@@ -1111,7 +1111,7 @@ func (h *Handler) handleVersionRemoveFix(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Fix version mapping not found",
 			"",
 		))

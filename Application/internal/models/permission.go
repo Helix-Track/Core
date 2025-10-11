@@ -1,7 +1,7 @@
 package models
 
-// Permission represents a permission type in the system
-type Permission struct {
+// PermissionEntity represents a permission type in the system (database model)
+type PermissionEntity struct {
 	ID          string `json:"id" db:"id"`
 	Title       string `json:"title" db:"title" binding:"required"`
 	Description string `json:"description,omitempty" db:"description"`
@@ -11,9 +11,9 @@ type Permission struct {
 	Deleted     bool   `json:"deleted" db:"deleted"`
 }
 
-// PermissionContext represents a context in which permissions can be applied
+// PermissionContextEntity represents a context in which permissions can be applied (database model)
 // Contexts form a hierarchy: node → account → organization → team/project
-type PermissionContext struct {
+type PermissionContextEntity struct {
 	ID       string `json:"id" db:"id"`
 	Context  string `json:"context" db:"context" binding:"required"` // node, account, organization, team, project
 	Created  int64  `json:"created" db:"created"`
@@ -42,13 +42,13 @@ type PermissionTeamMapping struct {
 }
 
 // IsValidPermissionValue validates if the permission value is one of the allowed values
-func (p *Permission) IsValidPermissionValue() bool {
-	return p.Value == PermissionRead || p.Value == PermissionCreate ||
-		p.Value == PermissionUpdate || p.Value == PermissionDelete
+func (p *PermissionEntity) IsValidPermissionValue() bool {
+	return p.Value == int(PermissionRead) || p.Value == int(PermissionCreate) ||
+		p.Value == int(PermissionUpdate) || p.Value == int(PermissionDelete)
 }
 
 // IsValidContext validates if the context is one of the allowed contexts
-func (pc *PermissionContext) IsValidContext() bool {
+func (pc *PermissionContextEntity) IsValidContext() bool {
 	validContexts := []string{"node", "account", "organization", "team", "project"}
 	for _, ctx := range validContexts {
 		if pc.Context == ctx {

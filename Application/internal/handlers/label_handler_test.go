@@ -251,7 +251,7 @@ func TestLabelHandler_Read_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 	assert.Contains(t, response.ErrorMessage, "Label not found")
 }
 
@@ -488,7 +488,7 @@ func TestLabelHandler_Modify_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestLabelHandler_Modify_NoFieldsToUpdate(t *testing.T) {
@@ -575,7 +575,7 @@ func TestLabelHandler_Remove_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 // ============================================================================
@@ -896,7 +896,7 @@ func TestLabelHandler_RemoveTicket_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestLabelHandler_ListTickets_Success(t *testing.T) {
@@ -1112,7 +1112,7 @@ func TestLabelHandler_UnassignCategory_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestLabelHandler_ListCategories_Success(t *testing.T) {

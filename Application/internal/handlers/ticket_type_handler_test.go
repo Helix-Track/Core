@@ -251,7 +251,7 @@ func TestTicketTypeHandler_Read_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestTicketTypeHandler_List_Empty tests listing ticket types when none exist
@@ -517,7 +517,7 @@ func TestTicketTypeHandler_Modify_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestTicketTypeHandler_Remove_Success tests successful ticket type deletion
@@ -591,7 +591,7 @@ func TestTicketTypeHandler_Remove_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestTicketTypeHandler_Assign_Success tests successful ticket type assignment to project
@@ -676,7 +676,7 @@ func TestTicketTypeHandler_Assign_AlreadyAssigned(t *testing.T) {
 	var resp models.Response
 	err = json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeAlreadyExists, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityAlreadyExists, resp.ErrorCode)
 }
 
 // TestTicketTypeHandler_Unassign_Success tests successful ticket type unassignment
@@ -758,7 +758,7 @@ func TestTicketTypeHandler_Unassign_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestTicketTypeHandler_ListByProject_Success tests listing ticket types for a project

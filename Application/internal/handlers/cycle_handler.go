@@ -95,7 +95,7 @@ func (h *Handler) handleCycleCreate(c *gin.Context, req *models.Request) {
 		err := h.db.QueryRow(c.Request.Context(), checkQuery, cycle.CycleID).Scan(&parentType)
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
-				models.ErrorCodeNotFound,
+				models.ErrorCodeEntityNotFound,
 				"Parent cycle not found",
 				"",
 			))
@@ -206,7 +206,7 @@ func (h *Handler) handleCycleRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Cycle not found",
 			"",
 		))
@@ -362,7 +362,7 @@ func (h *Handler) handleCycleModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, cycleID).Scan(&currentType)
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Cycle not found",
 			"",
 		))
@@ -514,7 +514,7 @@ func (h *Handler) handleCycleRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Cycle not found",
 			"",
 		))
@@ -593,7 +593,7 @@ func (h *Handler) handleCycleAssignProject(c *gin.Context, req *models.Request) 
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, cycleID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Cycle not found",
 			"",
 		))
@@ -605,7 +605,7 @@ func (h *Handler) handleCycleAssignProject(c *gin.Context, req *models.Request) 
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, projectID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Project not found",
 			"",
 		))
@@ -617,7 +617,7 @@ func (h *Handler) handleCycleAssignProject(c *gin.Context, req *models.Request) 
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, cycleID, projectID).Scan(&count)
 	if err == nil && count > 0 {
 		c.JSON(http.StatusConflict, models.NewErrorResponse(
-			models.ErrorCodeAlreadyExists,
+			models.ErrorCodeEntityAlreadyExists,
 			"Cycle already assigned to project",
 			"",
 		))
@@ -744,7 +744,7 @@ func (h *Handler) handleCycleUnassignProject(c *gin.Context, req *models.Request
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Cycle-project mapping not found",
 			"",
 		))
@@ -900,7 +900,7 @@ func (h *Handler) handleCycleAddTicket(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, cycleID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Cycle not found",
 			"",
 		))
@@ -912,7 +912,7 @@ func (h *Handler) handleCycleAddTicket(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, ticketID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket not found",
 			"",
 		))
@@ -924,7 +924,7 @@ func (h *Handler) handleCycleAddTicket(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, ticketID, cycleID).Scan(&count)
 	if err == nil && count > 0 {
 		c.JSON(http.StatusConflict, models.NewErrorResponse(
-			models.ErrorCodeAlreadyExists,
+			models.ErrorCodeEntityAlreadyExists,
 			"Ticket already in cycle",
 			"",
 		))
@@ -1051,7 +1051,7 @@ func (h *Handler) handleCycleRemoveTicket(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket-cycle mapping not found",
 			"",
 		))

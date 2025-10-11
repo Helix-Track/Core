@@ -133,7 +133,7 @@ func TestWatcherHandler_Add_AlreadyWatching(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeAlreadyExists, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityAlreadyExists, response.ErrorCode)
 	assert.Contains(t, response.ErrorMessage, "Already watching")
 }
 
@@ -330,7 +330,7 @@ func TestWatcherHandler_Remove_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 	assert.Contains(t, response.ErrorMessage, "Watcher not found")
 }
 
@@ -587,7 +587,7 @@ func TestWatcherHandler_FullCycle(t *testing.T) {
 	var dupResp models.Response
 	err = json.Unmarshal(w.Body.Bytes(), &dupResp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeAlreadyExists, dupResp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityAlreadyExists, dupResp.ErrorCode)
 
 	// 4. Remove watcher
 	removeReq := models.Request{

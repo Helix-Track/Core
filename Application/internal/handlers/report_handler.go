@@ -174,7 +174,7 @@ func (h *Handler) handleReportRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Report not found",
 			"",
 		))
@@ -315,7 +315,7 @@ func (h *Handler) handleReportModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, reportID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Report not found",
 			"",
 		))
@@ -455,7 +455,7 @@ func (h *Handler) handleReportRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Report not found",
 			"",
 		))
@@ -517,7 +517,7 @@ func (h *Handler) handleReportExecute(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Report not found",
 			"",
 		))
@@ -702,7 +702,7 @@ func (h *Handler) handleReportGetMetadata(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Report metadata not found",
 			"",
 		))
@@ -769,7 +769,7 @@ func (h *Handler) handleReportRemoveMetadata(c *gin.Context, req *models.Request
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Report metadata not found",
 			"",
 		))

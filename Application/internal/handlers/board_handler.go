@@ -155,7 +155,7 @@ func (h *Handler) handleBoardRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Board not found",
 			"",
 		))
@@ -295,7 +295,7 @@ func (h *Handler) handleBoardModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, boardID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Board not found",
 			"",
 		))
@@ -423,7 +423,7 @@ func (h *Handler) handleBoardRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Board not found",
 			"",
 		))
@@ -502,7 +502,7 @@ func (h *Handler) handleBoardAddTicket(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), boardQuery, boardID).Scan(&boardCount)
 	if err != nil || boardCount == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Board not found",
 			"",
 		))
@@ -525,7 +525,7 @@ func (h *Handler) handleBoardAddTicket(c *gin.Context, req *models.Request) {
 
 	if count > 0 {
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
-			models.ErrorCodeAlreadyExists,
+			models.ErrorCodeEntityAlreadyExists,
 			"Ticket is already assigned to this board",
 			"",
 		))
@@ -649,7 +649,7 @@ func (h *Handler) handleBoardRemoveTicket(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket not found on this board",
 			"",
 		))
@@ -806,7 +806,7 @@ func (h *Handler) handleBoardSetMetadata(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), boardQuery, boardID).Scan(&boardCount)
 	if err != nil || boardCount == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Board not found",
 			"",
 		))
@@ -956,7 +956,7 @@ func (h *Handler) handleBoardGetMetadata(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Metadata not found",
 			"",
 		))
@@ -1130,7 +1130,7 @@ func (h *Handler) handleBoardRemoveMetadata(c *gin.Context, req *models.Request)
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Metadata not found",
 			"",
 		))

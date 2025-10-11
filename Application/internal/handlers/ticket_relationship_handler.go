@@ -142,7 +142,7 @@ func (h *Handler) handleTicketRelationshipTypeRead(c *gin.Context, req *models.R
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket relationship type not found",
 			"",
 		))
@@ -278,7 +278,7 @@ func (h *Handler) handleTicketRelationshipTypeModify(c *gin.Context, req *models
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, relationshipTypeID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket relationship type not found",
 			"",
 		))
@@ -401,7 +401,7 @@ func (h *Handler) handleTicketRelationshipTypeRemove(c *gin.Context, req *models
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket relationship type not found",
 			"",
 		))
@@ -590,7 +590,7 @@ func (h *Handler) handleTicketRelationshipRemove(c *gin.Context, req *models.Req
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Ticket relationship not found",
 			"",
 		))

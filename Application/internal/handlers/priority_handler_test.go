@@ -306,7 +306,7 @@ func TestPriorityHandler_Read_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestPriorityHandler_List_Empty tests listing priorities when none exist
@@ -615,7 +615,7 @@ func TestPriorityHandler_Modify_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestPriorityHandler_Remove_Success tests successful priority deletion
@@ -689,7 +689,7 @@ func TestPriorityHandler_Remove_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestPriorityHandler_CRUD_FullCycle tests complete priority lifecycle

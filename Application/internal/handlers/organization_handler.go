@@ -10,6 +10,7 @@ import (
 
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/models"
+	"go.uber.org/zap"
 )
 
 // OrganizationCreate handles creating a new organization
@@ -18,22 +19,22 @@ func (h *Handler) OrganizationCreate(c *gin.Context, req *models.Request) {
 	var organization models.Organization
 	dataBytes, err := json.Marshal(req.Data)
 	if err != nil {
-		logger.Error("Failed to marshal organization data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format")
+		logger.Error("Failed to marshal organization data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if err := json.Unmarshal(dataBytes, &organization); err != nil {
-		logger.Error("Failed to unmarshal organization data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format")
+		logger.Error("Failed to unmarshal organization data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// Validate required fields
 	if organization.Title == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization title is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization title is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -46,9 +47,9 @@ func (h *Handler) OrganizationCreate(c *gin.Context, req *models.Request) {
 
 	// TODO: Store organization in database
 	// This will be implemented when database layer is updated
-	logger.Info("Organization created", "id", organization.ID, "title", organization.Title)
+	logger.Info("Organization created", zap.String("id", organization.ID), zap.String("title", organization.Title))
 
-	response := models.NewSuccessResponse(organization)
+	response := models.NewSuccessResponse(map[string]interface{}{"organization": organization})
 	c.JSON(http.StatusOK, response)
 }
 
@@ -57,17 +58,17 @@ func (h *Handler) OrganizationRead(c *gin.Context, req *models.Request) {
 	// Get organization ID from request data
 	organizationID, ok := req.Data["id"].(string)
 	if !ok || organizationID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// TODO: Retrieve organization from database
 	// This will be implemented when database layer is updated
-	logger.Info("Organization read requested", "id", organizationID)
+	logger.Info("Organization read requested", zap.String("id", organizationID))
 
 	// For now, return a placeholder response
-	response := models.NewErrorResponse(models.ErrorCodeInternalError, "Organization read not yet implemented")
+	response := models.NewErrorResponse(models.ErrorCodeInternalError, "Organization read not yet implemented", "")
 	c.JSON(http.StatusNotImplemented, response)
 }
 
@@ -79,7 +80,7 @@ func (h *Handler) OrganizationList(c *gin.Context, req *models.Request) {
 
 	// For now, return empty list
 	organizations := []models.Organization{}
-	response := models.NewSuccessResponse(organizations)
+	response := models.NewSuccessResponse(map[string]interface{}{"organizations": organizations, "count": len(organizations)})
 	c.JSON(http.StatusOK, response)
 }
 
@@ -89,22 +90,22 @@ func (h *Handler) OrganizationModify(c *gin.Context, req *models.Request) {
 	var organization models.Organization
 	dataBytes, err := json.Marshal(req.Data)
 	if err != nil {
-		logger.Error("Failed to marshal organization data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format")
+		logger.Error("Failed to marshal organization data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if err := json.Unmarshal(dataBytes, &organization); err != nil {
-		logger.Error("Failed to unmarshal organization data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format")
+		logger.Error("Failed to unmarshal organization data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid organization data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// Validate required fields
 	if organization.ID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -114,9 +115,9 @@ func (h *Handler) OrganizationModify(c *gin.Context, req *models.Request) {
 
 	// TODO: Update organization in database
 	// This will be implemented when database layer is updated
-	logger.Info("Organization modified", "id", organization.ID)
+	logger.Info("Organization modified", zap.String("id", organization.ID))
 
-	response := models.NewSuccessResponse(organization)
+	response := models.NewSuccessResponse(map[string]interface{}{"organization": organization})
 	c.JSON(http.StatusOK, response)
 }
 
@@ -125,14 +126,14 @@ func (h *Handler) OrganizationRemove(c *gin.Context, req *models.Request) {
 	// Get organization ID from request data
 	organizationID, ok := req.Data["id"].(string)
 	if !ok || organizationID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// TODO: Soft-delete organization in database (set deleted=true)
 	// This will be implemented when database layer is updated
-	logger.Info("Organization removed", "id", organizationID)
+	logger.Info("Organization removed", zap.String("id", organizationID))
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"id":      organizationID,
@@ -147,22 +148,22 @@ func (h *Handler) OrganizationAssignAccount(c *gin.Context, req *models.Request)
 	var mapping models.OrganizationAccountMapping
 	dataBytes, err := json.Marshal(req.Data)
 	if err != nil {
-		logger.Error("Failed to marshal mapping data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid mapping data format")
+		logger.Error("Failed to marshal mapping data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid mapping data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if err := json.Unmarshal(dataBytes, &mapping); err != nil {
-		logger.Error("Failed to unmarshal mapping data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid mapping data format")
+		logger.Error("Failed to unmarshal mapping data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid mapping data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// Validate required fields
 	if mapping.OrganizationID == "" || mapping.AccountID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID and Account ID are required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID and Account ID are required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -176,10 +177,10 @@ func (h *Handler) OrganizationAssignAccount(c *gin.Context, req *models.Request)
 	// TODO: Store mapping in database
 	// This will be implemented when database layer is updated
 	logger.Info("Organization assigned to account",
-		"organizationId", mapping.OrganizationID,
-		"accountId", mapping.AccountID)
+		zap.String("organizationId", mapping.OrganizationID),
+		zap.String("accountId", mapping.AccountID))
 
-	response := models.NewSuccessResponse(mapping)
+	response := models.NewSuccessResponse(map[string]interface{}{"mapping": mapping})
 	c.JSON(http.StatusOK, response)
 }
 
@@ -188,17 +189,17 @@ func (h *Handler) OrganizationListAccounts(c *gin.Context, req *models.Request) 
 	// Get organization ID from request data
 	organizationID, ok := req.Data["organizationId"].(string)
 	if !ok || organizationID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Organization ID is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// TODO: Retrieve accounts from database for this organization
 	// This will be implemented when database layer is updated
-	logger.Info("Organization accounts list requested", "organizationId", organizationID)
+	logger.Info("Organization accounts list requested", zap.String("organizationId", organizationID))
 
 	// For now, return empty list
 	accounts := []models.Account{}
-	response := models.NewSuccessResponse(accounts)
+	response := models.NewSuccessResponse(map[string]interface{}{"accounts": accounts, "count": len(accounts)})
 	c.JSON(http.StatusOK, response)
 }

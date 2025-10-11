@@ -146,7 +146,7 @@ func (h *Handler) handleLabelRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label not found",
 			"",
 		))
@@ -286,7 +286,7 @@ func (h *Handler) handleLabelModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, labelID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label not found",
 			"",
 		))
@@ -417,7 +417,7 @@ func (h *Handler) handleLabelRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label not found",
 			"",
 		))
@@ -568,7 +568,7 @@ func (h *Handler) handleLabelCategoryRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label category not found",
 			"",
 		))
@@ -708,7 +708,7 @@ func (h *Handler) handleLabelCategoryModify(c *gin.Context, req *models.Request)
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, categoryID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label category not found",
 			"",
 		))
@@ -836,7 +836,7 @@ func (h *Handler) handleLabelCategoryRemove(c *gin.Context, req *models.Request)
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label category not found",
 			"",
 		))
@@ -1012,7 +1012,7 @@ func (h *Handler) handleLabelRemoveTicket(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label-ticket mapping not found",
 			"",
 		))
@@ -1256,7 +1256,7 @@ func (h *Handler) handleLabelUnassignCategory(c *gin.Context, req *models.Reques
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Label-category mapping not found",
 			"",
 		))

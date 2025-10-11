@@ -145,7 +145,7 @@ func (h *Handler) handleAssetRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Asset not found",
 			"",
 		))
@@ -285,7 +285,7 @@ func (h *Handler) handleAssetModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, assetID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Asset not found",
 			"",
 		))
@@ -413,7 +413,7 @@ func (h *Handler) handleAssetRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Asset not found",
 			"",
 		))
@@ -589,7 +589,7 @@ func (h *Handler) handleAssetRemoveTicket(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Asset-ticket mapping not found",
 			"",
 		))
@@ -833,7 +833,7 @@ func (h *Handler) handleAssetRemoveComment(c *gin.Context, req *models.Request) 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Asset-comment mapping not found",
 			"",
 		))
@@ -1077,7 +1077,7 @@ func (h *Handler) handleAssetRemoveProject(c *gin.Context, req *models.Request) 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Asset-project mapping not found",
 			"",
 		))

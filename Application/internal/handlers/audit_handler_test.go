@@ -251,7 +251,7 @@ func TestAuditHandler_Read_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 // TestAuditHandler_Read_MissingID tests reading without providing ID

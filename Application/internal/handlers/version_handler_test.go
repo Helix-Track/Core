@@ -239,7 +239,7 @@ func TestVersionHandler_Read_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestVersionHandler_List_Empty tests listing versions when none exist
@@ -447,7 +447,7 @@ func TestVersionHandler_Modify_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestVersionHandler_Remove_Success tests successful version deletion
@@ -521,7 +521,7 @@ func TestVersionHandler_Remove_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestVersionHandler_Release_Success tests successful version release
@@ -595,7 +595,7 @@ func TestVersionHandler_Release_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestVersionHandler_Archive_Success tests successful version archiving
@@ -669,7 +669,7 @@ func TestVersionHandler_Archive_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestVersionHandler_AddAffected_Success tests adding affected version to ticket

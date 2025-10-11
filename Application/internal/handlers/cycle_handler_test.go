@@ -334,7 +334,7 @@ func TestCycleHandler_Read_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestCycleHandler_List_Empty tests listing cycles when none exist
@@ -543,7 +543,7 @@ func TestCycleHandler_Modify_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestCycleHandler_Remove_Success tests successful cycle deletion
@@ -617,7 +617,7 @@ func TestCycleHandler_Remove_NotFound(t *testing.T) {
 	var resp models.Response
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNotFound, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, resp.ErrorCode)
 }
 
 // TestCycleHandler_AssignProject_Success tests successful cycle-project assignment
@@ -702,7 +702,7 @@ func TestCycleHandler_AssignProject_AlreadyAssigned(t *testing.T) {
 	var resp models.Response
 	err = json.NewDecoder(w.Body).Decode(&resp)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeAlreadyExists, resp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityAlreadyExists, resp.ErrorCode)
 }
 
 // TestCycleHandler_UnassignProject_Success tests successful cycle-project unassignment

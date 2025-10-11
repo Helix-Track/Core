@@ -158,7 +158,7 @@ func (h *Handler) handleRepositoryRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Repository not found",
 			"",
 		))
@@ -296,7 +296,7 @@ func (h *Handler) handleRepositoryModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, repositoryID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Repository not found",
 			"",
 		))
@@ -423,7 +423,7 @@ func (h *Handler) handleRepositoryRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Repository not found",
 			"",
 		))
@@ -571,7 +571,7 @@ func (h *Handler) handleRepositoryTypeRead(c *gin.Context, req *models.Request) 
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Repository type not found",
 			"",
 		))
@@ -707,7 +707,7 @@ func (h *Handler) handleRepositoryTypeModify(c *gin.Context, req *models.Request
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, repositoryTypeID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Repository type not found",
 			"",
 		))
@@ -830,7 +830,7 @@ func (h *Handler) handleRepositoryTypeRemove(c *gin.Context, req *models.Request
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Repository type not found",
 			"",
 		))
@@ -1020,7 +1020,7 @@ func (h *Handler) handleRepositoryUnassignProject(c *gin.Context, req *models.Re
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Repository-project mapping not found",
 			"",
 		))
@@ -1285,7 +1285,7 @@ func (h *Handler) handleRepositoryRemoveCommit(c *gin.Context, req *models.Reque
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Commit mapping not found",
 			"",
 		))
@@ -1417,7 +1417,7 @@ func (h *Handler) handleRepositoryGetCommit(c *gin.Context, req *models.Request)
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Commit not found",
 			"",
 		))

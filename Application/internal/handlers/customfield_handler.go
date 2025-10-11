@@ -1338,14 +1338,6 @@ func (h *Handler) handleCustomFieldValueRemove(c *gin.Context, req *models.Reque
 	c.JSON(http.StatusOK, response)
 }
 
-// Helper function to safely get boolean from map
-func getBoolFromData(data map[string]interface{}, key string) bool {
-	if val, ok := data[key].(bool); ok {
-		return val
-	}
-	return false
-}
-
 // Helper function to safely get int from map
 func getIntFromData(data map[string]interface{}, key string) int {
 	if val, ok := data[key].(float64); ok {

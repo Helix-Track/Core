@@ -72,7 +72,7 @@ func (h *Handler) handleFilterSave(c *gin.Context, req *models.Request) {
 		err := h.db.QueryRow(c.Request.Context(), ownerCheckQuery, filterID).Scan(&ownerID)
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, models.NewErrorResponse(
-				models.ErrorCodeNotFound,
+				models.ErrorCodeEntityNotFound,
 				"Filter not found",
 				"",
 			))
@@ -254,7 +254,7 @@ func (h *Handler) handleFilterLoad(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Filter not found",
 			"",
 		))
@@ -417,7 +417,7 @@ func (h *Handler) handleFilterShare(c *gin.Context, req *models.Request) {
 	err := h.db.QueryRow(c.Request.Context(), ownerCheckQuery, filterID).Scan(&ownerID)
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Filter not found",
 			"",
 		))
@@ -610,7 +610,7 @@ func (h *Handler) handleFilterModify(c *gin.Context, req *models.Request) {
 	err := h.db.QueryRow(c.Request.Context(), ownerCheckQuery, filterID).Scan(&ownerID)
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Filter not found",
 			"",
 		))
@@ -747,7 +747,7 @@ func (h *Handler) handleFilterRemove(c *gin.Context, req *models.Request) {
 	err := h.db.QueryRow(c.Request.Context(), ownerCheckQuery, filterID).Scan(&ownerID)
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Filter not found",
 			"",
 		))
@@ -789,7 +789,7 @@ func (h *Handler) handleFilterRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Filter not found",
 			"",
 		))

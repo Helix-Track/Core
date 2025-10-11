@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/models"
@@ -18,22 +19,22 @@ func (h *Handler) AccountCreate(c *gin.Context, req *models.Request) {
 	var account models.Account
 	dataBytes, err := json.Marshal(req.Data)
 	if err != nil {
-		logger.Error("Failed to marshal account data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format")
+		logger.Error("Failed to marshal account data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if err := json.Unmarshal(dataBytes, &account); err != nil {
-		logger.Error("Failed to unmarshal account data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format")
+		logger.Error("Failed to unmarshal account data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// Validate required fields
 	if account.Title == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account title is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account title is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -46,9 +47,11 @@ func (h *Handler) AccountCreate(c *gin.Context, req *models.Request) {
 
 	// TODO: Store account in database
 	// This will be implemented when database layer is updated
-	logger.Info("Account created", "id", account.ID, "title", account.Title)
+	logger.Info("Account created", zap.String("id", account.ID), zap.String("title", account.Title))
 
-	response := models.NewSuccessResponse(account)
+	response := models.NewSuccessResponse(map[string]interface{}{
+		"account": account,
+	})
 	c.JSON(http.StatusOK, response)
 }
 
@@ -57,17 +60,17 @@ func (h *Handler) AccountRead(c *gin.Context, req *models.Request) {
 	// Get account ID from request data
 	accountID, ok := req.Data["id"].(string)
 	if !ok || accountID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account ID is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account ID is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// TODO: Retrieve account from database
 	// This will be implemented when database layer is updated
-	logger.Info("Account read requested", "id", accountID)
+	logger.Info("Account read requested", zap.String("id", accountID))
 
 	// For now, return a placeholder response
-	response := models.NewErrorResponse(models.ErrorCodeInternalError, "Account read not yet implemented")
+	response := models.NewErrorResponse(models.ErrorCodeInternalError, "Account read not yet implemented", "")
 	c.JSON(http.StatusNotImplemented, response)
 }
 
@@ -79,7 +82,10 @@ func (h *Handler) AccountList(c *gin.Context, req *models.Request) {
 
 	// For now, return empty list
 	accounts := []models.Account{}
-	response := models.NewSuccessResponse(accounts)
+	response := models.NewSuccessResponse(map[string]interface{}{
+		"accounts": accounts,
+		"count":    len(accounts),
+	})
 	c.JSON(http.StatusOK, response)
 }
 
@@ -89,22 +95,22 @@ func (h *Handler) AccountModify(c *gin.Context, req *models.Request) {
 	var account models.Account
 	dataBytes, err := json.Marshal(req.Data)
 	if err != nil {
-		logger.Error("Failed to marshal account data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format")
+		logger.Error("Failed to marshal account data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	if err := json.Unmarshal(dataBytes, &account); err != nil {
-		logger.Error("Failed to unmarshal account data", "error", err)
-		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format")
+		logger.Error("Failed to unmarshal account data", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInvalidRequest, "Invalid account data format", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// Validate required fields
 	if account.ID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account ID is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account ID is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -114,9 +120,11 @@ func (h *Handler) AccountModify(c *gin.Context, req *models.Request) {
 
 	// TODO: Update account in database
 	// This will be implemented when database layer is updated
-	logger.Info("Account modified", "id", account.ID)
+	logger.Info("Account modified", zap.String("id", account.ID))
 
-	response := models.NewSuccessResponse(account)
+	response := models.NewSuccessResponse(map[string]interface{}{
+		"account": account,
+	})
 	c.JSON(http.StatusOK, response)
 }
 
@@ -125,14 +133,14 @@ func (h *Handler) AccountRemove(c *gin.Context, req *models.Request) {
 	// Get account ID from request data
 	accountID, ok := req.Data["id"].(string)
 	if !ok || accountID == "" {
-		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account ID is required")
+		response := models.NewErrorResponse(models.ErrorCodeMissingData, "Account ID is required", "")
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	// TODO: Soft-delete account in database (set deleted=true)
 	// This will be implemented when database layer is updated
-	logger.Info("Account removed", "id", accountID)
+	logger.Info("Account removed", zap.String("id", accountID))
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"id":      accountID,

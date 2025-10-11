@@ -67,7 +67,7 @@ func (h *Handler) handlePermissionCreate(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	permission := &models.Permission{
+	permission := &models.PermissionEntity{
 		ID:          uuid.New().String(),
 		Title:       title,
 		Description: getStringFromData(req.Data, "description"),
@@ -155,7 +155,7 @@ func (h *Handler) handlePermissionRead(c *gin.Context, req *models.Request) {
 		WHERE id = ? AND deleted = 0
 	`
 
-	var permission models.Permission
+	var permission models.PermissionEntity
 	err := h.db.QueryRow(c.Request.Context(), query, permissionID).Scan(
 		&permission.ID,
 		&permission.Title,
@@ -168,7 +168,7 @@ func (h *Handler) handlePermissionRead(c *gin.Context, req *models.Request) {
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission not found",
 			"",
 		))
@@ -228,9 +228,9 @@ func (h *Handler) handlePermissionList(c *gin.Context, req *models.Request) {
 	}
 	defer rows.Close()
 
-	permissions := make([]models.Permission, 0)
+	permissions := make([]models.PermissionEntity, 0)
 	for rows.Next() {
-		var permission models.Permission
+		var permission models.PermissionEntity
 		err := rows.Scan(
 			&permission.ID,
 			&permission.Title,
@@ -309,7 +309,7 @@ func (h *Handler) handlePermissionModify(c *gin.Context, req *models.Request) {
 	err = h.db.QueryRow(c.Request.Context(), checkQuery, permissionID).Scan(&count)
 	if err != nil || count == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission not found",
 			"",
 		))
@@ -328,8 +328,8 @@ func (h *Handler) handlePermissionModify(c *gin.Context, req *models.Request) {
 	if value, ok := req.Data["value"].(float64); ok {
 		valueInt := int(value)
 		// Validate permission value
-		if valueInt != models.PermissionRead && valueInt != models.PermissionCreate &&
-			valueInt != models.PermissionUpdate && valueInt != models.PermissionDelete {
+		if models.PermissionLevel(valueInt) != models.PermissionRead && models.PermissionLevel(valueInt) != models.PermissionCreate &&
+			models.PermissionLevel(valueInt) != models.PermissionUpdate && models.PermissionLevel(valueInt) != models.PermissionDelete {
 			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 				models.ErrorCodeInvalidData,
 				"Invalid permission value",
@@ -451,7 +451,7 @@ func (h *Handler) handlePermissionRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission not found",
 			"",
 		))
@@ -514,7 +514,7 @@ func (h *Handler) handlePermissionContextCreate(c *gin.Context, req *models.Requ
 		return
 	}
 
-	permContext := &models.PermissionContext{
+	permContext := &models.PermissionContextEntity{
 		ID:       uuid.New().String(),
 		Context:  context,
 		Created:  time.Now().Unix(),
@@ -598,7 +598,7 @@ func (h *Handler) handlePermissionContextRead(c *gin.Context, req *models.Reques
 		WHERE id = ? AND deleted = 0
 	`
 
-	var permContext models.PermissionContext
+	var permContext models.PermissionContextEntity
 	err := h.db.QueryRow(c.Request.Context(), query, contextID).Scan(
 		&permContext.ID,
 		&permContext.Context,
@@ -609,7 +609,7 @@ func (h *Handler) handlePermissionContextRead(c *gin.Context, req *models.Reques
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission context not found",
 			"",
 		))
@@ -669,9 +669,9 @@ func (h *Handler) handlePermissionContextList(c *gin.Context, req *models.Reques
 	}
 	defer rows.Close()
 
-	contexts := make([]models.PermissionContext, 0)
+	contexts := make([]models.PermissionContextEntity, 0)
 	for rows.Next() {
-		var permContext models.PermissionContext
+		var permContext models.PermissionContextEntity
 		err := rows.Scan(
 			&permContext.ID,
 			&permContext.Context,
@@ -788,7 +788,7 @@ func (h *Handler) handlePermissionContextModify(c *gin.Context, req *models.Requ
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission context not found",
 			"",
 		))
@@ -867,7 +867,7 @@ func (h *Handler) handlePermissionContextRemove(c *gin.Context, req *models.Requ
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission context not found",
 			"",
 		))
@@ -1057,7 +1057,7 @@ func (h *Handler) handlePermissionUnassignUser(c *gin.Context, req *models.Reque
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission mapping not found",
 			"",
 		))
@@ -1247,7 +1247,7 @@ func (h *Handler) handlePermissionUnassignTeam(c *gin.Context, req *models.Reque
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Permission mapping not found",
 			"",
 		))
@@ -1310,7 +1310,7 @@ func (h *Handler) handlePermissionCheck(c *gin.Context, req *models.Request) {
 	}
 
 	// Use permission service to check
-	allowed, err := h.permService.CheckPermission(c.Request.Context(), targetUser, resource, int(permValue))
+	allowed, err := h.permService.CheckPermission(c.Request.Context(), targetUser, resource, models.PermissionLevel(permValue))
 	if err != nil {
 		logger.Error("Permission check failed", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(

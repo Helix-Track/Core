@@ -240,7 +240,7 @@ func TestComponentHandler_Read_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 	assert.Contains(t, response.ErrorMessage, "Component not found")
 }
 
@@ -476,7 +476,7 @@ func TestComponentHandler_Modify_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestComponentHandler_Modify_NoFieldsToUpdate(t *testing.T) {
@@ -563,7 +563,7 @@ func TestComponentHandler_Remove_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 // ============================================================================
@@ -692,7 +692,7 @@ func TestComponentHandler_RemoveTicket_NotFound(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestComponentHandler_ListTickets_Success(t *testing.T) {
@@ -923,7 +923,7 @@ func TestComponentHandler_GetMetadata_NotFound(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 func TestComponentHandler_ListMetadata_Success(t *testing.T) {
@@ -1076,7 +1076,7 @@ func TestComponentHandler_RemoveMetadata_NotFound(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
 
-	assert.Equal(t, models.ErrorCodeNotFound, response.ErrorCode)
+	assert.Equal(t, models.ErrorCodeEntityNotFound, response.ErrorCode)
 }
 
 // ============================================================================

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
 	"time"
 
@@ -62,7 +61,7 @@ func (h *Handler) handleWatcherAdd(c *gin.Context, req *models.Request) {
 
 	if count > 0 {
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
-			models.ErrorCodeAlreadyExists,
+			models.ErrorCodeEntityAlreadyExists,
 			"Already watching this ticket",
 			"",
 		))
@@ -163,7 +162,7 @@ func (h *Handler) handleWatcherRemove(c *gin.Context, req *models.Request) {
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
-			models.ErrorCodeNotFound,
+			models.ErrorCodeEntityNotFound,
 			"Watcher not found",
 			"",
 		))
