@@ -14,9 +14,55 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
-// setupBoardTestHandler creates a test handler for board tests
+// setupBoardTestHandler creates a test handler for board tests with database schema
 func setupBoardTestHandler(t *testing.T) *Handler {
-	return setupTestHandler(t)
+	handler := setupTestHandler(t)
+
+	// Create board-related tables in the test database
+	ctx := context.Background()
+
+	// Create board table
+	_, err := handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS board (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT,
+			description TEXT,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create board_meta_data table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS board_meta_data (
+			id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			board_id TEXT    NOT NULL,
+			property TEXT    NOT NULL,
+			value    TEXT,
+			created  INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted  BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket_board_mapping table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_board_mapping (
+			id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			ticket_id TEXT    NOT NULL,
+			board_id  TEXT    NOT NULL,
+			created   INTEGER NOT NULL,
+			modified  INTEGER NOT NULL,
+			deleted   BOOLEAN NOT NULL,
+			UNIQUE (ticket_id, board_id)
+		)
+	`)
+	require.NoError(t, err)
+
+	return handler
 }
 
 // =============================================================================
@@ -132,7 +178,8 @@ func TestBoardHandler_Create_Unauthorized(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	// No username set
+	c.Set("request", &reqBody)
+	// No username set - testing unauthorized access
 
 	handler.DoAction(c)
 
@@ -161,6 +208,7 @@ func TestBoardHandler_Read_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -182,6 +230,7 @@ func TestBoardHandler_Read_Success(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusOK, wRead.Code)
@@ -299,6 +348,7 @@ func TestBoardHandler_List_Multiple(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -351,6 +401,7 @@ func TestBoardHandler_List_ExcludesDeleted(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 
 		if i == 1 {
@@ -414,6 +465,7 @@ func TestBoardHandler_Modify_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -437,6 +489,7 @@ func TestBoardHandler_Modify_Success(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -519,6 +572,7 @@ func TestBoardHandler_Remove_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -540,6 +594,7 @@ func TestBoardHandler_Remove_Success(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	assert.Equal(t, http.StatusOK, wRemove.Code)
@@ -620,6 +675,7 @@ func TestBoardHandler_CRUD_FullCycle(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 	assert.Equal(t, http.StatusCreated, wCreate.Code)
 
@@ -642,6 +698,7 @@ func TestBoardHandler_CRUD_FullCycle(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 	assert.Equal(t, http.StatusOK, wRead.Code)
 
@@ -660,6 +717,7 @@ func TestBoardHandler_CRUD_FullCycle(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 	assert.Equal(t, http.StatusOK, wModify.Code)
 
@@ -677,6 +735,7 @@ func TestBoardHandler_CRUD_FullCycle(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 	assert.Equal(t, http.StatusOK, wRemove.Code)
 
@@ -694,6 +753,7 @@ func TestBoardHandler_CRUD_FullCycle(t *testing.T) {
 	cRead2, _ := gin.CreateTestContext(wRead2)
 	cRead2.Request = readHttpReq2
 	cRead2.Set("username", "testuser")
+	cRead2.Set("request", &readReq2)
 	handler.DoAction(cRead2)
 	assert.Equal(t, http.StatusNotFound, wRead2.Code)
 }
