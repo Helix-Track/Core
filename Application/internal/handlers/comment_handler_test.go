@@ -35,6 +35,7 @@ func setupCommentTestHandler(t *testing.T) (*Handler, string, string) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -68,6 +69,7 @@ func TestCommentHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -105,6 +107,7 @@ func TestCommentHandler_Create_MissingTicketID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -136,6 +139,7 @@ func TestCommentHandler_Create_MissingComment(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -170,6 +174,7 @@ func TestCommentHandler_Create_MultipleComments(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = req
 		c.Set("username", "testuser")
+		c.Set("request", &reqBody)
 
 		handler.DoAction(c)
 
@@ -193,6 +198,7 @@ func TestCommentHandler_Create_MultipleComments(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &listReq)
 
 	handler.DoAction(c)
 
@@ -225,6 +231,7 @@ func TestCommentHandler_Modify_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -247,6 +254,7 @@ func TestCommentHandler_Modify_Success(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -275,6 +283,7 @@ func TestCommentHandler_Modify_Success(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	var readResp models.Response
@@ -302,6 +311,7 @@ func TestCommentHandler_Modify_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -333,6 +343,7 @@ func TestCommentHandler_Modify_MissingComment(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -356,6 +367,7 @@ func TestCommentHandler_Modify_MissingComment(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -391,6 +403,7 @@ func TestCommentHandler_Remove_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -412,6 +425,7 @@ func TestCommentHandler_Remove_Success(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	assert.Equal(t, http.StatusOK, wRemove.Code)
@@ -443,6 +457,7 @@ func TestCommentHandler_Remove_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -478,6 +493,7 @@ func TestCommentHandler_Read_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -499,6 +515,7 @@ func TestCommentHandler_Read_Success(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusOK, wRead.Code)
@@ -532,6 +549,7 @@ func TestCommentHandler_Read_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -563,6 +581,7 @@ func TestCommentHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -594,6 +613,7 @@ func TestCommentHandler_Read_DeletedComment(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -615,6 +635,7 @@ func TestCommentHandler_Read_DeletedComment(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	// Try to read deleted comment
@@ -632,6 +653,7 @@ func TestCommentHandler_Read_DeletedComment(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusNotFound, wRead.Code)
@@ -660,6 +682,7 @@ func TestCommentHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -696,6 +719,7 @@ func TestCommentHandler_List_Multiple(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -716,6 +740,7 @@ func TestCommentHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -749,6 +774,7 @@ func TestCommentHandler_List_MissingTicketID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -782,6 +808,7 @@ func TestCommentHandler_List_ExcludesDeleted(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 
 		if i == 1 {
@@ -806,6 +833,7 @@ func TestCommentHandler_List_ExcludesDeleted(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	// List comments
@@ -823,6 +851,7 @@ func TestCommentHandler_List_ExcludesDeleted(t *testing.T) {
 	cList, _ := gin.CreateTestContext(wList)
 	cList.Request = listHttpReq
 	cList.Set("username", "testuser")
+	cList.Set("request", &listReq)
 	handler.DoAction(cList)
 
 	var listResp models.Response
@@ -841,9 +870,56 @@ func TestCommentHandler_List_ExcludesDeleted(t *testing.T) {
 func TestCommentHandler_Create_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
 
+	// Create tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS project (
+			id TEXT PRIMARY KEY,
+			title TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id TEXT PRIMARY KEY,
+			title TEXT,
+			project_id TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS comment (
+			id TEXT PRIMARY KEY,
+			comment TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS comment_ticket_mapping (
+			id TEXT PRIMARY KEY,
+			comment_id TEXT,
+			ticket_id TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
 	// Insert test project and ticket
 	projectID := "test-project-id"
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO project (id, title, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
 		projectID, "Test Project", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -871,6 +947,7 @@ func TestCommentHandler_Create_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -901,9 +978,56 @@ func TestCommentHandler_Create_PublishesEvent(t *testing.T) {
 func TestCommentHandler_Modify_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
 
+	// Create tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS project (
+			id TEXT PRIMARY KEY,
+			title TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id TEXT PRIMARY KEY,
+			title TEXT,
+			project_id TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS comment (
+			id TEXT PRIMARY KEY,
+			comment TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS comment_ticket_mapping (
+			id TEXT PRIMARY KEY,
+			comment_id TEXT,
+			ticket_id TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
 	// Insert test project and ticket
 	projectID := "test-project-id"
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO project (id, title, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
 		projectID, "Test Project", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -924,8 +1048,8 @@ func TestCommentHandler_Modify_PublishesEvent(t *testing.T) {
 	// Insert comment-ticket mapping
 	mappingID := "test-mapping-id"
 	_, err = handler.db.Exec(context.Background(),
-		"INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified) VALUES (?, ?, ?, ?, ?)",
-		mappingID, commentID, ticketID, 1000, 1000)
+		"INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		mappingID, commentID, ticketID, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -945,6 +1069,7 @@ func TestCommentHandler_Modify_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -974,9 +1099,56 @@ func TestCommentHandler_Modify_PublishesEvent(t *testing.T) {
 func TestCommentHandler_Remove_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
 
+	// Create tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS project (
+			id TEXT PRIMARY KEY,
+			title TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id TEXT PRIMARY KEY,
+			title TEXT,
+			project_id TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS comment (
+			id TEXT PRIMARY KEY,
+			comment TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS comment_ticket_mapping (
+			id TEXT PRIMARY KEY,
+			comment_id TEXT,
+			ticket_id TEXT,
+			created INTEGER,
+			modified INTEGER,
+			deleted INTEGER
+		)
+	`)
+	require.NoError(t, err)
+
 	// Insert test project and ticket
 	projectID := "test-project-id"
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO project (id, title, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
 		projectID, "Test Project", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -997,8 +1169,8 @@ func TestCommentHandler_Remove_PublishesEvent(t *testing.T) {
 	// Insert comment-ticket mapping
 	mappingID := "test-mapping-id"
 	_, err = handler.db.Exec(context.Background(),
-		"INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified) VALUES (?, ?, ?, ?, ?)",
-		mappingID, commentID, ticketID, 1000, 1000)
+		"INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		mappingID, commentID, ticketID, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -1017,6 +1189,7 @@ func TestCommentHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1063,6 +1236,7 @@ func TestCommentHandler_Create_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1093,6 +1267,7 @@ func TestCommentHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1122,6 +1297,7 @@ func TestCommentHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

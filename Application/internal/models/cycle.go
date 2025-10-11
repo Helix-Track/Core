@@ -3,14 +3,14 @@ package models
 // Cycle represents a sprint/milestone/release (Agile iteration)
 // Cycles form a hierarchy: Release (1000) > Milestone (100) > Sprint (10)
 type Cycle struct {
-	ID          string `json:"id" db:"id"`
-	Title       string `json:"title" db:"title" binding:"required"`
-	Description string `json:"description,omitempty" db:"description"`
-	CycleID     string `json:"cycleId,omitempty" db:"cycle_id"` // Parent cycle ID
-	Type        int    `json:"type" db:"type" binding:"required"`
-	Created     int64  `json:"created" db:"created"`
-	Modified    int64  `json:"modified" db:"modified"`
-	Deleted     bool   `json:"deleted" db:"deleted"`
+	ID          string  `json:"id" db:"id"`
+	Title       string  `json:"title" db:"title" binding:"required"`
+	Description *string `json:"description,omitempty" db:"description"` // NULL allowed
+	CycleID     *string `json:"cycleId,omitempty" db:"cycle_id"`         // Parent cycle ID (NULL for top-level cycles)
+	Type        int     `json:"type" db:"type" binding:"required"`
+	Created     int64   `json:"created" db:"created"`
+	Modified    int64   `json:"modified" db:"modified"`
+	Deleted     bool    `json:"deleted" db:"deleted"`
 }
 
 // Cycle type constants
@@ -62,7 +62,7 @@ func (c *Cycle) GetTypeName() string {
 // IsValidParent checks if the parent cycle type is valid for this cycle
 // Parent's type must be greater than current cycle's type (Release > Milestone > Sprint)
 func (c *Cycle) IsValidParent(parentType int) bool {
-	if c.CycleID == "" {
+	if c.CycleID == nil || *c.CycleID == "" {
 		return true // No parent is valid
 	}
 	return parentType > c.Type

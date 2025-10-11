@@ -82,10 +82,10 @@ func TestFilterHandler_Save_CreateSuccess(t *testing.T) {
 
 	filterData, ok := response.Data["filter"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "My Bugs Filter", filterData["Title"])
-	assert.Equal(t, `{"status": "open", "type": "bug"}`, filterData["Query"])
-	assert.Equal(t, true, filterData["IsFavorite"])
-	assert.NotEmpty(t, filterData["ID"])
+	assert.Equal(t, "My Bugs Filter", filterData["title"])
+	assert.Equal(t, `{"status": "open", "type": "bug"}`, filterData["query"])
+	assert.Equal(t, true, filterData["isFavorite"])
+	assert.NotEmpty(t, filterData["id"])
 
 	// Verify in database
 	var count int
@@ -116,10 +116,10 @@ func TestFilterHandler_Save_CreateMinimalFields(t *testing.T) {
 
 	filterData, ok := response.Data["filter"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Minimal Filter", filterData["Title"])
-	assert.Empty(t, filterData["Description"])
-	assert.Equal(t, false, filterData["IsPublic"])
-	assert.Equal(t, false, filterData["IsFavorite"])
+	assert.Equal(t, "Minimal Filter", filterData["title"])
+	assert.Empty(t, filterData["description"])
+	assert.Equal(t, false, filterData["isPublic"])
+	assert.Equal(t, false, filterData["isFavorite"])
 }
 
 func TestFilterHandler_Save_CreateMissingTitle(t *testing.T) {
@@ -220,8 +220,8 @@ func TestFilterHandler_Save_CreateComplexQuery(t *testing.T) {
 	filterData, ok := response.Data["filter"].(map[string]interface{})
 	require.True(t, ok)
 	// Verify query was stored (exact match might differ due to JSON formatting)
-	assert.Contains(t, filterData["Query"], "status")
-	assert.Contains(t, filterData["Query"], "priority")
+	assert.Contains(t, filterData["query"], "status")
+	assert.Contains(t, filterData["query"], "priority")
 }
 
 // ============================================================================
@@ -236,7 +236,7 @@ func TestFilterHandler_Save_UpdateSuccess(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "Old Title", "Old description", "test-user", `{"status": "old"}`, 0, 0, 1000, 1000, 0)
+		filterID, "Old Title", "Old description", "testuser", `{"status": "old"}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -341,7 +341,7 @@ func TestFilterHandler_Load_Success(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "My Filter", "Description", "test-user", `{"status": "open"}`, 0, 1, 1000, 1000, 0)
+		filterID, "My Filter", "Description", "testuser", `{"status": "open"}`, 0, 1, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -361,8 +361,8 @@ func TestFilterHandler_Load_Success(t *testing.T) {
 
 	filterData, ok := response.Data["filter"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, filterID, filterData["ID"])
-	assert.Equal(t, "My Filter", filterData["Title"])
+	assert.Equal(t, filterID, filterData["id"])
+	assert.Equal(t, "My Filter", filterData["title"])
 }
 
 func TestFilterHandler_Load_NotFound(t *testing.T) {
@@ -414,8 +414,8 @@ func TestFilterHandler_Load_PublicFilter(t *testing.T) {
 
 	filterData, ok := response.Data["filter"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Public Filter", filterData["Title"])
-	assert.Equal(t, true, filterData["IsPublic"])
+	assert.Equal(t, "Public Filter", filterData["title"])
+	assert.Equal(t, true, filterData["isPublic"])
 }
 
 func TestFilterHandler_Load_SharedFilter(t *testing.T) {
@@ -430,7 +430,7 @@ func TestFilterHandler_Load_SharedFilter(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create share mapping
-	testUser := "test-user"
+	testUser := "testuser"
 	_, err = handler.db.Exec(context.Background(),
 		`INSERT INTO filter_share_mapping (id, filter_id, user_id, team_id, project_id, created, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -454,7 +454,7 @@ func TestFilterHandler_Load_SharedFilter(t *testing.T) {
 
 	filterData, ok := response.Data["filter"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Shared Filter", filterData["Title"])
+	assert.Equal(t, "Shared Filter", filterData["title"])
 }
 
 func TestFilterHandler_Load_NoAccess(t *testing.T) {
@@ -519,13 +519,13 @@ func TestFilterHandler_List_OwnFilters(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		"filter-1", "My Filter 1", "Desc", "test-user", `{"status": "open"}`, 0, 0, 1000, 1000, 0)
+		"filter-1", "My Filter 1", "Desc", "testuser", `{"status": "open"}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	_, err = handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		"filter-2", "My Filter 2", "Desc", "test-user", `{"status": "closed"}`, 0, 1, 2000, 2000, 0)
+		"filter-2", "My Filter 2", "Desc", "testuser", `{"status": "closed"}`, 0, 1, 2000, 2000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -551,7 +551,7 @@ func TestFilterHandler_List_IncludesPublicFilters(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		"own-filter", "My Filter", "Desc", "test-user", `{"status": "open"}`, 0, 0, 1000, 1000, 0)
+		"own-filter", "My Filter", "Desc", "testuser", `{"status": "open"}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	// Insert public filter from another user
@@ -584,19 +584,19 @@ func TestFilterHandler_List_OrderedByFavoriteThenModified(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		"filter-1", "Non-favorite old", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		"filter-1", "Non-favorite old", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	_, err = handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		"filter-2", "Favorite old", "Desc", "test-user", `{}`, 0, 1, 2000, 2000, 0)
+		"filter-2", "Favorite old", "Desc", "testuser", `{}`, 0, 1, 2000, 2000, 0)
 	require.NoError(t, err)
 
 	_, err = handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		"filter-3", "Favorite new", "Desc", "test-user", `{}`, 0, 1, 3000, 3000, 0)
+		"filter-3", "Favorite new", "Desc", "testuser", `{}`, 0, 1, 3000, 3000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -617,7 +617,7 @@ func TestFilterHandler_List_OrderedByFavoriteThenModified(t *testing.T) {
 	titles := make([]string, len(filters))
 	for i, filter := range filters {
 		filterMap := filter.(map[string]interface{})
-		titles[i] = filterMap["Title"].(string)
+		titles[i] = filterMap["title"].(string)
 	}
 
 	assert.Equal(t, "Favorite new", titles[0])    // Favorite, most recent
@@ -637,7 +637,7 @@ func TestFilterHandler_Share_Public(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "My Filter", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "My Filter", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -675,7 +675,7 @@ func TestFilterHandler_Share_WithUser(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "My Filter", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "My Filter", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -715,7 +715,7 @@ func TestFilterHandler_Share_WithTeam(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "My Filter", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "My Filter", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -784,7 +784,7 @@ func TestFilterHandler_Share_MissingUserId(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "My Filter", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "My Filter", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -819,7 +819,7 @@ func TestFilterHandler_Modify_Success(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "Old Title", "Old desc", "test-user", `{"old": true}`, 0, 0, 1000, 1000, 0)
+		filterID, "Old Title", "Old desc", "testuser", `{"old": true}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -858,7 +858,7 @@ func TestFilterHandler_Modify_InvalidQuery(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "Title", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "Title", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -888,7 +888,7 @@ func TestFilterHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "Title", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "Title", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -922,7 +922,7 @@ func TestFilterHandler_Remove_Success(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "My Filter", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "My Filter", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
@@ -958,7 +958,7 @@ func TestFilterHandler_Remove_CascadesShares(t *testing.T) {
 	_, err := handler.db.Exec(context.Background(),
 		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		filterID, "My Filter", "Desc", "test-user", `{}`, 0, 0, 1000, 1000, 0)
+		filterID, "My Filter", "Desc", "testuser", `{}`, 0, 0, 1000, 1000, 0)
 	require.NoError(t, err)
 
 	// Create share mappings
@@ -1043,7 +1043,7 @@ func TestFilterHandler_FullLifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 	filterData := createResp.Data["filter"].(map[string]interface{})
-	filterID := filterData["ID"].(string)
+	filterID := filterData["id"].(string)
 
 	// 2. Load filter
 	loadReq := models.Request{
@@ -1169,6 +1169,7 @@ func TestFilterHandler_Save_Create_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1259,6 +1260,7 @@ func TestFilterHandler_Save_Update_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1346,6 +1348,7 @@ func TestFilterHandler_Modify_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1428,6 +1431,7 @@ func TestFilterHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1512,6 +1516,7 @@ func TestFilterHandler_Share_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1589,6 +1594,7 @@ func TestFilterHandler_Save_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1648,6 +1654,7 @@ func TestFilterHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1706,6 +1713,7 @@ func TestFilterHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1773,6 +1781,7 @@ func TestFilterHandler_Share_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

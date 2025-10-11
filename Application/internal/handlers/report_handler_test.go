@@ -72,6 +72,7 @@ func TestReportHandler_Create_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportCreate(c, &reqBody)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
@@ -103,6 +104,7 @@ func TestReportHandler_Create_MissingTitle(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportCreate(c, &reqBody)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -137,6 +139,7 @@ func TestReportHandler_Read_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportRead(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -162,6 +165,7 @@ func TestReportHandler_Read_NotFound(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportRead(c, &reqBody)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -184,6 +188,7 @@ func TestReportHandler_List_EmptyList(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportList(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -217,6 +222,7 @@ func TestReportHandler_List_MultipleReports(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportList(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -260,6 +266,7 @@ func TestReportHandler_Modify_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportModify(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -292,6 +299,7 @@ func TestReportHandler_Modify_NotFound(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportModify(c, &reqBody)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -326,6 +334,7 @@ func TestReportHandler_Remove_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportRemove(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -366,6 +375,7 @@ func TestReportHandler_Execute_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportExecute(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -391,6 +401,7 @@ func TestReportHandler_Execute_NotFound(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportExecute(c, &reqBody)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -427,6 +438,7 @@ func TestReportHandler_SetMetadata_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportSetMetadata(c, &reqBody)
 
 	assert.Equal(t, http.StatusCreated, w.Code)
@@ -468,6 +480,7 @@ func TestReportHandler_GetMetadata_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportGetMetadata(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -494,6 +507,7 @@ func TestReportHandler_GetMetadata_NotFound(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportGetMetadata(c, &reqBody)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -528,6 +542,7 @@ func TestReportHandler_RemoveMetadata_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportRemoveMetadata(c, &reqBody)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -559,6 +574,7 @@ func TestReportHandler_RemoveMetadata_NotFound(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.handleReportRemoveMetadata(c, &reqBody)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)

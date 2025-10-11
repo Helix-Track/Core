@@ -73,8 +73,8 @@ func (h *Handler) handleCreateComment(c *gin.Context, req *models.Request) {
 	// Create ticket-comment mapping
 	mappingID := uuid.New().String()
 	mappingQuery := `
-		INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified)
-		VALUES (?, ?, ?, ?, ?)
+		INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified, deleted)
+		VALUES (?, ?, ?, ?, ?, ?)
 	`
 
 	_, err = h.db.Exec(
@@ -85,6 +85,7 @@ func (h *Handler) handleCreateComment(c *gin.Context, req *models.Request) {
 		ticketID,
 		now,
 		now,
+		0,
 	)
 
 	if err != nil {

@@ -63,10 +63,16 @@ func (h *Handler) handleExtensionCreate(c *gin.Context, req *models.Request) {
 		enabled = enabledVal
 	}
 
+	// Get description as pointer
+	var descPtr *string
+	if descStr := getStringFromData(req.Data, "description"); descStr != "" {
+		descPtr = &descStr
+	}
+
 	extension := &models.Extension{
 		ID:          uuid.New().String(),
 		Title:       title,
-		Description: getStringFromData(req.Data, "description"),
+		Description: descPtr,
 		Version:     getStringFromData(req.Data, "version"),
 		Enabled:     enabled,
 		Created:     time.Now().Unix(),
@@ -323,7 +329,11 @@ func (h *Handler) handleExtensionModify(c *gin.Context, req *models.Request) {
 		updates["title"] = title
 	}
 	if description, ok := req.Data["description"].(string); ok {
-		updates["description"] = description
+		if description != "" {
+			updates["description"] = description
+		} else {
+			updates["description"] = nil
+		}
 	}
 	if version, ok := req.Data["version"].(string); ok {
 		updates["version"] = version

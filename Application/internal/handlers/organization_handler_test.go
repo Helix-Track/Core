@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -13,9 +14,40 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupOrganizationTables creates the organization and related tables for testing
+func setupOrganizationTables(t *testing.T, handler *Handler) {
+	// Create organization table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS organization (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL UNIQUE,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create organization_account_mapping table
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS organization_account_mapping (
+			id TEXT PRIMARY KEY,
+			organization_id TEXT NOT NULL,
+			account_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted BOOLEAN NOT NULL,
+			UNIQUE (organization_id, account_id)
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // TestOrganizationHandler_Create_Success tests successful organization creation (stub)
 func TestOrganizationHandler_Create_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -33,6 +65,7 @@ func TestOrganizationHandler_Create_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationCreate(c, &reqBody)
 
@@ -46,19 +79,23 @@ func TestOrganizationHandler_Create_Success(t *testing.T) {
 	assert.NotNil(t, response.Data)
 
 	// Verify organization data structure
-	dataMap := response.Data
+	organizationData, ok := response.Data["organization"]
+	require.True(t, ok, "Organization should be in response")
+	organization, ok := organizationData.(map[string]interface{})
+	require.True(t, ok, "Organization should be a map")
 
-	assert.NotEmpty(t, dataMap["id"], "Organization ID should be generated")
-	assert.Equal(t, "Test Organization", dataMap["title"])
-	assert.Equal(t, "Test organization description", dataMap["description"])
-	assert.NotZero(t, dataMap["created"], "Created timestamp should be set")
-	assert.NotZero(t, dataMap["modified"], "Modified timestamp should be set")
-	assert.Equal(t, false, dataMap["deleted"], "Deleted flag should be false")
+	assert.NotEmpty(t, organization["id"], "Organization ID should be generated")
+	assert.Equal(t, "Test Organization", organization["title"])
+	assert.Equal(t, "Test organization description", organization["description"])
+	assert.NotZero(t, organization["created"], "Created timestamp should be set")
+	assert.NotZero(t, organization["modified"], "Modified timestamp should be set")
+	assert.Equal(t, false, organization["deleted"], "Deleted flag should be false")
 }
 
 // TestOrganizationHandler_Create_MinimalFields tests organization creation with minimal fields
 func TestOrganizationHandler_Create_MinimalFields(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -75,6 +112,7 @@ func TestOrganizationHandler_Create_MinimalFields(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationCreate(c, &reqBody)
 
@@ -90,6 +128,7 @@ func TestOrganizationHandler_Create_MinimalFields(t *testing.T) {
 // TestOrganizationHandler_Create_MissingTitle tests organization creation with missing title
 func TestOrganizationHandler_Create_MissingTitle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -106,6 +145,7 @@ func TestOrganizationHandler_Create_MissingTitle(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationCreate(c, &reqBody)
 
@@ -122,6 +162,7 @@ func TestOrganizationHandler_Create_MissingTitle(t *testing.T) {
 // TestOrganizationHandler_Create_EmptyTitle tests organization creation with empty title
 func TestOrganizationHandler_Create_EmptyTitle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -139,6 +180,7 @@ func TestOrganizationHandler_Create_EmptyTitle(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationCreate(c, &reqBody)
 
@@ -154,6 +196,7 @@ func TestOrganizationHandler_Create_EmptyTitle(t *testing.T) {
 // TestOrganizationHandler_Read_NotImplemented tests organization read returns not implemented
 func TestOrganizationHandler_Read_NotImplemented(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -170,6 +213,7 @@ func TestOrganizationHandler_Read_NotImplemented(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationRead(c, &reqBody)
 
@@ -186,6 +230,7 @@ func TestOrganizationHandler_Read_NotImplemented(t *testing.T) {
 // TestOrganizationHandler_Read_MissingID tests organization read with missing ID
 func TestOrganizationHandler_Read_MissingID(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -200,6 +245,7 @@ func TestOrganizationHandler_Read_MissingID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationRead(c, &reqBody)
 
@@ -216,6 +262,7 @@ func TestOrganizationHandler_Read_MissingID(t *testing.T) {
 // TestOrganizationHandler_List_EmptyList tests organization list returns empty array (stub)
 func TestOrganizationHandler_List_EmptyList(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -229,6 +276,7 @@ func TestOrganizationHandler_List_EmptyList(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationList(c, &reqBody)
 
@@ -253,6 +301,7 @@ func TestOrganizationHandler_List_EmptyList(t *testing.T) {
 // TestOrganizationHandler_Modify_Success tests organization modification (stub)
 func TestOrganizationHandler_Modify_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -271,6 +320,7 @@ func TestOrganizationHandler_Modify_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationModify(c, &reqBody)
 
@@ -284,16 +334,20 @@ func TestOrganizationHandler_Modify_Success(t *testing.T) {
 	assert.NotNil(t, response.Data)
 
 	// Verify organization data structure
-	dataMap := response.Data
+	organizationData, ok := response.Data["organization"]
+	require.True(t, ok, "Organization should be in response")
+	organization, ok := organizationData.(map[string]interface{})
+	require.True(t, ok, "Organization should be a map")
 
-	assert.Equal(t, "test-organization-id", dataMap["id"])
-	assert.Equal(t, "Modified Organization", dataMap["title"])
-	assert.NotZero(t, dataMap["modified"], "Modified timestamp should be updated")
+	assert.Equal(t, "test-organization-id", organization["id"])
+	assert.Equal(t, "Modified Organization", organization["title"])
+	assert.NotZero(t, organization["modified"], "Modified timestamp should be updated")
 }
 
 // TestOrganizationHandler_Modify_MissingID tests organization modification with missing ID
 func TestOrganizationHandler_Modify_MissingID(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -310,6 +364,7 @@ func TestOrganizationHandler_Modify_MissingID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationModify(c, &reqBody)
 
@@ -326,6 +381,7 @@ func TestOrganizationHandler_Modify_MissingID(t *testing.T) {
 // TestOrganizationHandler_Remove_Success tests organization removal (stub)
 func TestOrganizationHandler_Remove_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -342,6 +398,7 @@ func TestOrganizationHandler_Remove_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationRemove(c, &reqBody)
 
@@ -364,6 +421,7 @@ func TestOrganizationHandler_Remove_Success(t *testing.T) {
 // TestOrganizationHandler_Remove_MissingID tests organization removal with missing ID
 func TestOrganizationHandler_Remove_MissingID(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -378,6 +436,7 @@ func TestOrganizationHandler_Remove_MissingID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationRemove(c, &reqBody)
 
@@ -394,6 +453,7 @@ func TestOrganizationHandler_Remove_MissingID(t *testing.T) {
 // TestOrganizationHandler_AssignAccount_Success tests assigning organization to account (stub)
 func TestOrganizationHandler_AssignAccount_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -411,6 +471,7 @@ func TestOrganizationHandler_AssignAccount_Success(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationAssignAccount(c, &reqBody)
 
@@ -424,19 +485,23 @@ func TestOrganizationHandler_AssignAccount_Success(t *testing.T) {
 	assert.NotNil(t, response.Data)
 
 	// Verify mapping data structure
-	dataMap := response.Data
+	mappingData, ok := response.Data["mapping"]
+	require.True(t, ok, "Mapping should be in response")
+	mapping, ok := mappingData.(map[string]interface{})
+	require.True(t, ok, "Mapping should be a map")
 
-	assert.NotEmpty(t, dataMap["id"], "Mapping ID should be generated")
-	assert.Equal(t, "test-org-id", dataMap["organizationId"])
-	assert.Equal(t, "test-account-id", dataMap["accountId"])
-	assert.NotZero(t, dataMap["created"], "Created timestamp should be set")
-	assert.NotZero(t, dataMap["modified"], "Modified timestamp should be set")
-	assert.Equal(t, false, dataMap["deleted"], "Deleted flag should be false")
+	assert.NotEmpty(t, mapping["id"], "Mapping ID should be generated")
+	assert.Equal(t, "test-org-id", mapping["organizationId"])
+	assert.Equal(t, "test-account-id", mapping["accountId"])
+	assert.NotZero(t, mapping["created"], "Created timestamp should be set")
+	assert.NotZero(t, mapping["modified"], "Modified timestamp should be set")
+	assert.Equal(t, false, mapping["deleted"], "Deleted flag should be false")
 }
 
 // TestOrganizationHandler_AssignAccount_MissingOrganizationID tests assignment with missing organization ID
 func TestOrganizationHandler_AssignAccount_MissingOrganizationID(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -453,6 +518,7 @@ func TestOrganizationHandler_AssignAccount_MissingOrganizationID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationAssignAccount(c, &reqBody)
 
@@ -469,6 +535,7 @@ func TestOrganizationHandler_AssignAccount_MissingOrganizationID(t *testing.T) {
 // TestOrganizationHandler_AssignAccount_MissingAccountID tests assignment with missing account ID
 func TestOrganizationHandler_AssignAccount_MissingAccountID(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -485,6 +552,7 @@ func TestOrganizationHandler_AssignAccount_MissingAccountID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationAssignAccount(c, &reqBody)
 
@@ -501,6 +569,7 @@ func TestOrganizationHandler_AssignAccount_MissingAccountID(t *testing.T) {
 // TestOrganizationHandler_AssignAccount_MissingBothIDs tests assignment with missing both IDs
 func TestOrganizationHandler_AssignAccount_MissingBothIDs(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -515,6 +584,7 @@ func TestOrganizationHandler_AssignAccount_MissingBothIDs(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationAssignAccount(c, &reqBody)
 
@@ -530,6 +600,7 @@ func TestOrganizationHandler_AssignAccount_MissingBothIDs(t *testing.T) {
 // TestOrganizationHandler_ListAccounts_EmptyList tests listing accounts returns empty array (stub)
 func TestOrganizationHandler_ListAccounts_EmptyList(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -546,6 +617,7 @@ func TestOrganizationHandler_ListAccounts_EmptyList(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationListAccounts(c, &reqBody)
 
@@ -570,6 +642,7 @@ func TestOrganizationHandler_ListAccounts_EmptyList(t *testing.T) {
 // TestOrganizationHandler_ListAccounts_MissingOrganizationID tests listing accounts with missing organization ID
 func TestOrganizationHandler_ListAccounts_MissingOrganizationID(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupOrganizationTables(t, handler)
 	gin.SetMode(gin.TestMode)
 
 	reqBody := models.Request{
@@ -584,6 +657,7 @@ func TestOrganizationHandler_ListAccounts_MissingOrganizationID(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 
 	handler.OrganizationListAccounts(c, &reqBody)
 

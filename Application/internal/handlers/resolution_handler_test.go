@@ -14,9 +14,25 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupResolutionTable creates the resolution table for testing
+func setupResolutionTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS resolution (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // TestResolutionHandler_Create_Success tests successful resolution creation
 func TestResolutionHandler_Create_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionCreate,
@@ -34,6 +50,7 @@ func TestResolutionHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -54,6 +71,7 @@ func TestResolutionHandler_Create_Success(t *testing.T) {
 // TestResolutionHandler_Create_MinimalFields tests resolution creation with only title
 func TestResolutionHandler_Create_MinimalFields(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionCreate,
@@ -70,6 +88,7 @@ func TestResolutionHandler_Create_MinimalFields(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -88,6 +107,7 @@ func TestResolutionHandler_Create_MinimalFields(t *testing.T) {
 // TestResolutionHandler_Create_MissingTitle tests resolution creation without title
 func TestResolutionHandler_Create_MissingTitle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionCreate,
@@ -104,6 +124,7 @@ func TestResolutionHandler_Create_MissingTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -118,6 +139,7 @@ func TestResolutionHandler_Create_MissingTitle(t *testing.T) {
 // TestResolutionHandler_Create_MultipleCommonResolutions tests creating multiple JIRA-style resolutions
 func TestResolutionHandler_Create_MultipleCommonResolutions(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	resolutions := []struct {
 		title       string
@@ -148,6 +170,7 @@ func TestResolutionHandler_Create_MultipleCommonResolutions(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = req
 		c.Set("username", "testuser")
+		c.Set("request", &reqBody)
 
 		handler.DoAction(c)
 
@@ -163,6 +186,7 @@ func TestResolutionHandler_Create_MultipleCommonResolutions(t *testing.T) {
 // TestResolutionHandler_Read_Success tests successful resolution read
 func TestResolutionHandler_Read_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	// Insert test resolution
 	_, err := handler.db.Exec(context.Background(),
@@ -185,6 +209,7 @@ func TestResolutionHandler_Read_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -205,6 +230,7 @@ func TestResolutionHandler_Read_Success(t *testing.T) {
 // TestResolutionHandler_Read_NotFound tests reading non-existent resolution
 func TestResolutionHandler_Read_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionRead,
@@ -221,6 +247,7 @@ func TestResolutionHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -235,6 +262,7 @@ func TestResolutionHandler_Read_NotFound(t *testing.T) {
 // TestResolutionHandler_List_Empty tests listing resolutions when none exist
 func TestResolutionHandler_List_Empty(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionList,
@@ -249,6 +277,7 @@ func TestResolutionHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -267,6 +296,7 @@ func TestResolutionHandler_List_Empty(t *testing.T) {
 // TestResolutionHandler_List_Multiple tests listing multiple resolutions
 func TestResolutionHandler_List_Multiple(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	// Insert multiple resolutions
 	resolutions := []struct {
@@ -298,6 +328,7 @@ func TestResolutionHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -316,6 +347,7 @@ func TestResolutionHandler_List_Multiple(t *testing.T) {
 // TestResolutionHandler_List_OrderedByTitle tests that resolutions are ordered by title
 func TestResolutionHandler_List_OrderedByTitle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	// Insert resolutions in non-alphabetical order
 	resolutions := []struct {
@@ -347,6 +379,7 @@ func TestResolutionHandler_List_OrderedByTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -370,6 +403,7 @@ func TestResolutionHandler_List_OrderedByTitle(t *testing.T) {
 // TestResolutionHandler_Modify_Success tests successful resolution modification
 func TestResolutionHandler_Modify_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	// Insert test resolution
 	_, err := handler.db.Exec(context.Background(),
@@ -394,6 +428,7 @@ func TestResolutionHandler_Modify_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -417,6 +452,7 @@ func TestResolutionHandler_Modify_Success(t *testing.T) {
 // TestResolutionHandler_Modify_TitleOnly tests modifying only the title
 func TestResolutionHandler_Modify_TitleOnly(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	// Insert test resolution
 	_, err := handler.db.Exec(context.Background(),
@@ -440,6 +476,7 @@ func TestResolutionHandler_Modify_TitleOnly(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -463,6 +500,7 @@ func TestResolutionHandler_Modify_TitleOnly(t *testing.T) {
 // TestResolutionHandler_Modify_NotFound tests modifying non-existent resolution
 func TestResolutionHandler_Modify_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionModify,
@@ -480,6 +518,7 @@ func TestResolutionHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -494,6 +533,7 @@ func TestResolutionHandler_Modify_NotFound(t *testing.T) {
 // TestResolutionHandler_Remove_Success tests successful resolution deletion
 func TestResolutionHandler_Remove_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	// Insert test resolution
 	_, err := handler.db.Exec(context.Background(),
@@ -516,6 +556,7 @@ func TestResolutionHandler_Remove_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -538,6 +579,7 @@ func TestResolutionHandler_Remove_Success(t *testing.T) {
 // TestResolutionHandler_Remove_NotFound tests deleting non-existent resolution
 func TestResolutionHandler_Remove_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionRemove,
@@ -554,6 +596,7 @@ func TestResolutionHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -568,6 +611,7 @@ func TestResolutionHandler_Remove_NotFound(t *testing.T) {
 // TestResolutionHandler_CRUD_FullCycle tests complete resolution lifecycle
 func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupResolutionTable(t, handler)
 
 	// 1. Create resolution
 	createReq := models.Request{
@@ -584,6 +628,7 @@ func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &createReq)
 	handler.DoAction(c)
 
 	var createResp models.Response
@@ -603,6 +648,7 @@ func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -621,6 +667,7 @@ func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &modifyReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -636,6 +683,7 @@ func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &deleteReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -651,6 +699,7 @@ func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
@@ -660,6 +709,7 @@ func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 // TestResolutionHandler_Create_PublishesEvent tests that resolution creation publishes an event
 func TestResolutionHandler_Create_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionCreate,
@@ -677,6 +727,7 @@ func TestResolutionHandler_Create_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -705,6 +756,7 @@ func TestResolutionHandler_Create_PublishesEvent(t *testing.T) {
 // TestResolutionHandler_Modify_PublishesEvent tests that resolution modification publishes an event
 func TestResolutionHandler_Modify_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupResolutionTable(t, handler)
 
 	// Insert test resolution
 	_, err := handler.db.Exec(context.Background(),
@@ -729,6 +781,7 @@ func TestResolutionHandler_Modify_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -757,6 +810,7 @@ func TestResolutionHandler_Modify_PublishesEvent(t *testing.T) {
 // TestResolutionHandler_Remove_PublishesEvent tests that resolution deletion publishes an event
 func TestResolutionHandler_Remove_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupResolutionTable(t, handler)
 
 	// Insert test resolution
 	_, err := handler.db.Exec(context.Background(),
@@ -779,6 +833,7 @@ func TestResolutionHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -807,6 +862,7 @@ func TestResolutionHandler_Remove_PublishesEvent(t *testing.T) {
 // TestResolutionHandler_Create_NoEventOnFailure tests that no event is published on create failure
 func TestResolutionHandler_Create_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionCreate,
@@ -824,6 +880,7 @@ func TestResolutionHandler_Create_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -836,6 +893,7 @@ func TestResolutionHandler_Create_NoEventOnFailure(t *testing.T) {
 // TestResolutionHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
 func TestResolutionHandler_Modify_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionModify,
@@ -853,6 +911,7 @@ func TestResolutionHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -865,6 +924,7 @@ func TestResolutionHandler_Modify_NoEventOnFailure(t *testing.T) {
 // TestResolutionHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
 func TestResolutionHandler_Remove_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupResolutionTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionResolutionRemove,
@@ -881,6 +941,7 @@ func TestResolutionHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

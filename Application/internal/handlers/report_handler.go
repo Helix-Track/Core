@@ -237,10 +237,11 @@ func (h *Handler) handleReportList(c *gin.Context, req *models.Request) {
 	reports := make([]models.Report, 0)
 	for rows.Next() {
 		var report models.Report
+		var description sql.NullString
 		err := rows.Scan(
 			&report.ID,
 			&report.Title,
-			&report.Description,
+			&description,
 			&report.Query,
 			&report.Created,
 			&report.Modified,
@@ -249,6 +250,9 @@ func (h *Handler) handleReportList(c *gin.Context, req *models.Request) {
 		if err != nil {
 			logger.Error("Failed to scan report", zap.Error(err))
 			continue
+		}
+		if description.Valid {
+			report.Description = description.String
 		}
 		reports = append(reports, report)
 	}
@@ -505,15 +509,19 @@ func (h *Handler) handleReportExecute(c *gin.Context, req *models.Request) {
 	`
 
 	var report models.Report
+	var description sql.NullString
 	err := h.db.QueryRow(c.Request.Context(), query, reportID).Scan(
 		&report.ID,
 		&report.Title,
-		&report.Description,
+		&description,
 		&report.Query,
 		&report.Created,
 		&report.Modified,
 		&report.Deleted,
 	)
+	if description.Valid {
+		report.Description = description.String
+	}
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(

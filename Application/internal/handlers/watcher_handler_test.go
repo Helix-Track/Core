@@ -14,11 +14,25 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
-// setupWatcherTestHandler creates a test handler with watcher table and dependencies
-func setupWatcherTestHandler(t *testing.T) *Handler {
-	handler := setupTestHandler(t)
+// setupTicketTable creates the ticket table for watcher tests
+func setupTicketTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			status TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
 
-	// Create ticket_watcher_mapping table
+// setupWatcherMappingTable creates the ticket_watcher_mapping table
+func setupWatcherMappingTable(t *testing.T, handler *Handler) {
 	_, err := handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
 			id TEXT PRIMARY KEY,
@@ -29,9 +43,18 @@ func setupWatcherTestHandler(t *testing.T) *Handler {
 		)
 	`)
 	require.NoError(t, err)
+}
+
+// setupWatcherTestHandler creates a test handler with watcher table and dependencies
+func setupWatcherTestHandler(t *testing.T) *Handler {
+	handler := setupTestHandler(t)
+
+	// Create required tables
+	setupTicketTable(t, handler)
+	setupWatcherMappingTable(t, handler)
 
 	// Insert test ticket for watcher tests
-	_, err = handler.db.Exec(context.Background(),
+	_, err := handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
 		"test-ticket-id", "Test Ticket", "Test ticket description", "open", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -66,9 +89,9 @@ func TestWatcherHandler_Add_Success(t *testing.T) {
 
 	watcherData, ok := response.Data["watcher"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "test-ticket-id", watcherData["TicketID"])
-	assert.Equal(t, "user123", watcherData["UserID"])
-	assert.NotEmpty(t, watcherData["ID"])
+	assert.Equal(t, "test-ticket-id", watcherData["ticketId"])
+	assert.Equal(t, "user123", watcherData["userId"])
+	assert.NotEmpty(t, watcherData["id"])
 
 	// Verify in database
 	var count int
@@ -100,13 +123,13 @@ func TestWatcherHandler_Add_DefaultUserId(t *testing.T) {
 
 	watcherData, ok := response.Data["watcher"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "test-user", watcherData["UserID"]) // Default username from setupTestHandler
+	assert.Equal(t, "testuser", watcherData["userId"]) // Default username from setupTestHandler
 
 	// Verify in database
 	var count int
 	err = handler.db.QueryRow(context.Background(),
 		"SELECT COUNT(*) FROM ticket_watcher_mapping WHERE ticket_id = ? AND user_id = ? AND deleted = 0",
-		"test-ticket-id", "test-user").Scan(&count)
+		"test-ticket-id", "testuser").Scan(&count)
 	require.NoError(t, err)
 	assert.Equal(t, 1, count)
 }
@@ -282,14 +305,14 @@ func TestWatcherHandler_Remove_DefaultUserId(t *testing.T) {
 	// Insert watcher with default username
 	_, err := handler.db.Exec(context.Background(),
 		"INSERT INTO ticket_watcher_mapping (id, ticket_id, user_id, created, deleted) VALUES (?, ?, ?, ?, ?)",
-		"watcher-id", "test-ticket-id", "test-user", 1000, 0)
+		"watcher-id", "test-ticket-id", "testuser", 1000, 0)
 	require.NoError(t, err)
 
 	reqBody := models.Request{
 		Action: models.ActionWatcherRemove,
 		Data: map[string]interface{}{
 			"ticketId": "test-ticket-id",
-			// No userId - should default to current username "test-user"
+			// No userId - should default to current username "testuser"
 		},
 	}
 
@@ -303,13 +326,13 @@ func TestWatcherHandler_Remove_DefaultUserId(t *testing.T) {
 
 	assert.Equal(t, models.ErrorCodeNoError, response.ErrorCode)
 	assert.True(t, response.Data["removed"].(bool))
-	assert.Equal(t, "test-user", response.Data["userId"].(string))
+	assert.Equal(t, "testuser", response.Data["userId"].(string))
 
 	// Verify soft delete
 	var deleted bool
 	err = handler.db.QueryRow(context.Background(),
 		"SELECT deleted FROM ticket_watcher_mapping WHERE ticket_id = ? AND user_id = ?",
-		"test-ticket-id", "test-user").Scan(&deleted)
+		"test-ticket-id", "testuser").Scan(&deleted)
 	require.NoError(t, err)
 	assert.True(t, deleted)
 }
@@ -475,7 +498,7 @@ func TestWatcherHandler_List_OrderedByCreated(t *testing.T) {
 	userIDs := make([]string, len(watchers))
 	for i, watcher := range watchers {
 		watcherMap := watcher.(map[string]interface{})
-		userIDs[i] = watcherMap["UserID"].(string)
+		userIDs[i] = watcherMap["userId"].(string)
 	}
 
 	assert.Equal(t, "user1", userIDs[0])
@@ -515,7 +538,7 @@ func TestWatcherHandler_List_ExcludesDeleted(t *testing.T) {
 	assert.Len(t, watchers, 1)
 
 	watcherMap := watchers[0].(map[string]interface{})
-	assert.Equal(t, "active-user", watcherMap["UserID"])
+	assert.Equal(t, "active-user", watcherMap["userId"])
 }
 
 func TestWatcherHandler_List_MissingTicketId(t *testing.T) {
@@ -564,7 +587,7 @@ func TestWatcherHandler_FullCycle(t *testing.T) {
 	require.NoError(t, err)
 
 	watcherData := addResp.Data["watcher"].(map[string]interface{})
-	assert.Equal(t, "cycle-user", watcherData["UserID"])
+	assert.Equal(t, "cycle-user", watcherData["userId"])
 
 	// 2. List watchers (should have 1)
 	listReq := models.Request{
@@ -640,20 +663,12 @@ func TestWatcherHandler_FullCycle(t *testing.T) {
 func TestWatcherHandler_Add_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
 
-	// Create ticket_watcher_mapping table
-	_, err := handler.db.Exec(context.Background(), `
-		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
-			id TEXT PRIMARY KEY,
-			ticket_id TEXT NOT NULL,
-			user_id TEXT NOT NULL,
-			created INTEGER NOT NULL,
-			deleted INTEGER NOT NULL DEFAULT 0
-		)
-	`)
-	require.NoError(t, err)
+	// Setup required tables
+	setupTicketTable(t, handler)
+	setupWatcherMappingTable(t, handler)
 
 	// Insert test ticket with project_id for hierarchical context
-	_, err = handler.db.Exec(context.Background(),
+	_, err := handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, project_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 		"test-ticket-id", "Test Ticket", "Test ticket description", "open", "project-123", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -674,6 +689,7 @@ func TestWatcherHandler_Add_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -704,20 +720,12 @@ func TestWatcherHandler_Add_PublishesEvent(t *testing.T) {
 func TestWatcherHandler_Remove_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
 
-	// Create ticket_watcher_mapping table
-	_, err := handler.db.Exec(context.Background(), `
-		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
-			id TEXT PRIMARY KEY,
-			ticket_id TEXT NOT NULL,
-			user_id TEXT NOT NULL,
-			created INTEGER NOT NULL,
-			deleted INTEGER NOT NULL DEFAULT 0
-		)
-	`)
-	require.NoError(t, err)
+	// Setup required tables
+	setupTicketTable(t, handler)
+	setupWatcherMappingTable(t, handler)
 
 	// Insert test ticket with project_id for hierarchical context
-	_, err = handler.db.Exec(context.Background(),
+	_, err := handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, project_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 		"test-ticket-id", "Test Ticket", "Test ticket description", "open", "project-456", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -744,6 +752,7 @@ func TestWatcherHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -773,20 +782,12 @@ func TestWatcherHandler_Remove_PublishesEvent(t *testing.T) {
 func TestWatcherHandler_Add_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
 
-	// Create ticket_watcher_mapping table
-	_, err := handler.db.Exec(context.Background(), `
-		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
-			id TEXT PRIMARY KEY,
-			ticket_id TEXT NOT NULL,
-			user_id TEXT NOT NULL,
-			created INTEGER NOT NULL,
-			deleted INTEGER NOT NULL DEFAULT 0
-		)
-	`)
-	require.NoError(t, err)
+	// Setup required tables
+	setupTicketTable(t, handler)
+	setupWatcherMappingTable(t, handler)
 
 	// Insert test ticket
-	_, err = handler.db.Exec(context.Background(),
+	_, err := handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
 		"test-ticket-id", "Test Ticket", "Test ticket description", "open", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -814,6 +815,7 @@ func TestWatcherHandler_Add_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -827,20 +829,12 @@ func TestWatcherHandler_Add_NoEventOnFailure(t *testing.T) {
 func TestWatcherHandler_Remove_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
 
-	// Create ticket_watcher_mapping table
-	_, err := handler.db.Exec(context.Background(), `
-		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
-			id TEXT PRIMARY KEY,
-			ticket_id TEXT NOT NULL,
-			user_id TEXT NOT NULL,
-			created INTEGER NOT NULL,
-			deleted INTEGER NOT NULL DEFAULT 0
-		)
-	`)
-	require.NoError(t, err)
+	// Setup required tables
+	setupTicketTable(t, handler)
+	setupWatcherMappingTable(t, handler)
 
 	// Insert test ticket (no watcher)
-	_, err = handler.db.Exec(context.Background(),
+	_, err := handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
 		"test-ticket-id", "Test Ticket", "Test ticket description", "open", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -862,6 +856,7 @@ func TestWatcherHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

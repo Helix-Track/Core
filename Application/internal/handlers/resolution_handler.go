@@ -422,6 +422,32 @@ func (h *Handler) handleResolutionRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Read resolution data before deleting (for event publishing)
+	readQuery := `SELECT id, title, description FROM resolution WHERE id = ? AND deleted = 0`
+	var resolution models.Resolution
+	err = h.db.QueryRow(c.Request.Context(), readQuery, resolutionID).Scan(
+		&resolution.ID,
+		&resolution.Title,
+		&resolution.Description,
+	)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Resolution not found",
+			"",
+		))
+		return
+	}
+	if err != nil {
+		logger.Error("Failed to read resolution before deletion", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to read resolution",
+			"",
+		))
+		return
+	}
+
 	// Soft delete the resolution
 	query := `UPDATE resolution SET deleted = 1, modified = ? WHERE id = ? AND deleted = 0`
 	result, err := h.db.Exec(c.Request.Context(), query, time.Now().Unix(), resolutionID)
@@ -457,7 +483,9 @@ func (h *Handler) handleResolutionRemove(c *gin.Context, req *models.Request) {
 		resolutionID,
 		username,
 		map[string]interface{}{
-			"id": resolutionID,
+			"id":          resolution.ID,
+			"title":       resolution.Title,
+			"description": resolution.Description,
 		},
 		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
 	)

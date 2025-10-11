@@ -18,9 +18,113 @@ import (
 // setupTicketTestHandler creates a test handler with required test data
 func setupTicketTestHandler(t *testing.T) (*Handler, string) {
 	handler := setupTestHandler(t)
+	ctx := context.Background()
+
+	// Create workflow table
+	_, err := handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT,
+			description TEXT,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket_type table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_type (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT    NOT NULL UNIQUE,
+			description TEXT,
+			created     INTEGER NOT NULL,
+			modified     INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket_status table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_status (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT    NOT NULL UNIQUE,
+			description TEXT,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create project table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS project (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			identifier  TEXT    NOT NULL UNIQUE,
+			title       TEXT    NOT NULL,
+			description TEXT,
+			workflow_id TEXT    NOT NULL,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			ticket_number    INTEGER NOT NULL,
+			position         INTEGER NOT NULL,
+			title            TEXT,
+			description      TEXT,
+			created          INTEGER NOT NULL,
+			modified         INTEGER NOT NULL,
+			ticket_type_id   TEXT    NOT NULL,
+			ticket_status_id TEXT    NOT NULL,
+			project_id       TEXT    NOT NULL,
+			user_id          TEXT,
+			estimation       REAL    NOT NULL,
+			story_points     INTEGER NOT NULL,
+			creator          TEXT    NOT NULL,
+			deleted          BOOLEAN NOT NULL,
+			UNIQUE (ticket_number, project_id)
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create comment table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS comment (
+			id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			comment  TEXT    NOT NULL,
+			created  INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted  BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create comment_ticket_mapping table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS comment_ticket_mapping (
+			id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			comment_id TEXT    NOT NULL,
+			ticket_id  TEXT    NOT NULL,
+			created    INTEGER NOT NULL,
+			modified   INTEGER NOT NULL,
+			deleted    BOOLEAN NOT NULL,
+			UNIQUE (comment_id, ticket_id)
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert default workflow
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(ctx,
 		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 		"test-workflow-id", "Test Workflow", "Test workflow", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -37,7 +141,7 @@ func setupTicketTestHandler(t *testing.T) (*Handler, string) {
 	// Insert ticket statuses
 	statuses := []string{"open", "in_progress", "done", "closed"}
 	for _, status := range statuses {
-		_, err := handler.db.Exec(context.Background(),
+		_, err = handler.db.Exec(ctx,
 			"INSERT INTO ticket_status (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 			"status-"+status, status, "Status: "+status, 1000, 1000, 0)
 		require.NoError(t, err)
@@ -80,6 +184,7 @@ func TestTicketHandler_Create_Success(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -121,6 +226,7 @@ func TestTicketHandler_Create_MinimalFields(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -154,6 +260,7 @@ func TestTicketHandler_Create_MissingProjectID(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -185,6 +292,7 @@ func TestTicketHandler_Create_MissingTitle(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -218,6 +326,7 @@ func TestTicketHandler_Create_InvalidTicketType(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -252,6 +361,7 @@ func TestTicketHandler_Create_TicketNumberIncrement(t *testing.T) {
 		c.Request = req
 		c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 		handler.DoAction(c)
 
 		var resp models.Response
@@ -286,6 +396,7 @@ func TestTicketHandler_Create_DifferentTypes(t *testing.T) {
 		c.Request = req
 		c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 		handler.DoAction(c)
 
 		assert.Equal(t, http.StatusOK, w.Code)
@@ -320,6 +431,7 @@ func TestTicketHandler_Modify_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -343,6 +455,7 @@ func TestTicketHandler_Modify_Success(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -376,6 +489,7 @@ func TestTicketHandler_Modify_StatusChange(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -398,6 +512,7 @@ func TestTicketHandler_Modify_StatusChange(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -423,6 +538,7 @@ func TestTicketHandler_Modify_MissingID(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -454,6 +570,7 @@ func TestTicketHandler_Modify_OnlyTitle(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -476,6 +593,7 @@ func TestTicketHandler_Modify_OnlyTitle(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -504,6 +622,7 @@ func TestTicketHandler_Remove_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -525,6 +644,7 @@ func TestTicketHandler_Remove_Success(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	assert.Equal(t, http.StatusOK, wRemove.Code)
@@ -557,6 +677,7 @@ func TestTicketHandler_Remove_MissingID(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -593,6 +714,7 @@ func TestTicketHandler_Read_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -614,6 +736,7 @@ func TestTicketHandler_Read_Success(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusOK, wRead.Code)
@@ -651,6 +774,7 @@ func TestTicketHandler_Read_MissingID(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -682,6 +806,7 @@ func TestTicketHandler_Read_NotFound(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -712,6 +837,7 @@ func TestTicketHandler_Read_DeletedTicket(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -733,6 +859,7 @@ func TestTicketHandler_Read_DeletedTicket(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	// Try to read deleted ticket
@@ -750,6 +877,7 @@ func TestTicketHandler_Read_DeletedTicket(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusNotFound, wRead.Code)
@@ -777,6 +905,7 @@ func TestTicketHandler_List_Empty(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -812,6 +941,7 @@ func TestTicketHandler_List_Multiple(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -831,6 +961,7 @@ func TestTicketHandler_List_Multiple(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -873,6 +1004,7 @@ func TestTicketHandler_List_FilterByProject(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -891,6 +1023,7 @@ func TestTicketHandler_List_FilterByProject(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	// List tickets filtered by first project
@@ -911,6 +1044,7 @@ func TestTicketHandler_List_FilterByProject(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	var resp models.Response
@@ -948,6 +1082,7 @@ func TestTicketHandler_List_ExcludesDeleted(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 
 		if i == 1 {
@@ -972,6 +1107,7 @@ func TestTicketHandler_List_ExcludesDeleted(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	// List tickets
@@ -987,6 +1123,7 @@ func TestTicketHandler_List_ExcludesDeleted(t *testing.T) {
 	cList, _ := gin.CreateTestContext(wList)
 	cList.Request = listHttpReq
 	cList.Set("username", "testuser")
+	cList.Set("request", &listReq)
 	handler.DoAction(cList)
 
 	var listResp models.Response
@@ -1004,9 +1141,113 @@ func TestTicketHandler_List_ExcludesDeleted(t *testing.T) {
 // setupTicketTestHandlerWithPublisher creates a test handler with mock event publisher and test data
 func setupTicketTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPublisher, string) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	ctx := context.Background()
+
+	// Create workflow table
+	_, err := handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT,
+			description TEXT,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket_type table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_type (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT    NOT NULL UNIQUE,
+			description TEXT,
+			created     INTEGER NOT NULL,
+			modified     INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket_status table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_status (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT    NOT NULL UNIQUE,
+			description TEXT,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create project table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS project (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			identifier  TEXT    NOT NULL UNIQUE,
+			title       TEXT    NOT NULL,
+			description TEXT,
+			workflow_id TEXT    NOT NULL,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			ticket_number    INTEGER NOT NULL,
+			position         INTEGER NOT NULL,
+			title            TEXT,
+			description      TEXT,
+			created          INTEGER NOT NULL,
+			modified         INTEGER NOT NULL,
+			ticket_type_id   TEXT    NOT NULL,
+			ticket_status_id TEXT    NOT NULL,
+			project_id       TEXT    NOT NULL,
+			user_id          TEXT,
+			estimation       REAL    NOT NULL,
+			story_points     INTEGER NOT NULL,
+			creator          TEXT    NOT NULL,
+			deleted          BOOLEAN NOT NULL,
+			UNIQUE (ticket_number, project_id)
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create comment table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS comment (
+			id       TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			comment  TEXT    NOT NULL,
+			created  INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted  BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create comment_ticket_mapping table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS comment_ticket_mapping (
+			id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			comment_id TEXT    NOT NULL,
+			ticket_id  TEXT    NOT NULL,
+			created    INTEGER NOT NULL,
+			modified   INTEGER NOT NULL,
+			deleted    BOOLEAN NOT NULL,
+			UNIQUE (comment_id, ticket_id)
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert default workflow
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(ctx,
 		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 		"test-workflow-id", "Test Workflow", "Test workflow", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -1014,7 +1255,7 @@ func setupTicketTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPubl
 	// Insert ticket types
 	ticketTypes := []string{"task", "bug", "story", "epic"}
 	for _, tt := range ticketTypes {
-		_, err := handler.db.Exec(context.Background(),
+		_, err = handler.db.Exec(ctx,
 			"INSERT INTO ticket_type (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 			"type-"+tt, tt, "Type: "+tt, 1000, 1000, 0)
 		require.NoError(t, err)
@@ -1023,7 +1264,7 @@ func setupTicketTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPubl
 	// Insert ticket statuses
 	statuses := []string{"open", "in_progress", "done", "closed"}
 	for _, status := range statuses {
-		_, err := handler.db.Exec(context.Background(),
+		_, err = handler.db.Exec(ctx,
 			"INSERT INTO ticket_status (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 			"status-"+status, status, "Status: "+status, 1000, 1000, 0)
 		require.NoError(t, err)
@@ -1064,6 +1305,7 @@ func TestTicketHandler_Create_PublishesEvent(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -1113,6 +1355,7 @@ func TestTicketHandler_Modify_PublishesEvent(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -1140,6 +1383,7 @@ func TestTicketHandler_Modify_PublishesEvent(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -1186,6 +1430,7 @@ func TestTicketHandler_Remove_PublishesEvent(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -1210,6 +1455,7 @@ func TestTicketHandler_Remove_PublishesEvent(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	assert.Equal(t, http.StatusOK, wRemove.Code)
@@ -1256,6 +1502,7 @@ func TestTicketHandler_Create_NoEventOnFailure(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -1286,6 +1533,7 @@ func TestTicketHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
@@ -1315,6 +1563,7 @@ func TestTicketHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c.Request = req
 	c.Set("username", "testuser")
 
+	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)

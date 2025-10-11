@@ -66,6 +66,20 @@ func setupCustomFieldTestHandler(t *testing.T) *Handler {
 	`)
 	require.NoError(t, err)
 
+	// Create ticket table for value tests
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			status TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
 	// Insert test ticket for value tests
 	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -105,10 +119,10 @@ func TestCustomFieldHandler_Create_Success(t *testing.T) {
 
 	customFieldData, ok := response.Data["customField"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "priority_score", customFieldData["FieldName"])
-	assert.Equal(t, "number", customFieldData["FieldType"])
-	assert.Equal(t, true, customFieldData["IsRequired"])
-	assert.NotEmpty(t, customFieldData["ID"])
+	assert.Equal(t, "priority_score", customFieldData["fieldName"])
+	assert.Equal(t, "number", customFieldData["fieldType"])
+	assert.Equal(t, true, customFieldData["isRequired"])
+	assert.NotEmpty(t, customFieldData["id"])
 
 	// Verify in database
 	var count int
@@ -121,7 +135,7 @@ func TestCustomFieldHandler_Create_Success(t *testing.T) {
 func TestCustomFieldHandler_Create_AllFieldTypes(t *testing.T) {
 	handler := setupCustomFieldTestHandler(t)
 
-	fieldTypes := []string{"text", "number", "date", "boolean", "select", "multiselect", "textarea", "url", "email"}
+	fieldTypes := []string{"text", "number", "date", "checkbox", "select", "multi_select", "textarea", "url"}
 
 	for _, fieldType := range fieldTypes {
 		reqBody := models.Request{
@@ -293,8 +307,8 @@ func TestCustomFieldHandler_Read_Success(t *testing.T) {
 
 	customFieldData, ok := response.Data["customField"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, fieldID, customFieldData["ID"])
-	assert.Equal(t, "test_field", customFieldData["FieldName"])
+	assert.Equal(t, fieldID, customFieldData["id"])
+	assert.Equal(t, "test_field", customFieldData["fieldName"])
 }
 
 func TestCustomFieldHandler_Read_NotFound(t *testing.T) {
@@ -559,9 +573,9 @@ func TestCustomFieldHandler_OptionCreate_Success(t *testing.T) {
 
 	optionData, ok := response.Data["option"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "in_progress", optionData["Value"])
-	assert.Equal(t, "In Progress", optionData["DisplayValue"])
-	assert.Equal(t, true, optionData["IsDefault"])
+	assert.Equal(t, "in_progress", optionData["value"])
+	assert.Equal(t, "In Progress", optionData["displayValue"])
+	assert.Equal(t, true, optionData["isDefault"])
 
 	// Verify in database
 	var count int
@@ -715,7 +729,7 @@ func TestCustomFieldHandler_OptionList_Success(t *testing.T) {
 	values := make([]string, len(optionsList))
 	for i, opt := range optionsList {
 		optMap := opt.(map[string]interface{})
-		values[i] = optMap["Value"].(string)
+		values[i] = optMap["value"].(string)
 	}
 	assert.Equal(t, "low", values[0])    // position 1
 	assert.Equal(t, "medium", values[1]) // position 2
@@ -846,7 +860,7 @@ func TestCustomFieldHandler_ValueGet_Success(t *testing.T) {
 
 	fieldValue, ok := response.Data["fieldValue"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Test Value", *fieldValue["Value"].(*string))
+	assert.Equal(t, "Test Value", fieldValue["value"].(string))
 }
 
 func TestCustomFieldHandler_ValueGet_NotFound(t *testing.T) {
@@ -976,7 +990,7 @@ func TestCustomFieldHandler_FullLifecycle(t *testing.T) {
 	require.NoError(t, err)
 
 	fieldData := createResp.Data["customField"].(map[string]interface{})
-	fieldID := fieldData["ID"].(string)
+	fieldID := fieldData["id"].(string)
 
 	// 2. Create options for the select field
 	options := []struct {
@@ -1125,6 +1139,7 @@ func TestCustomFieldHandler_Create_Global_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1194,6 +1209,7 @@ func TestCustomFieldHandler_Create_ProjectSpecific_PublishesEvent(t *testing.T) 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1276,6 +1292,7 @@ func TestCustomFieldHandler_Modify_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1345,6 +1362,7 @@ func TestCustomFieldHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1408,6 +1426,7 @@ func TestCustomFieldHandler_Create_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1456,6 +1475,7 @@ func TestCustomFieldHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1502,6 +1522,7 @@ func TestCustomFieldHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

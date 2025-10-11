@@ -17,17 +17,101 @@ import (
 // setupCycleTestHandler creates a test handler with cycle test data
 func setupCycleTestHandler(t *testing.T) *Handler {
 	handler := setupTestHandler(t)
+	ctx := context.Background()
+
+	// Create cycle table
+	_, err := handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS cycle (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			title       TEXT    NOT NULL,
+			description TEXT,
+			type        INTEGER NOT NULL,
+			cycle_id    TEXT,
+			started     INTEGER,
+			ended       INTEGER,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create project table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS project (
+			id          TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			identifier  TEXT    NOT NULL UNIQUE,
+			title       TEXT    NOT NULL,
+			description TEXT,
+			workflow_id TEXT    NOT NULL,
+			created     INTEGER NOT NULL,
+			modified    INTEGER NOT NULL,
+			deleted     BOOLEAN NOT NULL
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id               TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			ticket_number    INTEGER NOT NULL,
+			position         INTEGER NOT NULL,
+			title            TEXT,
+			description      TEXT,
+			created          INTEGER NOT NULL,
+			modified         INTEGER NOT NULL,
+			ticket_type_id   TEXT    NOT NULL,
+			ticket_status_id TEXT    NOT NULL,
+			project_id       TEXT    NOT NULL,
+			user_id          TEXT,
+			estimation       REAL    NOT NULL,
+			story_points     INTEGER NOT NULL,
+			creator          TEXT    NOT NULL,
+			deleted          BOOLEAN NOT NULL,
+			UNIQUE (ticket_number, project_id)
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create cycle_project_mapping table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS cycle_project_mapping (
+			id         TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			cycle_id   TEXT    NOT NULL,
+			project_id TEXT    NOT NULL,
+			created    INTEGER NOT NULL,
+			modified   INTEGER NOT NULL,
+			deleted    BOOLEAN NOT NULL,
+			UNIQUE (cycle_id, project_id)
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create ticket_cycle_mapping table
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_cycle_mapping (
+			id        TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			ticket_id TEXT    NOT NULL,
+			cycle_id  TEXT    NOT NULL,
+			created   INTEGER NOT NULL,
+			modified  INTEGER NOT NULL,
+			deleted   BOOLEAN NOT NULL,
+			UNIQUE (ticket_id, cycle_id)
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert test project for cycle-project mappings
-	_, err := handler.db.Exec(context.Background(),
-		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
-		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	_, err = handler.db.Exec(ctx,
+		"INSERT INTO project (id, identifier, title, description, workflow_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-project-id", "TEST", "Test Project", "Test project description", "workflow-1", 1000, 1000, 0)
 	require.NoError(t, err)
 
 	// Insert test ticket for cycle-ticket mappings
-	_, err = handler.db.Exec(context.Background(),
-		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		"test-ticket-id", "Test Ticket", "Test ticket description", "open", 1000, 1000, 0)
+	_, err = handler.db.Exec(ctx,
+		"INSERT INTO ticket (id, ticket_number, position, title, description, ticket_type_id, ticket_status_id, project_id, user_id, estimation, story_points, creator, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-ticket-id", 1, 0, "Test Ticket", "Test ticket description", "type-1", "status-1", "test-project-id", "user-1", 0.0, 0, "testuser", 1000, 1000, 0)
 	require.NoError(t, err)
 
 	return handler
@@ -54,6 +138,7 @@ func TestCycleHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -104,6 +189,7 @@ func TestCycleHandler_Create_AllTypes(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 			c.Set("username", "testuser")
+			c.Set("request", &reqBody)
 
 			handler.DoAction(c)
 
@@ -150,6 +236,7 @@ func TestCycleHandler_Create_WithParent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -194,6 +281,7 @@ func TestCycleHandler_Create_InvalidParentHierarchy(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -224,6 +312,7 @@ func TestCycleHandler_Create_MissingTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -255,6 +344,7 @@ func TestCycleHandler_Create_InvalidType(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -291,6 +381,7 @@ func TestCycleHandler_Read_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -326,6 +417,7 @@ func TestCycleHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -354,6 +446,7 @@ func TestCycleHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -404,6 +497,7 @@ func TestCycleHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -450,6 +544,7 @@ func TestCycleHandler_List_FilterByType(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -495,6 +590,7 @@ func TestCycleHandler_Modify_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -535,6 +631,7 @@ func TestCycleHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -571,6 +668,7 @@ func TestCycleHandler_Remove_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -609,6 +707,7 @@ func TestCycleHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -646,6 +745,7 @@ func TestCycleHandler_AssignProject_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -694,6 +794,7 @@ func TestCycleHandler_AssignProject_AlreadyAssigned(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -737,6 +838,7 @@ func TestCycleHandler_UnassignProject_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -787,6 +889,7 @@ func TestCycleHandler_ListProjects_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -832,6 +935,7 @@ func TestCycleHandler_AddTicket_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -880,6 +984,7 @@ func TestCycleHandler_RemoveTicket_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -930,6 +1035,7 @@ func TestCycleHandler_ListTickets_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -969,6 +1075,7 @@ func TestCycleHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &createReq)
 	handler.DoAction(c)
 
 	var createResp models.Response
@@ -988,6 +1095,7 @@ func TestCycleHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -1006,6 +1114,7 @@ func TestCycleHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &modifyReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -1021,6 +1130,7 @@ func TestCycleHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &deleteReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -1036,6 +1146,7 @@ func TestCycleHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }

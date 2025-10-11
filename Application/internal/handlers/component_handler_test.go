@@ -58,6 +58,20 @@ func setupComponentTestHandler(t *testing.T) *Handler {
 	`)
 	require.NoError(t, err)
 
+	// Create ticket table for mapping tests
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			status TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
 	// Insert test ticket for mapping tests
 	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -79,6 +93,7 @@ func performRequest(handler *Handler, method, path string, reqBody models.Reques
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -112,9 +127,9 @@ func TestComponentHandler_Create_Success(t *testing.T) {
 
 	componentData, ok := response.Data["component"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Database", componentData["Title"])
-	assert.Equal(t, "Database-related components", componentData["Description"])
-	assert.NotEmpty(t, componentData["ID"])
+	assert.Equal(t, "Database", componentData["title"])
+	assert.Equal(t, "Database-related components", componentData["description"])
+	assert.NotEmpty(t, componentData["id"])
 
 	// Verify in database
 	var count int
@@ -146,8 +161,8 @@ func TestComponentHandler_Create_MinimalFields(t *testing.T) {
 
 	componentData, ok := response.Data["component"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "API", componentData["Title"])
-	assert.Empty(t, componentData["Description"])
+	assert.Equal(t, "API", componentData["title"])
+	assert.Empty(t, componentData["description"])
 }
 
 func TestComponentHandler_Create_MissingTitle(t *testing.T) {
@@ -236,8 +251,8 @@ func TestComponentHandler_Read_Success(t *testing.T) {
 
 	componentData, ok := response.Data["component"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, componentID, componentData["ID"])
-	assert.Equal(t, "Frontend", componentData["Title"])
+	assert.Equal(t, componentID, componentData["id"])
+	assert.Equal(t, "Frontend", componentData["title"])
 }
 
 func TestComponentHandler_Read_NotFound(t *testing.T) {
@@ -363,7 +378,7 @@ func TestComponentHandler_List_OrderedByTitle(t *testing.T) {
 	titles := make([]string, len(componentsList))
 	for i, comp := range componentsList {
 		compMap := comp.(map[string]interface{})
-		titles[i] = compMap["Title"].(string)
+		titles[i] = compMap["title"].(string)
 	}
 
 	assert.Equal(t, "Apple", titles[0])
@@ -401,7 +416,7 @@ func TestComponentHandler_List_ExcludesDeleted(t *testing.T) {
 	assert.Len(t, componentsList, 1)
 
 	compMap := componentsList[0].(map[string]interface{})
-	assert.Equal(t, "Active", compMap["Title"])
+	assert.Equal(t, "Active", compMap["title"])
 }
 
 func TestComponentHandler_Modify_Success(t *testing.T) {
@@ -911,8 +926,8 @@ func TestComponentHandler_GetMetadata_Success(t *testing.T) {
 
 	metadata, ok := response.Data["metadata"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "owner", metadata["Property"])
-	assert.Equal(t, "john.doe", metadata["Value"])
+	assert.Equal(t, "owner", metadata["property"])
+	assert.Equal(t, "john.doe", metadata["value"])
 }
 
 func TestComponentHandler_GetMetadata_NotFound(t *testing.T) {
@@ -1121,7 +1136,7 @@ func TestComponentHandler_FullCRUDCycle(t *testing.T) {
 	require.NoError(t, err)
 
 	componentData := createResp.Data["component"].(map[string]interface{})
-	componentID := componentData["ID"].(string)
+	componentID := componentData["id"].(string)
 
 	// 2. Read component
 	readReq := models.Request{
@@ -1154,7 +1169,7 @@ func TestComponentHandler_FullCRUDCycle(t *testing.T) {
 	require.NoError(t, err)
 
 	modifiedData := readResp.Data["component"].(map[string]interface{})
-	assert.Equal(t, "Modified Component", modifiedData["Title"])
+	assert.Equal(t, "Modified Component", modifiedData["title"])
 
 	// 5. Add to ticket
 	addTicketReq := models.Request{

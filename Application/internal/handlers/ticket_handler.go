@@ -213,11 +213,6 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 		}
 	}
 
-	// Always update modified timestamp
-	updates = append(updates, "modified = ?")
-	args = append(args, time.Now().Unix())
-	args = append(args, ticketID)
-
 	if len(updates) == 0 {
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidData,
@@ -227,8 +222,26 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Always update modified timestamp
+	updates = append(updates, "modified = ?")
+	args = append(args, time.Now().Unix())
+	args = append(args, ticketID)
+
+	// Check if ticket exists first
+	var count int
+	err := h.db.QueryRow(context.Background(),
+		"SELECT COUNT(*) FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&count)
+	if err != nil || count == 0 {
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to update ticket",
+			"",
+		))
+		return
+	}
+
 	query := fmt.Sprintf("UPDATE ticket SET %s WHERE id = ?", joinWithComma(updates))
-	_, err := h.db.Exec(context.Background(), query, args...)
+	_, err = h.db.Exec(context.Background(), query, args...)
 	if err != nil {
 		logger.Error("Failed to update ticket", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(

@@ -130,21 +130,29 @@ func (h *Handler) handleVersionCreate(c *gin.Context, req *models.Request) {
 	)
 
 	// Publish version created event
+	eventData := map[string]interface{}{
+		"id":          version.ID,
+		"title":       version.Title,
+		"description": version.Description,
+		"project_id":  version.ProjectID,
+		"released":    version.Released,
+		"archived":    version.Archived,
+	}
+
+	// Add nullable fields only if they have values (convert to float64 for JSON compatibility)
+	if version.StartDate != nil {
+		eventData["start_date"] = float64(*version.StartDate)
+	}
+	if version.ReleaseDate != nil {
+		eventData["release_date"] = float64(*version.ReleaseDate)
+	}
+
 	h.publisher.PublishEntityEvent(
 		models.ActionCreate,
 		"version",
 		version.ID,
 		username,
-		map[string]interface{}{
-			"id":           version.ID,
-			"title":        version.Title,
-			"description":  version.Description,
-			"project_id":   version.ProjectID,
-			"start_date":   version.StartDate,
-			"release_date": version.ReleaseDate,
-			"released":     version.Released,
-			"archived":     version.Archived,
-		},
+		eventData,
 		websocket.NewProjectContext(version.ProjectID, []string{"READ"}),
 	)
 
@@ -437,13 +445,21 @@ func (h *Handler) handleVersionModify(c *gin.Context, req *models.Request) {
 	contextQuery := `SELECT project_id FROM version WHERE id = ? AND deleted = 0`
 	err = h.db.QueryRow(c.Request.Context(), contextQuery, versionID).Scan(&projectID)
 	if err == nil {
+		// Add project_id to event data
+		eventData := make(map[string]interface{})
+		for k, v := range updates {
+			eventData[k] = v
+		}
+		eventData["id"] = versionID
+		eventData["project_id"] = projectID
+
 		// Publish version updated event
 		h.publisher.PublishEntityEvent(
 			models.ActionModify,
 			"version",
 			versionID,
 			username,
-			updates,
+			eventData,
 			websocket.NewProjectContext(projectID, []string{"READ"}),
 		)
 	}
@@ -499,10 +515,48 @@ func (h *Handler) handleVersionRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// Get project context before deletion for event publishing
-	var projectID string
-	contextQuery := `SELECT project_id FROM version WHERE id = ? AND deleted = 0`
-	_ = h.db.QueryRow(c.Request.Context(), contextQuery, versionID).Scan(&projectID)
+	// Read version data before deleting (for event publishing)
+	readQuery := `SELECT id, title, description, project_id, start_date, release_date, released, archived
+	              FROM version WHERE id = ? AND deleted = 0`
+	var version models.Version
+	var startDate, releaseDate sql.NullInt64
+	err = h.db.QueryRow(c.Request.Context(), readQuery, versionID).Scan(
+		&version.ID,
+		&version.Title,
+		&version.Description,
+		&version.ProjectID,
+		&startDate,
+		&releaseDate,
+		&version.Released,
+		&version.Archived,
+	)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Version not found",
+			"",
+		))
+		return
+	}
+	if err != nil {
+		logger.Error("Failed to read version before deletion", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to read version",
+			"",
+		))
+		return
+	}
+
+	// Convert nullable fields
+	if startDate.Valid {
+		val := startDate.Int64
+		version.StartDate = &val
+	}
+	if releaseDate.Valid {
+		val := releaseDate.Int64
+		version.ReleaseDate = &val
+	}
 
 	// Soft delete the version
 	query := `UPDATE version SET deleted = 1, modified = ? WHERE id = ? AND deleted = 0`
@@ -532,17 +586,29 @@ func (h *Handler) handleVersionRemove(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
-	// Publish version deleted event
+	// Publish version deleted event with full data
+	eventData := map[string]interface{}{
+		"id":          version.ID,
+		"title":       version.Title,
+		"description": version.Description,
+		"project_id":  version.ProjectID,
+		"released":    version.Released,
+		"archived":    version.Archived,
+	}
+	if version.StartDate != nil {
+		eventData["start_date"] = float64(*version.StartDate)
+	}
+	if version.ReleaseDate != nil {
+		eventData["release_date"] = float64(*version.ReleaseDate)
+	}
+
 	h.publisher.PublishEntityEvent(
 		models.ActionRemove,
 		"version",
 		versionID,
 		username,
-		map[string]interface{}{
-			"id":         versionID,
-			"project_id": projectID,
-		},
-		websocket.NewProjectContext(projectID, []string{"READ"}),
+		eventData,
+		websocket.NewProjectContext(version.ProjectID, []string{"READ"}),
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -640,7 +706,7 @@ func (h *Handler) handleVersionRelease(c *gin.Context, req *models.Request) {
 	if err == nil {
 		// Publish version released event
 		h.publisher.PublishEntityEvent(
-			models.ActionModify,
+			models.ActionVersionRelease,
 			"version",
 			versionID,
 			username,
@@ -741,7 +807,7 @@ func (h *Handler) handleVersionArchive(c *gin.Context, req *models.Request) {
 	if err == nil {
 		// Publish version archived event
 		h.publisher.PublishEntityEvent(
-			models.ActionModify,
+			models.ActionVersionArchive,
 			"version",
 			versionID,
 			username,

@@ -14,9 +14,91 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupVersionTable creates the version table for testing
+func setupVersionTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS version (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT NOT NULL,
+			start_date INTEGER,
+			release_date INTEGER,
+			released INTEGER NOT NULL DEFAULT 0,
+			archived INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
+func setupVersionProjectTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS project (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
+func setupVersionTicketTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			status TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
+func setupTicketAffectedVersionMappingTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_affected_version_mapping (
+			id TEXT PRIMARY KEY,
+			ticket_id TEXT NOT NULL,
+			version_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
+func setupTicketFixVersionMappingTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_fix_version_mapping (
+			id TEXT PRIMARY KEY,
+			ticket_id TEXT NOT NULL,
+			version_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // setupVersionTestHandler creates a test handler with version test data
 func setupVersionTestHandler(t *testing.T) *Handler {
 	handler := setupTestHandler(t)
+
+	// Setup tables
+	setupVersionProjectTable(t, handler)
+	setupVersionTicketTable(t, handler)
+	setupVersionTable(t, handler)
+	setupTicketAffectedVersionMappingTable(t, handler)
+	setupTicketFixVersionMappingTable(t, handler)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -31,6 +113,20 @@ func setupVersionTestHandler(t *testing.T) *Handler {
 	require.NoError(t, err)
 
 	return handler
+}
+
+// setupVersionTestHandlerWithPublisher creates a test handler with version test data and mock publisher
+func setupVersionTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPublisher) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Setup tables
+	setupVersionProjectTable(t, handler)
+	setupVersionTicketTable(t, handler)
+	setupVersionTable(t, handler)
+	setupTicketAffectedVersionMappingTable(t, handler)
+	setupTicketFixVersionMappingTable(t, handler)
+
+	return handler, mockPublisher
 }
 
 // TestVersionHandler_Create_Success tests successful version creation with all fields
@@ -56,6 +152,7 @@ func TestVersionHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -94,6 +191,7 @@ func TestVersionHandler_Create_MinimalFields(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -130,6 +228,7 @@ func TestVersionHandler_Create_MissingTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -160,6 +259,7 @@ func TestVersionHandler_Create_MissingProjectId(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -196,6 +296,7 @@ func TestVersionHandler_Read_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -231,6 +332,7 @@ func TestVersionHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -259,6 +361,7 @@ func TestVersionHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -301,6 +404,7 @@ func TestVersionHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -353,6 +457,7 @@ func TestVersionHandler_List_FilterByProject(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -399,6 +504,7 @@ func TestVersionHandler_Modify_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -439,6 +545,7 @@ func TestVersionHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -475,6 +582,7 @@ func TestVersionHandler_Remove_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -513,6 +621,7 @@ func TestVersionHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -549,6 +658,7 @@ func TestVersionHandler_Release_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -587,6 +697,7 @@ func TestVersionHandler_Release_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -623,6 +734,7 @@ func TestVersionHandler_Archive_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -661,6 +773,7 @@ func TestVersionHandler_Archive_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -698,6 +811,7 @@ func TestVersionHandler_AddAffected_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -746,6 +860,7 @@ func TestVersionHandler_RemoveAffected_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -796,6 +911,7 @@ func TestVersionHandler_ListAffected_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -840,6 +956,7 @@ func TestVersionHandler_AddFix_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -888,6 +1005,7 @@ func TestVersionHandler_RemoveFix_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -938,6 +1056,7 @@ func TestVersionHandler_ListFix_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -960,7 +1079,7 @@ func TestVersionHandler_ListFix_Success(t *testing.T) {
 
 // TestVersionHandler_Create_PublishesEvent tests that version creation publishes an event
 func TestVersionHandler_Create_PublishesEvent(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project for project-based context
 	_, err := handler.db.Exec(context.Background(),
@@ -987,6 +1106,7 @@ func TestVersionHandler_Create_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1019,7 +1139,7 @@ func TestVersionHandler_Create_PublishesEvent(t *testing.T) {
 
 // TestVersionHandler_Modify_PublishesEvent tests that version modification publishes an event
 func TestVersionHandler_Modify_PublishesEvent(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1051,6 +1171,7 @@ func TestVersionHandler_Modify_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1079,7 +1200,7 @@ func TestVersionHandler_Modify_PublishesEvent(t *testing.T) {
 
 // TestVersionHandler_Remove_PublishesEvent tests that version deletion publishes an event
 func TestVersionHandler_Remove_PublishesEvent(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1108,6 +1229,7 @@ func TestVersionHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1136,7 +1258,7 @@ func TestVersionHandler_Remove_PublishesEvent(t *testing.T) {
 
 // TestVersionHandler_Release_PublishesEvent tests that version release publishes an event
 func TestVersionHandler_Release_PublishesEvent(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1165,6 +1287,7 @@ func TestVersionHandler_Release_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1194,7 +1317,7 @@ func TestVersionHandler_Release_PublishesEvent(t *testing.T) {
 
 // TestVersionHandler_Archive_PublishesEvent tests that version archive publishes an event
 func TestVersionHandler_Archive_PublishesEvent(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1223,6 +1346,7 @@ func TestVersionHandler_Archive_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1252,7 +1376,7 @@ func TestVersionHandler_Archive_PublishesEvent(t *testing.T) {
 
 // TestVersionHandler_Create_NoEventOnFailure tests that no event is published on create failure
 func TestVersionHandler_Create_NoEventOnFailure(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1276,6 +1400,7 @@ func TestVersionHandler_Create_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1287,7 +1412,7 @@ func TestVersionHandler_Create_NoEventOnFailure(t *testing.T) {
 
 // TestVersionHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
 func TestVersionHandler_Modify_NoEventOnFailure(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1311,6 +1436,7 @@ func TestVersionHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1322,7 +1448,7 @@ func TestVersionHandler_Modify_NoEventOnFailure(t *testing.T) {
 
 // TestVersionHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
 func TestVersionHandler_Remove_NoEventOnFailure(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1345,6 +1471,7 @@ func TestVersionHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1356,7 +1483,7 @@ func TestVersionHandler_Remove_NoEventOnFailure(t *testing.T) {
 
 // TestVersionHandler_Release_NoEventOnFailure tests that no event is published on release failure
 func TestVersionHandler_Release_NoEventOnFailure(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1379,6 +1506,7 @@ func TestVersionHandler_Release_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1390,7 +1518,7 @@ func TestVersionHandler_Release_NoEventOnFailure(t *testing.T) {
 
 // TestVersionHandler_Archive_NoEventOnFailure tests that no event is published on archive failure
 func TestVersionHandler_Archive_NoEventOnFailure(t *testing.T) {
-	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	handler, mockPublisher := setupVersionTestHandlerWithPublisher(t)
 
 	// Insert test project
 	_, err := handler.db.Exec(context.Background(),
@@ -1413,6 +1541,7 @@ func TestVersionHandler_Archive_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

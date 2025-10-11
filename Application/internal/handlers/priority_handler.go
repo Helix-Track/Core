@@ -475,6 +475,35 @@ func (h *Handler) handlePriorityRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Read priority data before deleting (for event publishing)
+	readQuery := `SELECT id, title, description, level, icon, color FROM priority WHERE id = ? AND deleted = 0`
+	var priority models.Priority
+	err = h.db.QueryRow(c.Request.Context(), readQuery, priorityID).Scan(
+		&priority.ID,
+		&priority.Title,
+		&priority.Description,
+		&priority.Level,
+		&priority.Icon,
+		&priority.Color,
+	)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Priority not found",
+			"",
+		))
+		return
+	}
+	if err != nil {
+		logger.Error("Failed to read priority before deletion", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to read priority",
+			"",
+		))
+		return
+	}
+
 	// Soft delete the priority
 	query := `UPDATE priority SET deleted = 1, modified = ? WHERE id = ? AND deleted = 0`
 	result, err := h.db.Exec(c.Request.Context(), query, time.Now().Unix(), priorityID)
@@ -503,14 +532,19 @@ func (h *Handler) handlePriorityRemove(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
-	// Publish priority deleted event
+	// Publish priority deleted event with full data
 	h.publisher.PublishEntityEvent(
 		models.ActionRemove,
 		"priority",
 		priorityID,
 		username,
 		map[string]interface{}{
-			"id": priorityID,
+			"id":          priority.ID,
+			"title":       priority.Title,
+			"description": priority.Description,
+			"level":       priority.Level,
+			"icon":        priority.Icon,
+			"color":       priority.Color,
 		},
 		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
 	)

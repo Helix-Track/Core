@@ -131,14 +131,18 @@ func (h *Handler) handleTicketRelationshipTypeRead(c *gin.Context, req *models.R
 	`
 
 	var relType models.TicketRelationshipType
+	var description sql.NullString
 	err := h.db.QueryRow(c.Request.Context(), query, relationshipTypeID).Scan(
 		&relType.ID,
 		&relType.Title,
-		&relType.Description,
+		&description,
 		&relType.Created,
 		&relType.Modified,
 		&relType.Deleted,
 	)
+	if description.Valid {
+		relType.Description = description.String
+	}
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
@@ -204,10 +208,11 @@ func (h *Handler) handleTicketRelationshipTypeList(c *gin.Context, req *models.R
 	relTypes := make([]models.TicketRelationshipType, 0)
 	for rows.Next() {
 		var relType models.TicketRelationshipType
+		var description sql.NullString
 		err := rows.Scan(
 			&relType.ID,
 			&relType.Title,
-			&relType.Description,
+			&description,
 			&relType.Created,
 			&relType.Modified,
 			&relType.Deleted,
@@ -215,6 +220,9 @@ func (h *Handler) handleTicketRelationshipTypeList(c *gin.Context, req *models.R
 		if err != nil {
 			logger.Error("Failed to scan ticket relationship type", zap.Error(err))
 			continue
+		}
+		if description.Valid {
+			relType.Description = description.String
 		}
 		relTypes = append(relTypes, relType)
 	}

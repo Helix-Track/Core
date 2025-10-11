@@ -14,9 +14,58 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupTicketTypeTable creates the ticket_type table for testing
+func setupTicketTypeTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_type (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			icon TEXT,
+			color TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
+// setupTicketTypeProjectMappingTable creates the ticket_type_project_mapping table for testing
+func setupTicketTypeProjectMappingTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_type_project_mapping (
+			id TEXT PRIMARY KEY,
+			ticket_type_id TEXT NOT NULL,
+			project_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
+// setupSimpleProjectTable creates a simplified project table for testing
+func setupSimpleProjectTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS project (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // setupTicketTypeTestHandler creates a test handler with ticket type test data
 func setupTicketTypeTestHandler(t *testing.T) *Handler {
 	handler := setupTestHandler(t)
+	setupTicketTypeTable(t, handler)
+	setupSimpleProjectTable(t, handler)
+	setupTicketTypeProjectMappingTable(t, handler)
 
 	// Insert test project for ticket type assignments
 	_, err := handler.db.Exec(context.Background(),
@@ -49,6 +98,7 @@ func TestTicketTypeHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -87,6 +137,7 @@ func TestTicketTypeHandler_Create_MinimalFields(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -122,6 +173,7 @@ func TestTicketTypeHandler_Create_MissingTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -169,6 +221,7 @@ func TestTicketTypeHandler_Create_MultipleCommonTypes(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = req
 		c.Set("username", "testuser")
+		c.Set("request", &reqBody)
 
 		handler.DoAction(c)
 
@@ -206,6 +259,7 @@ func TestTicketTypeHandler_Read_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -243,6 +297,7 @@ func TestTicketTypeHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -271,6 +326,7 @@ func TestTicketTypeHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -320,6 +376,7 @@ func TestTicketTypeHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -369,6 +426,7 @@ func TestTicketTypeHandler_List_OrderedByTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -418,6 +476,7 @@ func TestTicketTypeHandler_Modify_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -467,6 +526,7 @@ func TestTicketTypeHandler_Modify_IconAndColorOnly(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -509,6 +569,7 @@ func TestTicketTypeHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -545,6 +606,7 @@ func TestTicketTypeHandler_Remove_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -583,6 +645,7 @@ func TestTicketTypeHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -620,6 +683,7 @@ func TestTicketTypeHandler_Assign_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -668,6 +732,7 @@ func TestTicketTypeHandler_Assign_AlreadyAssigned(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -711,6 +776,7 @@ func TestTicketTypeHandler_Unassign_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -750,6 +816,7 @@ func TestTicketTypeHandler_Unassign_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -796,6 +863,7 @@ func TestTicketTypeHandler_ListByProject_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -830,6 +898,7 @@ func TestTicketTypeHandler_ListByProject_EmptyList(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -866,6 +935,7 @@ func TestTicketTypeHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &createReq)
 	handler.DoAction(c)
 
 	var createResp models.Response
@@ -885,6 +955,7 @@ func TestTicketTypeHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -903,6 +974,7 @@ func TestTicketTypeHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &modifyReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -918,6 +990,7 @@ func TestTicketTypeHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &deleteReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -933,6 +1006,7 @@ func TestTicketTypeHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }

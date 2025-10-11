@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -218,7 +219,9 @@ func (h *ServiceDiscoveryHandler) DiscoverServices(c *gin.Context) {
 
 	for rows.Next() {
 		var service models.ServiceRegistration
-		var registeredAt, lastHealthCheck int64
+		var registeredAt int64
+		var lastHealthCheck sql.NullInt64
+		var healthCheckURL, publicKey, signature, certificate, metadata sql.NullString
 
 		err := rows.Scan(
 			&service.ID,
@@ -226,13 +229,13 @@ func (h *ServiceDiscoveryHandler) DiscoverServices(c *gin.Context) {
 			&service.Type,
 			&service.Version,
 			&service.URL,
-			&service.HealthCheckURL,
-			&service.PublicKey,
-			&service.Signature,
-			&service.Certificate,
+			&healthCheckURL,
+			&publicKey,
+			&signature,
+			&certificate,
 			&service.Status,
 			&service.Priority,
-			&service.Metadata,
+			&metadata,
 			&service.RegisteredBy,
 			&registeredAt,
 			&lastHealthCheck,
@@ -245,9 +248,26 @@ func (h *ServiceDiscoveryHandler) DiscoverServices(c *gin.Context) {
 			continue
 		}
 
+		// Convert nullable strings
+		if healthCheckURL.Valid {
+			service.HealthCheckURL = healthCheckURL.String
+		}
+		if publicKey.Valid {
+			service.PublicKey = publicKey.String
+		}
+		if signature.Valid {
+			service.Signature = signature.String
+		}
+		if certificate.Valid {
+			service.Certificate = certificate.String
+		}
+		if metadata.Valid {
+			service.Metadata = metadata.String
+		}
+
 		service.RegisteredAt = time.Unix(registeredAt, 0)
-		if lastHealthCheck > 0 {
-			service.LastHealthCheck = time.Unix(lastHealthCheck, 0)
+		if lastHealthCheck.Valid && lastHealthCheck.Int64 > 0 {
+			service.LastHealthCheck = time.Unix(lastHealthCheck.Int64, 0)
 		}
 
 		// Filter by version if specified
@@ -649,7 +669,9 @@ func (h *ServiceDiscoveryHandler) getServiceByID(ctx context.Context, serviceID 
 		WHERE id = ? AND deleted = 0
 	`
 
-	var registeredAt, lastHealthCheck int64
+	var registeredAt int64
+	var lastHealthCheck sql.NullInt64
+	var healthCheckURL, publicKey, signature, certificate, metadata sql.NullString
 
 	err := h.db.QueryRow(ctx, query, serviceID).Scan(
 		&service.ID,
@@ -657,13 +679,13 @@ func (h *ServiceDiscoveryHandler) getServiceByID(ctx context.Context, serviceID 
 		&service.Type,
 		&service.Version,
 		&service.URL,
-		&service.HealthCheckURL,
-		&service.PublicKey,
-		&service.Signature,
-		&service.Certificate,
+		&healthCheckURL,
+		&publicKey,
+		&signature,
+		&certificate,
 		&service.Status,
 		&service.Priority,
-		&service.Metadata,
+		&metadata,
 		&service.RegisteredBy,
 		&registeredAt,
 		&lastHealthCheck,
@@ -675,9 +697,26 @@ func (h *ServiceDiscoveryHandler) getServiceByID(ctx context.Context, serviceID 
 		return err
 	}
 
+	// Convert nullable strings
+	if healthCheckURL.Valid {
+		service.HealthCheckURL = healthCheckURL.String
+	}
+	if publicKey.Valid {
+		service.PublicKey = publicKey.String
+	}
+	if signature.Valid {
+		service.Signature = signature.String
+	}
+	if certificate.Valid {
+		service.Certificate = certificate.String
+	}
+	if metadata.Valid {
+		service.Metadata = metadata.String
+	}
+
 	service.RegisteredAt = time.Unix(registeredAt, 0)
-	if lastHealthCheck > 0 {
-		service.LastHealthCheck = time.Unix(lastHealthCheck, 0)
+	if lastHealthCheck.Valid && lastHealthCheck.Int64 > 0 {
+		service.LastHealthCheck = time.Unix(lastHealthCheck.Int64, 0)
 	}
 
 	return nil

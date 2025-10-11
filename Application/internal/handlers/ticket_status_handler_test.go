@@ -14,9 +14,26 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupTicketStatusTable creates the ticket_status table for testing
+func setupTicketStatusTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_status (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			category TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // TestTicketStatusHandler_Create_Success tests successful ticket status creation
 func TestTicketStatusHandler_Create_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusCreate,
@@ -34,6 +51,7 @@ func TestTicketStatusHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -54,6 +72,7 @@ func TestTicketStatusHandler_Create_Success(t *testing.T) {
 // TestTicketStatusHandler_Create_MinimalFields tests ticket status creation with only required fields
 func TestTicketStatusHandler_Create_MinimalFields(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusCreate,
@@ -70,6 +89,7 @@ func TestTicketStatusHandler_Create_MinimalFields(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -88,6 +108,7 @@ func TestTicketStatusHandler_Create_MinimalFields(t *testing.T) {
 // TestTicketStatusHandler_Create_MissingTitle tests ticket status creation with missing title
 func TestTicketStatusHandler_Create_MissingTitle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusCreate,
@@ -104,6 +125,7 @@ func TestTicketStatusHandler_Create_MissingTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -118,6 +140,7 @@ func TestTicketStatusHandler_Create_MissingTitle(t *testing.T) {
 // TestTicketStatusHandler_Create_MultipleStatuses tests creating multiple common ticket statuses
 func TestTicketStatusHandler_Create_MultipleStatuses(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	statuses := []struct {
 		title       string
@@ -148,6 +171,7 @@ func TestTicketStatusHandler_Create_MultipleStatuses(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = req
 		c.Set("username", "testuser")
+		c.Set("request", &reqBody)
 
 		handler.DoAction(c)
 
@@ -163,6 +187,7 @@ func TestTicketStatusHandler_Create_MultipleStatuses(t *testing.T) {
 // TestTicketStatusHandler_Read_Success tests successful ticket status read
 func TestTicketStatusHandler_Read_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert test ticket status
 	_, err := handler.db.Exec(context.Background(),
@@ -185,6 +210,7 @@ func TestTicketStatusHandler_Read_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -205,6 +231,7 @@ func TestTicketStatusHandler_Read_Success(t *testing.T) {
 // TestTicketStatusHandler_Read_NotFound tests reading non-existent ticket status
 func TestTicketStatusHandler_Read_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusRead,
@@ -221,6 +248,7 @@ func TestTicketStatusHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -235,6 +263,7 @@ func TestTicketStatusHandler_Read_NotFound(t *testing.T) {
 // TestTicketStatusHandler_Read_MissingId tests reading without providing ID
 func TestTicketStatusHandler_Read_MissingId(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusRead,
@@ -249,6 +278,7 @@ func TestTicketStatusHandler_Read_MissingId(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -263,6 +293,7 @@ func TestTicketStatusHandler_Read_MissingId(t *testing.T) {
 // TestTicketStatusHandler_List_Empty tests listing ticket statuses when none exist
 func TestTicketStatusHandler_List_Empty(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusList,
@@ -277,6 +308,7 @@ func TestTicketStatusHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -295,6 +327,7 @@ func TestTicketStatusHandler_List_Empty(t *testing.T) {
 // TestTicketStatusHandler_List_Multiple tests listing multiple ticket statuses
 func TestTicketStatusHandler_List_Multiple(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert multiple ticket statuses
 	statuses := []struct {
@@ -326,6 +359,7 @@ func TestTicketStatusHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -344,6 +378,7 @@ func TestTicketStatusHandler_List_Multiple(t *testing.T) {
 // TestTicketStatusHandler_List_ExcludesDeleted tests that list excludes soft-deleted statuses
 func TestTicketStatusHandler_List_ExcludesDeleted(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert active and deleted ticket statuses
 	_, err := handler.db.Exec(context.Background(),
@@ -369,6 +404,7 @@ func TestTicketStatusHandler_List_ExcludesDeleted(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -391,6 +427,7 @@ func TestTicketStatusHandler_List_ExcludesDeleted(t *testing.T) {
 // TestTicketStatusHandler_List_OrderedByTitle tests that statuses are ordered by title
 func TestTicketStatusHandler_List_OrderedByTitle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert statuses in non-alphabetical order
 	statuses := []struct {
@@ -422,6 +459,7 @@ func TestTicketStatusHandler_List_OrderedByTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -445,6 +483,7 @@ func TestTicketStatusHandler_List_OrderedByTitle(t *testing.T) {
 // TestTicketStatusHandler_Modify_Success tests successful ticket status modification
 func TestTicketStatusHandler_Modify_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert test ticket status
 	_, err := handler.db.Exec(context.Background(),
@@ -469,6 +508,7 @@ func TestTicketStatusHandler_Modify_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -492,6 +532,7 @@ func TestTicketStatusHandler_Modify_Success(t *testing.T) {
 // TestTicketStatusHandler_Modify_TitleOnly tests modifying only the title
 func TestTicketStatusHandler_Modify_TitleOnly(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert test ticket status
 	_, err := handler.db.Exec(context.Background(),
@@ -515,6 +556,7 @@ func TestTicketStatusHandler_Modify_TitleOnly(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -538,6 +580,7 @@ func TestTicketStatusHandler_Modify_TitleOnly(t *testing.T) {
 // TestTicketStatusHandler_Modify_NotFound tests modifying non-existent ticket status
 func TestTicketStatusHandler_Modify_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusModify,
@@ -555,6 +598,7 @@ func TestTicketStatusHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -569,6 +613,7 @@ func TestTicketStatusHandler_Modify_NotFound(t *testing.T) {
 // TestTicketStatusHandler_Modify_NoFieldsToUpdate tests modifying without providing any fields
 func TestTicketStatusHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert test ticket status
 	_, err := handler.db.Exec(context.Background(),
@@ -592,6 +637,7 @@ func TestTicketStatusHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -606,6 +652,7 @@ func TestTicketStatusHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 // TestTicketStatusHandler_Remove_Success tests successful ticket status deletion
 func TestTicketStatusHandler_Remove_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// Insert test ticket status
 	_, err := handler.db.Exec(context.Background(),
@@ -628,6 +675,7 @@ func TestTicketStatusHandler_Remove_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -650,6 +698,7 @@ func TestTicketStatusHandler_Remove_Success(t *testing.T) {
 // TestTicketStatusHandler_Remove_NotFound tests deleting non-existent ticket status
 func TestTicketStatusHandler_Remove_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionTicketStatusRemove,
@@ -666,6 +715,7 @@ func TestTicketStatusHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -680,6 +730,7 @@ func TestTicketStatusHandler_Remove_NotFound(t *testing.T) {
 // TestTicketStatusHandler_CRUD_FullCycle tests complete ticket status lifecycle
 func TestTicketStatusHandler_CRUD_FullCycle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupTicketStatusTable(t, handler)
 
 	// 1. Create ticket status
 	createReq := models.Request{
@@ -696,6 +747,7 @@ func TestTicketStatusHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &createReq)
 	handler.DoAction(c)
 
 	var createResp models.Response
@@ -715,6 +767,7 @@ func TestTicketStatusHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -733,6 +786,7 @@ func TestTicketStatusHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &modifyReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -748,6 +802,7 @@ func TestTicketStatusHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &deleteReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -763,6 +818,7 @@ func TestTicketStatusHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }

@@ -67,11 +67,23 @@ func (h *Handler) handleCycleCreate(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get description as pointer
+	var descPtr *string
+	if descStr := getStringFromData(req.Data, "description"); descStr != "" {
+		descPtr = &descStr
+	}
+
+	// Get parent cycle ID as pointer
+	var cycleIDPtr *string
+	if cycleIDStr := getStringFromData(req.Data, "cycleId"); cycleIDStr != "" {
+		cycleIDPtr = &cycleIDStr
+	}
+
 	cycle := &models.Cycle{
 		ID:          uuid.New().String(),
 		Title:       title,
-		Description: getStringFromData(req.Data, "description"),
-		CycleID:     getStringFromData(req.Data, "cycleId"), // Parent cycle ID
+		Description: descPtr,    // NULL if not provided
+		CycleID:     cycleIDPtr, // Parent cycle ID (NULL for top-level)
 		Type:        int(cycleType),
 		Created:     time.Now().Unix(),
 		Modified:    time.Now().Unix(),
@@ -89,10 +101,10 @@ func (h *Handler) handleCycleCreate(c *gin.Context, req *models.Request) {
 	}
 
 	// If parent cycle is specified, validate it exists and type hierarchy
-	if cycle.CycleID != "" {
+	if cycle.CycleID != nil && *cycle.CycleID != "" {
 		var parentType int
 		checkQuery := `SELECT type FROM cycle WHERE id = ? AND deleted = 0`
-		err := h.db.QueryRow(c.Request.Context(), checkQuery, cycle.CycleID).Scan(&parentType)
+		err := h.db.QueryRow(c.Request.Context(), checkQuery, *cycle.CycleID).Scan(&parentType)
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 				models.ErrorCodeEntityNotFound,
@@ -385,7 +397,11 @@ func (h *Handler) handleCycleModify(c *gin.Context, req *models.Request) {
 		updates["title"] = title
 	}
 	if description, ok := req.Data["description"].(string); ok {
-		updates["description"] = description
+		if description != "" {
+			updates["description"] = description
+		} else {
+			updates["description"] = nil
+		}
 	}
 	if cycleType, ok := req.Data["type"].(float64); ok {
 		typeInt := int(cycleType)
@@ -399,8 +415,12 @@ func (h *Handler) handleCycleModify(c *gin.Context, req *models.Request) {
 		}
 		updates["type"] = typeInt
 	}
-	if cycleID, ok := req.Data["cycleId"].(string); ok {
-		updates["cycle_id"] = cycleID
+	if cycleIDStr, ok := req.Data["cycleId"].(string); ok {
+		if cycleIDStr != "" {
+			updates["cycle_id"] = cycleIDStr
+		} else {
+			updates["cycle_id"] = nil
+		}
 	}
 
 	updates["modified"] = time.Now().Unix()
@@ -1097,7 +1117,7 @@ func (h *Handler) handleCycleListTickets(c *gin.Context, req *models.Request) {
 
 	// Query tickets in cycle
 	query := `
-		SELECT t.id, t.title, t.description, t.status, t.created, t.modified
+		SELECT t.id, t.title, t.description, t.ticket_status_id, t.created, t.modified
 		FROM ticket t
 		INNER JOIN ticket_cycle_mapping tcm ON t.id = tcm.ticket_id
 		WHERE tcm.cycle_id = ? AND tcm.deleted = 0 AND t.deleted = 0
@@ -1118,20 +1138,20 @@ func (h *Handler) handleCycleListTickets(c *gin.Context, req *models.Request) {
 
 	tickets := make([]map[string]interface{}, 0)
 	for rows.Next() {
-		var id, title, description, status string
+		var id, title, description, ticketStatusID string
 		var created, modified int64
-		err := rows.Scan(&id, &title, &description, &status, &created, &modified)
+		err := rows.Scan(&id, &title, &description, &ticketStatusID, &created, &modified)
 		if err != nil {
 			logger.Error("Failed to scan ticket", zap.Error(err))
 			continue
 		}
 		tickets = append(tickets, map[string]interface{}{
-			"id":          id,
-			"title":       title,
-			"description": description,
-			"status":      status,
-			"created":     created,
-			"modified":    modified,
+			"id":               id,
+			"title":            title,
+			"description":      description,
+			"ticket_status_id": ticketStatusID,
+			"created":          created,
+			"modified":         modified,
 		})
 	}
 

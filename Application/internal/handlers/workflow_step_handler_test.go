@@ -14,9 +14,30 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupWorkflowStepTable creates the workflow_step table for testing
+func setupWorkflowStepTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS workflow_step (
+			id TEXT PRIMARY KEY,
+			workflow_id TEXT NOT NULL,
+			status_id TEXT NOT NULL,
+			position INTEGER NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // setupWorkflowStepTestHandler creates a test handler with workflow step test data
 func setupWorkflowStepTestHandler(t *testing.T) *Handler {
 	handler := setupTestHandler(t)
+
+	// Create all required tables
+	setupWorkflowTable(t, handler)
+	setupTicketStatusTable(t, handler)
+	setupWorkflowStepTable(t, handler)
 
 	// Insert test workflow
 	_, err := handler.db.Exec(context.Background(),
@@ -60,6 +81,7 @@ func TestWorkflowStepHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -122,6 +144,7 @@ func TestWorkflowStepHandler_Create_MultiplePositions(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = req
 		c.Set("username", "testuser")
+		c.Set("request", &reqBody)
 
 		handler.DoAction(c)
 
@@ -149,6 +172,7 @@ func TestWorkflowStepHandler_Create_MissingWorkflowId(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -180,6 +204,7 @@ func TestWorkflowStepHandler_Create_MissingStatusId(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -211,6 +236,7 @@ func TestWorkflowStepHandler_Create_MissingPosition(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -247,6 +273,7 @@ func TestWorkflowStepHandler_Read_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -284,6 +311,7 @@ func TestWorkflowStepHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -312,6 +340,7 @@ func TestWorkflowStepHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -361,6 +390,7 @@ func TestWorkflowStepHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -413,6 +443,7 @@ func TestWorkflowStepHandler_List_FilterByWorkflow(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -468,6 +499,7 @@ func TestWorkflowStepHandler_List_OrderedByPosition(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -515,6 +547,7 @@ func TestWorkflowStepHandler_Modify_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -562,6 +595,7 @@ func TestWorkflowStepHandler_Modify_PositionOnly(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -601,6 +635,7 @@ func TestWorkflowStepHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -638,6 +673,7 @@ func TestWorkflowStepHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -674,6 +710,7 @@ func TestWorkflowStepHandler_Remove_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -712,6 +749,7 @@ func TestWorkflowStepHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -743,6 +781,7 @@ func TestWorkflowStepHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &createReq)
 	handler.DoAction(c)
 
 	var createResp models.Response
@@ -762,6 +801,7 @@ func TestWorkflowStepHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -780,6 +820,7 @@ func TestWorkflowStepHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &modifyReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -795,6 +836,7 @@ func TestWorkflowStepHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &deleteReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -810,6 +852,7 @@ func TestWorkflowStepHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }

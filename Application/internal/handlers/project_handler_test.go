@@ -15,12 +15,44 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupProjectTable creates the project table for testing
+func setupProjectTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS project (
+			id TEXT PRIMARY KEY,
+			identifier TEXT NOT NULL UNIQUE,
+			title TEXT NOT NULL,
+			description TEXT,
+			type TEXT,
+			workflow_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // setupProjectTestHandler creates a test handler with a default workflow
 func setupProjectTestHandler(t *testing.T) *Handler {
 	handler := setupTestHandler(t)
+	setupProjectTable(t, handler)
+
+	// Create workflow table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert default workflow for project creation
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -57,6 +89,7 @@ func TestProjectHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -95,6 +128,7 @@ func TestProjectHandler_Create_MinimalFields(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -131,6 +165,7 @@ func TestProjectHandler_Create_MissingName(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -162,6 +197,7 @@ func TestProjectHandler_Create_MissingKey(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -195,6 +231,7 @@ func TestProjectHandler_Create_DuplicateKey(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -217,6 +254,7 @@ func TestProjectHandler_Create_DuplicateKey(t *testing.T) {
 	c2, _ := gin.CreateTestContext(w2)
 	c2.Request = req2
 	c2.Set("username", "testuser")
+	c2.Set("request", &reqBody2)
 
 	handler.DoAction(c2)
 
@@ -249,6 +287,7 @@ func TestProjectHandler_Create_DefaultType(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -286,6 +325,7 @@ func TestProjectHandler_Modify_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -310,6 +350,7 @@ func TestProjectHandler_Modify_Success(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -343,6 +384,7 @@ func TestProjectHandler_Modify_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -375,6 +417,7 @@ func TestProjectHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -406,6 +449,7 @@ func TestProjectHandler_Modify_OnlyTitle(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -428,6 +472,7 @@ func TestProjectHandler_Modify_OnlyTitle(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -456,6 +501,7 @@ func TestProjectHandler_Remove_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -477,6 +523,7 @@ func TestProjectHandler_Remove_Success(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	assert.Equal(t, http.StatusOK, wRemove.Code)
@@ -508,6 +555,7 @@ func TestProjectHandler_Remove_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -544,6 +592,7 @@ func TestProjectHandler_Read_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -565,6 +614,7 @@ func TestProjectHandler_Read_Success(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusOK, wRead.Code)
@@ -599,6 +649,7 @@ func TestProjectHandler_Read_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -630,6 +681,7 @@ func TestProjectHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -661,6 +713,7 @@ func TestProjectHandler_Read_DeletedProject(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -682,6 +735,7 @@ func TestProjectHandler_Read_DeletedProject(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	// Try to read deleted project
@@ -699,6 +753,7 @@ func TestProjectHandler_Read_DeletedProject(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusNotFound, wRead.Code)
@@ -725,6 +780,7 @@ func TestProjectHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -762,6 +818,7 @@ func TestProjectHandler_List_Multiple(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -780,6 +837,7 @@ func TestProjectHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -822,6 +880,7 @@ func TestProjectHandler_List_ExcludesDeleted(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -838,6 +897,7 @@ func TestProjectHandler_List_ExcludesDeleted(t *testing.T) {
 	cList, _ := gin.CreateTestContext(wList)
 	cList.Request = listHttpReq
 	cList.Set("username", "testuser")
+	cList.Set("request", &listReq)
 	handler.DoAction(cList)
 
 	var listResp models.Response
@@ -860,6 +920,7 @@ func TestProjectHandler_List_ExcludesDeleted(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	// List after deletion
@@ -875,6 +936,7 @@ func TestProjectHandler_List_ExcludesDeleted(t *testing.T) {
 	cList2, _ := gin.CreateTestContext(wList2)
 	cList2.Request = listHttpReq2
 	cList2.Set("username", "testuser")
+	cList2.Set("request", &listReq2)
 	handler.DoAction(cList2)
 
 	var listResp2 models.Response
@@ -932,9 +994,23 @@ func TestJoinWithComma(t *testing.T) {
 // TestProjectHandler_Create_PublishesEvent tests that project creation publishes an event
 func TestProjectHandler_Create_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupProjectTable(t, handler)
+
+	// Create workflow table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert default workflow for project creation
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -958,6 +1034,7 @@ func TestProjectHandler_Create_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -989,9 +1066,23 @@ func TestProjectHandler_Create_PublishesEvent(t *testing.T) {
 // TestProjectHandler_Modify_PublishesEvent tests that project modification publishes an event
 func TestProjectHandler_Modify_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupProjectTable(t, handler)
+
+	// Create workflow table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert default workflow
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -1020,6 +1111,7 @@ func TestProjectHandler_Modify_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1049,9 +1141,23 @@ func TestProjectHandler_Modify_PublishesEvent(t *testing.T) {
 // TestProjectHandler_Remove_PublishesEvent tests that project deletion publishes an event
 func TestProjectHandler_Remove_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupProjectTable(t, handler)
+
+	// Create workflow table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert default workflow
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -1078,6 +1184,7 @@ func TestProjectHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1105,9 +1212,23 @@ func TestProjectHandler_Remove_PublishesEvent(t *testing.T) {
 // TestProjectHandler_Create_NoEventOnFailure tests that no event is published on create failure
 func TestProjectHandler_Create_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupProjectTable(t, handler)
+
+	// Create workflow table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
 
 	// Insert default workflow
-	_, err := handler.db.Exec(context.Background(),
+	_, err = handler.db.Exec(context.Background(),
 		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
 		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
 	require.NoError(t, err)
@@ -1129,6 +1250,7 @@ func TestProjectHandler_Create_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1141,6 +1263,7 @@ func TestProjectHandler_Create_NoEventOnFailure(t *testing.T) {
 // TestProjectHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
 func TestProjectHandler_Modify_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupProjectTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionModify,
@@ -1159,6 +1282,7 @@ func TestProjectHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1171,6 +1295,7 @@ func TestProjectHandler_Modify_NoEventOnFailure(t *testing.T) {
 // TestProjectHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
 func TestProjectHandler_Remove_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupProjectTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionRemove,
@@ -1188,6 +1313,7 @@ func TestProjectHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

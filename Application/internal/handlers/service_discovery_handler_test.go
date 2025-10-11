@@ -172,7 +172,7 @@ func TestServiceDiscoveryHandler_DiscoverServices_FilterByType(t *testing.T) {
 
 	dataMap := response.Data
 	discovery := dataMap["discovery"].(map[string]interface{})
-	totalCount := int(discovery["TotalCount"].(float64))
+	totalCount := int(discovery["total_count"].(float64))
 	assert.Equal(t, 1, totalCount) // Only authentication service
 }
 

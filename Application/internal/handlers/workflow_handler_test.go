@@ -15,9 +15,26 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupWorkflowTable creates the workflow table for testing
+func setupWorkflowTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS workflow (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // setupWorkflowTestHandler creates a test handler for workflow tests
 func setupWorkflowTestHandler(t *testing.T) *Handler {
-	return setupTestHandler(t)
+	handler := setupTestHandler(t)
+	setupWorkflowTable(t, handler)
+	return handler
 }
 
 // =============================================================================
@@ -43,6 +60,7 @@ func TestWorkflowHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -80,6 +98,7 @@ func TestWorkflowHandler_Create_MinimalFields(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -113,6 +132,7 @@ func TestWorkflowHandler_Create_MissingTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -142,6 +162,7 @@ func TestWorkflowHandler_Create_Unauthorized(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 	// No username set - should be unauthorized
 
 	handler.DoAction(c)
@@ -172,6 +193,7 @@ func TestWorkflowHandler_Create_EmptyTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -200,6 +222,7 @@ func TestWorkflowHandler_Read_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -221,6 +244,7 @@ func TestWorkflowHandler_Read_Success(t *testing.T) {
 	cRead, _ := gin.CreateTestContext(wRead)
 	cRead.Request = readHttpReq
 	cRead.Set("username", "testuser")
+	cRead.Set("request", &readReq)
 	handler.DoAction(cRead)
 
 	assert.Equal(t, http.StatusOK, wRead.Code)
@@ -252,6 +276,7 @@ func TestWorkflowHandler_Read_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -282,6 +307,7 @@ func TestWorkflowHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -310,6 +336,7 @@ func TestWorkflowHandler_Read_Unauthorized(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 	// No username set
 
 	handler.DoAction(c)
@@ -337,6 +364,7 @@ func TestWorkflowHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -372,6 +400,7 @@ func TestWorkflowHandler_List_Multiple(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -389,6 +418,7 @@ func TestWorkflowHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -424,6 +454,7 @@ func TestWorkflowHandler_List_Unauthorized(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 	// No username set
 
 	handler.DoAction(c)
@@ -450,6 +481,7 @@ func TestWorkflowHandler_List_ExcludesDeleted(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 
 		if i == 1 {
@@ -479,6 +511,7 @@ func TestWorkflowHandler_List_ExcludesDeleted(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -512,6 +545,7 @@ func TestWorkflowHandler_Modify_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -535,6 +569,7 @@ func TestWorkflowHandler_Modify_Success(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -564,6 +599,7 @@ func TestWorkflowHandler_Modify_OnlyTitle(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -586,6 +622,7 @@ func TestWorkflowHandler_Modify_OnlyTitle(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
@@ -609,6 +646,7 @@ func TestWorkflowHandler_Modify_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -639,6 +677,7 @@ func TestWorkflowHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -667,6 +706,7 @@ func TestWorkflowHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -688,6 +728,7 @@ func TestWorkflowHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 	cModify, _ := gin.CreateTestContext(wModify)
 	cModify.Request = modifyHttpReq
 	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusBadRequest, wModify.Code)
@@ -714,6 +755,7 @@ func TestWorkflowHandler_Remove_Success(t *testing.T) {
 	cCreate, _ := gin.CreateTestContext(wCreate)
 	cCreate.Request = createHttpReq
 	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
 	handler.DoAction(cCreate)
 
 	var createResp models.Response
@@ -735,6 +777,7 @@ func TestWorkflowHandler_Remove_Success(t *testing.T) {
 	cRemove, _ := gin.CreateTestContext(wRemove)
 	cRemove.Request = removeHttpReq
 	cRemove.Set("username", "testuser")
+	cRemove.Set("request", &removeReq)
 	handler.DoAction(cRemove)
 
 	assert.Equal(t, http.StatusOK, wRemove.Code)
@@ -763,6 +806,7 @@ func TestWorkflowHandler_Remove_MissingID(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -792,6 +836,7 @@ func TestWorkflowHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -820,6 +865,7 @@ func TestWorkflowHandler_Remove_Unauthorized(t *testing.T) {
 
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
+	c.Set("request", &reqBody)
 	// No username set
 
 	handler.DoAction(c)

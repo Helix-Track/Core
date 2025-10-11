@@ -14,9 +14,28 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
+// setupPriorityTable creates the priority table for testing
+func setupPriorityTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS priority (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			level INTEGER NOT NULL,
+			icon TEXT,
+			color TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 // TestPriorityHandler_Create_Success tests successful priority creation with all fields
 func TestPriorityHandler_Create_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityCreate,
@@ -37,6 +56,7 @@ func TestPriorityHandler_Create_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -60,6 +80,7 @@ func TestPriorityHandler_Create_Success(t *testing.T) {
 // TestPriorityHandler_Create_MinimalFields tests priority creation with only required fields
 func TestPriorityHandler_Create_MinimalFields(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityCreate,
@@ -77,6 +98,7 @@ func TestPriorityHandler_Create_MinimalFields(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -96,8 +118,9 @@ func TestPriorityHandler_Create_MinimalFields(t *testing.T) {
 // TestPriorityHandler_Create_AllLevels tests creating priorities at all valid levels
 func TestPriorityHandler_Create_AllLevels(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
-	levels := []struct {
+	levels := []struct{
 		title string
 		level int
 	}{
@@ -125,6 +148,7 @@ func TestPriorityHandler_Create_AllLevels(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = req
 		c.Set("username", "testuser")
+		c.Set("request", &reqBody)
 
 		handler.DoAction(c)
 
@@ -145,6 +169,7 @@ func TestPriorityHandler_Create_AllLevels(t *testing.T) {
 // TestPriorityHandler_Create_MissingTitle tests priority creation without title
 func TestPriorityHandler_Create_MissingTitle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityCreate,
@@ -161,6 +186,7 @@ func TestPriorityHandler_Create_MissingTitle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -175,6 +201,7 @@ func TestPriorityHandler_Create_MissingTitle(t *testing.T) {
 // TestPriorityHandler_Create_MissingLevel tests priority creation without level
 func TestPriorityHandler_Create_MissingLevel(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityCreate,
@@ -191,6 +218,7 @@ func TestPriorityHandler_Create_MissingLevel(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -205,6 +233,7 @@ func TestPriorityHandler_Create_MissingLevel(t *testing.T) {
 // TestPriorityHandler_Create_InvalidLevel tests priority creation with invalid level
 func TestPriorityHandler_Create_InvalidLevel(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	invalidLevels := []int{0, 6, 10, -1}
 
@@ -225,6 +254,7 @@ func TestPriorityHandler_Create_InvalidLevel(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = req
 		c.Set("username", "testuser")
+		c.Set("request", &reqBody)
 
 		handler.DoAction(c)
 
@@ -240,6 +270,7 @@ func TestPriorityHandler_Create_InvalidLevel(t *testing.T) {
 // TestPriorityHandler_Read_Success tests successful priority read
 func TestPriorityHandler_Read_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// Insert test priority
 	_, err := handler.db.Exec(context.Background(),
@@ -262,6 +293,7 @@ func TestPriorityHandler_Read_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -282,6 +314,7 @@ func TestPriorityHandler_Read_Success(t *testing.T) {
 // TestPriorityHandler_Read_NotFound tests reading non-existent priority
 func TestPriorityHandler_Read_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityRead,
@@ -298,6 +331,7 @@ func TestPriorityHandler_Read_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -312,6 +346,7 @@ func TestPriorityHandler_Read_NotFound(t *testing.T) {
 // TestPriorityHandler_List_Empty tests listing priorities when none exist
 func TestPriorityHandler_List_Empty(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityList,
@@ -326,6 +361,7 @@ func TestPriorityHandler_List_Empty(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -344,6 +380,7 @@ func TestPriorityHandler_List_Empty(t *testing.T) {
 // TestPriorityHandler_List_Multiple tests listing multiple priorities
 func TestPriorityHandler_List_Multiple(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// Insert multiple priorities
 	priorities := []struct {
@@ -376,6 +413,7 @@ func TestPriorityHandler_List_Multiple(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -394,6 +432,7 @@ func TestPriorityHandler_List_Multiple(t *testing.T) {
 // TestPriorityHandler_List_OrderedByLevel tests that priorities are ordered by level
 func TestPriorityHandler_List_OrderedByLevel(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// Insert priorities in random level order
 	priorities := []struct {
@@ -426,6 +465,7 @@ func TestPriorityHandler_List_OrderedByLevel(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -452,6 +492,7 @@ func TestPriorityHandler_List_OrderedByLevel(t *testing.T) {
 // TestPriorityHandler_Modify_Success tests successful priority modification
 func TestPriorityHandler_Modify_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// Insert test priority
 	_, err := handler.db.Exec(context.Background(),
@@ -479,6 +520,7 @@ func TestPriorityHandler_Modify_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -506,6 +548,7 @@ func TestPriorityHandler_Modify_Success(t *testing.T) {
 // TestPriorityHandler_Modify_LevelOnly tests modifying only the level
 func TestPriorityHandler_Modify_LevelOnly(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// Insert test priority
 	_, err := handler.db.Exec(context.Background(),
@@ -529,6 +572,7 @@ func TestPriorityHandler_Modify_LevelOnly(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -553,6 +597,7 @@ func TestPriorityHandler_Modify_LevelOnly(t *testing.T) {
 // TestPriorityHandler_Modify_InvalidLevel tests modifying with invalid level
 func TestPriorityHandler_Modify_InvalidLevel(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// Insert test priority
 	_, err := handler.db.Exec(context.Background(),
@@ -576,6 +621,7 @@ func TestPriorityHandler_Modify_InvalidLevel(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -590,6 +636,7 @@ func TestPriorityHandler_Modify_InvalidLevel(t *testing.T) {
 // TestPriorityHandler_Modify_NotFound tests modifying non-existent priority
 func TestPriorityHandler_Modify_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityModify,
@@ -607,6 +654,7 @@ func TestPriorityHandler_Modify_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -621,6 +669,7 @@ func TestPriorityHandler_Modify_NotFound(t *testing.T) {
 // TestPriorityHandler_Remove_Success tests successful priority deletion
 func TestPriorityHandler_Remove_Success(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// Insert test priority
 	_, err := handler.db.Exec(context.Background(),
@@ -643,6 +692,7 @@ func TestPriorityHandler_Remove_Success(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -665,6 +715,7 @@ func TestPriorityHandler_Remove_Success(t *testing.T) {
 // TestPriorityHandler_Remove_NotFound tests deleting non-existent priority
 func TestPriorityHandler_Remove_NotFound(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityRemove,
@@ -681,6 +732,7 @@ func TestPriorityHandler_Remove_NotFound(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -695,6 +747,7 @@ func TestPriorityHandler_Remove_NotFound(t *testing.T) {
 // TestPriorityHandler_CRUD_FullCycle tests complete priority lifecycle
 func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 	handler := setupTestHandler(t)
+	setupPriorityTable(t, handler)
 
 	// 1. Create priority
 	createReq := models.Request{
@@ -714,6 +767,7 @@ func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &createReq)
 	handler.DoAction(c)
 
 	var createResp models.Response
@@ -733,6 +787,7 @@ func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -751,6 +806,7 @@ func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &modifyReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -766,6 +822,7 @@ func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &deleteReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -781,6 +838,7 @@ func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &readReq)
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
@@ -790,6 +848,7 @@ func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 // TestPriorityHandler_Create_PublishesEvent tests that priority creation publishes an event
 func TestPriorityHandler_Create_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityCreate,
@@ -810,6 +869,7 @@ func TestPriorityHandler_Create_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -829,7 +889,7 @@ func TestPriorityHandler_Create_PublishesEvent(t *testing.T) {
 	// Verify event data
 	assert.Equal(t, "Critical", lastCall.Data["title"])
 	assert.Equal(t, "Critical priority issues", lastCall.Data["description"])
-	assert.Equal(t, float64(5), lastCall.Data["level"])
+	assert.Equal(t, 5, lastCall.Data["level"])
 	assert.Equal(t, "alert-triangle", lastCall.Data["icon"])
 	assert.Equal(t, "#FF0000", lastCall.Data["color"])
 
@@ -841,6 +901,7 @@ func TestPriorityHandler_Create_PublishesEvent(t *testing.T) {
 // TestPriorityHandler_Modify_PublishesEvent tests that priority modification publishes an event
 func TestPriorityHandler_Modify_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupPriorityTable(t, handler)
 
 	// Insert test priority
 	_, err := handler.db.Exec(context.Background(),
@@ -866,6 +927,7 @@ func TestPriorityHandler_Modify_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -885,7 +947,7 @@ func TestPriorityHandler_Modify_PublishesEvent(t *testing.T) {
 	// Verify event data
 	assert.Equal(t, "High", lastCall.Data["title"])
 	assert.Equal(t, "Updated description", lastCall.Data["description"])
-	assert.Equal(t, float64(4), lastCall.Data["level"])
+	assert.Equal(t, 4, lastCall.Data["level"])
 
 	// Verify system-wide context
 	assert.Equal(t, "", lastCall.Context.ProjectID)
@@ -895,6 +957,7 @@ func TestPriorityHandler_Modify_PublishesEvent(t *testing.T) {
 // TestPriorityHandler_Remove_PublishesEvent tests that priority deletion publishes an event
 func TestPriorityHandler_Remove_PublishesEvent(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupPriorityTable(t, handler)
 
 	// Insert test priority
 	_, err := handler.db.Exec(context.Background(),
@@ -917,6 +980,7 @@ func TestPriorityHandler_Remove_PublishesEvent(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -945,6 +1009,7 @@ func TestPriorityHandler_Remove_PublishesEvent(t *testing.T) {
 // TestPriorityHandler_Create_NoEventOnFailure tests that no event is published on create failure
 func TestPriorityHandler_Create_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityCreate,
@@ -962,6 +1027,7 @@ func TestPriorityHandler_Create_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -974,6 +1040,7 @@ func TestPriorityHandler_Create_NoEventOnFailure(t *testing.T) {
 // TestPriorityHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
 func TestPriorityHandler_Modify_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityModify,
@@ -991,6 +1058,7 @@ func TestPriorityHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 
@@ -1003,6 +1071,7 @@ func TestPriorityHandler_Modify_NoEventOnFailure(t *testing.T) {
 // TestPriorityHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
 func TestPriorityHandler_Remove_NoEventOnFailure(t *testing.T) {
 	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+	setupPriorityTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionPriorityRemove,
@@ -1019,6 +1088,7 @@ func TestPriorityHandler_Remove_NoEventOnFailure(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	c.Set("username", "testuser")
+	c.Set("request", &reqBody)
 
 	handler.DoAction(c)
 

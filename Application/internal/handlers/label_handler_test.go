@@ -11,25 +11,25 @@ import (
 	"helixtrack.ru/core/internal/models"
 )
 
-// setupLabelTestHandler creates a test handler with label tables and dependencies
-func setupLabelTestHandler(t *testing.T) *Handler {
-	handler := setupTestHandler(t)
-
-	// Create label table
+// setupLabelTable creates the label table for testing
+func setupLabelTable(t *testing.T, handler *Handler) {
 	_, err := handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS label (
 			id TEXT PRIMARY KEY,
 			title TEXT NOT NULL,
 			description TEXT,
+			color TEXT,
 			created INTEGER NOT NULL,
 			modified INTEGER NOT NULL,
 			deleted INTEGER NOT NULL DEFAULT 0
 		)
 	`)
 	require.NoError(t, err)
+}
 
-	// Create label_category table
-	_, err = handler.db.Exec(context.Background(), `
+// setupLabelCategoryTable creates the label_category table for testing
+func setupLabelCategoryTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS label_category (
 			id TEXT PRIMARY KEY,
 			title TEXT NOT NULL,
@@ -40,9 +40,11 @@ func setupLabelTestHandler(t *testing.T) *Handler {
 		)
 	`)
 	require.NoError(t, err)
+}
 
-	// Create label_ticket_mapping table
-	_, err = handler.db.Exec(context.Background(), `
+// setupLabelTicketMappingTable creates the label_ticket_mapping table for testing
+func setupLabelTicketMappingTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS label_ticket_mapping (
 			id TEXT PRIMARY KEY,
 			label_id TEXT NOT NULL,
@@ -53,9 +55,11 @@ func setupLabelTestHandler(t *testing.T) *Handler {
 		)
 	`)
 	require.NoError(t, err)
+}
 
-	// Create label_label_category_mapping table
-	_, err = handler.db.Exec(context.Background(), `
+// setupLabelCategoryMappingTable creates the label_category_mapping table for testing
+func setupLabelCategoryMappingTable(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS label_label_category_mapping (
 			id TEXT PRIMARY KEY,
 			label_id TEXT NOT NULL,
@@ -66,14 +70,14 @@ func setupLabelTestHandler(t *testing.T) *Handler {
 		)
 	`)
 	require.NoError(t, err)
+}
 
-	// Insert test ticket for mapping tests
-	_, err = handler.db.Exec(context.Background(),
+// setupTestTicket creates a test ticket for mapping tests
+func setupTestTicket(t *testing.T, handler *Handler) {
+	_, err := handler.db.Exec(context.Background(),
 		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
 		"test-ticket-id", "Test Ticket", "Test ticket description", "open", 1000, 1000, 0)
 	require.NoError(t, err)
-
-	return handler
 }
 
 // ============================================================================
@@ -81,7 +85,11 @@ func setupLabelTestHandler(t *testing.T) *Handler {
 // ============================================================================
 
 func TestLabelHandler_Create_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelCreate,
@@ -104,9 +112,9 @@ func TestLabelHandler_Create_Success(t *testing.T) {
 
 	labelData, ok := response.Data["label"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "bug", labelData["Title"])
-	assert.Equal(t, "Bug-related issues", labelData["Description"])
-	assert.NotEmpty(t, labelData["ID"])
+	assert.Equal(t, "bug", labelData["title"])
+	assert.Equal(t, "Bug-related issues", labelData["description"])
+	assert.NotEmpty(t, labelData["id"])
 
 	// Verify in database
 	var count int
@@ -117,7 +125,11 @@ func TestLabelHandler_Create_Success(t *testing.T) {
 }
 
 func TestLabelHandler_Create_MinimalFields(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelCreate,
@@ -138,11 +150,15 @@ func TestLabelHandler_Create_MinimalFields(t *testing.T) {
 
 	labelData, ok := response.Data["label"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "feature", labelData["Title"])
+	assert.Equal(t, "feature", labelData["title"])
 }
 
 func TestLabelHandler_Create_MissingTitle(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelCreate,
@@ -164,7 +180,11 @@ func TestLabelHandler_Create_MissingTitle(t *testing.T) {
 }
 
 func TestLabelHandler_Create_MultipleCommonLabels(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	labels := []struct {
 		title       string
@@ -201,7 +221,11 @@ func TestLabelHandler_Create_MultipleCommonLabels(t *testing.T) {
 }
 
 func TestLabelHandler_Read_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -229,12 +253,16 @@ func TestLabelHandler_Read_Success(t *testing.T) {
 
 	labelData, ok := response.Data["label"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, labelID, labelData["ID"])
-	assert.Equal(t, "bug", labelData["Title"])
+	assert.Equal(t, labelID, labelData["id"])
+	assert.Equal(t, "bug", labelData["title"])
 }
 
 func TestLabelHandler_Read_NotFound(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelRead,
@@ -256,7 +284,11 @@ func TestLabelHandler_Read_NotFound(t *testing.T) {
 }
 
 func TestLabelHandler_List_Empty(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelList,
@@ -283,7 +315,11 @@ func TestLabelHandler_List_Empty(t *testing.T) {
 }
 
 func TestLabelHandler_List_Multiple(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert multiple labels
 	labels := []struct {
@@ -327,7 +363,11 @@ func TestLabelHandler_List_Multiple(t *testing.T) {
 }
 
 func TestLabelHandler_List_OrderedByTitle(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert labels in random order
 	labels := []string{"zebra", "apple", "mango"}
@@ -356,7 +396,7 @@ func TestLabelHandler_List_OrderedByTitle(t *testing.T) {
 	titles := make([]string, len(labelsList))
 	for i, label := range labelsList {
 		labelMap := label.(map[string]interface{})
-		titles[i] = labelMap["Title"].(string)
+		titles[i] = labelMap["title"].(string)
 	}
 
 	assert.Equal(t, "apple", titles[0])
@@ -365,7 +405,11 @@ func TestLabelHandler_List_OrderedByTitle(t *testing.T) {
 }
 
 func TestLabelHandler_List_ExcludesDeleted(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert active and deleted labels
 	_, err := handler.db.Exec(context.Background(),
@@ -394,11 +438,15 @@ func TestLabelHandler_List_ExcludesDeleted(t *testing.T) {
 	assert.Len(t, labelsList, 1)
 
 	labelMap := labelsList[0].(map[string]interface{})
-	assert.Equal(t, "bug", labelMap["Title"])
+	assert.Equal(t, "bug", labelMap["title"])
 }
 
 func TestLabelHandler_Modify_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -438,7 +486,11 @@ func TestLabelHandler_Modify_Success(t *testing.T) {
 }
 
 func TestLabelHandler_Modify_PartialUpdate(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -470,7 +522,11 @@ func TestLabelHandler_Modify_PartialUpdate(t *testing.T) {
 }
 
 func TestLabelHandler_Modify_NotFound(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelModify,
@@ -492,7 +548,11 @@ func TestLabelHandler_Modify_NotFound(t *testing.T) {
 }
 
 func TestLabelHandler_Modify_NoFieldsToUpdate(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -522,7 +582,11 @@ func TestLabelHandler_Modify_NoFieldsToUpdate(t *testing.T) {
 }
 
 func TestLabelHandler_Remove_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -558,7 +622,11 @@ func TestLabelHandler_Remove_Success(t *testing.T) {
 }
 
 func TestLabelHandler_Remove_NotFound(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelRemove,
@@ -583,7 +651,11 @@ func TestLabelHandler_Remove_NotFound(t *testing.T) {
 // ============================================================================
 
 func TestLabelHandler_CategoryCreate_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelCategoryCreate,
@@ -605,8 +677,8 @@ func TestLabelHandler_CategoryCreate_Success(t *testing.T) {
 
 	categoryData, ok := response.Data["category"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Priority Labels", categoryData["Title"])
-	assert.NotEmpty(t, categoryData["ID"])
+	assert.Equal(t, "Priority Labels", categoryData["title"])
+	assert.NotEmpty(t, categoryData["id"])
 
 	// Verify in database
 	var count int
@@ -617,7 +689,11 @@ func TestLabelHandler_CategoryCreate_Success(t *testing.T) {
 }
 
 func TestLabelHandler_CategoryCreate_MinimalFields(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelCategoryCreate,
@@ -636,11 +712,15 @@ func TestLabelHandler_CategoryCreate_MinimalFields(t *testing.T) {
 
 	categoryData, ok := response.Data["category"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Status Labels", categoryData["Title"])
+	assert.Equal(t, "Status Labels", categoryData["title"])
 }
 
 func TestLabelHandler_CategoryRead_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test category
 	categoryID := "test-category-id"
@@ -666,12 +746,16 @@ func TestLabelHandler_CategoryRead_Success(t *testing.T) {
 
 	categoryData, ok := response.Data["category"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, categoryID, categoryData["ID"])
-	assert.Equal(t, "Priority Labels", categoryData["Title"])
+	assert.Equal(t, categoryID, categoryData["id"])
+	assert.Equal(t, "Priority Labels", categoryData["title"])
 }
 
 func TestLabelHandler_CategoryList_Multiple(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert multiple categories
 	categories := []string{"Priority", "Status", "Type"}
@@ -699,7 +783,11 @@ func TestLabelHandler_CategoryList_Multiple(t *testing.T) {
 }
 
 func TestLabelHandler_CategoryModify_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test category
 	categoryID := "test-category-id"
@@ -736,7 +824,11 @@ func TestLabelHandler_CategoryModify_Success(t *testing.T) {
 }
 
 func TestLabelHandler_CategoryRemove_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test category
 	categoryID := "test-category-id"
@@ -775,7 +867,11 @@ func TestLabelHandler_CategoryRemove_Success(t *testing.T) {
 // ============================================================================
 
 func TestLabelHandler_AddTicket_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -813,7 +909,11 @@ func TestLabelHandler_AddTicket_Success(t *testing.T) {
 }
 
 func TestLabelHandler_AddTicket_MissingLabelId(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelAddTicket,
@@ -835,7 +935,11 @@ func TestLabelHandler_AddTicket_MissingLabelId(t *testing.T) {
 }
 
 func TestLabelHandler_RemoveTicket_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label and mapping
 	labelID := "test-label-id"
@@ -878,7 +982,11 @@ func TestLabelHandler_RemoveTicket_Success(t *testing.T) {
 }
 
 func TestLabelHandler_RemoveTicket_NotFound(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelRemoveTicket,
@@ -900,7 +1008,11 @@ func TestLabelHandler_RemoveTicket_NotFound(t *testing.T) {
 }
 
 func TestLabelHandler_ListTickets_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -945,7 +1057,11 @@ func TestLabelHandler_ListTickets_Success(t *testing.T) {
 }
 
 func TestLabelHandler_ListTickets_Empty(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label with no mappings
 	labelID := "test-label-id"
@@ -977,7 +1093,11 @@ func TestLabelHandler_ListTickets_Empty(t *testing.T) {
 // ============================================================================
 
 func TestLabelHandler_AssignCategory_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label and category
 	labelID := "test-label-id"
@@ -1022,7 +1142,11 @@ func TestLabelHandler_AssignCategory_Success(t *testing.T) {
 }
 
 func TestLabelHandler_AssignCategory_MissingLabelId(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelAssignCategory,
@@ -1044,7 +1168,11 @@ func TestLabelHandler_AssignCategory_MissingLabelId(t *testing.T) {
 }
 
 func TestLabelHandler_UnassignCategory_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label, category, and mapping
 	labelID := "test-label-id"
@@ -1094,7 +1222,11 @@ func TestLabelHandler_UnassignCategory_Success(t *testing.T) {
 }
 
 func TestLabelHandler_UnassignCategory_NotFound(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	reqBody := models.Request{
 		Action: models.ActionLabelUnassignCategory,
@@ -1116,7 +1248,11 @@ func TestLabelHandler_UnassignCategory_NotFound(t *testing.T) {
 }
 
 func TestLabelHandler_ListCategories_Success(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label
 	labelID := "test-label-id"
@@ -1166,7 +1302,11 @@ func TestLabelHandler_ListCategories_Success(t *testing.T) {
 }
 
 func TestLabelHandler_ListCategories_Empty(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// Insert test label with no category mappings
 	labelID := "test-label-id"
@@ -1198,7 +1338,11 @@ func TestLabelHandler_ListCategories_Empty(t *testing.T) {
 // ============================================================================
 
 func TestLabelHandler_FullCRUDCycle(t *testing.T) {
-	handler := setupLabelTestHandler(t)
+	handler := setupTestHandler(t)
+	setupLabelTable(t, handler)
+	setupLabelCategoryTable(t, handler)
+	setupLabelTicketMappingTable(t, handler)
+	setupLabelCategoryMappingTable(t, handler)
 
 	// 1. Create label
 	createReq := models.Request{
@@ -1218,7 +1362,7 @@ func TestLabelHandler_FullCRUDCycle(t *testing.T) {
 	require.NoError(t, err)
 
 	labelData := createResp.Data["label"].(map[string]interface{})
-	labelID := labelData["ID"].(string)
+	labelID := labelData["id"].(string)
 
 	// 2. Read label
 	readReq := models.Request{
@@ -1251,7 +1395,7 @@ func TestLabelHandler_FullCRUDCycle(t *testing.T) {
 	require.NoError(t, err)
 
 	modifiedData := readResp.Data["label"].(map[string]interface{})
-	assert.Equal(t, "Modified Label", modifiedData["Title"])
+	assert.Equal(t, "Modified Label", modifiedData["title"])
 
 	// 5. Add to ticket
 	addTicketReq := models.Request{
@@ -1279,7 +1423,7 @@ func TestLabelHandler_FullCRUDCycle(t *testing.T) {
 	require.NoError(t, err)
 
 	categoryData := catResp.Data["category"].(map[string]interface{})
-	categoryID := categoryData["ID"].(string)
+	categoryID := categoryData["id"].(string)
 
 	assignReq := models.Request{
 		Action: models.ActionLabelAssignCategory,
