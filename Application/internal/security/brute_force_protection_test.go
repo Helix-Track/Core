@@ -187,6 +187,7 @@ func TestBruteForceProtectionMiddleware(t *testing.T) {
 
 func TestRecordLoginFailure(t *testing.T) {
 	cfg := DefaultBruteForceProtectionConfig()
+	cfg.MaxFailedAttempts = 2 // Set threshold to 2 so 3 failures will block
 	InitBruteForceProtection(cfg)
 
 	ip := "192.168.1.1"
@@ -224,6 +225,7 @@ func TestRecordLoginSuccess(t *testing.T) {
 func TestUnblockIP(t *testing.T) {
 	cfg := DefaultBruteForceProtectionConfig()
 	cfg.MaxFailedAttempts = 2
+	cfg.TrackByUsername = false // Disable username tracking for IP-specific test
 	InitBruteForceProtection(cfg)
 
 	ip := "192.168.1.1"

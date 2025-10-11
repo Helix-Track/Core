@@ -2,7 +2,9 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -10,6 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"helixtrack.ru/core/internal/config"
 )
+
+var dbCounter atomic.Uint64
 
 func TestDefaultOptimizationConfig(t *testing.T) {
 	cfg := DefaultOptimizationConfig()
@@ -41,12 +45,10 @@ func TestDefaultOptimizationConfig(t *testing.T) {
 }
 
 func TestNewOptimizedDatabase_SQLite(t *testing.T) {
-	tmpDir := t.TempDir()
-	dbPath := filepath.Join(tmpDir, "optimized_test.db")
-
+	dbID := dbCounter.Add(1)
 	dbCfg := config.DatabaseConfig{
 		Type:       "sqlite",
-		SQLitePath: dbPath,
+		SQLitePath: fmt.Sprintf("file:testdb_%d?mode=memory&cache=shared", dbID),
 	}
 
 	optCfg := DefaultOptimizationConfig()
@@ -101,12 +103,10 @@ func TestNewOptimizedDatabase_SQLite_WithEncryption(t *testing.T) {
 }
 
 func TestNewOptimizedDatabase_SQLite_CustomOptimizations(t *testing.T) {
-	tmpDir := t.TempDir()
-	dbPath := filepath.Join(tmpDir, "custom_opt_test.db")
-
+	dbID := dbCounter.Add(1)
 	dbCfg := config.DatabaseConfig{
 		Type:       "sqlite",
-		SQLitePath: dbPath,
+		SQLitePath: fmt.Sprintf("file:testdb_%d?mode=memory&cache=shared", dbID),
 	}
 
 	optCfg := OptimizationConfig{
@@ -178,7 +178,7 @@ func TestOptimizedDatabase_PreparedQuery(t *testing.T) {
 		results = append(results, id)
 	}
 
-	assert.Len(t, results, 4) // IDs 6, 7, 8, 9, 10
+	assert.Len(t, results, 5) // IDs 6, 7, 8, 9, 10
 	assert.Equal(t, []int{6, 7, 8, 9, 10}, results)
 
 	// Execute same query again (should use cached statement)
@@ -525,12 +525,11 @@ func TestOptimizedDatabase_MultipleStatements(t *testing.T) {
 
 // Helper function to set up an optimized test database
 func setupOptimizedTestDB(t *testing.T) OptimizedDatabase {
-	tmpDir := t.TempDir()
-	dbPath := filepath.Join(tmpDir, "optimized_test.db")
-
+	// Generate unique database name for each test to avoid table conflicts
+	dbID := dbCounter.Add(1)
 	dbCfg := config.DatabaseConfig{
 		Type:       "sqlite",
-		SQLitePath: dbPath,
+		SQLitePath: fmt.Sprintf("file:testdb_%d?mode=memory&cache=shared", dbID),
 	}
 
 	optCfg := DefaultOptimizationConfig()

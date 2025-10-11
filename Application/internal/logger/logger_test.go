@@ -101,7 +101,15 @@ func TestInitialize(t *testing.T) {
 				}
 
 				// Write a test log to ensure file is created
-				Info("Test log message")
+			// Use appropriate log level based on configuration
+				switch tt.config.Level {
+				case "error":
+					Error("Test log message")
+				case "warn":
+					Warn("Test log message")
+				default:
+					Info("Test log message")
+				}
 				Sync()
 
 				_, err := os.Stat(expectedLogFile)

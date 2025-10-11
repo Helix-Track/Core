@@ -1,9 +1,11 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -96,7 +98,15 @@ func GetSugared() *zap.SugaredLogger {
 // Sync flushes any buffered log entries
 func Sync() error {
 	if globalLogger != nil {
-		return globalLogger.Sync()
+		err := globalLogger.Sync()
+		// Ignore "sync /dev/stdout: invalid argument" and "sync /dev/stderr: invalid argument" errors
+		// These are expected on Linux and other Unix-like systems
+		if err != nil && (strings.Contains(err.Error(), "sync /dev/stdout") ||
+			strings.Contains(err.Error(), "sync /dev/stderr") ||
+			errors.Is(err, os.ErrInvalid)) {
+			return nil
+		}
+		return err
 	}
 	return nil
 }

@@ -133,9 +133,26 @@ func NewOptimizedDatabase(cfg config.DatabaseConfig, optCfg OptimizationConfig) 
 		// Build SQLCipher connection string with encryption and optimizations
 		connStr := cfg.SQLitePath
 
+		// Check if the path already contains parameters (e.g., "file::memory:?cache=shared")
+		hasParams := false
+		if len(connStr) > 0 && (connStr[len(connStr)-1] != '/' && connStr[len(connStr)-1] != '\\') {
+			// Check if string contains '?'
+			for i := 0; i < len(connStr); i++ {
+				if connStr[i] == '?' {
+					hasParams = true
+					break
+				}
+			}
+		}
+
 		if optCfg.EncryptionKey != "" {
 			// Use SQLCipher with encryption
-			connStr = fmt.Sprintf("%s?_pragma_key=%s", cfg.SQLitePath, optCfg.EncryptionKey)
+			if hasParams {
+				connStr += fmt.Sprintf("&_pragma_key=%s", optCfg.EncryptionKey)
+			} else {
+				connStr += fmt.Sprintf("?_pragma_key=%s", optCfg.EncryptionKey)
+				hasParams = true
+			}
 
 			// Add cipher configuration
 			connStr += fmt.Sprintf("&_pragma_cipher_page_size=%d", optCfg.CipherPageSize)
@@ -146,7 +163,11 @@ func NewOptimizedDatabase(cfg config.DatabaseConfig, optCfg OptimizationConfig) 
 		}
 
 		// Add performance pragmas
-		connStr += fmt.Sprintf("&_pragma_foreign_keys=ON")
+		separator := "?"
+		if hasParams {
+			separator = "&"
+		}
+		connStr += fmt.Sprintf("%s_pragma_foreign_keys=ON", separator)
 		connStr += fmt.Sprintf("&_pragma_journal_mode=%s", optCfg.JournalMode)
 		connStr += fmt.Sprintf("&_pragma_synchronous=%s", optCfg.Synchronous)
 		connStr += fmt.Sprintf("&_pragma_cache_size=%d", optCfg.CacheSize)

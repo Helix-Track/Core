@@ -85,7 +85,7 @@ func TestMetrics_EndpointMetrics(t *testing.T) {
 	metrics.RecordRequest(15*time.Millisecond, 200, "/api/tickets", "GET")
 
 	summary := metrics.GetSummary(true)
-	assert.Equal(t, 2, len(summary.Endpoints))
+	assert.Equal(t, 3, len(summary.Endpoints)) // GET /api/users, POST /api/users, GET /api/tickets
 
 	// Find the /api/users endpoint
 	var usersMetric *EndpointMetrics

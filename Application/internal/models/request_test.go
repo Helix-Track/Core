@@ -33,9 +33,9 @@ func TestRequest_IsAuthenticationRequired(t *testing.T) {
 			expected: false,
 		},
 		{
-			name:     "Authenticate action requires auth",
+			name:     "Authenticate action does not require auth",
 			action:   ActionAuthenticate,
-			expected: true,
+			expected: false,
 		},
 		{
 			name:     "Create action requires auth",

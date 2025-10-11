@@ -444,7 +444,9 @@ func TestCheckPermissionForAction_Success(t *testing.T) {
 				},
 			}
 
-			c, _ := gin.CreateTestContext(httptest.NewRecorder())
+			w := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(w)
+			c.Request = httptest.NewRequest("GET", "/test", nil)
 			c.Set("username", "testuser")
 			allowed := CheckPermissionForAction(c, mockService, tt.action, "node1")
 			assert.Equal(t, tt.expected, allowed)
@@ -463,7 +465,9 @@ func TestCheckPermissionForAction_ServiceError(t *testing.T) {
 		},
 	}
 
-	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest("GET", "/test", nil)
 	c.Set("username", "testuser")
 	allowed := CheckPermissionForAction(c, mockService, "read", "node1")
 	assert.False(t, allowed, "Should deny on service error")
@@ -522,7 +526,9 @@ func TestGetUserPermissions_Success(t *testing.T) {
 		},
 	}
 
-	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest("GET", "/test", nil)
 	c.Set("username", "testuser")
 	permissions, err := GetUserPermissions(c, mockService)
 	assert.NoError(t, err)
@@ -542,7 +548,9 @@ func TestGetUserPermissions_ServiceError(t *testing.T) {
 		},
 	}
 
-	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest("GET", "/test", nil)
 	c.Set("username", "testuser")
 	permissions, err := GetUserPermissions(c, mockService)
 	assert.Error(t, err)

@@ -136,12 +136,13 @@ func (bp *bruteForceProtector) checkAttempt(ip, username string) (allowed bool, 
 	// Check IP-based failures
 	if bp.config.TrackByIP {
 		if record, exists := bp.ipFailures[ip]; exists {
-			if isBlocked, reason, delay := bp.checkRecord(record, now, "IP"); isBlocked {
+			isBlocked, reason, delay := bp.checkRecord(record, now, "IP")
+			if isBlocked {
 				blocked = true
 				blockReason = reason
-				if delay > maxDelay {
-					maxDelay = delay
-				}
+			}
+			if delay > maxDelay {
+				maxDelay = delay
 			}
 		}
 	}
@@ -149,12 +150,13 @@ func (bp *bruteForceProtector) checkAttempt(ip, username string) (allowed bool, 
 	// Check username-based failures
 	if bp.config.TrackByUsername && username != "" {
 		if record, exists := bp.usernameFailures[username]; exists {
-			if isBlocked, reason, delay := bp.checkRecord(record, now, "username"); isBlocked {
+			isBlocked, reason, delay := bp.checkRecord(record, now, "username")
+			if isBlocked {
 				blocked = true
 				blockReason = reason
-				if delay > maxDelay {
-					maxDelay = delay
-				}
+			}
+			if delay > maxDelay {
+				maxDelay = delay
 			}
 		}
 	}
@@ -163,12 +165,13 @@ func (bp *bruteForceProtector) checkAttempt(ip, username string) (allowed bool, 
 	if bp.config.TrackByIPAndUsername && username != "" {
 		key := fmt.Sprintf("%s:%s", ip, username)
 		if record, exists := bp.combinedFailures[key]; exists {
-			if isBlocked, reason, delay := bp.checkRecord(record, now, "IP+username"); isBlocked {
+			isBlocked, reason, delay := bp.checkRecord(record, now, "IP+username")
+			if isBlocked {
 				blocked = true
 				blockReason = reason
-				if delay > maxDelay {
-					maxDelay = delay
-				}
+			}
+			if delay > maxDelay {
+				maxDelay = delay
 			}
 		}
 	}
@@ -177,7 +180,7 @@ func (bp *bruteForceProtector) checkAttempt(ip, username string) (allowed bool, 
 		return false, blockReason, maxDelay
 	}
 
-	return true, "", 0
+	return true, "", maxDelay
 }
 
 // checkRecord checks if a failure record indicates blocking
@@ -191,6 +194,13 @@ func (bp *bruteForceProtector) checkRecord(record *failureRecord, now time.Time,
 	if now.Before(record.BlockedUntil) {
 		remaining := record.BlockedUntil.Sub(now)
 		return true, fmt.Sprintf("Temporarily blocked (%s) - %v remaining", recordType, remaining.Round(time.Second)), 0
+	}
+
+	// If block has expired, reset attempts
+	if !record.BlockedUntil.IsZero() && now.After(record.BlockedUntil) {
+		record.Attempts = 0
+		record.BlockedUntil = time.Time{} // Clear block time
+		return false, "", 0
 	}
 
 	// Check if we're in the failure window
@@ -522,7 +532,17 @@ func UnblockIP(ip string) {
 	if globalBruteForceProtector != nil {
 		globalBruteForceProtector.mu.Lock()
 		defer globalBruteForceProtector.mu.Unlock()
+
+		// Delete IP-specific record
 		delete(globalBruteForceProtector.ipFailures, ip)
+
+		// Delete all combined IP+username records for this IP
+		for key := range globalBruteForceProtector.combinedFailures {
+			// Combined key format is "ip:username"
+			if len(key) > len(ip) && key[:len(ip)] == ip && key[len(ip)] == ':' {
+				delete(globalBruteForceProtector.combinedFailures, key)
+			}
+		}
 	}
 }
 
@@ -531,7 +551,25 @@ func UnblockUsername(username string) {
 	if globalBruteForceProtector != nil {
 		globalBruteForceProtector.mu.Lock()
 		defer globalBruteForceProtector.mu.Unlock()
+
+		// Delete username-specific record
 		delete(globalBruteForceProtector.usernameFailures, username)
+
+		// Delete all combined IP+username records for this username
+		for key := range globalBruteForceProtector.combinedFailures {
+			// Combined key format is "ip:username"
+			// Find the colon and check if username matches
+			colonIdx := -1
+			for i := range key {
+				if key[i] == ':' {
+					colonIdx = i
+					break
+				}
+			}
+			if colonIdx >= 0 && colonIdx+1 < len(key) && key[colonIdx+1:] == username {
+				delete(globalBruteForceProtector.combinedFailures, key)
+			}
+		}
 	}
 }
 

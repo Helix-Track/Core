@@ -13,8 +13,8 @@ import (
 func TestDefaultTLSConfig(t *testing.T) {
 	cfg := DefaultTLSConfig()
 
-	assert.Equal(t, tls.VersionTLS12, cfg.MinTLSVersion)
-	assert.Equal(t, tls.VersionTLS13, cfg.MaxTLSVersion)
+	assert.Equal(t, uint16(tls.VersionTLS12), cfg.MinTLSVersion)
+	assert.Equal(t, uint16(tls.VersionTLS13), cfg.MaxTLSVersion)
 	assert.True(t, cfg.EnforceHTTPS)
 	assert.True(t, cfg.EnableHSTS)
 	assert.Equal(t, 31536000, cfg.HSTSMaxAge)
@@ -24,7 +24,7 @@ func TestDefaultTLSConfig(t *testing.T) {
 func TestStrictTLSConfig(t *testing.T) {
 	cfg := StrictTLSConfig()
 
-	assert.Equal(t, tls.VersionTLS13, cfg.MinTLSVersion)
+	assert.Equal(t, uint16(tls.VersionTLS13), cfg.MinTLSVersion)
 	assert.True(t, cfg.SessionTicketsDisabled)
 	assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
 }

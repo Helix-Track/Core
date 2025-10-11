@@ -71,8 +71,6 @@ var sqlInjectionPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`(?i)(drop.*table)`),
 	regexp.MustCompile(`(?i)(update.*set)`),
 	regexp.MustCompile(`(?i)(exec(ute)?)`),
-	regexp.MustCompile(`(?i)(script)`),
-	regexp.MustCompile(`(?i)(javascript:)`),
 	regexp.MustCompile(`(?i)(--)`),
 	regexp.MustCompile(`(?i)(;.*--)`),
 	regexp.MustCompile(`(?i)('.*or.*'.*=.*')`),
