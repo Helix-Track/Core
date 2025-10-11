@@ -955,3 +955,469 @@ func TestVersionHandler_ListFix_Success(t *testing.T) {
 	version := versions[0].(map[string]interface{})
 	assert.Equal(t, "v1.0.1", version["title"])
 }
+
+// Event Publishing Tests
+
+// TestVersionHandler_Create_PublishesEvent tests that version creation publishes an event
+func TestVersionHandler_Create_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project for project-based context
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionCreate,
+		Data: map[string]interface{}{
+			"title":       "v1.0.0",
+			"description": "First major release",
+			"projectId":   "test-project-id",
+			"startDate":   float64(1000000),
+			"releaseDate": float64(2000000),
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "version", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "v1.0.0", lastCall.Data["title"])
+	assert.Equal(t, "First major release", lastCall.Data["description"])
+	assert.Equal(t, "test-project-id", lastCall.Data["project_id"])
+	assert.Equal(t, float64(1000000), lastCall.Data["start_date"])
+	assert.Equal(t, float64(2000000), lastCall.Data["release_date"])
+	assert.Equal(t, false, lastCall.Data["released"])
+	assert.Equal(t, false, lastCall.Data["archived"])
+
+	// Verify project-based context
+	assert.Equal(t, "test-project-id", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestVersionHandler_Modify_PublishesEvent tests that version modification publishes an event
+func TestVersionHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test version
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO version (id, title, description, project_id, start_date, release_date, released, archived, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-version-id", "v1.0.0", "Old description", "test-project-id", nil, nil, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionModify,
+		Data: map[string]interface{}{
+			"id":          "test-version-id",
+			"title":       "v1.0.1",
+			"description": "Updated description",
+			"releaseDate": float64(2000000),
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "version", lastCall.Object)
+	assert.Equal(t, "test-version-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "v1.0.1", lastCall.Data["title"])
+	assert.Equal(t, "Updated description", lastCall.Data["description"])
+	assert.Equal(t, "test-project-id", lastCall.Data["project_id"])
+
+	// Verify project-based context
+	assert.Equal(t, "test-project-id", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestVersionHandler_Remove_PublishesEvent tests that version deletion publishes an event
+func TestVersionHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test version
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO version (id, title, description, project_id, start_date, release_date, released, archived, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-version-id", "v0.9.0", "Deprecated version", "test-project-id", nil, nil, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionRemove,
+		Data: map[string]interface{}{
+			"id": "test-version-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "version", lastCall.Object)
+	assert.Equal(t, "test-version-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-version-id", lastCall.Data["id"])
+	assert.Equal(t, "v0.9.0", lastCall.Data["title"])
+	assert.Equal(t, "test-project-id", lastCall.Data["project_id"])
+
+	// Verify project-based context
+	assert.Equal(t, "test-project-id", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestVersionHandler_Release_PublishesEvent tests that version release publishes an event
+func TestVersionHandler_Release_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test version
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO version (id, title, description, project_id, start_date, release_date, released, archived, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-version-id", "v1.0.0", "Ready to release", "test-project-id", nil, nil, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionRelease,
+		Data: map[string]interface{}{
+			"id": "test-version-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details (special release operation)
+	assert.Equal(t, "versionRelease", lastCall.Action)
+	assert.Equal(t, "version", lastCall.Object)
+	assert.Equal(t, "test-version-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-version-id", lastCall.Data["id"])
+	assert.Equal(t, "v1.0.0", lastCall.Data["title"])
+	assert.Equal(t, "test-project-id", lastCall.Data["project_id"])
+	assert.Equal(t, true, lastCall.Data["released"])
+
+	// Verify project-based context
+	assert.Equal(t, "test-project-id", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestVersionHandler_Archive_PublishesEvent tests that version archive publishes an event
+func TestVersionHandler_Archive_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test version
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO version (id, title, description, project_id, start_date, release_date, released, archived, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-version-id", "v0.1.0", "Old version", "test-project-id", nil, nil, 1, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionArchive,
+		Data: map[string]interface{}{
+			"id": "test-version-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details (special archive operation)
+	assert.Equal(t, "versionArchive", lastCall.Action)
+	assert.Equal(t, "version", lastCall.Object)
+	assert.Equal(t, "test-version-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-version-id", lastCall.Data["id"])
+	assert.Equal(t, "v0.1.0", lastCall.Data["title"])
+	assert.Equal(t, "test-project-id", lastCall.Data["project_id"])
+	assert.Equal(t, true, lastCall.Data["archived"])
+
+	// Verify project-based context
+	assert.Equal(t, "test-project-id", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestVersionHandler_Create_NoEventOnFailure tests that no event is published on create failure
+func TestVersionHandler_Create_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionCreate,
+		Data: map[string]interface{}{
+			// Missing required field 'title'
+			"projectId": "test-project-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestVersionHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestVersionHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionModify,
+		Data: map[string]interface{}{
+			"id":    "non-existent-version",
+			"title": "Updated",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestVersionHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestVersionHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionRemove,
+		Data: map[string]interface{}{
+			"id": "non-existent-version",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestVersionHandler_Release_NoEventOnFailure tests that no event is published on release failure
+func TestVersionHandler_Release_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionRelease,
+		Data: map[string]interface{}{
+			"id": "non-existent-version",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestVersionHandler_Archive_NoEventOnFailure tests that no event is published on archive failure
+func TestVersionHandler_Archive_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-project-id", "Test Project", "Test project description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionVersionArchive,
+		Data: map[string]interface{}{
+			"id": "non-existent-version",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}

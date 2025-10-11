@@ -654,3 +654,238 @@ func TestResolutionHandler_CRUD_FullCycle(t *testing.T) {
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
+
+// Event Publishing Tests
+
+// TestResolutionHandler_Create_PublishesEvent tests that resolution creation publishes an event
+func TestResolutionHandler_Create_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionResolutionCreate,
+		Data: map[string]interface{}{
+			"title":       "Fixed",
+			"description": "Issue has been fixed",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "resolution", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "Fixed", lastCall.Data["title"])
+	assert.Equal(t, "Issue has been fixed", lastCall.Data["description"])
+
+	// Verify system-wide context (empty project ID)
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestResolutionHandler_Modify_PublishesEvent tests that resolution modification publishes an event
+func TestResolutionHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test resolution
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO resolution (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-resolution-id", "Fixed", "Old description", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionResolutionModify,
+		Data: map[string]interface{}{
+			"id":          "test-resolution-id",
+			"title":       "Resolved",
+			"description": "Updated description",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "resolution", lastCall.Object)
+	assert.Equal(t, "test-resolution-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "Resolved", lastCall.Data["title"])
+	assert.Equal(t, "Updated description", lastCall.Data["description"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestResolutionHandler_Remove_PublishesEvent tests that resolution deletion publishes an event
+func TestResolutionHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test resolution
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO resolution (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-resolution-id", "Deprecated", "Old resolution", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionResolutionRemove,
+		Data: map[string]interface{}{
+			"id": "test-resolution-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "resolution", lastCall.Object)
+	assert.Equal(t, "test-resolution-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-resolution-id", lastCall.Data["id"])
+	assert.Equal(t, "Deprecated", lastCall.Data["title"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestResolutionHandler_Create_NoEventOnFailure tests that no event is published on create failure
+func TestResolutionHandler_Create_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionResolutionCreate,
+		Data: map[string]interface{}{
+			// Missing required field 'title'
+			"description": "Some description",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestResolutionHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestResolutionHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionResolutionModify,
+		Data: map[string]interface{}{
+			"id":    "non-existent-resolution",
+			"title": "Updated",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestResolutionHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestResolutionHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionResolutionRemove,
+		Data: map[string]interface{}{
+			"id": "non-existent-resolution",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}

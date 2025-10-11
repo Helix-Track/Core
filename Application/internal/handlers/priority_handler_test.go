@@ -784,3 +784,246 @@ func TestPriorityHandler_CRUD_FullCycle(t *testing.T) {
 	handler.DoAction(c)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
+
+// Event Publishing Tests
+
+// TestPriorityHandler_Create_PublishesEvent tests that priority creation publishes an event
+func TestPriorityHandler_Create_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionPriorityCreate,
+		Data: map[string]interface{}{
+			"title":       "Critical",
+			"description": "Critical priority issues",
+			"level":       float64(5),
+			"icon":        "alert-triangle",
+			"color":       "#FF0000",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "priority", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "Critical", lastCall.Data["title"])
+	assert.Equal(t, "Critical priority issues", lastCall.Data["description"])
+	assert.Equal(t, float64(5), lastCall.Data["level"])
+	assert.Equal(t, "alert-triangle", lastCall.Data["icon"])
+	assert.Equal(t, "#FF0000", lastCall.Data["color"])
+
+	// Verify system-wide context (empty project ID)
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestPriorityHandler_Modify_PublishesEvent tests that priority modification publishes an event
+func TestPriorityHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test priority
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO priority (id, title, description, level, icon, color, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-priority-id", "Medium", "Old description", 3, "old-icon", "#000000", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionPriorityModify,
+		Data: map[string]interface{}{
+			"id":          "test-priority-id",
+			"title":       "High",
+			"description": "Updated description",
+			"level":       float64(4),
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "priority", lastCall.Object)
+	assert.Equal(t, "test-priority-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "High", lastCall.Data["title"])
+	assert.Equal(t, "Updated description", lastCall.Data["description"])
+	assert.Equal(t, float64(4), lastCall.Data["level"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestPriorityHandler_Remove_PublishesEvent tests that priority deletion publishes an event
+func TestPriorityHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test priority
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO priority (id, title, description, level, icon, color, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-priority-id", "Deprecated", "Old priority", 2, "old", "#CCCCCC", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionPriorityRemove,
+		Data: map[string]interface{}{
+			"id": "test-priority-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "priority", lastCall.Object)
+	assert.Equal(t, "test-priority-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-priority-id", lastCall.Data["id"])
+	assert.Equal(t, "Deprecated", lastCall.Data["title"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestPriorityHandler_Create_NoEventOnFailure tests that no event is published on create failure
+func TestPriorityHandler_Create_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionPriorityCreate,
+		Data: map[string]interface{}{
+			// Missing required field 'title'
+			"level": float64(3),
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestPriorityHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestPriorityHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionPriorityModify,
+		Data: map[string]interface{}{
+			"id":    "non-existent-priority",
+			"title": "Updated",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestPriorityHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestPriorityHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionPriorityRemove,
+		Data: map[string]interface{}{
+			"id": "non-existent-priority",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}

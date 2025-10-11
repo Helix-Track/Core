@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,108 @@ func init() {
 		LogSizeLimit: 1000000,
 		Level:        "error",
 	})
+}
+
+// MockEventPublisher is a mock implementation of websocket.EventPublisher for testing
+type MockEventPublisher struct {
+	mu                   sync.Mutex
+	PublishedEvents      []*models.Event
+	PublishedEntityCalls []EntityEventCall
+	enabled              bool
+}
+
+// EntityEventCall represents a call to PublishEntityEvent
+type EntityEventCall struct {
+	Action   string
+	Object   string
+	EntityID string
+	Username string
+	Data     map[string]interface{}
+	Context  models.EventContext
+}
+
+// NewMockEventPublisher creates a new mock event publisher
+func NewMockEventPublisher(enabled bool) *MockEventPublisher {
+	return &MockEventPublisher{
+		PublishedEvents:      make([]*models.Event, 0),
+		PublishedEntityCalls: make([]EntityEventCall, 0),
+		enabled:              enabled,
+	}
+}
+
+// PublishEvent records the published event
+func (m *MockEventPublisher) PublishEvent(event *models.Event) {
+	if !m.enabled {
+		return
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.PublishedEvents = append(m.PublishedEvents, event)
+}
+
+// PublishEntityEvent records the entity event call and creates an event
+func (m *MockEventPublisher) PublishEntityEvent(action, object, entityID, username string, data map[string]interface{}, context models.EventContext) {
+	if !m.enabled {
+		return
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// Record the call
+	m.PublishedEntityCalls = append(m.PublishedEntityCalls, EntityEventCall{
+		Action:   action,
+		Object:   object,
+		EntityID: entityID,
+		Username: username,
+		Data:     data,
+		Context:  context,
+	})
+
+	// Create and store the event
+	eventType := models.GetEventTypeFromAction(action, object)
+	event := models.NewEvent(eventType, action, object, entityID, username, data)
+	event.Context = context
+	m.PublishedEvents = append(m.PublishedEvents, event)
+}
+
+// IsEnabled returns whether the mock publisher is enabled
+func (m *MockEventPublisher) IsEnabled() bool {
+	return m.enabled
+}
+
+// Reset clears all recorded events and calls
+func (m *MockEventPublisher) Reset() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.PublishedEvents = make([]*models.Event, 0)
+	m.PublishedEntityCalls = make([]EntityEventCall, 0)
+}
+
+// GetLastEvent returns the last published event (or nil if none)
+func (m *MockEventPublisher) GetLastEvent() *models.Event {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if len(m.PublishedEvents) == 0 {
+		return nil
+	}
+	return m.PublishedEvents[len(m.PublishedEvents)-1]
+}
+
+// GetLastEntityCall returns the last entity event call (or nil if none)
+func (m *MockEventPublisher) GetLastEntityCall() *EntityEventCall {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if len(m.PublishedEntityCalls) == 0 {
+		return nil
+	}
+	return &m.PublishedEntityCalls[len(m.PublishedEntityCalls)-1]
+}
+
+// GetEventCount returns the number of published events
+func (m *MockEventPublisher) GetEventCount() int {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return len(m.PublishedEvents)
 }
 
 func setupTestHandler(t *testing.T) *Handler {
@@ -57,6 +160,14 @@ func setupTestHandler(t *testing.T) *Handler {
 	}
 
 	return NewHandler(db, mockAuth, mockPerm, "1.0.0-test")
+}
+
+// setupTestHandlerWithPublisher creates a test handler with a mock event publisher
+func setupTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPublisher) {
+	handler := setupTestHandler(t)
+	mockPublisher := NewMockEventPublisher(true)
+	handler.SetEventPublisher(mockPublisher)
+	return handler, mockPublisher
 }
 
 func TestHandler_DoAction_Version(t *testing.T) {

@@ -923,3 +923,275 @@ func TestJoinWithComma(t *testing.T) {
 		})
 	}
 }
+
+// =============================================================================
+// Event Publishing Tests
+// =============================================================================
+
+// TestProjectHandler_Create_PublishesEvent tests that project creation publishes an event
+func TestProjectHandler_Create_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert default workflow for project creation
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCreate,
+		Object: "project",
+		Data: map[string]interface{}{
+			"name":        "Test Project",
+			"key":         "TEST",
+			"description": "A test project",
+			"type":        "software",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "project", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, lastCall.EntityID, lastCall.Data["id"])
+	assert.Equal(t, "TEST", lastCall.Data["identifier"])
+	assert.Equal(t, "Test Project", lastCall.Data["title"])
+	assert.Equal(t, "A test project", lastCall.Data["description"])
+	assert.Equal(t, "software", lastCall.Data["type"])
+
+	// Verify project-based context (self-referential)
+	assert.Equal(t, lastCall.EntityID, lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestProjectHandler_Modify_PublishesEvent tests that project modification publishes an event
+func TestProjectHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert default workflow
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test project
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, identifier, title, description, workflow_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-project-id", "TEST", "Original Project", "Original description", "default-workflow-id", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionModify,
+		Object: "project",
+		Data: map[string]interface{}{
+			"id":          "test-project-id",
+			"title":       "Updated Project",
+			"description": "Updated description",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "project", lastCall.Object)
+	assert.Equal(t, "test-project-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-project-id", lastCall.Data["id"])
+	assert.Equal(t, "Updated Project", lastCall.Data["title"])
+	assert.Equal(t, "Updated description", lastCall.Data["description"])
+
+	// Verify project-based context (self-referential)
+	assert.Equal(t, "test-project-id", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestProjectHandler_Remove_PublishesEvent tests that project deletion publishes an event
+func TestProjectHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert default workflow
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test project
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, identifier, title, description, workflow_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-project-id", "TEST", "To Delete", "Project to be deleted", "default-workflow-id", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionRemove,
+		Object: "project",
+		Data: map[string]interface{}{
+			"id": "test-project-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "project", lastCall.Object)
+	assert.Equal(t, "test-project-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-project-id", lastCall.Data["id"])
+
+	// Verify project-based context (self-referential)
+	assert.Equal(t, "test-project-id", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestProjectHandler_Create_NoEventOnFailure tests that no event is published on create failure
+func TestProjectHandler_Create_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert default workflow
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"default-workflow-id", "Default Workflow", "Default workflow for testing", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCreate,
+		Object: "project",
+		Data: map[string]interface{}{
+			// Missing required field 'name'
+			"key": "TEST",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestProjectHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestProjectHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionModify,
+		Object: "project",
+		Data: map[string]interface{}{
+			"id":    "non-existent-project",
+			"title": "Updated",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestProjectHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestProjectHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionRemove,
+		Object: "project",
+		Data: map[string]interface{}{
+			"id": "non-existent-project",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}

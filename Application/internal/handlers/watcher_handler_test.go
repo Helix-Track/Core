@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"helixtrack.ru/core/internal/models"
@@ -627,4 +630,243 @@ func TestWatcherHandler_FullCycle(t *testing.T) {
 	watchers, ok = listResp.Data["watchers"].([]interface{})
 	require.True(t, ok)
 	assert.Len(t, watchers, 1)
+}
+
+// ============================================================================
+// Event Publishing Tests
+// ============================================================================
+
+// TestWatcherHandler_Add_PublishesEvent tests that watcher addition publishes an event
+func TestWatcherHandler_Add_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create ticket_watcher_mapping table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
+			id TEXT PRIMARY KEY,
+			ticket_id TEXT NOT NULL,
+			user_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test ticket with project_id for hierarchical context
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket (id, title, description, status, project_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-ticket-id", "Test Ticket", "Test ticket description", "open", "project-123", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionWatcherAdd,
+		Data: map[string]interface{}{
+			"ticketId": "test-ticket-id",
+			"userId":   "user123",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "watcher", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "test-ticket-id", lastCall.Data["ticket_id"])
+	assert.Equal(t, "user123", lastCall.Data["user_id"])
+	assert.NotEmpty(t, lastCall.Data["id"])
+
+	// Verify hierarchical context (project ID from parent ticket)
+	assert.Equal(t, "project-123", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestWatcherHandler_Remove_PublishesEvent tests that watcher removal publishes an event
+func TestWatcherHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create ticket_watcher_mapping table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
+			id TEXT PRIMARY KEY,
+			ticket_id TEXT NOT NULL,
+			user_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test ticket with project_id for hierarchical context
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket (id, title, description, status, project_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-ticket-id", "Test Ticket", "Test ticket description", "open", "project-456", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert watcher
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket_watcher_mapping (id, ticket_id, user_id, created, deleted) VALUES (?, ?, ?, ?, ?)",
+		"watcher-id", "test-ticket-id", "user123", 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionWatcherRemove,
+		Data: map[string]interface{}{
+			"ticketId": "test-ticket-id",
+			"userId":   "user123",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "watcher", lastCall.Object)
+	assert.Equal(t, "test-ticket-id:user123", lastCall.EntityID) // Composite ID
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-ticket-id", lastCall.Data["ticket_id"])
+	assert.Equal(t, "user123", lastCall.Data["user_id"])
+
+	// Verify hierarchical context (project ID from parent ticket)
+	assert.Equal(t, "project-456", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestWatcherHandler_Add_NoEventOnFailure tests that no event is published on add failure
+func TestWatcherHandler_Add_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create ticket_watcher_mapping table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
+			id TEXT PRIMARY KEY,
+			ticket_id TEXT NOT NULL,
+			user_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test ticket
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		"test-ticket-id", "Test Ticket", "Test ticket description", "open", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert existing watcher
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket_watcher_mapping (id, ticket_id, user_id, created, deleted) VALUES (?, ?, ?, ?, ?)",
+		"watcher-id", "test-ticket-id", "user123", 1000, 0)
+	require.NoError(t, err)
+
+	// Try to add the same watcher again (should fail with already exists)
+	reqBody := models.Request{
+		Action: models.ActionWatcherAdd,
+		Data: map[string]interface{}{
+			"ticketId": "test-ticket-id",
+			"userId":   "user123",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestWatcherHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestWatcherHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create ticket_watcher_mapping table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS ticket_watcher_mapping (
+			id TEXT PRIMARY KEY,
+			ticket_id TEXT NOT NULL,
+			user_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test ticket (no watcher)
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket (id, title, description, status, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		"test-ticket-id", "Test Ticket", "Test ticket description", "open", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Try to remove non-existent watcher
+	reqBody := models.Request{
+		Action: models.ActionWatcherRemove,
+		Data: map[string]interface{}{
+			"ticketId": "test-ticket-id",
+			"userId":   "non-existent-user",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
 }

@@ -1108,3 +1108,673 @@ func TestFilterHandler_FullLifecycle(t *testing.T) {
 	w = performRequest(handler, "POST", "/do", loadReq)
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
+
+// ============================================================================
+// Event Publishing Tests
+// ============================================================================
+
+// TestFilterHandler_Save_Create_PublishesEvent tests that filter creation publishes an event
+func TestFilterHandler_Save_Create_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterSave,
+		Data: map[string]interface{}{
+			"title":       "Critical Bugs",
+			"description": "All critical bugs assigned to me",
+			"query":       `{"status": "open", "priority": 5}`,
+			"isPublic":    false,
+			"isFavorite":  true,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "filter", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "Critical Bugs", lastCall.Data["title"])
+	assert.Equal(t, "All critical bugs assigned to me", lastCall.Data["description"])
+	assert.Equal(t, "testuser", lastCall.Data["owner_id"])
+	assert.Equal(t, false, lastCall.Data["is_public"])
+	assert.Equal(t, true, lastCall.Data["is_favorite"])
+
+	// Verify system-wide context (empty project ID)
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestFilterHandler_Save_Update_PublishesEvent tests that filter update publishes an event
+func TestFilterHandler_Save_Update_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert existing filter
+	filterID := "test-filter-id"
+	_, err = handler.db.Exec(context.Background(),
+		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		filterID, "Old Title", "Old description", "testuser", `{"status": "old"}`, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterSave,
+		Data: map[string]interface{}{
+			"id":          filterID,
+			"title":       "Updated Title",
+			"description": "Updated description",
+			"query":       `{"status": "new"}`,
+			"isPublic":    true,
+			"isFavorite":  true,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "filter", lastCall.Object)
+	assert.Equal(t, filterID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "Updated Title", lastCall.Data["title"])
+	assert.Equal(t, "Updated description", lastCall.Data["description"])
+	assert.Equal(t, "testuser", lastCall.Data["owner_id"])
+	assert.Equal(t, true, lastCall.Data["is_public"])
+	assert.Equal(t, true, lastCall.Data["is_favorite"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestFilterHandler_Modify_PublishesEvent tests that filter modification publishes an event
+func TestFilterHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test filter
+	filterID := "test-filter-id"
+	_, err = handler.db.Exec(context.Background(),
+		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		filterID, "Old Title", "Old description", "testuser", `{"old": true}`, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterModify,
+		Data: map[string]interface{}{
+			"id":    filterID,
+			"title": "Modified Title",
+			"query": `{"new": true}`,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "filter", lastCall.Object)
+	assert.Equal(t, filterID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data contains the updated fields
+	assert.Equal(t, "Modified Title", lastCall.Data["title"])
+	assert.Equal(t, `{"new": true}`, lastCall.Data["query"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestFilterHandler_Remove_PublishesEvent tests that filter deletion publishes an event
+func TestFilterHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test filter
+	filterID := "test-filter-id"
+	_, err = handler.db.Exec(context.Background(),
+		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		filterID, "Deprecated Filter", "Old filter", "testuser", `{}`, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterRemove,
+		Data: map[string]interface{}{
+			"id": filterID,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "filter", lastCall.Object)
+	assert.Equal(t, filterID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, filterID, lastCall.Data["id"])
+	assert.Equal(t, "testuser", lastCall.Data["owner_id"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestFilterHandler_Share_PublishesEvent tests that filter sharing publishes an event
+func TestFilterHandler_Share_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test filter
+	filterID := "test-filter-id"
+	_, err = handler.db.Exec(context.Background(),
+		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		filterID, "My Filter", "Description", "testuser", `{}`, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Test public share
+	reqBody := models.Request{
+		Action: models.ActionFilterShare,
+		Data: map[string]interface{}{
+			"filterId":  filterID,
+			"shareType": "public",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "filter", lastCall.Object)
+	assert.Equal(t, filterID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, filterID, lastCall.Data["id"])
+	assert.Equal(t, "testuser", lastCall.Data["owner_id"])
+	assert.Equal(t, "public", lastCall.Data["share_type"])
+	assert.Equal(t, true, lastCall.Data["is_public"])
+
+	// Verify system-wide context
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestFilterHandler_Save_NoEventOnFailure tests that no event is published on save failure
+func TestFilterHandler_Save_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterSave,
+		Data: map[string]interface{}{
+			// Missing required field 'title'
+			"query": `{"status": "open"}`,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestFilterHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestFilterHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterModify,
+		Data: map[string]interface{}{
+			"id":    "non-existent-filter",
+			"title": "Updated",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestFilterHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestFilterHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterRemove,
+		Data: map[string]interface{}{
+			"id": "non-existent-filter",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestFilterHandler_Share_NoEventOnFailure tests that no event is published on share failure
+func TestFilterHandler_Share_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create filter tables
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			owner_id TEXT NOT NULL,
+			query TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
+			is_favorite INTEGER NOT NULL DEFAULT 0,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	_, err = handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS filter_share_mapping (
+			id TEXT PRIMARY KEY,
+			filter_id TEXT NOT NULL,
+			user_id TEXT,
+			team_id TEXT,
+			project_id TEXT,
+			created INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert filter owned by different user
+	filterID := "test-filter-id"
+	_, err = handler.db.Exec(context.Background(),
+		`INSERT INTO filter (id, title, description, owner_id, query, is_public, is_favorite, created, modified, deleted)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		filterID, "Other User Filter", "Description", "otheruser", `{}`, 0, 0, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionFilterShare,
+		Data: map[string]interface{}{
+			"filterId":  filterID,
+			"shareType": "public",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusForbidden, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}

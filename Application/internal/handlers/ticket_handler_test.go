@@ -996,3 +996,329 @@ func TestTicketHandler_List_ExcludesDeleted(t *testing.T) {
 	// Should have only 1 ticket (deleted one excluded)
 	assert.Equal(t, 1, len(items))
 }
+
+// =============================================================================
+// Event Publishing Tests
+// =============================================================================
+
+// setupTicketTestHandlerWithPublisher creates a test handler with mock event publisher and test data
+func setupTicketTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPublisher, string) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert default workflow
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO workflow (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		"test-workflow-id", "Test Workflow", "Test workflow", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert ticket types
+	ticketTypes := []string{"task", "bug", "story", "epic"}
+	for _, tt := range ticketTypes {
+		_, err := handler.db.Exec(context.Background(),
+			"INSERT INTO ticket_type (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+			"type-"+tt, tt, "Type: "+tt, 1000, 1000, 0)
+		require.NoError(t, err)
+	}
+
+	// Insert ticket statuses
+	statuses := []string{"open", "in_progress", "done", "closed"}
+	for _, status := range statuses {
+		_, err := handler.db.Exec(context.Background(),
+			"INSERT INTO ticket_status (id, title, description, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+			"status-"+status, status, "Status: "+status, 1000, 1000, 0)
+		require.NoError(t, err)
+	}
+
+	// Create a test project
+	projectID := "test-project-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, identifier, title, description, workflow_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		projectID, "TEST", "Test Project", "A test project", "test-workflow-id", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	return handler, mockPublisher, projectID
+}
+
+// TestTicketHandler_Create_PublishesEvent tests that ticket creation publishes an event
+func TestTicketHandler_Create_PublishesEvent(t *testing.T) {
+	handler, mockPublisher, projectID := setupTicketTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"project_id":  projectID,
+			"title":       "Event Test Ticket",
+			"description": "Testing event publishing",
+			"type":        "bug",
+			"priority":    "high",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "ticket", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "Event Test Ticket", lastCall.Data["title"])
+	assert.Equal(t, "Testing event publishing", lastCall.Data["description"])
+	assert.Equal(t, "bug", lastCall.Data["type"])
+	assert.Equal(t, "high", lastCall.Data["priority"])
+	assert.Equal(t, "open", lastCall.Data["status"])
+	assert.Equal(t, projectID, lastCall.Data["project_id"])
+
+	// Verify project-based context
+	assert.Equal(t, projectID, lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestTicketHandler_Modify_PublishesEvent tests that ticket modification publishes an event
+func TestTicketHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher, projectID := setupTicketTestHandlerWithPublisher(t)
+
+	// Create ticket first
+	createReq := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"project_id":  projectID,
+			"title":       "Original Title",
+			"description": "Original description",
+		},
+	}
+	createBody, _ := json.Marshal(createReq)
+	createHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(createBody))
+	createHttpReq.Header.Set("Content-Type", "application/json")
+	wCreate := httptest.NewRecorder()
+	cCreate, _ := gin.CreateTestContext(wCreate)
+	cCreate.Request = createHttpReq
+	cCreate.Set("username", "testuser")
+	handler.DoAction(cCreate)
+
+	var createResp models.Response
+	json.NewDecoder(wCreate.Body).Decode(&createResp)
+	ticketID := createResp.Data["ticket"].(map[string]interface{})["id"].(string)
+
+	// Reset mock publisher to clear create event
+	mockPublisher.Reset()
+
+	// Modify ticket
+	modifyReq := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":          ticketID,
+			"title":       "Updated Title",
+			"description": "Updated description",
+			"status":      "in_progress",
+		},
+	}
+	modifyBody, _ := json.Marshal(modifyReq)
+	modifyHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(modifyBody))
+	modifyHttpReq.Header.Set("Content-Type", "application/json")
+	wModify := httptest.NewRecorder()
+	cModify, _ := gin.CreateTestContext(wModify)
+	cModify.Request = modifyHttpReq
+	cModify.Set("username", "testuser")
+	handler.DoAction(cModify)
+
+	assert.Equal(t, http.StatusOK, wModify.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "ticket", lastCall.Object)
+	assert.Equal(t, ticketID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, ticketID, lastCall.Data["id"])
+	assert.Equal(t, "Updated Title", lastCall.Data["title"])
+	assert.Equal(t, "Updated description", lastCall.Data["description"])
+	assert.Equal(t, "in_progress", lastCall.Data["status"])
+
+	// Verify project-based context
+	assert.Equal(t, projectID, lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestTicketHandler_Remove_PublishesEvent tests that ticket deletion publishes an event
+func TestTicketHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher, projectID := setupTicketTestHandlerWithPublisher(t)
+
+	// Create ticket first
+	createReq := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"project_id": projectID,
+			"title":      "Ticket to Delete",
+		},
+	}
+	createBody, _ := json.Marshal(createReq)
+	createHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(createBody))
+	createHttpReq.Header.Set("Content-Type", "application/json")
+	wCreate := httptest.NewRecorder()
+	cCreate, _ := gin.CreateTestContext(wCreate)
+	cCreate.Request = createHttpReq
+	cCreate.Set("username", "testuser")
+	handler.DoAction(cCreate)
+
+	var createResp models.Response
+	json.NewDecoder(wCreate.Body).Decode(&createResp)
+	ticketID := createResp.Data["ticket"].(map[string]interface{})["id"].(string)
+
+	// Reset mock publisher to clear create event
+	mockPublisher.Reset()
+
+	// Remove ticket
+	removeReq := models.Request{
+		Action: models.ActionRemove,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id": ticketID,
+		},
+	}
+	removeBody, _ := json.Marshal(removeReq)
+	removeHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(removeBody))
+	removeHttpReq.Header.Set("Content-Type", "application/json")
+	wRemove := httptest.NewRecorder()
+	cRemove, _ := gin.CreateTestContext(wRemove)
+	cRemove.Request = removeHttpReq
+	cRemove.Set("username", "testuser")
+	handler.DoAction(cRemove)
+
+	assert.Equal(t, http.StatusOK, wRemove.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "ticket", lastCall.Object)
+	assert.Equal(t, ticketID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, ticketID, lastCall.Data["id"])
+	assert.Equal(t, projectID, lastCall.Data["project_id"])
+
+	// Verify project-based context
+	assert.Equal(t, projectID, lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestTicketHandler_Create_NoEventOnFailure tests that no event is published on create failure
+func TestTicketHandler_Create_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher, _ := setupTicketTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			// Missing required field 'project_id'
+			"title": "Test Ticket",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestTicketHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestTicketHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher, _ := setupTicketTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":    "non-existent-ticket-id",
+			"title": "Updated Title",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestTicketHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestTicketHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher, _ := setupTicketTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionRemove,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id": "non-existent-ticket-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}

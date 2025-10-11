@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"helixtrack.ru/core/internal/models"
@@ -1076,4 +1079,434 @@ func TestCustomFieldHandler_FullLifecycle(t *testing.T) {
 
 	w = performRequest(handler, "POST", "/do", removeFieldReq)
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+// ============================================================================
+// Event Publishing Tests
+// ============================================================================
+
+// TestCustomFieldHandler_Create_Global_PublishesEvent tests that global custom field creation publishes an event
+func TestCustomFieldHandler_Create_Global_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create custom field table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS custom_field (
+			id TEXT PRIMARY KEY,
+			field_name TEXT NOT NULL,
+			field_type TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			default_value TEXT,
+			configuration TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCustomFieldCreate,
+		Data: map[string]interface{}{
+			"fieldName":   "global_field",
+			"fieldType":   "text",
+			"description": "A global custom field",
+			"isRequired":  true,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "customfield", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "global_field", lastCall.Data["field_name"])
+	assert.Equal(t, "text", lastCall.Data["field_type"])
+	assert.Equal(t, "A global custom field", lastCall.Data["description"])
+	assert.Equal(t, true, lastCall.Data["is_required"])
+	assert.Nil(t, lastCall.Data["project_id"])
+
+	// Verify system-wide context (empty project ID for global custom field)
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestCustomFieldHandler_Create_ProjectSpecific_PublishesEvent tests that project-specific custom field creation publishes an event
+func TestCustomFieldHandler_Create_ProjectSpecific_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create custom field table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS custom_field (
+			id TEXT PRIMARY KEY,
+			field_name TEXT NOT NULL,
+			field_type TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			default_value TEXT,
+			configuration TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCustomFieldCreate,
+		Data: map[string]interface{}{
+			"fieldName":   "project_field",
+			"fieldType":   "number",
+			"description": "A project-specific custom field",
+			"projectId":   "project-123",
+			"isRequired":  false,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusCreated, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "customfield", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "project_field", lastCall.Data["field_name"])
+	assert.Equal(t, "number", lastCall.Data["field_type"])
+	assert.Equal(t, "A project-specific custom field", lastCall.Data["description"])
+	assert.Equal(t, false, lastCall.Data["is_required"])
+
+	// Verify project ID in event data
+	projectIDData := lastCall.Data["project_id"]
+	require.NotNil(t, projectIDData)
+	projectIDStr, ok := projectIDData.(*string)
+	require.True(t, ok)
+	require.NotNil(t, projectIDStr)
+	assert.Equal(t, "project-123", *projectIDStr)
+
+	// Verify project-based context
+	assert.Equal(t, "project-123", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestCustomFieldHandler_Modify_PublishesEvent tests that custom field modification publishes an event
+func TestCustomFieldHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create custom field table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS custom_field (
+			id TEXT PRIMARY KEY,
+			field_name TEXT NOT NULL,
+			field_type TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			default_value TEXT,
+			configuration TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test custom field with project ID
+	projectID := "project-456"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO custom_field (id, field_name, field_type, description, project_id, is_required, default_value, configuration, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-field-id", "old_field", "text", "Old description", &projectID, 0, nil, nil, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCustomFieldModify,
+		Data: map[string]interface{}{
+			"id":          "test-field-id",
+			"fieldName":   "updated_field",
+			"description": "Updated description",
+			"isRequired":  true,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "customfield", lastCall.Object)
+	assert.Equal(t, "test-field-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data contains updated fields
+	assert.Equal(t, "updated_field", lastCall.Data["field_name"])
+	assert.Equal(t, "Updated description", lastCall.Data["description"])
+	assert.Equal(t, true, lastCall.Data["is_required"])
+
+	// Verify project-based context (from existing custom field)
+	assert.Equal(t, "project-456", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestCustomFieldHandler_Remove_PublishesEvent tests that custom field deletion publishes an event
+func TestCustomFieldHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create custom field table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS custom_field (
+			id TEXT PRIMARY KEY,
+			field_name TEXT NOT NULL,
+			field_type TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			default_value TEXT,
+			configuration TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Insert test custom field (global - no project ID)
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO custom_field (id, field_name, field_type, description, project_id, is_required, default_value, configuration, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"test-field-id", "deprecated_field", "text", "Old field", nil, 0, nil, nil, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCustomFieldRemove,
+		Data: map[string]interface{}{
+			"id": "test-field-id",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "customfield", lastCall.Object)
+	assert.Equal(t, "test-field-id", lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "test-field-id", lastCall.Data["id"])
+	assert.Nil(t, lastCall.Data["project_id"])
+
+	// Verify system-wide context (global custom field, no project ID)
+	assert.Equal(t, "", lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestCustomFieldHandler_Create_NoEventOnFailure tests that no event is published on create failure
+func TestCustomFieldHandler_Create_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create custom field table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS custom_field (
+			id TEXT PRIMARY KEY,
+			field_name TEXT NOT NULL,
+			field_type TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			default_value TEXT,
+			configuration TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCustomFieldCreate,
+		Data: map[string]interface{}{
+			// Missing required field 'fieldName'
+			"fieldType": "text",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestCustomFieldHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestCustomFieldHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create custom field table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS custom_field (
+			id TEXT PRIMARY KEY,
+			field_name TEXT NOT NULL,
+			field_type TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			default_value TEXT,
+			configuration TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCustomFieldModify,
+		Data: map[string]interface{}{
+			"id":          "non-existent-field",
+			"fieldName":   "updated",
+			"description": "Updated field",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestCustomFieldHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestCustomFieldHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Create custom field table
+	_, err := handler.db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS custom_field (
+			id TEXT PRIMARY KEY,
+			field_name TEXT NOT NULL,
+			field_type TEXT NOT NULL,
+			description TEXT,
+			project_id TEXT,
+			is_required INTEGER NOT NULL DEFAULT 0,
+			default_value TEXT,
+			configuration TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCustomFieldRemove,
+		Data: map[string]interface{}{
+			"id": "non-existent-field",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
 }

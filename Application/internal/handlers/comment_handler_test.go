@@ -832,3 +832,301 @@ func TestCommentHandler_List_ExcludesDeleted(t *testing.T) {
 	// Should have only 1 comment (deleted one excluded)
 	assert.Equal(t, 1, len(items))
 }
+
+// =============================================================================
+// Event Publishing Tests
+// =============================================================================
+
+// TestCommentHandler_Create_PublishesEvent tests that comment creation publishes an event
+func TestCommentHandler_Create_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project and ticket
+	projectID := "test-project-id"
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
+		projectID, "Test Project", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	ticketID := "test-ticket-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket (id, title, project_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		ticketID, "Test Ticket", projectID, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionCreate,
+		Object: "comment",
+		Data: map[string]interface{}{
+			"ticket_id": ticketID,
+			"comment":   "This is a test comment",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionCreate, lastCall.Action)
+	assert.Equal(t, "comment", lastCall.Object)
+	assert.Equal(t, "testuser", lastCall.Username)
+	assert.NotEmpty(t, lastCall.EntityID)
+
+	// Verify event data
+	assert.Equal(t, "This is a test comment", lastCall.Data["comment"])
+	assert.Equal(t, ticketID, lastCall.Data["ticket_id"])
+	assert.NotEmpty(t, lastCall.Data["id"])
+
+	// Verify hierarchical context (project ID from parent ticket)
+	assert.Equal(t, projectID, lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestCommentHandler_Modify_PublishesEvent tests that comment modification publishes an event
+func TestCommentHandler_Modify_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project and ticket
+	projectID := "test-project-id"
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
+		projectID, "Test Project", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	ticketID := "test-ticket-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket (id, title, project_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		ticketID, "Test Ticket", projectID, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test comment
+	commentID := "test-comment-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO comment (id, comment, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
+		commentID, "Original comment", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert comment-ticket mapping
+	mappingID := "test-mapping-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified) VALUES (?, ?, ?, ?, ?)",
+		mappingID, commentID, ticketID, 1000, 1000)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionModify,
+		Object: "comment",
+		Data: map[string]interface{}{
+			"id":      commentID,
+			"comment": "Updated comment text",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionModify, lastCall.Action)
+	assert.Equal(t, "comment", lastCall.Object)
+	assert.Equal(t, commentID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, "Updated comment text", lastCall.Data["comment"])
+	assert.Equal(t, ticketID, lastCall.Data["ticket_id"])
+
+	// Verify hierarchical context (project ID from parent ticket)
+	assert.Equal(t, projectID, lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestCommentHandler_Remove_PublishesEvent tests that comment deletion publishes an event
+func TestCommentHandler_Remove_PublishesEvent(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	// Insert test project and ticket
+	projectID := "test-project-id"
+	_, err := handler.db.Exec(context.Background(),
+		"INSERT INTO project (id, title, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
+		projectID, "Test Project", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	ticketID := "test-ticket-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO ticket (id, title, project_id, created, modified, deleted) VALUES (?, ?, ?, ?, ?, ?)",
+		ticketID, "Test Ticket", projectID, 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert test comment
+	commentID := "test-comment-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO comment (id, comment, created, modified, deleted) VALUES (?, ?, ?, ?, ?)",
+		commentID, "To be deleted", 1000, 1000, 0)
+	require.NoError(t, err)
+
+	// Insert comment-ticket mapping
+	mappingID := "test-mapping-id"
+	_, err = handler.db.Exec(context.Background(),
+		"INSERT INTO comment_ticket_mapping (id, comment_id, ticket_id, created, modified) VALUES (?, ?, ?, ?, ?)",
+		mappingID, commentID, ticketID, 1000, 1000)
+	require.NoError(t, err)
+
+	reqBody := models.Request{
+		Action: models.ActionRemove,
+		Object: "comment",
+		Data: map[string]interface{}{
+			"id": commentID,
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Verify event was published
+	assert.Equal(t, 1, mockPublisher.GetEventCount())
+	lastCall := mockPublisher.GetLastEntityCall()
+	require.NotNil(t, lastCall)
+
+	// Verify event details
+	assert.Equal(t, models.ActionRemove, lastCall.Action)
+	assert.Equal(t, "comment", lastCall.Object)
+	assert.Equal(t, commentID, lastCall.EntityID)
+	assert.Equal(t, "testuser", lastCall.Username)
+
+	// Verify event data
+	assert.Equal(t, commentID, lastCall.Data["id"])
+	assert.Equal(t, ticketID, lastCall.Data["ticket_id"])
+
+	// Verify hierarchical context (project ID from parent ticket)
+	assert.Equal(t, projectID, lastCall.Context.ProjectID)
+	assert.Contains(t, lastCall.Context.Permissions, "READ")
+}
+
+// TestCommentHandler_Create_NoEventOnFailure tests that no event is published on create failure
+func TestCommentHandler_Create_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionCreate,
+		Object: "comment",
+		Data: map[string]interface{}{
+			// Missing required field 'ticket_id'
+			"comment": "Test comment",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestCommentHandler_Modify_NoEventOnFailure tests that no event is published on modify failure
+func TestCommentHandler_Modify_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionModify,
+		Object: "comment",
+		Data: map[string]interface{}{
+			// Missing required field 'id'
+			"comment": "Updated",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
+
+// TestCommentHandler_Remove_NoEventOnFailure tests that no event is published on remove failure
+func TestCommentHandler_Remove_NoEventOnFailure(t *testing.T) {
+	handler, mockPublisher := setupTestHandlerWithPublisher(t)
+
+	reqBody := models.Request{
+		Action: models.ActionRemove,
+		Object: "comment",
+		Data: map[string]interface{}{
+			"id": "non-existent-comment",
+		},
+	}
+	body, _ := json.Marshal(reqBody)
+
+	req := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+	c.Set("username", "testuser")
+
+	handler.DoAction(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// Verify no event was published
+	assert.Equal(t, 0, mockPublisher.GetEventCount())
+}
