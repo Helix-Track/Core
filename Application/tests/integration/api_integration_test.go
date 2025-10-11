@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -34,7 +35,24 @@ func TestAPI_FullAuthenticationFlow(t *testing.T) {
 	handler := handlers.NewHandler(db, authService, permService, "1.0.0-test")
 
 	router := gin.New()
-	router.POST("/do", handler.DoAction)
+	router.POST("/do", func(c *gin.Context) {
+		// Parse request and set in context - let handler do all validation
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	// Step 1: Check if JWT is capable
 	reqBody := models.Request{
@@ -73,7 +91,24 @@ func TestAPI_HandlerWithDatabase(t *testing.T) {
 	handler := handlers.NewHandler(db, authService, permService, "1.0.0-test")
 
 	router := gin.New()
-	router.POST("/do", handler.DoAction)
+	router.POST("/do", func(c *gin.Context) {
+		// Parse request and set in context - let handler do all validation
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	// Test version endpoint
 	versionReq := models.Request{
@@ -115,8 +150,25 @@ func TestAPI_HandlerWithJWTMiddleware(t *testing.T) {
 	// Add JWT middleware
 	jwtMiddleware := middleware.NewJWTMiddleware(authService, "test-secret")
 
-	// Protected endpoint
-	router.POST("/do", jwtMiddleware.Validate(), handler.DoAction)
+	// Protected endpoint - with JWT validation and request context setup
+	router.POST("/do", jwtMiddleware.Validate(), func(c *gin.Context) {
+		// Parse request and set in context
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	// Test without JWT (should fail)
 	createReq := models.Request{
@@ -145,7 +197,24 @@ func TestAPI_HandlerWithPermissionCheck(t *testing.T) {
 	// Add JWT middleware
 	jwtMiddleware := middleware.NewJWTMiddleware(authService, "test-secret")
 
-	router.POST("/do", jwtMiddleware.Validate(), handler.DoAction)
+	router.POST("/do", jwtMiddleware.Validate(), func(c *gin.Context) {
+		// Parse request and set in context
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	// Test create operation (requires CREATE permission)
 	createReq := models.Request{
@@ -170,7 +239,24 @@ func TestAPI_HealthEndpoint(t *testing.T) {
 	handler := handlers.NewHandler(db, authService, permService, "1.0.0-test")
 
 	router := gin.New()
-	router.POST("/do", handler.DoAction)
+	router.POST("/do", func(c *gin.Context) {
+		// Parse request and set in context - let handler do all validation
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	healthReq := models.Request{
 		Action: models.ActionHealth,
@@ -196,7 +282,24 @@ func TestAPI_InvalidRequests(t *testing.T) {
 	handler := handlers.NewHandler(db, authService, permService, "1.0.0-test")
 
 	router := gin.New()
-	router.POST("/do", handler.DoAction)
+	router.POST("/do", func(c *gin.Context) {
+		// Parse request and set in context - let handler do all validation
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	tests := []struct {
 		name           string
@@ -292,7 +395,24 @@ func TestAPI_ConcurrentRequests(t *testing.T) {
 	handler := handlers.NewHandler(db, authService, permService, "1.0.0-test")
 
 	router := gin.New()
-	router.POST("/do", handler.DoAction)
+	router.POST("/do", func(c *gin.Context) {
+		// Parse request and set in context - let handler do all validation
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	// Send concurrent requests
 	done := make(chan bool)
@@ -330,7 +450,24 @@ func TestAPI_MiddlewareChain(t *testing.T) {
 	jwtMiddleware := middleware.NewJWTMiddleware(authService, "test-secret")
 	router.Use(jwtMiddleware.Validate())
 
-	router.POST("/do", handler.DoAction)
+	router.POST("/do", func(c *gin.Context) {
+		// Parse request and set in context
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		handler.DoAction(c)
+	})
 
 	// Test request goes through entire middleware chain
 	req := models.Request{

@@ -47,13 +47,15 @@ func TestAccountHandler_Create_Success(t *testing.T) {
 
 	// Verify account data structure
 	dataMap := response.Data
+	accountData, ok := dataMap["account"].(map[string]interface{})
+	require.True(t, ok, "Account data should be in response")
 
-	assert.NotEmpty(t, dataMap["id"], "Account ID should be generated")
-	assert.Equal(t, "Test Account", dataMap["title"])
-	assert.Equal(t, "Test account description", dataMap["description"])
-	assert.NotZero(t, dataMap["created"], "Created timestamp should be set")
-	assert.NotZero(t, dataMap["modified"], "Modified timestamp should be set")
-	assert.Equal(t, false, dataMap["deleted"], "Deleted flag should be false")
+	assert.NotEmpty(t, accountData["id"], "Account ID should be generated")
+	assert.Equal(t, "Test Account", accountData["title"])
+	assert.Equal(t, "Test account description", accountData["description"])
+	assert.NotZero(t, accountData["created"], "Created timestamp should be set")
+	assert.NotZero(t, accountData["modified"], "Modified timestamp should be set")
+	assert.Equal(t, false, accountData["deleted"], "Deleted flag should be false")
 }
 
 // TestAccountHandler_Create_MinimalFields tests account creation with minimal required fields
@@ -285,10 +287,12 @@ func TestAccountHandler_Modify_Success(t *testing.T) {
 
 	// Verify account data structure
 	dataMap := response.Data
+	accountData, ok := dataMap["account"].(map[string]interface{})
+	require.True(t, ok, "Account data should be in response")
 
-	assert.Equal(t, "test-account-id", dataMap["id"])
-	assert.Equal(t, "Modified Account", dataMap["title"])
-	assert.NotZero(t, dataMap["modified"], "Modified timestamp should be updated")
+	assert.Equal(t, "test-account-id", accountData["id"])
+	assert.Equal(t, "Modified Account", accountData["title"])
+	assert.NotZero(t, accountData["modified"], "Modified timestamp should be updated")
 }
 
 // TestAccountHandler_Modify_MissingID tests account modification with missing ID

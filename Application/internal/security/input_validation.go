@@ -238,6 +238,9 @@ func SanitizeFilename(filename string) string {
 		filename = strings.ReplaceAll(filename, char, "")
 	}
 
+	// Remove leading dots (path traversal sequences)
+	filename = strings.TrimLeft(filename, ".")
+
 	return filename
 }
 

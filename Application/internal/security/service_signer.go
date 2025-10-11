@@ -53,6 +53,13 @@ func NewServiceSignerFromPrivateKey(privateKeyPEM string) (*ServiceSigner, error
 
 // SignServiceRegistration signs a service registration with the private key
 func (s *ServiceSigner) SignServiceRegistration(service *models.ServiceRegistration) error {
+	// Get the public key in PEM format
+	publicKeyPEM, err := s.GetPublicKeyPEM()
+	if err != nil {
+		return fmt.Errorf("failed to get public key: %w", err)
+	}
+	service.PublicKey = publicKeyPEM
+
 	// Compute the data to sign
 	data := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%d",
 		service.ID,
@@ -150,6 +157,11 @@ func (s *ServiceSigner) VerifyServiceRotation(
 	// 6. Verify time-based constraints (prevent rapid rotations)
 	if time.Since(oldService.RegisteredAt) < 5*time.Minute {
 		return fmt.Errorf("service was registered too recently for rotation")
+	}
+
+	// 7. Verify new service has been registered long enough
+	if time.Since(newService.RegisteredAt) < 5*time.Minute {
+		return fmt.Errorf("new service must be registered for at least 5 minutes before rotation")
 	}
 
 	return nil

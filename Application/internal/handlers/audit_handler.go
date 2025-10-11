@@ -130,17 +130,26 @@ func (h *Handler) handleAuditRead(c *gin.Context, req *models.Request) {
 	`
 
 	var audit models.Audit
+	var entityID, details sql.NullString
 	err := h.db.QueryRow(c.Request.Context(), query, auditID).Scan(
 		&audit.ID,
 		&audit.Action,
 		&audit.UserID,
-		&audit.EntityID,
+		&entityID,
 		&audit.EntityType,
-		&audit.Details,
+		&details,
 		&audit.Created,
 		&audit.Modified,
 		&audit.Deleted,
 	)
+
+	// Handle nullable fields
+	if entityID.Valid {
+		audit.EntityID = entityID.String
+	}
+	if details.Valid {
+		audit.Details = details.String
+	}
 
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
@@ -208,13 +217,14 @@ func (h *Handler) handleAuditList(c *gin.Context, req *models.Request) {
 	audits := make([]models.Audit, 0)
 	for rows.Next() {
 		var audit models.Audit
+		var entityID, details sql.NullString
 		err := rows.Scan(
 			&audit.ID,
 			&audit.Action,
 			&audit.UserID,
-			&audit.EntityID,
+			&entityID,
 			&audit.EntityType,
-			&audit.Details,
+			&details,
 			&audit.Created,
 			&audit.Modified,
 			&audit.Deleted,
@@ -223,6 +233,15 @@ func (h *Handler) handleAuditList(c *gin.Context, req *models.Request) {
 			logger.Error("Failed to scan audit entry", zap.Error(err))
 			continue
 		}
+
+		// Handle nullable fields
+		if entityID.Valid {
+			audit.EntityID = entityID.String
+		}
+		if details.Valid {
+			audit.Details = details.String
+		}
+
 		audits = append(audits, audit)
 	}
 
@@ -308,13 +327,14 @@ func (h *Handler) handleAuditQuery(c *gin.Context, req *models.Request) {
 	audits := make([]models.Audit, 0)
 	for rows.Next() {
 		var audit models.Audit
+		var entityID, details sql.NullString
 		err := rows.Scan(
 			&audit.ID,
 			&audit.Action,
 			&audit.UserID,
-			&audit.EntityID,
+			&entityID,
 			&audit.EntityType,
-			&audit.Details,
+			&details,
 			&audit.Created,
 			&audit.Modified,
 			&audit.Deleted,
@@ -323,6 +343,15 @@ func (h *Handler) handleAuditQuery(c *gin.Context, req *models.Request) {
 			logger.Error("Failed to scan audit entry", zap.Error(err))
 			continue
 		}
+
+		// Handle nullable fields
+		if entityID.Valid {
+			audit.EntityID = entityID.String
+		}
+		if details.Valid {
+			audit.Details = details.String
+		}
+
 		audits = append(audits, audit)
 	}
 

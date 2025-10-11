@@ -24,9 +24,30 @@ type AuditMetaData struct {
 	Deleted  bool   `json:"deleted" db:"deleted"`
 }
 
-// IsValidAction validates if the action is not empty
+// Valid audit actions
+var validAuditActions = map[string]bool{
+	// Standard CRUD actions
+	ActionCreate:        true,
+	ActionRead:          true,
+	ActionModify:        true,
+	ActionRemove:        true,
+	ActionList:          true,
+	ActionAuthenticate:  true,
+
+	// Entity-specific actions
+	"login":            true,
+	"logout":           true,
+	"permission_change": true,
+	"status_change":    true,
+	"assignment_change": true,
+	"comment_add":      true,
+	"attachment_add":   true,
+	"workflow_transition": true,
+}
+
+// IsValidAction validates if the action is a recognized audit action
 func (a *Audit) IsValidAction() bool {
-	return a.Action != ""
+	return validAuditActions[a.Action]
 }
 
 // HasEntity checks if the audit entry has entity information

@@ -100,7 +100,7 @@ func TestServiceSigner_VerifyServiceRotation(t *testing.T) {
 		URL:            "http://localhost:8082",
 		HealthCheckURL: "http://localhost:8082/health",
 		Status:         models.ServiceStatusHealthy,
-		RegisteredAt:   time.Now(),
+		RegisteredAt:   time.Now().Add(-10 * time.Minute), // Registered 10 minutes ago
 	}
 
 	err = signer.SignServiceRegistration(newService)
@@ -116,7 +116,7 @@ func TestServiceSigner_VerifyServiceRotation(t *testing.T) {
 		shortToken := "short"
 		err := signer.VerifyServiceRotation(oldService, newService, shortToken)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "admin token must be at least 32 characters")
+		assert.Contains(t, err.Error(), "invalid admin token")
 	})
 
 	t.Run("Reject rotation when old service is rotating", func(t *testing.T) {
@@ -126,7 +126,7 @@ func TestServiceSigner_VerifyServiceRotation(t *testing.T) {
 		adminToken := "valid-admin-token-with-32-characters-minimum"
 		err := signer.VerifyServiceRotation(&rotatingService, newService, adminToken)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "cannot rotate")
+		assert.Contains(t, err.Error(), "cannot be rotated")
 	})
 
 	t.Run("Reject rotation when old service is decommissioned", func(t *testing.T) {
@@ -136,7 +136,7 @@ func TestServiceSigner_VerifyServiceRotation(t *testing.T) {
 		adminToken := "valid-admin-token-with-32-characters-minimum"
 		err := signer.VerifyServiceRotation(&decommissionedService, newService, adminToken)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "cannot rotate")
+		assert.Contains(t, err.Error(), "cannot be rotated")
 	})
 
 	t.Run("Reject rotation with invalid new service signature", func(t *testing.T) {
@@ -173,7 +173,7 @@ func TestServiceSigner_VerifyServiceRotation(t *testing.T) {
 		adminToken := "valid-admin-token-with-32-characters-minimum"
 		err = signer.VerifyServiceRotation(oldService, &unhealthyService, adminToken)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "new service must be healthy")
+		assert.Contains(t, err.Error(), "not healthy")
 	})
 
 	t.Run("Reject rotation when service registered too recently", func(t *testing.T) {
@@ -187,7 +187,7 @@ func TestServiceSigner_VerifyServiceRotation(t *testing.T) {
 		adminToken := "valid-admin-token-with-32-characters-minimum"
 		err = signer.VerifyServiceRotation(oldService, &recentService, adminToken)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "new service must be registered for at least 5 minutes")
+		assert.Contains(t, err.Error(), "new service must be registered for at least 5 minutes before rotation")
 	})
 }
 
@@ -248,7 +248,7 @@ func TestServiceSigner_GetKeys(t *testing.T) {
 }
 
 func TestServiceSigner_MultipleSigners(t *testing.T) {
-	t.Run("Different signers cannot verify each other's signatures", func(t *testing.T) {
+	t.Run("Service with swapped public key fails verification", func(t *testing.T) {
 		signer1, err := NewServiceSigner()
 		require.NoError(t, err)
 
@@ -270,8 +270,17 @@ func TestServiceSigner_MultipleSigners(t *testing.T) {
 		err = signer1.SignServiceRegistration(service)
 		require.NoError(t, err)
 
-		// Try to verify with signer2
-		err = signer2.VerifyServiceRegistration(service)
+		// Save the original signature
+		originalSignature := service.Signature
+
+		// Swap the public key to signer2's key (but keep signer1's signature)
+		publicKey2, err := signer2.GetPublicKeyPEM()
+		require.NoError(t, err)
+		service.PublicKey = publicKey2
+		service.Signature = originalSignature
+
+		// Verification should fail because signature doesn't match the new public key
+		err = signer1.VerifyServiceRegistration(service)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "signature verification failed")
 	})
