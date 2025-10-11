@@ -13,6 +13,7 @@ type Config struct {
 	Plugins   []PluginConfig   `json:"plugins"`
 	Database  DatabaseConfig   `json:"database"`
 	Services  ServicesConfig   `json:"services"`
+	WebSocket WebSocketConfig  `json:"websocket"`
 	Version   string           `json:"version,omitempty"`
 }
 
@@ -65,6 +66,23 @@ type ServiceEndpoint struct {
 	Enabled bool   `json:"enabled"`
 	URL     string `json:"url"`
 	Timeout int    `json:"timeout,omitempty"` // in seconds
+}
+
+// WebSocketConfig represents WebSocket configuration
+type WebSocketConfig struct {
+	Enabled           bool     `json:"enabled"`
+	Path              string   `json:"path"`
+	ReadBufferSize    int      `json:"readBufferSize"`
+	WriteBufferSize   int      `json:"writeBufferSize"`
+	MaxMessageSize    int64    `json:"maxMessageSize"`
+	WriteWaitSeconds  int      `json:"writeWaitSeconds"`
+	PongWaitSeconds   int      `json:"pongWaitSeconds"`
+	PingPeriodSeconds int      `json:"pingPeriodSeconds"`
+	MaxClients        int      `json:"maxClients"`
+	RequireAuth       bool     `json:"requireAuth"`
+	AllowOrigins      []string `json:"allowOrigins"`
+	EnableCompression bool     `json:"enableCompression"`
+	HandshakeTimeout  int      `json:"handshakeTimeout"`
 }
 
 // LoadConfig loads configuration from a JSON file
@@ -128,6 +146,40 @@ func (c *Config) applyDefaults() {
 			c.Services.Extensions[name] = ext
 		}
 	}
+
+	// Set default WebSocket configuration
+	if c.WebSocket.Path == "" {
+		c.WebSocket.Path = "/ws"
+	}
+	if c.WebSocket.ReadBufferSize == 0 {
+		c.WebSocket.ReadBufferSize = 1024
+	}
+	if c.WebSocket.WriteBufferSize == 0 {
+		c.WebSocket.WriteBufferSize = 1024
+	}
+	if c.WebSocket.MaxMessageSize == 0 {
+		c.WebSocket.MaxMessageSize = 512 * 1024 // 512KB
+	}
+	if c.WebSocket.WriteWaitSeconds == 0 {
+		c.WebSocket.WriteWaitSeconds = 10
+	}
+	if c.WebSocket.PongWaitSeconds == 0 {
+		c.WebSocket.PongWaitSeconds = 60
+	}
+	if c.WebSocket.PingPeriodSeconds == 0 {
+		c.WebSocket.PingPeriodSeconds = 54 // Must be less than pongWait
+	}
+	if c.WebSocket.MaxClients == 0 {
+		c.WebSocket.MaxClients = 1000
+	}
+	if c.WebSocket.HandshakeTimeout == 0 {
+		c.WebSocket.HandshakeTimeout = 10
+	}
+	if len(c.WebSocket.AllowOrigins) == 0 {
+		c.WebSocket.AllowOrigins = []string{"*"}
+	}
+	// RequireAuth defaults to true, Enabled defaults to false
+	// No need to set defaults for these booleans
 }
 
 // Validate validates the configuration
@@ -202,4 +254,14 @@ func (c *Config) GetListenerAddress() string {
 		return ":8080"
 	}
 	return fmt.Sprintf("%s:%d", listener.Address, listener.Port)
+}
+
+// GetWebSocketConfig converts config WebSocketConfig to models.WebSocketConfig
+func (c *Config) GetWebSocketConfig() WebSocketConfig {
+	return c.WebSocket
+}
+
+// IsWebSocketEnabled returns whether WebSocket is enabled
+func (c *Config) IsWebSocketEnabled() bool {
+	return c.WebSocket.Enabled
 }

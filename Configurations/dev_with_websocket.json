@@ -1,0 +1,44 @@
+{
+  "log": {
+    "log_path": "/tmp/htCoreLogs",
+    "logfile_base_name": "htCore",
+    "log_size_limit": 100000000,
+    "level": "debug"
+  },
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 8080,
+      "https": false
+    }
+  ],
+  "database": {
+    "type": "sqlite",
+    "sqlite_path": "Database/Definition.sqlite"
+  },
+  "services": {
+    "authentication": {
+      "enabled": false,
+      "url": ""
+    },
+    "permissions": {
+      "enabled": false,
+      "url": ""
+    }
+  },
+  "websocket": {
+    "enabled": true,
+    "path": "/ws",
+    "readBufferSize": 1024,
+    "writeBufferSize": 1024,
+    "maxMessageSize": 524288,
+    "writeWaitSeconds": 10,
+    "pongWaitSeconds": 60,
+    "pingPeriodSeconds": 54,
+    "maxClients": 1000,
+    "requireAuth": true,
+    "allowOrigins": ["*"],
+    "enableCompression": true,
+    "handshakeTimeout": 10
+  }
+}

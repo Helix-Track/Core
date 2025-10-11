@@ -11,6 +11,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleResolutionCreate creates a new resolution
@@ -95,6 +96,20 @@ func (h *Handler) handleResolutionCreate(c *gin.Context, req *models.Request) {
 		zap.String("resolution_id", resolution.ID),
 		zap.String("title", resolution.Title),
 		zap.String("username", username),
+	)
+
+	// Publish resolution created event
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"resolution",
+		resolution.ID,
+		username,
+		map[string]interface{}{
+			"id":          resolution.ID,
+			"title":       resolution.Title,
+			"description": resolution.Description,
+		},
+		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -346,6 +361,16 @@ func (h *Handler) handleResolutionModify(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
+	// Publish resolution updated event
+	h.publisher.PublishEntityEvent(
+		models.ActionModify,
+		"resolution",
+		resolutionID,
+		username,
+		updates,
+		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
+	)
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"updated": true,
 		"id":      resolutionID,
@@ -423,6 +448,18 @@ func (h *Handler) handleResolutionRemove(c *gin.Context, req *models.Request) {
 	logger.Info("Resolution deleted",
 		zap.String("resolution_id", resolutionID),
 		zap.String("username", username),
+	)
+
+	// Publish resolution deleted event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"resolution",
+		resolutionID,
+		username,
+		map[string]interface{}{
+			"id": resolutionID,
+		},
+		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{

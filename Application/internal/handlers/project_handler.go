@@ -10,7 +10,9 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"helixtrack.ru/core/internal/logger"
+	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleCreateProject creates a new project
@@ -92,6 +94,25 @@ func (h *Handler) handleCreateProject(c *gin.Context, req *models.Request) {
 		))
 		return
 	}
+
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish project created event
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"project",
+		projectID,
+		username,
+		map[string]interface{}{
+			"id":          projectID,
+			"identifier":  key,
+			"title":       name,
+			"description": description,
+			"type":        projectType,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
+	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"project": map[string]interface{}{
@@ -180,6 +201,19 @@ func (h *Handler) handleModifyProject(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish project updated event
+	h.publisher.PublishEntityEvent(
+		models.ActionModify,
+		"project",
+		projectID,
+		username,
+		projectData,
+		websocket.NewProjectContext(projectID, []string{"READ"}),
+	)
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"project": map[string]interface{}{
 			"id":      projectID,
@@ -207,8 +241,23 @@ func (h *Handler) handleRemoveProject(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Check if project exists before deletion
+	var exists int
+	err := h.db.QueryRow(context.Background(),
+		"SELECT COUNT(*) FROM project WHERE id = ? AND deleted = 0",
+		projectID).Scan(&exists)
+
+	if err != nil || exists == 0 {
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Project not found",
+			"",
+		))
+		return
+	}
+
 	query := "UPDATE project SET deleted = 1, modified = ? WHERE id = ?"
-	_, err := h.db.Exec(context.Background(), query, time.Now().Unix(), projectID)
+	_, err = h.db.Exec(context.Background(), query, time.Now().Unix(), projectID)
 	if err != nil {
 		logger.Error("Failed to delete project", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
@@ -218,6 +267,21 @@ func (h *Handler) handleRemoveProject(c *gin.Context, req *models.Request) {
 		))
 		return
 	}
+
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish project deleted event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"project",
+		projectID,
+		username,
+		map[string]interface{}{
+			"id": projectID,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
+	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"project": map[string]interface{}{

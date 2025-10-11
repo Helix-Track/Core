@@ -12,6 +12,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleCreateTicket creates a new ticket
@@ -134,6 +135,25 @@ func (h *Handler) handleCreateTicket(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Publish ticket created event
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"ticket",
+		ticketID,
+		username,
+		map[string]interface{}{
+			"id":            ticketID,
+			"ticket_number": ticketNumber,
+			"title":         title,
+			"description":   description,
+			"type":          ticketTypeStr,
+			"priority":      priority,
+			"status":        "open",
+			"project_id":    projectID,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
+	)
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"ticket": map[string]interface{}{
 			"id":            ticketID,
@@ -219,6 +239,26 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get project_id for event context
+	var projectID string
+	err = h.db.QueryRow(context.Background(),
+		"SELECT project_id FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&projectID)
+
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish ticket updated event
+	if err == nil {
+		h.publisher.PublishEntityEvent(
+			models.ActionModify,
+			"ticket",
+			ticketID,
+			username,
+			ticketData,
+			websocket.NewProjectContext(projectID, []string{"READ"}),
+		)
+	}
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"ticket": map[string]interface{}{
 			"id":      ticketID,
@@ -246,8 +286,22 @@ func (h *Handler) handleRemoveTicket(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get project_id before deletion for event context
+	var projectID string
+	err := h.db.QueryRow(context.Background(),
+		"SELECT project_id FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&projectID)
+	if err != nil {
+		logger.Error("Ticket not found", zap.Error(err))
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Ticket not found",
+			"",
+		))
+		return
+	}
+
 	query := "UPDATE ticket SET deleted = 1, modified = ? WHERE id = ?"
-	_, err := h.db.Exec(context.Background(), query, time.Now().Unix(), ticketID)
+	_, err = h.db.Exec(context.Background(), query, time.Now().Unix(), ticketID)
 	if err != nil {
 		logger.Error("Failed to delete ticket", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
@@ -257,6 +311,22 @@ func (h *Handler) handleRemoveTicket(c *gin.Context, req *models.Request) {
 		))
 		return
 	}
+
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish ticket deleted event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"ticket",
+		ticketID,
+		username,
+		map[string]interface{}{
+			"id":         ticketID,
+			"project_id": projectID,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
+	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"ticket": map[string]interface{}{

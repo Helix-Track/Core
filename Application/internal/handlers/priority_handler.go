@@ -11,6 +11,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handlePriorityCreate creates a new priority
@@ -121,6 +122,23 @@ func (h *Handler) handlePriorityCreate(c *gin.Context, req *models.Request) {
 		zap.String("priority_id", priority.ID),
 		zap.String("title", priority.Title),
 		zap.String("username", username),
+	)
+
+	// Publish priority created event
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"priority",
+		priority.ID,
+		username,
+		map[string]interface{}{
+			"id":          priority.ID,
+			"title":       priority.Title,
+			"description": priority.Description,
+			"level":       priority.Level,
+			"icon":        priority.Icon,
+			"color":       priority.Color,
+		},
+		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -396,6 +414,16 @@ func (h *Handler) handlePriorityModify(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
+	// Publish priority updated event
+	h.publisher.PublishEntityEvent(
+		models.ActionModify,
+		"priority",
+		priorityID,
+		username,
+		updates,
+		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
+	)
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"updated": true,
 		"id":      priorityID,
@@ -473,6 +501,18 @@ func (h *Handler) handlePriorityRemove(c *gin.Context, req *models.Request) {
 	logger.Info("Priority deleted",
 		zap.String("priority_id", priorityID),
 		zap.String("username", username),
+	)
+
+	// Publish priority deleted event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"priority",
+		priorityID,
+		username,
+		map[string]interface{}{
+			"id": priorityID,
+		},
+		websocket.NewProjectContext("", []string{"READ"}), // System-wide entity
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{

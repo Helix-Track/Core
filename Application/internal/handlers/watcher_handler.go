@@ -10,6 +10,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleWatcherAdd adds a user as a watcher to a ticket
@@ -106,6 +107,25 @@ func (h *Handler) handleWatcherAdd(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
+	// Get project context from ticket for event publishing
+	var projectID string
+	contextQuery := `SELECT project_id FROM ticket WHERE id = ? AND deleted = 0`
+	_ = h.db.QueryRow(c.Request.Context(), contextQuery, ticketID).Scan(&projectID)
+
+	// Publish watcher added event
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"watcher",
+		watcher.ID,
+		username,
+		map[string]interface{}{
+			"id":        watcher.ID,
+			"ticket_id": ticketID,
+			"user_id":   userID,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
+	)
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"watcher": watcher,
 	})
@@ -173,6 +193,24 @@ func (h *Handler) handleWatcherRemove(c *gin.Context, req *models.Request) {
 		zap.String("ticket_id", ticketID),
 		zap.String("user_id", userID),
 		zap.String("username", username),
+	)
+
+	// Get project context from ticket for event publishing
+	var projectID string
+	contextQuery := `SELECT project_id FROM ticket WHERE id = ? AND deleted = 0`
+	_ = h.db.QueryRow(c.Request.Context(), contextQuery, ticketID).Scan(&projectID)
+
+	// Publish watcher removed event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"watcher",
+		ticketID+":"+userID, // Composite ID for watcher mapping
+		username,
+		map[string]interface{}{
+			"ticket_id": ticketID,
+			"user_id":   userID,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{

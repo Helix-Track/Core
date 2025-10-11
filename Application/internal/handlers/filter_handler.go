@@ -12,6 +12,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleFilterSave creates a new filter or updates an existing one
@@ -135,6 +136,23 @@ func (h *Handler) handleFilterSave(c *gin.Context, req *models.Request) {
 			zap.String("username", username),
 		)
 
+		// Publish filter updated event
+		h.publisher.PublishEntityEvent(
+			models.ActionModify,
+			"filter",
+			filterID,
+			username,
+			map[string]interface{}{
+				"id":          filterID,
+				"title":       title,
+				"description": description,
+				"owner_id":    userID,
+				"is_public":   isPublic,
+				"is_favorite": isFavorite,
+			},
+			websocket.NewProjectContext("", []string{"READ"}), // User-level entity, system-wide context
+		)
+
 		response := models.NewSuccessResponse(map[string]interface{}{
 			"filter": map[string]interface{}{
 				"id":          filterID,
@@ -198,6 +216,23 @@ func (h *Handler) handleFilterSave(c *gin.Context, req *models.Request) {
 		zap.String("filter_id", filter.ID),
 		zap.String("title", filter.Title),
 		zap.String("username", username),
+	)
+
+	// Publish filter created event
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"filter",
+		filter.ID,
+		username,
+		map[string]interface{}{
+			"id":          filter.ID,
+			"title":       filter.Title,
+			"description": filter.Description,
+			"owner_id":    filter.OwnerID,
+			"is_public":   filter.IsPublic,
+			"is_favorite": filter.IsFavorite,
+		},
+		websocket.NewProjectContext("", []string{"READ"}), // User-level entity, system-wide context
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -473,6 +508,21 @@ func (h *Handler) handleFilterShare(c *gin.Context, req *models.Request) {
 			zap.String("username", username),
 		)
 
+		// Publish filter shared event (public)
+		h.publisher.PublishEntityEvent(
+			models.ActionModify,
+			"filter",
+			filterID,
+			username,
+			map[string]interface{}{
+				"id":         filterID,
+				"owner_id":   ownerID,
+				"share_type": shareType,
+				"is_public":  true,
+			},
+			websocket.NewProjectContext("", []string{"READ"}), // User-level entity, system-wide context
+		)
+
 		response := models.NewSuccessResponse(map[string]interface{}{
 			"shared":     true,
 			"filterId":   filterID,
@@ -568,6 +618,31 @@ func (h *Handler) handleFilterShare(c *gin.Context, req *models.Request) {
 		zap.String("filter_id", filterID),
 		zap.String("share_type", shareType),
 		zap.String("username", username),
+	)
+
+	// Publish filter shared event (user/team/project)
+	eventData := map[string]interface{}{
+		"id":         filterID,
+		"owner_id":   ownerID,
+		"share_type": shareType,
+		"share_id":   shareMapping.ID,
+	}
+	if shareMapping.UserID != nil {
+		eventData["user_id"] = *shareMapping.UserID
+	}
+	if shareMapping.TeamID != nil {
+		eventData["team_id"] = *shareMapping.TeamID
+	}
+	if shareMapping.ProjectID != nil {
+		eventData["project_id"] = *shareMapping.ProjectID
+	}
+	h.publisher.PublishEntityEvent(
+		models.ActionModify,
+		"filter",
+		filterID,
+		username,
+		eventData,
+		websocket.NewProjectContext("", []string{"READ"}), // User-level entity, system-wide context
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -709,6 +784,16 @@ func (h *Handler) handleFilterModify(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
+	// Publish filter updated event
+	h.publisher.PublishEntityEvent(
+		models.ActionModify,
+		"filter",
+		filterID,
+		username,
+		updates,
+		websocket.NewProjectContext("", []string{"READ"}), // User-level entity, system-wide context
+	)
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"updated": true,
 		"id":      filterID,
@@ -807,6 +892,19 @@ func (h *Handler) handleFilterRemove(c *gin.Context, req *models.Request) {
 	logger.Info("Filter deleted",
 		zap.String("filter_id", filterID),
 		zap.String("username", username),
+	)
+
+	// Publish filter deleted event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"filter",
+		filterID,
+		username,
+		map[string]interface{}{
+			"id":       filterID,
+			"owner_id": ownerID,
+		},
+		websocket.NewProjectContext("", []string{"READ"}), // User-level entity, system-wide context
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{

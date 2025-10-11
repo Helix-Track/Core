@@ -17,6 +17,7 @@ import (
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
 	"helixtrack.ru/core/internal/services"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // Server represents the HTTP server
@@ -28,6 +29,9 @@ type Server struct {
 	authService               services.AuthService
 	permService               services.PermissionService
 	serviceDiscoveryHandler   *handlers.ServiceDiscoveryHandler
+	wsManager                 *websocket.Manager
+	wsPublisher               websocket.EventPublisher
+	wsHandler                 *websocket.Handler
 }
 
 // NewServer creates a new server instance
@@ -57,12 +61,35 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		return nil, fmt.Errorf("failed to initialize service discovery handler: %w", err)
 	}
 
+	// Initialize WebSocket manager and publisher
+	var wsManager *websocket.Manager
+	var wsPublisher websocket.EventPublisher
+	var wsHandler *websocket.Handler
+
+	if cfg.IsWebSocketEnabled() {
+		wsConfig := websocket.ConfigToModel(cfg.GetWebSocketConfig())
+		wsManager = websocket.NewManager(wsConfig, permService)
+		wsPublisher = websocket.NewPublisher(wsManager, true)
+		wsHandler = websocket.NewHandler(wsManager, authService, wsConfig)
+
+		logger.Info("WebSocket enabled",
+			zap.String("path", wsConfig.Path),
+			zap.Int("maxClients", wsConfig.MaxClients),
+		)
+	} else {
+		wsPublisher = websocket.NewNoOpPublisher()
+		logger.Info("WebSocket disabled")
+	}
+
 	server := &Server{
 		config:                  cfg,
 		db:                      db,
 		authService:             authService,
 		permService:             permService,
 		serviceDiscoveryHandler: serviceDiscoveryHandler,
+		wsManager:               wsManager,
+		wsPublisher:             wsPublisher,
+		wsHandler:               wsHandler,
 	}
 
 	server.setupRouter()
@@ -106,7 +133,19 @@ func (s *Server) setupRouter() {
 
 	// Create handlers
 	handler := handlers.NewHandler(s.db, s.authService, s.permService, s.config.Version)
+	handler.SetEventPublisher(s.wsPublisher) // Set event publisher for WebSocket events
 	authHandler := handlers.NewAuthHandler(s.db)
+
+	// WebSocket routes (if enabled)
+	if s.config.IsWebSocketEnabled() && s.wsHandler != nil {
+		wsPath := s.config.WebSocket.Path
+		router.GET(wsPath, s.wsHandler.HandleConnection)
+		router.GET(wsPath+"/stats", s.wsHandler.HandleStats)
+		logger.Info("WebSocket routes registered",
+			zap.String("path", wsPath),
+			zap.String("statsPath", wsPath+"/stats"),
+		)
+	}
 
 	// Authentication routes (public)
 	auth := router.Group("/api/auth")
@@ -256,6 +295,14 @@ func (s *Server) corsMiddleware() gin.HandlerFunc {
 
 // Start starts the HTTP server
 func (s *Server) Start() error {
+	// Start WebSocket manager if enabled
+	if s.wsManager != nil {
+		if err := s.wsManager.Start(); err != nil {
+			return fmt.Errorf("failed to start WebSocket manager: %w", err)
+		}
+		logger.Info("WebSocket manager started")
+	}
+
 	addr := s.config.GetListenerAddress()
 
 	s.httpServer = &http.Server{
@@ -284,6 +331,14 @@ func (s *Server) Start() error {
 func (s *Server) Shutdown(ctx context.Context) error {
 	logger.Info("Shutting down server...")
 
+	// Stop WebSocket manager
+	if s.wsManager != nil {
+		logger.Info("Stopping WebSocket manager...")
+		if err := s.wsManager.Stop(); err != nil {
+			logger.Error("Error stopping WebSocket manager", zap.Error(err))
+		}
+	}
+
 	// Stop health checker
 	if s.serviceDiscoveryHandler != nil {
 		logger.Info("Stopping service health checker...")
@@ -311,4 +366,9 @@ func (s *Server) Shutdown(ctx context.Context) error {
 // GetRouter returns the Gin router (useful for testing)
 func (s *Server) GetRouter() *gin.Engine {
 	return s.router
+}
+
+// GetEventPublisher returns the WebSocket event publisher
+func (s *Server) GetEventPublisher() websocket.EventPublisher {
+	return s.wsPublisher
 }

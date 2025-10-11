@@ -13,6 +13,7 @@ import (
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
 	"helixtrack.ru/core/internal/services"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // Handler manages all HTTP handlers
@@ -21,6 +22,7 @@ type Handler struct {
 	authService services.AuthService
 	permService services.PermissionService
 	version     string
+	publisher   websocket.EventPublisher
 }
 
 // NewHandler creates a new handler instance
@@ -30,7 +32,13 @@ func NewHandler(db database.Database, authService services.AuthService, permServ
 		authService: authService,
 		permService: permService,
 		version:     version,
+		publisher:   websocket.NewNoOpPublisher(), // Default to no-op publisher
 	}
+}
+
+// SetEventPublisher sets the event publisher for the handler
+func (h *Handler) SetEventPublisher(publisher websocket.EventPublisher) {
+	h.publisher = publisher
 }
 
 // DoAction handles the unified /do endpoint with action-based routing

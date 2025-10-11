@@ -141,3 +141,16 @@ func GetRequiredPermissionLevel(action string) PermissionLevel {
 	// read, list, get, etc.
 	return PermissionRead
 }
+
+// HasPermission checks if the JWT claims contain a specific permission level
+func (c *JWTClaims) HasPermission(required int) bool {
+	if c == nil {
+		return false
+	}
+
+	// Parse permissions string (e.g., "READ|CREATE|UPDATE|DELETE")
+	permissionLevel := ParsePermissionLevel(c.Permissions)
+	requiredLevel := PermissionLevel(required)
+
+	return permissionLevel.HasPermission(requiredLevel)
+}

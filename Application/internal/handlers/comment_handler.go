@@ -9,7 +9,9 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"helixtrack.ru/core/internal/logger"
+	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleCreateComment creates a new comment
@@ -95,6 +97,30 @@ func (h *Handler) handleCreateComment(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get project_id from ticket for event context
+	var projectID string
+	h.db.QueryRow(context.Background(),
+		"SELECT project_id FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&projectID)
+
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish comment created event
+	if projectID != "" {
+		h.publisher.PublishEntityEvent(
+			models.ActionCreate,
+			"comment",
+			commentID,
+			username,
+			map[string]interface{}{
+				"id":        commentID,
+				"comment":   commentText,
+				"ticket_id": ticketID,
+			},
+			websocket.NewProjectContext(projectID, []string{"READ"}),
+		)
+	}
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"comment": map[string]interface{}{
 			"id":        commentID,
@@ -146,6 +172,32 @@ func (h *Handler) handleModifyComment(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get project_id from ticket for event context
+	var ticketID, projectID string
+	h.db.QueryRow(context.Background(),
+		`SELECT t.id, t.project_id FROM ticket t
+		 JOIN comment_ticket_mapping ctm ON t.id = ctm.ticket_id
+		 WHERE ctm.comment_id = ? AND t.deleted = 0`, commentID).Scan(&ticketID, &projectID)
+
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish comment updated event
+	if projectID != "" {
+		h.publisher.PublishEntityEvent(
+			models.ActionModify,
+			"comment",
+			commentID,
+			username,
+			map[string]interface{}{
+				"id":        commentID,
+				"comment":   commentText,
+				"ticket_id": ticketID,
+			},
+			websocket.NewProjectContext(projectID, []string{"READ"}),
+		)
+	}
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"comment": map[string]interface{}{
 			"id":      commentID,
@@ -173,8 +225,24 @@ func (h *Handler) handleRemoveComment(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get project_id from ticket before deletion for event context
+	var ticketID, projectID string
+	err := h.db.QueryRow(context.Background(),
+		`SELECT t.id, t.project_id FROM ticket t
+		 JOIN comment_ticket_mapping ctm ON t.id = ctm.ticket_id
+		 WHERE ctm.comment_id = ? AND t.deleted = 0`, commentID).Scan(&ticketID, &projectID)
+	if err != nil {
+		logger.Error("Comment not found", zap.Error(err))
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Comment not found",
+			"",
+		))
+		return
+	}
+
 	query := "UPDATE comment SET deleted = 1, modified = ? WHERE id = ?"
-	_, err := h.db.Exec(context.Background(), query, time.Now().Unix(), commentID)
+	_, err = h.db.Exec(context.Background(), query, time.Now().Unix(), commentID)
 	if err != nil {
 		logger.Error("Failed to delete comment", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
@@ -184,6 +252,22 @@ func (h *Handler) handleRemoveComment(c *gin.Context, req *models.Request) {
 		))
 		return
 	}
+
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Publish comment deleted event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"comment",
+		commentID,
+		username,
+		map[string]interface{}{
+			"id":        commentID,
+			"ticket_id": ticketID,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
+	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"comment": map[string]interface{}{

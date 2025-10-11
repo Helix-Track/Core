@@ -11,6 +11,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleVersionCreate creates a new version
@@ -126,6 +127,25 @@ func (h *Handler) handleVersionCreate(c *gin.Context, req *models.Request) {
 		zap.String("title", version.Title),
 		zap.String("project_id", version.ProjectID),
 		zap.String("username", username),
+	)
+
+	// Publish version created event
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"version",
+		version.ID,
+		username,
+		map[string]interface{}{
+			"id":           version.ID,
+			"title":        version.Title,
+			"description":  version.Description,
+			"project_id":   version.ProjectID,
+			"start_date":   version.StartDate,
+			"release_date": version.ReleaseDate,
+			"released":     version.Released,
+			"archived":     version.Archived,
+		},
+		websocket.NewProjectContext(version.ProjectID, []string{"READ"}),
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -412,6 +432,22 @@ func (h *Handler) handleVersionModify(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
+	// Get project context for event publishing
+	var projectID string
+	contextQuery := `SELECT project_id FROM version WHERE id = ? AND deleted = 0`
+	err = h.db.QueryRow(c.Request.Context(), contextQuery, versionID).Scan(&projectID)
+	if err == nil {
+		// Publish version updated event
+		h.publisher.PublishEntityEvent(
+			models.ActionModify,
+			"version",
+			versionID,
+			username,
+			updates,
+			websocket.NewProjectContext(projectID, []string{"READ"}),
+		)
+	}
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"updated": true,
 		"id":      versionID,
@@ -463,6 +499,11 @@ func (h *Handler) handleVersionRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get project context before deletion for event publishing
+	var projectID string
+	contextQuery := `SELECT project_id FROM version WHERE id = ? AND deleted = 0`
+	_ = h.db.QueryRow(c.Request.Context(), contextQuery, versionID).Scan(&projectID)
+
 	// Soft delete the version
 	query := `UPDATE version SET deleted = 1, modified = ? WHERE id = ? AND deleted = 0`
 	result, err := h.db.Exec(c.Request.Context(), query, time.Now().Unix(), versionID)
@@ -489,6 +530,19 @@ func (h *Handler) handleVersionRemove(c *gin.Context, req *models.Request) {
 	logger.Info("Version deleted",
 		zap.String("version_id", versionID),
 		zap.String("username", username),
+	)
+
+	// Publish version deleted event
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"version",
+		versionID,
+		username,
+		map[string]interface{}{
+			"id":         versionID,
+			"project_id": projectID,
+		},
+		websocket.NewProjectContext(projectID, []string{"READ"}),
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -578,6 +632,29 @@ func (h *Handler) handleVersionRelease(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
+	// Get version data for event publishing
+	var title, projectID string
+	var releaseDate *int64
+	eventQuery := `SELECT title, project_id, release_date FROM version WHERE id = ? AND deleted = 0`
+	err = h.db.QueryRow(c.Request.Context(), eventQuery, versionID).Scan(&title, &projectID, &releaseDate)
+	if err == nil {
+		// Publish version released event
+		h.publisher.PublishEntityEvent(
+			models.ActionModify,
+			"version",
+			versionID,
+			username,
+			map[string]interface{}{
+				"id":           versionID,
+				"title":        title,
+				"project_id":   projectID,
+				"released":     true,
+				"release_date": releaseDate,
+			},
+			websocket.NewProjectContext(projectID, []string{"READ"}),
+		)
+	}
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"released": true,
 		"id":       versionID,
@@ -656,6 +733,27 @@ func (h *Handler) handleVersionArchive(c *gin.Context, req *models.Request) {
 		zap.String("version_id", versionID),
 		zap.String("username", username),
 	)
+
+	// Get version data for event publishing
+	var title, projectID string
+	eventQuery := `SELECT title, project_id FROM version WHERE id = ? AND deleted = 0`
+	err = h.db.QueryRow(c.Request.Context(), eventQuery, versionID).Scan(&title, &projectID)
+	if err == nil {
+		// Publish version archived event
+		h.publisher.PublishEntityEvent(
+			models.ActionModify,
+			"version",
+			versionID,
+			username,
+			map[string]interface{}{
+				"id":         versionID,
+				"title":      title,
+				"project_id": projectID,
+				"archived":   true,
+			},
+			websocket.NewProjectContext(projectID, []string{"READ"}),
+		)
+	}
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"archived": true,

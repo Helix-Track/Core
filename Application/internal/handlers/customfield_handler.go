@@ -12,6 +12,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/websocket"
 )
 
 // handleCustomFieldCreate creates a new custom field definition
@@ -148,6 +149,27 @@ func (h *Handler) handleCustomFieldCreate(c *gin.Context, req *models.Request) {
 		zap.String("custom_field_id", customField.ID),
 		zap.String("field_name", customField.FieldName),
 		zap.String("username", username),
+	)
+
+	// Publish custom field created event
+	projectContext := ""
+	if customField.ProjectID != nil {
+		projectContext = *customField.ProjectID
+	}
+	h.publisher.PublishEntityEvent(
+		models.ActionCreate,
+		"customfield",
+		customField.ID,
+		username,
+		map[string]interface{}{
+			"id":          customField.ID,
+			"field_name":  customField.FieldName,
+			"field_type":  customField.FieldType,
+			"description": customField.Description,
+			"project_id":  customField.ProjectID,
+			"is_required": customField.IsRequired,
+		},
+		websocket.NewProjectContext(projectContext, []string{"READ"}),
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -445,6 +467,26 @@ func (h *Handler) handleCustomFieldModify(c *gin.Context, req *models.Request) {
 		zap.String("username", username),
 	)
 
+	// Get project context for event publishing
+	var projectID *string
+	contextQuery := `SELECT project_id FROM custom_field WHERE id = ? AND deleted = 0`
+	err = h.db.QueryRow(c.Request.Context(), contextQuery, customFieldID).Scan(&projectID)
+
+	projectContext := ""
+	if err == nil && projectID != nil {
+		projectContext = *projectID
+	}
+
+	// Publish custom field updated event
+	h.publisher.PublishEntityEvent(
+		models.ActionModify,
+		"customfield",
+		customFieldID,
+		username,
+		updates,
+		websocket.NewProjectContext(projectContext, []string{"READ"}),
+	)
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"updated": true,
 		"id":      customFieldID,
@@ -496,6 +538,11 @@ func (h *Handler) handleCustomFieldRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get project context before deletion for event publishing
+	var projectID *string
+	contextQuery := `SELECT project_id FROM custom_field WHERE id = ? AND deleted = 0`
+	_ = h.db.QueryRow(c.Request.Context(), contextQuery, customFieldID).Scan(&projectID)
+
 	// Soft delete the custom field
 	query := `UPDATE custom_field SET deleted = 1, modified = ? WHERE id = ? AND deleted = 0`
 	result, err := h.db.Exec(c.Request.Context(), query, time.Now().Unix(), customFieldID)
@@ -522,6 +569,23 @@ func (h *Handler) handleCustomFieldRemove(c *gin.Context, req *models.Request) {
 	logger.Info("Custom field deleted",
 		zap.String("custom_field_id", customFieldID),
 		zap.String("username", username),
+	)
+
+	// Publish custom field deleted event
+	projectContext := ""
+	if projectID != nil {
+		projectContext = *projectID
+	}
+	h.publisher.PublishEntityEvent(
+		models.ActionRemove,
+		"customfield",
+		customFieldID,
+		username,
+		map[string]interface{}{
+			"id":         customFieldID,
+			"project_id": projectID,
+		},
+		websocket.NewProjectContext(projectContext, []string{"READ"}),
 	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{

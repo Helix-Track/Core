@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelixTrack WebSocket Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        button.danger {
+            background: #e53e3e;
+        }
+
+        button.danger:hover {
+            background: #c53030;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .status.connected {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.disconnected {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .status.connecting {
+            background: #feebc8;
+            color: #7c2d12;
+            border: 1px solid #fbd38d;
+        }
+
+        #events {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 4px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .event-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #2d3748;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+        }
+
+        .event-time {
+            color: #a0aec0;
+            font-size: 11px;
+        }
+
+        .event-type {
+            color: #81e6d9;
+            font-weight: bold;
+        }
+
+        .event-data {
+            color: #e2e8f0;
+            margin-top: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 5px;
+            width: auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 HelixTrack WebSocket Client</h1>
+            <p>Real-time Event Notification Testing</p>
+        </div>
+
+        <div class="content">
+            <!-- Connection Status -->
+            <div id="statusContainer" class="status disconnected">
+                <strong>Status:</strong> <span id="statusText">Disconnected</span>
+            </div>
+
+            <!-- Authentication Section -->
+            <div class="section">
+                <h2>1. Authentication</h2>
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label>Username:</label>
+                            <input type="text" id="username" value="testuser" placeholder="Enter username">
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="password" value="testpass" placeholder="Enter password">
+                        </div>
+                        <button id="authBtn" onclick="authenticate()">Authenticate</button>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Server URL:</label>
+                            <input type="text" id="serverUrl" value="http://localhost:8080" placeholder="http://localhost:8080">
+                        </div>
+                        <div class="form-group">
+                            <label>WebSocket URL:</label>
+                            <input type="text" id="wsUrl" value="ws://localhost:8080/ws" placeholder="ws://localhost:8080/ws">
+                        </div>
+                        <div class="form-group">
+                            <label>JWT Token:</label>
+                            <input type="text" id="jwtToken" placeholder="Token will appear here after authentication" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Section -->
+            <div class="section">
+                <h2>2. WebSocket Connection</h2>
+                <button id="connectBtn" onclick="connect()" disabled>Connect</button>
+                <button id="disconnectBtn" onclick="disconnect()" disabled class="danger">Disconnect</button>
+            </div>
+
+            <!-- Subscription Section -->
+            <div class="section">
+                <h2>3. Event Subscription</h2>
+                <div class="form-group">
+                    <label>Event Types:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="ticket.created" checked> Ticket Created</label>
+                        <label><input type="checkbox" value="ticket.updated" checked> Ticket Updated</label>
+                        <label><input type="checkbox" value="ticket.deleted" checked> Ticket Deleted</label>
+                        <label><input type="checkbox" value="project.created" checked> Project Created</label>
+                        <label><input type="checkbox" value="project.updated"> Project Updated</label>
+                        <label><input type="checkbox" value="comment.created"> Comment Created</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="includeReads"> Include Read Events</label>
+                </div>
+                <button onclick="subscribe()">Subscribe</button>
+                <button onclick="unsubscribe()">Unsubscribe</button>
+            </div>
+
+            <!-- Events Display -->
+            <div class="section">
+                <h2>4. Live Events <span class="badge" id="eventCount">0</span></h2>
+                <button onclick="clearEvents()" style="margin-bottom: 10px;">Clear Events</button>
+                <div id="events">
+                    <div style="color: #a0aec0; text-align: center; padding: 50px;">
+                        Waiting for events...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let eventCount = 0;
+
+        // Authenticate with the server
+        async function authenticate() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const serverUrl = document.getElementById('serverUrl').value;
+            const authBtn = document.getElementById('authBtn');
+
+            authBtn.disabled = true;
+            authBtn.textContent = 'Authenticating...';
+
+            try {
+                const response = await fetch(`${serverUrl}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.errorCode === -1 && data.data.token) {
+                    document.getElementById('jwtToken').value = data.data.token;
+                    document.getElementById('connectBtn').disabled = false;
+                    alert('✅ Authentication successful!');
+                    logEvent('system', 'Authentication successful');
+                } else {
+                    alert('❌ Authentication failed: ' + (data.errorMessage || 'Unknown error'));
+                    logEvent('error', 'Authentication failed: ' + (data.errorMessage || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('❌ Authentication error: ' + error.message);
+                logEvent('error', 'Authentication error: ' + error.message);
+            } finally {
+                authBtn.disabled = false;
+                authBtn.textContent = 'Authenticate';
+            }
+        }
+
+        // Connect to WebSocket
+        function connect() {
+            const wsUrl = document.getElementById('wsUrl').value;
+            const jwtToken = document.getElementById('jwtToken').value;
+
+            if (!jwtToken) {
+                alert('Please authenticate first');
+                return;
+            }
+
+            updateStatus('connecting', 'Connecting...');
+            logEvent('system', 'Connecting to WebSocket...');
+
+            ws = new WebSocket(`${wsUrl}?token=${jwtToken}`);
+
+            ws.onopen = () => {
+                updateStatus('connected', 'Connected');
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('disconnectBtn').disabled = false;
+                logEvent('system', 'WebSocket connected successfully');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    handleMessage(message);
+                } catch (error) {
+                    logEvent('error', 'Failed to parse message: ' + error.message);
+                }
+            };
+
+            ws.onerror = (error) => {
+                logEvent('error', 'WebSocket error occurred');
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                updateStatus('disconnected', 'Disconnected');
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+                logEvent('system', 'WebSocket disconnected');
+            };
+        }
+
+        // Disconnect from WebSocket
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        // Subscribe to events
+        function subscribe() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('Please connect to WebSocket first');
+                return;
+            }
+
+            const eventTypes = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            const includeReads = document.getElementById('includeReads').checked;
+
+            const subscribeMessage = {
+                type: 'subscribe',
+                data: {
+                    eventTypes: eventTypes,
+                    entityTypes: ['ticket', 'project', 'comment'],
+                    includeReads: includeReads
+                }
+            };
+
+            ws.send(JSON.stringify(subscribeMessage));
+            logEvent('system', `Subscribed to ${eventTypes.length} event types`);
+        }
+
+        // Unsubscribe from events
+        function unsubscribe() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('Please connect to WebSocket first');
+                return;
+            }
+
+            const unsubscribeMessage = {
+                type: 'unsubscribe'
+            };
+
+            ws.send(JSON.stringify(unsubscribeMessage));
+            logEvent('system', 'Unsubscribed from all events');
+        }
+
+        // Handle incoming WebSocket messages
+        function handleMessage(message) {
+            switch (message.type) {
+                case 'event':
+                    const event = message.data.event;
+                    logEvent(
+                        message.type,
+                        `${event.type}: ${event.object} (${event.entityId})`,
+                        event
+                    );
+                    eventCount++;
+                    document.getElementById('eventCount').textContent = eventCount;
+                    break;
+
+                case 'ack':
+                    logEvent('ack', message.data.message || 'Acknowledged');
+                    break;
+
+                case 'error':
+                    logEvent('error', message.error);
+                    break;
+
+                case 'pong':
+                    logEvent('pong', 'Pong received');
+                    break;
+
+                default:
+                    logEvent('unknown', JSON.stringify(message));
+            }
+        }
+
+        // Log event to the display
+        function logEvent(type, message, data = null) {
+            const eventsDiv = document.getElementById('events');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event-item';
+
+            const time = new Date().toLocaleTimeString();
+            let html = `<div class="event-time">${time}</div>`;
+            html += `<div class="event-type">[${type.toUpperCase()}]</div>`;
+            html += `<div class="event-data">${message}</div>`;
+
+            if (data) {
+                html += `<details style="margin-top: 5px; color: #a0aec0;">`;
+                html += `<summary style="cursor: pointer;">Show details</summary>`;
+                html += `<pre style="margin-top: 5px; overflow-x: auto;">${JSON.stringify(data, null, 2)}</pre>`;
+                html += `</details>`;
+            }
+
+            eventDiv.innerHTML = html;
+
+            // Remove placeholder if it exists
+            if (eventsDiv.children.length === 1 && eventsDiv.children[0].textContent.includes('Waiting for events')) {
+                eventsDiv.innerHTML = '';
+            }
+
+            eventsDiv.insertBefore(eventDiv, eventsDiv.firstChild);
+
+            // Keep only last 100 events
+            while (eventsDiv.children.length > 100) {
+                eventsDiv.removeChild(eventsDiv.lastChild);
+            }
+        }
+
+        // Clear events display
+        function clearEvents() {
+            document.getElementById('events').innerHTML = '<div style="color: #a0aec0; text-align: center; padding: 50px;">Events cleared. Waiting for new events...</div>';
+            eventCount = 0;
+            document.getElementById('eventCount').textContent = '0';
+        }
+
+        // Update connection status
+        function updateStatus(status, text) {
+            const container = document.getElementById('statusContainer');
+            const statusText = document.getElementById('statusText');
+
+            container.className = `status ${status}`;
+            statusText.textContent = text;
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            logEvent('system', 'WebSocket client loaded. Please authenticate to begin.');
+        });
+    </script>
+</body>
+</html>
