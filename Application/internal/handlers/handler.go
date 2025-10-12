@@ -745,6 +745,18 @@ func (h *Handler) DoAction(c *gin.Context) {
 	case models.ActionActivityStreamFilter:
 		h.handleActivityStreamFilter(c, req)
 
+	// Comment Mention actions (Phase 3)
+	case models.ActionCommentMention:
+		h.handleCommentMention(c, req)
+	case models.ActionCommentUnmention:
+		h.handleCommentUnmention(c, req)
+	case models.ActionCommentListMentions:
+		h.handleCommentListMentions(c, req)
+	case models.ActionCommentGetMentions:
+		h.handleCommentGetMentions(c, req)
+	case models.ActionCommentParseMentions:
+		h.handleCommentParseMentions(c, req)
+
 	default:
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidAction,
