@@ -1,0 +1,292 @@
+{
+  "comment": "TechCorp Global - Project Definitions for AI QA Testing",
+  "projects": [
+    {
+      "key": "BANK",
+      "name": "Banking Application",
+      "description": "Secure online banking platform with account management, transactions, loans, and investments",
+      "type": "Software Development",
+      "methodology": "Scrum",
+      "duration": "6 months",
+      "sprintDuration": 2,
+      "teamSize": 7,
+      "team_members": [
+        "alice.johnson",
+        "bob.smith",
+        "carol.davis",
+        "david.wilson",
+        "grace.lee",
+        "henry.taylor",
+        "karen.martinez"
+      ],
+      "priorities": [
+        {"name": "Critical", "level": 5, "color": "#FF0000", "icon": "fire"},
+        {"name": "High", "level": 4, "color": "#FF9900", "icon": "arrow-up"},
+        {"name": "Medium", "level": 3, "color": "#FFD700", "icon": "equals"},
+        {"name": "Low", "level": 2, "color": "#90EE90", "icon": "arrow-down"},
+        {"name": "Trivial", "level": 1, "color": "#87CEEB", "icon": "circle"}
+      ],
+      "statuses": [
+        {"name": "Backlog", "category": "TODO", "order": 1},
+        {"name": "Sprint Backlog", "category": "TODO", "order": 2},
+        {"name": "In Progress", "category": "IN_PROGRESS", "order": 3},
+        {"name": "In Review", "category": "IN_PROGRESS", "order": 4},
+        {"name": "Ready for QA", "category": "IN_PROGRESS", "order": 5},
+        {"name": "QA Testing", "category": "IN_PROGRESS", "order": 6},
+        {"name": "Done", "category": "DONE", "order": 7},
+        {"name": "Closed", "category": "DONE", "order": 8}
+      ],
+      "epics": [
+        {
+          "key": "BANK-1",
+          "title": "User Authentication & Authorization",
+          "description": "Implement secure user authentication with MFA, biometric login, and role-based access control",
+          "stories": 6,
+          "tasks": 24,
+          "subtasks": 40,
+          "estimatedHours": 480
+        },
+        {
+          "key": "BANK-2",
+          "title": "Account Management System",
+          "description": "Create comprehensive account management including checking, savings, credit cards, and loans",
+          "stories": 8,
+          "tasks": 32,
+          "subtasks": 50,
+          "estimatedHours": 640
+        },
+        {
+          "key": "BANK-3",
+          "title": "Transaction Processing Engine",
+          "description": "Build real-time transaction processing with fraud detection, limits, and notifications",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 35,
+          "estimatedHours": 400
+        },
+        {
+          "key": "BANK-4",
+          "title": "Payment & Transfer System",
+          "description": "Implement internal transfers, external payments, bill pay, and scheduled transactions",
+          "stories": 6,
+          "tasks": 24,
+          "subtasks": 40,
+          "estimatedHours": 480
+        },
+        {
+          "key": "BANK-5",
+          "title": "Reporting & Analytics Dashboard",
+          "description": "Create comprehensive dashboards with spending analysis, budgeting, and financial reports",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 35,
+          "estimatedHours": 400
+        }
+      ]
+    },
+    {
+      "key": "UNI",
+      "name": "University Management System",
+      "description": "Comprehensive university management platform for students, faculty, courses, and exams",
+      "type": "Software Development",
+      "methodology": "Kanban",
+      "duration": "4 months",
+      "sprintDuration": 0,
+      "teamSize": 5,
+      "team_members": [
+        "alice.johnson",
+        "emma.brown",
+        "frank.miller",
+        "isabel.anderson",
+        "karen.martinez"
+      ],
+      "priorities": [
+        {"name": "Critical", "level": 5, "color": "#FF0000", "icon": "fire"},
+        {"name": "High", "level": 4, "color": "#FF9900", "icon": "arrow-up"},
+        {"name": "Medium", "level": 3, "color": "#FFD700", "icon": "equals"},
+        {"name": "Low", "level": 2, "color": "#90EE90", "icon": "arrow-down"}
+      ],
+      "statuses": [
+        {"name": "Backlog", "category": "TODO", "order": 1},
+        {"name": "Ready", "category": "TODO", "order": 2},
+        {"name": "In Progress", "category": "IN_PROGRESS", "order": 3},
+        {"name": "Review", "category": "IN_PROGRESS", "order": 4},
+        {"name": "Testing", "category": "IN_PROGRESS", "order": 5},
+        {"name": "Done", "category": "DONE", "order": 6}
+      ],
+      "epics": [
+        {
+          "key": "UNI-1",
+          "title": "Student Portal",
+          "description": "Student registration, enrollment, grade viewing, and profile management",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 300
+        },
+        {
+          "key": "UNI-2",
+          "title": "Course Management",
+          "description": "Course catalog, scheduling, prerequisites, and capacity management",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 300
+        },
+        {
+          "key": "UNI-3",
+          "title": "Examination System",
+          "description": "Exam scheduling, online testing, grading, and results publication",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 300
+        },
+        {
+          "key": "UNI-4",
+          "title": "Faculty Dashboard",
+          "description": "Faculty portal for course management, grading, and student interaction",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 300
+        }
+      ]
+    },
+    {
+      "key": "CHAT",
+      "name": "Real-Time Chat System",
+      "description": "WebSocket-based real-time messaging platform with channels, DMs, file sharing, and notifications",
+      "type": "Software Development",
+      "methodology": "Scrum",
+      "duration": "3 months",
+      "sprintDuration": 1,
+      "teamSize": 4,
+      "team_members": [
+        "bob.smith",
+        "david.wilson",
+        "grace.lee",
+        "karen.martinez"
+      ],
+      "priorities": [
+        {"name": "Critical", "level": 5, "color": "#FF0000", "icon": "fire"},
+        {"name": "High", "level": 4, "color": "#FF9900", "icon": "arrow-up"},
+        {"name": "Medium", "level": 3, "color": "#FFD700", "icon": "equals"}
+      ],
+      "statuses": [
+        {"name": "To Do", "category": "TODO", "order": 1},
+        {"name": "In Progress", "category": "IN_PROGRESS", "order": 2},
+        {"name": "Testing", "category": "IN_PROGRESS", "order": 3},
+        {"name": "Done", "category": "DONE", "order": 4}
+      ],
+      "epics": [
+        {
+          "key": "CHAT-1",
+          "title": "Real-Time Messaging Core",
+          "description": "WebSocket infrastructure, message delivery, and persistence",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 240
+        },
+        {
+          "key": "CHAT-2",
+          "title": "Channels & Direct Messages",
+          "description": "Public/private channels, direct messages, and group conversations",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 240
+        },
+        {
+          "key": "CHAT-3",
+          "title": "Media & File Sharing",
+          "description": "File uploads, image/video previews, and link previews",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 240
+        }
+      ]
+    },
+    {
+      "key": "SHOP",
+      "name": "E-Commerce Platform",
+      "description": "Full-featured e-commerce platform with product catalog, shopping cart, checkout, and order management",
+      "type": "Software Development",
+      "methodology": "Scrum",
+      "duration": "5 months",
+      "sprintDuration": 2,
+      "teamSize": 6,
+      "team_members": [
+        "alice.johnson",
+        "carol.davis",
+        "frank.miller",
+        "henry.taylor",
+        "jack.thomas",
+        "karen.martinez"
+      ],
+      "priorities": [
+        {"name": "Critical", "level": 5, "color": "#FF0000", "icon": "fire"},
+        {"name": "High", "level": 4, "color": "#FF9900", "icon": "arrow-up"},
+        {"name": "Medium", "level": 3, "color": "#FFD700", "icon": "equals"},
+        {"name": "Low", "level": 2, "color": "#90EE90", "icon": "arrow-down"}
+      ],
+      "statuses": [
+        {"name": "Backlog", "category": "TODO", "order": 1},
+        {"name": "Sprint Ready", "category": "TODO", "order": 2},
+        {"name": "In Development", "category": "IN_PROGRESS", "order": 3},
+        {"name": "Code Review", "category": "IN_PROGRESS", "order": 4},
+        {"name": "QA Testing", "category": "IN_PROGRESS", "order": 5},
+        {"name": "Deployed", "category": "DONE", "order": 6}
+      ],
+      "epics": [
+        {
+          "key": "SHOP-1",
+          "title": "Product Catalog System",
+          "description": "Product listings, search, filtering, categories, and recommendations",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 320
+        },
+        {
+          "key": "SHOP-2",
+          "title": "Shopping Cart & Wishlist",
+          "description": "Cart management, wishlist, save for later, and cart persistence",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 320
+        },
+        {
+          "key": "SHOP-3",
+          "title": "Checkout & Payment Processing",
+          "description": "Multi-step checkout, payment gateway integration, and order confirmation",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 320
+        },
+        {
+          "key": "SHOP-4",
+          "title": "Order Management",
+          "description": "Order tracking, fulfillment, shipping, and returns",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 320
+        },
+        {
+          "key": "SHOP-5",
+          "title": "Customer Account & Reviews",
+          "description": "User accounts, order history, reviews, ratings, and loyalty program",
+          "stories": 5,
+          "tasks": 20,
+          "subtasks": 30,
+          "estimatedHours": 320
+        }
+      ]
+    }
+  ]
+}

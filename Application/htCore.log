@@ -1,0 +1,134 @@
+2025-10-12T16:13:34.195+0300	INFO	logger/logger.go:146	Starting Helix Track Core v1.0.0
+2025-10-12T16:13:34.195+0300	INFO	logger/logger.go:146	Configuration loaded from: Configurations/default.json
+2025-10-12T16:13:34.300+0300	INFO	logger/logger.go:121	WebSocket disabled
+2025-10-12T16:13:34.302+0300	INFO	logger/logger.go:121	Initializing service discovery tables
+2025-10-12T16:13:34.302+0300	INFO	logger/logger.go:121	Service discovery tables created successfully
+2025-10-12T16:13:34.302+0300	INFO	logger/logger.go:121	Starting service health checker	{"interval": 60}
+2025-10-12T16:13:34.302+0300	INFO	logger/logger.go:121	Service health checker started
+2025-10-12T16:13:34.302+0300	INFO	logger/logger.go:121	Starting HTTP server	{"address": "0.0.0.0:8080"}
+2025-10-12T16:13:48.307+0300	INFO	logger/logger.go:121	Received /do request	{"body": "{\"action\":\"version\"}"}
+2025-10-12T16:13:48.307+0300	INFO	logger/logger.go:121	Successfully parsed request	{"action": "version"}
+2025-10-12T16:13:48.307+0300	INFO	logger/logger.go:121	Processing action	{"action": "version", "object": ""}
+2025-10-12T16:13:48.307+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/do", "status": 200, "latency": 0.0002223, "client_ip": "::1"}
+2025-10-12T16:13:59.709+0300	INFO	logger/logger.go:121	Received /do request	{"body": "{\"action\":\"version\"}"}
+2025-10-12T16:13:59.709+0300	INFO	logger/logger.go:121	Successfully parsed request	{"action": "version"}
+2025-10-12T16:13:59.709+0300	INFO	logger/logger.go:121	Processing action	{"action": "version", "object": ""}
+2025-10-12T16:13:59.709+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/do", "status": 200, "latency": 0.00014792, "client_ip": "::1"}
+2025-10-12T16:13:59.714+0300	INFO	logger/logger.go:121	Received /do request	{"body": "{\"action\":\"version\"}"}
+2025-10-12T16:13:59.714+0300	INFO	logger/logger.go:121	Successfully parsed request	{"action": "version"}
+2025-10-12T16:13:59.714+0300	INFO	logger/logger.go:121	Processing action	{"action": "version", "object": ""}
+2025-10-12T16:13:59.714+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/do", "status": 200, "latency": 0.000086671, "client_ip": "::1"}
+2025-10-12T16:13:59.731+0300	INFO	logger/logger.go:121	Received /do request	{"body": "{\"action\": \"accountCreate\", \"data\": {\"name\":\"TechCorp Global\",\"description\":\"Global technology corporation\",\"email\":\"admin@techcorp.global\",\"contactPerson\":\"Alice Johnson\",\"phoneNumber\":\"+1-555-0100\",\"address\":\"123 Tech Street, Silicon Valley, CA 94000, USA\"}}"}
+2025-10-12T16:13:59.731+0300	INFO	logger/logger.go:121	Successfully parsed request	{"action": "accountCreate"}
+2025-10-12T16:13:59.731+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/do", "status": 401, "latency": 0.000103363, "client_ip": "::1"}
+2025-10-12T16:16:37.849+0300	INFO	logger/logger.go:121	Received /do request	{"body": "{\"action\":\"version\"}"}
+2025-10-12T16:16:37.849+0300	INFO	logger/logger.go:121	Successfully parsed request	{"action": "version"}
+2025-10-12T16:16:37.849+0300	INFO	logger/logger.go:121	Processing action	{"action": "version", "object": ""}
+2025-10-12T16:16:37.849+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/do", "status": 200, "latency": 0.00014408, "client_ip": "::1"}
+2025-10-12T16:16:37.857+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "GET", "path": "/health", "status": 200, "latency": 0.000022419, "client_ip": "::1"}
+2025-10-12T16:16:37.865+0300	INFO	logger/logger.go:121	Received /do request	{"body": "{\"action\":\"jwtCapable\"}"}
+2025-10-12T16:16:37.865+0300	INFO	logger/logger.go:121	Successfully parsed request	{"action": "jwtCapable"}
+2025-10-12T16:16:37.865+0300	INFO	logger/logger.go:121	Processing action	{"action": "jwtCapable", "object": ""}
+2025-10-12T16:16:37.866+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/do", "status": 200, "latency": 0.000111604, "client_ip": "::1"}
+2025-10-12T16:16:37.873+0300	INFO	logger/logger.go:121	Received /do request	{"body": "{\"action\":\"dbCapable\"}"}
+2025-10-12T16:16:37.873+0300	INFO	logger/logger.go:121	Successfully parsed request	{"action": "dbCapable"}
+2025-10-12T16:16:37.873+0300	INFO	logger/logger.go:121	Processing action	{"action": "dbCapable", "object": ""}
+2025-10-12T16:16:37.873+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/do", "status": 200, "latency": 0.000117889, "client_ip": "::1"}
+2025-10-12T16:16:37.937+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/api/auth/register", "status": 201, "latency": 0.055852608, "client_ip": "::1"}
+2025-10-12T16:17:19.065+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "invalid character '!' in string escape code"}
+helixtrack.ru/core/internal/logger.Error
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
+helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler.go:119
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+helixtrack.ru/core/internal/server.(*Server).setupRouter.(*Server).corsMiddleware.func4
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:292
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+helixtrack.ru/core/internal/server.(*Server).setupRouter.(*Server).loggingMiddleware.func3
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:265
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+github.com/gin-gonic/gin.CustomRecoveryWithWriter.func1
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/recovery.go:102
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:633
+github.com/gin-gonic/gin.(*Engine).ServeHTTP
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:589
+net/http.serverHandler.ServeHTTP
+	/usr/lib/go-1.22/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/lib/go-1.22/src/net/http/server.go:2044
+2025-10-12T16:17:19.065+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/api/auth/login", "status": 400, "latency": 0.000110278, "client_ip": "::1"}
+2025-10-12T16:17:42.078+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.username"}
+helixtrack.ru/core/internal/logger.Error
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
+helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler.go:93
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+helixtrack.ru/core/internal/server.(*Server).setupRouter.(*Server).corsMiddleware.func4
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:292
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+helixtrack.ru/core/internal/server.(*Server).setupRouter.(*Server).loggingMiddleware.func3
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:265
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+github.com/gin-gonic/gin.CustomRecoveryWithWriter.func1
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/recovery.go:102
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:633
+github.com/gin-gonic/gin.(*Engine).ServeHTTP
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:589
+net/http.serverHandler.ServeHTTP
+	/usr/lib/go-1.22/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/lib/go-1.22/src/net/http/server.go:2044
+2025-10-12T16:17:42.078+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/api/auth/register", "status": 409, "latency": 0.047936991, "client_ip": "::1"}
+2025-10-12T16:18:00.794+0300	ERROR	logger/logger.go:131	Invalid password	{"username": "testuser"}
+helixtrack.ru/core/internal/logger.Error
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
+helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler.go:165
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+helixtrack.ru/core/internal/server.(*Server).setupRouter.(*Server).corsMiddleware.func4
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:292
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+helixtrack.ru/core/internal/server.(*Server).setupRouter.(*Server).loggingMiddleware.func3
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:265
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+github.com/gin-gonic/gin.CustomRecoveryWithWriter.func1
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/recovery.go:102
+github.com/gin-gonic/gin.(*Context).Next
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:633
+github.com/gin-gonic/gin.(*Engine).ServeHTTP
+	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:589
+net/http.serverHandler.ServeHTTP
+	/usr/lib/go-1.22/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/lib/go-1.22/src/net/http/server.go:2044
+2025-10-12T16:18:00.794+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/api/auth/login", "status": 401, "latency": 0.047898311, "client_ip": "::1"}
+2025-10-12T16:18:10.137+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/api/auth/register", "status": 201, "latency": 0.056545629, "client_ip": "::1"}
+2025-10-12T16:18:19.262+0300	INFO	logger/logger.go:121	HTTP Request	{"method": "POST", "path": "/api/auth/login", "status": 200, "latency": 0.047557223, "client_ip": "::1"}
+2025-10-12T16:20:16.643+0300	INFO	logger/logger.go:121	Shutting down server...
+2025-10-12T16:20:16.643+0300	INFO	logger/logger.go:121	Shutting down server...
+2025-10-12T16:20:16.643+0300	INFO	logger/logger.go:121	Stopping service health checker...
+2025-10-12T16:20:16.643+0300	INFO	logger/logger.go:121	Service health checker stopped
+2025-10-12T16:20:16.643+0300	FATAL	logger/logger.go:161	Server error: http: Server closed
+helixtrack.ru/core/internal/logger.Fatalf
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:161
+main.main.func1
+	/home/milosvasic/Projects/HelixTrack/Core/Application/main.go:63
+2025-10-12T16:20:16.644+0300	INFO	logger/logger.go:121	Server shutdown complete
+2025-10-12T16:20:16.701+0300	INFO	logger/logger.go:121	Server exited successfully

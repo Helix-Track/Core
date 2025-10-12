@@ -1,0 +1,136 @@
+{
+  "comment": "TechCorp Global - Organization Structure for AI QA Testing",
+  "account": {
+    "name": "TechCorp Global",
+    "description": "Global technology corporation",
+    "email": "admin@techcorp.global",
+    "contactPerson": "Alice Johnson",
+    "phoneNumber": "+1-555-0100",
+    "address": "123 Tech Street, Silicon Valley, CA 94000, USA"
+  },
+  "organization": {
+    "name": "TechCorp Engineering",
+    "description": "Engineering division of TechCorp Global",
+    "email": "engineering@techcorp.global",
+    "contactPerson": "Alice Johnson",
+    "phoneNumber": "+1-555-0101"
+  },
+  "teams": [
+    {
+      "name": "Frontend Team",
+      "description": "UI/UX and frontend development",
+      "lead": "carol.davis@techcorp.global"
+    },
+    {
+      "name": "Backend Team",
+      "description": "Backend services and API development",
+      "lead": "grace.lee@techcorp.global"
+    },
+    {
+      "name": "QA & DevOps Team",
+      "description": "Quality assurance and DevOps infrastructure",
+      "lead": "karen.martinez@techcorp.global"
+    }
+  ],
+  "users": [
+    {
+      "username": "alice.johnson",
+      "email": "alice.johnson@techcorp.global",
+      "name": "Alice Johnson",
+      "role": "CTO",
+      "team": "Management",
+      "permissions": ["READ", "CREATE", "UPDATE", "DELETE"],
+      "password": "TechCorp2025!Alice"
+    },
+    {
+      "username": "bob.smith",
+      "email": "bob.smith@techcorp.global",
+      "name": "Bob Smith",
+      "role": "Engineering Manager",
+      "team": "Management",
+      "permissions": ["READ", "CREATE", "UPDATE", "DELETE"],
+      "password": "TechCorp2025!Bob"
+    },
+    {
+      "username": "carol.davis",
+      "email": "carol.davis@techcorp.global",
+      "name": "Carol Davis",
+      "role": "Senior Frontend Developer",
+      "team": "Frontend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!Carol"
+    },
+    {
+      "username": "david.wilson",
+      "email": "david.wilson@techcorp.global",
+      "name": "David Wilson",
+      "role": "Frontend Developer",
+      "team": "Frontend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!David"
+    },
+    {
+      "username": "emma.brown",
+      "email": "emma.brown@techcorp.global",
+      "name": "Emma Brown",
+      "role": "UI/UX Designer",
+      "team": "Frontend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!Emma"
+    },
+    {
+      "username": "frank.miller",
+      "email": "frank.miller@techcorp.global",
+      "name": "Frank Miller",
+      "role": "Frontend Developer",
+      "team": "Frontend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!Frank"
+    },
+    {
+      "username": "grace.lee",
+      "email": "grace.lee@techcorp.global",
+      "name": "Grace Lee",
+      "role": "Senior Backend Developer",
+      "team": "Backend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!Grace"
+    },
+    {
+      "username": "henry.taylor",
+      "email": "henry.taylor@techcorp.global",
+      "name": "Henry Taylor",
+      "role": "Backend Developer",
+      "team": "Backend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!Henry"
+    },
+    {
+      "username": "isabel.anderson",
+      "email": "isabel.anderson@techcorp.global",
+      "name": "Isabel Anderson",
+      "role": "Backend Developer",
+      "team": "Backend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!Isabel"
+    },
+    {
+      "username": "jack.thomas",
+      "email": "jack.thomas@techcorp.global",
+      "name": "Jack Thomas",
+      "role": "Backend Developer",
+      "team": "Backend Team",
+      "permissions": ["READ", "CREATE", "UPDATE"],
+      "password": "TechCorp2025!Jack"
+    },
+    {
+      "username": "karen.martinez",
+      "email": "karen.martinez@techcorp.global",
+      "name": "Karen Martinez",
+      "role": "QA Lead & DevOps Engineer",
+      "team": "QA & DevOps Team",
+      "permissions": ["READ", "CREATE", "UPDATE", "DELETE"],
+      "password": "TechCorp2025!Karen"
+    }
+  ]
+}
