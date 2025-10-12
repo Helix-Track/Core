@@ -685,6 +685,66 @@ func (h *Handler) DoAction(c *gin.Context) {
 	case models.ActionDashboardSetLayout:
 		h.handleDashboardSetLayout(c, req)
 
+	// Board Config actions (Phase 2)
+	case models.ActionBoardConfigureColumns:
+		h.handleBoardConfigureColumns(c, req)
+	case models.ActionBoardAddColumn:
+		h.handleBoardAddColumn(c, req)
+	case models.ActionBoardRemoveColumn:
+		h.handleBoardRemoveColumn(c, req)
+	case models.ActionBoardModifyColumn:
+		h.handleBoardModifyColumn(c, req)
+	case models.ActionBoardListColumns:
+		h.handleBoardListColumns(c, req)
+	case models.ActionBoardAddSwimlane:
+		h.handleBoardAddSwimlane(c, req)
+	case models.ActionBoardRemoveSwimlane:
+		h.handleBoardRemoveSwimlane(c, req)
+	case models.ActionBoardListSwimlanes:
+		h.handleBoardListSwimlanes(c, req)
+	case models.ActionBoardAddQuickFilter:
+		h.handleBoardAddQuickFilter(c, req)
+	case models.ActionBoardRemoveQuickFilter:
+		h.handleBoardRemoveQuickFilter(c, req)
+	case models.ActionBoardListQuickFilters:
+		h.handleBoardListQuickFilters(c, req)
+	case models.ActionBoardSetType:
+		h.handleBoardSetType(c, req)
+
+	// Notification actions (Phase 2)
+	case models.ActionNotificationSchemeCreate:
+		h.handleNotificationSchemeCreate(c, req)
+	case models.ActionNotificationSchemeRead:
+		h.handleNotificationSchemeRead(c, req)
+	case models.ActionNotificationSchemeList:
+		h.handleNotificationSchemeList(c, req)
+	case models.ActionNotificationSchemeModify:
+		h.handleNotificationSchemeModify(c, req)
+	case models.ActionNotificationSchemeRemove:
+		h.handleNotificationSchemeRemove(c, req)
+	case models.ActionNotificationSchemeAddRule:
+		h.handleNotificationSchemeAddRule(c, req)
+	case models.ActionNotificationSchemeRemoveRule:
+		h.handleNotificationSchemeRemoveRule(c, req)
+	case models.ActionNotificationSchemeListRules:
+		h.handleNotificationSchemeListRules(c, req)
+	case models.ActionNotificationEventList:
+		h.handleNotificationEventList(c, req)
+	case models.ActionNotificationSend:
+		h.handleNotificationSend(c, req)
+
+	// Activity Stream actions (Phase 3)
+	case models.ActionActivityStreamGet:
+		h.handleActivityStreamGet(c, req)
+	case models.ActionActivityStreamGetByProject:
+		h.handleActivityStreamGetByProject(c, req)
+	case models.ActionActivityStreamGetByUser:
+		h.handleActivityStreamGetByUser(c, req)
+	case models.ActionActivityStreamGetByTicket:
+		h.handleActivityStreamGetByTicket(c, req)
+	case models.ActionActivityStreamFilter:
+		h.handleActivityStreamFilter(c, req)
+
 	default:
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidAction,

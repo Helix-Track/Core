@@ -2,15 +2,17 @@ package models
 
 // Audit represents an audit log entry tracking actions in the system
 type Audit struct {
-	ID         string `json:"id" db:"id"`
-	Action     string `json:"action" db:"action" binding:"required"`       // The action performed
-	UserID     string `json:"userId" db:"user_id"`                         // User who performed the action
-	EntityID   string `json:"entityId" db:"entity_id"`                     // ID of the entity affected
-	EntityType string `json:"entityType" db:"entity_type"`                 // Type of entity (project, ticket, etc.)
-	Details    string `json:"details,omitempty" db:"details"`              // JSON encoded details
-	Created    int64  `json:"created" db:"created"`
-	Modified   int64  `json:"modified" db:"modified"`
-	Deleted    bool   `json:"deleted" db:"deleted"`
+	ID           string `json:"id" db:"id"`
+	Action       string `json:"action" db:"action" binding:"required"`       // The action performed
+	UserID       string `json:"userId" db:"user_id"`                         // User who performed the action
+	EntityID     string `json:"entityId" db:"entity_id"`                     // ID of the entity affected
+	EntityType   string `json:"entityType" db:"entity_type"`                 // Type of entity (project, ticket, etc.)
+	Details      string `json:"details,omitempty" db:"details"`              // JSON encoded details
+	IsPublic     bool   `json:"isPublic" db:"is_public"`                     // V3: Whether activity is public
+	ActivityType string `json:"activityType,omitempty" db:"activity_type"`   // V3: Type of activity (comment, status_change, etc.)
+	Created      int64  `json:"created" db:"created"`
+	Modified     int64  `json:"modified" db:"modified"`
+	Deleted      bool   `json:"deleted" db:"deleted"`
 }
 
 // AuditMetaData represents additional metadata for audit entries
