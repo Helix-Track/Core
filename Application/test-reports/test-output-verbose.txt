@@ -35,7 +35,7 @@
 --- PASS: TestCache_ConcurrentAccess (0.00s)
 PASS
 coverage: 96.4% of statements
-ok  	helixtrack.ru/core/internal/cache	1.375s	coverage: 96.4% of statements
+ok  	helixtrack.ru/core/internal/cache	1.379s	coverage: 96.4% of statements
 === RUN   TestLoadConfig
 === RUN   TestLoadConfig/Valid_minimal_configuration
 === RUN   TestLoadConfig/PostgreSQL_configuration
@@ -94,9 +94,9 @@ ok  	helixtrack.ru/core/internal/config	1.027s	coverage: 83.5% of statements
 === RUN   TestDatabase_Query
 --- PASS: TestDatabase_Query (0.02s)
 === RUN   TestDatabase_QueryRow
---- PASS: TestDatabase_QueryRow (0.02s)
+--- PASS: TestDatabase_QueryRow (0.01s)
 === RUN   TestDatabase_QueryRow_NotFound
---- PASS: TestDatabase_QueryRow_NotFound (0.02s)
+--- PASS: TestDatabase_QueryRow_NotFound (0.01s)
 === RUN   TestDatabase_Exec
 --- PASS: TestDatabase_Exec (0.02s)
 === RUN   TestDatabase_Begin
@@ -142,8 +142,8 @@ ok  	helixtrack.ru/core/internal/config	1.027s	coverage: 83.5% of statements
 === RUN   TestOptimizedDatabase_MultipleStatements
 --- PASS: TestOptimizedDatabase_MultipleStatements (0.00s)
 PASS
-coverage: 80.1% of statements
-ok  	helixtrack.ru/core/internal/database	1.150s	coverage: 80.1% of statements
+coverage: 79.6% of statements
+ok  	helixtrack.ru/core/internal/database	1.129s	coverage: 79.6% of statements
 === RUN   TestAccountHandler_Create_Success
 --- PASS: TestAccountHandler_Create_Success (0.00s)
 === RUN   TestAccountHandler_Create_MinimalFields
@@ -285,9 +285,9 @@ ok  	helixtrack.ru/core/internal/database	1.150s	coverage: 80.1% of statements
 === RUN   TestAuditHandler_AddMeta_MissingProperty
 --- PASS: TestAuditHandler_AddMeta_MissingProperty (0.00s)
 === RUN   TestAuthHandler_Register_Success
---- PASS: TestAuthHandler_Register_Success (3.04s)
+--- PASS: TestAuthHandler_Register_Success (3.05s)
 === RUN   TestAuthHandler_Register_MissingUsername
-2025-10-12T12:59:44.631+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
+2025-10-12T16:31:21.310+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -296,9 +296,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_MissingUsername
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:107
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_MissingUsername (2.44s)
+--- PASS: TestAuthHandler_Register_MissingUsername (2.45s)
 === RUN   TestAuthHandler_Register_MissingPassword
-2025-10-12T12:59:47.054+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
+2025-10-12T16:31:23.726+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -309,7 +309,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 --- PASS: TestAuthHandler_Register_MissingPassword (2.42s)
 === RUN   TestAuthHandler_Register_MissingEmail
-2025-10-12T12:59:49.497+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'required' tag"}
+2025-10-12T16:31:26.139+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -318,9 +318,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_MissingEmail
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:167
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_MissingEmail (2.44s)
+--- PASS: TestAuthHandler_Register_MissingEmail (2.41s)
 === RUN   TestAuthHandler_Register_MissingName
-2025-10-12T12:59:51.842+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Name' Error:Field validation for 'Name' failed on the 'required' tag"}
+2025-10-12T16:31:28.561+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Name' Error:Field validation for 'Name' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -329,9 +329,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_MissingName
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:197
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_MissingName (2.34s)
+--- PASS: TestAuthHandler_Register_MissingName (2.42s)
 === RUN   TestAuthHandler_Register_InvalidEmail
-2025-10-12T12:59:54.291+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
+2025-10-12T16:31:30.979+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -340,9 +340,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_InvalidEmail
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:228
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_InvalidEmail (2.45s)
+--- PASS: TestAuthHandler_Register_InvalidEmail (2.42s)
 === RUN   TestAuthHandler_Register_PasswordTooShort
-2025-10-12T12:59:56.713+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'min' tag"}
+2025-10-12T16:31:33.403+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'min' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -353,7 +353,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 --- PASS: TestAuthHandler_Register_PasswordTooShort (2.42s)
 === RUN   TestAuthHandler_Register_DuplicateUsername
-2025-10-12T13:00:00.205+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.username"}
+2025-10-12T16:31:37.032+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.username"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -362,9 +362,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_DuplicateUsername
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:300
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_DuplicateUsername (3.49s)
+--- PASS: TestAuthHandler_Register_DuplicateUsername (3.63s)
 === RUN   TestAuthHandler_Register_DuplicateEmail
-2025-10-12T13:00:03.823+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.email"}
+2025-10-12T16:31:40.531+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.email"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -373,11 +373,11 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_DuplicateEmail
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:341
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_DuplicateEmail (3.62s)
+--- PASS: TestAuthHandler_Register_DuplicateEmail (3.50s)
 === RUN   TestAuthHandler_Login_Success
---- PASS: TestAuthHandler_Login_Success (3.60s)
+--- PASS: TestAuthHandler_Login_Success (3.61s)
 === RUN   TestAuthHandler_Login_MissingUsername
-2025-10-12T13:00:09.721+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
+2025-10-12T16:31:46.521+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -386,9 +386,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_MissingUsername
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:416
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_MissingUsername (2.29s)
+--- PASS: TestAuthHandler_Login_MissingUsername (2.38s)
 === RUN   TestAuthHandler_Login_MissingPassword
-2025-10-12T13:00:12.094+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
+2025-10-12T16:31:48.894+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -399,7 +399,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 --- PASS: TestAuthHandler_Login_MissingPassword (2.37s)
 === RUN   TestAuthHandler_Login_UserNotFound
-2025-10-12T13:00:14.422+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "nonexistentuser"}
+2025-10-12T16:31:51.269+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "nonexistentuser"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -408,9 +408,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_UserNotFound
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:473
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_UserNotFound (2.33s)
+--- PASS: TestAuthHandler_Login_UserNotFound (2.37s)
 === RUN   TestAuthHandler_Login_IncorrectPassword
-2025-10-12T13:00:17.763+0300	ERROR	logger/logger.go:131	Invalid password	{"username": "testuser"}
+2025-10-12T16:31:54.825+0300	ERROR	logger/logger.go:131	Invalid password	{"username": "testuser"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -419,9 +419,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_IncorrectPassword
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:512
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_IncorrectPassword (3.34s)
+--- PASS: TestAuthHandler_Login_IncorrectPassword (3.56s)
 === RUN   TestAuthHandler_Login_DeletedUser
-2025-10-12T13:00:20.722+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "deleteduser"}
+2025-10-12T16:31:57.700+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "deleteduser"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -430,13 +430,13 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_DeletedUser
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:551
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_DeletedUser (2.96s)
+--- PASS: TestAuthHandler_Login_DeletedUser (2.88s)
 === RUN   TestAuthHandler_Logout_Success
 --- PASS: TestAuthHandler_Logout_Success (2.37s)
 === RUN   TestAuthHandler_FullAuthenticationCycle
---- PASS: TestAuthHandler_FullAuthenticationCycle (3.44s)
+--- PASS: TestAuthHandler_FullAuthenticationCycle (3.56s)
 === RUN   TestInitializeUserTable
---- PASS: TestInitializeUserTable (2.37s)
+--- PASS: TestInitializeUserTable (2.36s)
 === RUN   TestAuthHandler_Register_PasswordHashing
 --- PASS: TestAuthHandler_Register_PasswordHashing (4.15s)
 === RUN   TestAuthHandler_Login_JWTTokenGeneration
@@ -604,7 +604,7 @@ testing.tRunner
 === RUN   TestCommentHandler_Read_MissingID
 --- PASS: TestCommentHandler_Read_MissingID (0.00s)
 === RUN   TestCommentHandler_Read_NotFound
-2025-10-12T13:00:36.664+0300	ERROR	logger/logger.go:131	Comment not found	{"error": "sql: no rows in result set"}
+2025-10-12T16:32:13.768+0300	ERROR	logger/logger.go:131	Comment not found	{"error": "sql: no rows in result set"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleReadComment
@@ -619,7 +619,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 --- PASS: TestCommentHandler_Read_NotFound (0.00s)
 === RUN   TestCommentHandler_Read_DeletedComment
-2025-10-12T13:00:36.666+0300	ERROR	logger/logger.go:131	Comment not found	{"error": "sql: no rows in result set"}
+2025-10-12T16:32:13.770+0300	ERROR	logger/logger.go:131	Comment not found	{"error": "sql: no rows in result set"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleReadComment
@@ -652,7 +652,7 @@ testing.tRunner
 === RUN   TestCommentHandler_Modify_NoEventOnFailure
 --- PASS: TestCommentHandler_Modify_NoEventOnFailure (0.00s)
 === RUN   TestCommentHandler_Remove_NoEventOnFailure
-2025-10-12T13:00:36.675+0300	ERROR	logger/logger.go:131	Comment not found	{"error": "no such table: ticket"}
+2025-10-12T16:32:13.780+0300	ERROR	logger/logger.go:131	Comment not found	{"error": "no such table: ticket"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleRemoveComment
@@ -859,9 +859,9 @@ testing.tRunner
 === RUN   TestDashboardHandler_Create_EmptyTitle
 --- PASS: TestDashboardHandler_Create_EmptyTitle (0.00s)
 === RUN   TestDashboardHandler_Create_Unauthorized
---- PASS: TestDashboardHandler_Create_Unauthorized (0.00s)
+--- PASS: TestDashboardHandler_Create_Unauthorized (0.01s)
 === RUN   TestDashboardHandler_Create_PermissionDenied
---- PASS: TestDashboardHandler_Create_PermissionDenied (0.01s)
+--- PASS: TestDashboardHandler_Create_PermissionDenied (0.00s)
 === RUN   TestDashboardHandler_Read_Success_Owner
 --- PASS: TestDashboardHandler_Read_Success_Owner (0.01s)
 === RUN   TestDashboardHandler_Read_Success_Public
@@ -871,11 +871,11 @@ testing.tRunner
 === RUN   TestDashboardHandler_Read_MissingDashboardID
 --- PASS: TestDashboardHandler_Read_MissingDashboardID (0.00s)
 === RUN   TestDashboardHandler_Read_NotFound
---- PASS: TestDashboardHandler_Read_NotFound (0.00s)
+--- PASS: TestDashboardHandler_Read_NotFound (0.01s)
 === RUN   TestDashboardHandler_Read_AccessDenied
 --- PASS: TestDashboardHandler_Read_AccessDenied (0.01s)
 === RUN   TestDashboardHandler_Read_Unauthorized
---- PASS: TestDashboardHandler_Read_Unauthorized (0.00s)
+--- PASS: TestDashboardHandler_Read_Unauthorized (0.01s)
 === RUN   TestDashboardHandler_List_Success_Owned
 --- PASS: TestDashboardHandler_List_Success_Owned (0.01s)
 === RUN   TestDashboardHandler_List_Success_Mixed
@@ -883,7 +883,7 @@ testing.tRunner
 === RUN   TestDashboardHandler_List_Empty
 --- PASS: TestDashboardHandler_List_Empty (0.00s)
 === RUN   TestDashboardHandler_List_Unauthorized
---- PASS: TestDashboardHandler_List_Unauthorized (0.00s)
+--- PASS: TestDashboardHandler_List_Unauthorized (0.01s)
 === RUN   TestDashboardHandler_Modify_Success
 --- PASS: TestDashboardHandler_Modify_Success (0.01s)
 === RUN   TestDashboardHandler_Modify_Success_OnlyTitle
@@ -891,7 +891,7 @@ testing.tRunner
 === RUN   TestDashboardHandler_Modify_MissingDashboardID
 --- PASS: TestDashboardHandler_Modify_MissingDashboardID (0.00s)
 === RUN   TestDashboardHandler_Modify_NotFound
---- PASS: TestDashboardHandler_Modify_NotFound (0.01s)
+--- PASS: TestDashboardHandler_Modify_NotFound (0.00s)
 === RUN   TestDashboardHandler_Modify_NotOwner
 --- PASS: TestDashboardHandler_Modify_NotOwner (0.01s)
 === RUN   TestDashboardHandler_Modify_NoFieldsToUpdate
@@ -903,11 +903,11 @@ testing.tRunner
 === RUN   TestDashboardHandler_Remove_MissingDashboardID
 --- PASS: TestDashboardHandler_Remove_MissingDashboardID (0.01s)
 === RUN   TestDashboardHandler_Remove_NotFound
---- PASS: TestDashboardHandler_Remove_NotFound (0.01s)
+--- PASS: TestDashboardHandler_Remove_NotFound (0.00s)
 === RUN   TestDashboardHandler_Remove_NotOwner
 --- PASS: TestDashboardHandler_Remove_NotOwner (0.01s)
 === RUN   TestDashboardHandler_Remove_Unauthorized
---- PASS: TestDashboardHandler_Remove_Unauthorized (0.01s)
+--- PASS: TestDashboardHandler_Remove_Unauthorized (0.00s)
 === RUN   TestDashboardHandler_Share_Success_WithUser
 --- PASS: TestDashboardHandler_Share_Success_WithUser (0.01s)
 === RUN   TestDashboardHandler_Share_Success_WithTeam
@@ -915,13 +915,13 @@ testing.tRunner
 === RUN   TestDashboardHandler_Share_Success_WithProject
 --- PASS: TestDashboardHandler_Share_Success_WithProject (0.01s)
 === RUN   TestDashboardHandler_Share_MissingDashboardID
---- PASS: TestDashboardHandler_Share_MissingDashboardID (0.00s)
+--- PASS: TestDashboardHandler_Share_MissingDashboardID (0.01s)
 === RUN   TestDashboardHandler_Share_MissingRecipient
 --- PASS: TestDashboardHandler_Share_MissingRecipient (0.00s)
 === RUN   TestDashboardHandler_Share_MultipleRecipients
 --- PASS: TestDashboardHandler_Share_MultipleRecipients (0.01s)
 === RUN   TestDashboardHandler_Share_NotOwner
---- PASS: TestDashboardHandler_Share_NotOwner (0.01s)
+--- PASS: TestDashboardHandler_Share_NotOwner (0.00s)
 === RUN   TestDashboardHandler_Share_DashboardNotFound
 --- PASS: TestDashboardHandler_Share_DashboardNotFound (0.01s)
 === RUN   TestDashboardHandler_Share_Unauthorized
@@ -939,7 +939,7 @@ testing.tRunner
 === RUN   TestDashboardHandler_Unshare_NotOwner
 --- PASS: TestDashboardHandler_Unshare_NotOwner (0.01s)
 === RUN   TestDashboardHandler_Unshare_Unauthorized
---- PASS: TestDashboardHandler_Unshare_Unauthorized (0.01s)
+--- PASS: TestDashboardHandler_Unshare_Unauthorized (0.00s)
 === RUN   TestDashboardHandler_AddWidget_Success
 --- PASS: TestDashboardHandler_AddWidget_Success (0.01s)
 === RUN   TestDashboardHandler_AddWidget_MissingDashboardID
@@ -957,17 +957,17 @@ testing.tRunner
 === RUN   TestDashboardHandler_ListWidgets_Success
 --- PASS: TestDashboardHandler_ListWidgets_Success (0.01s)
 === RUN   TestDashboardHandler_SetLayout_Success
---- PASS: TestDashboardHandler_SetLayout_Success (0.01s)
+--- PASS: TestDashboardHandler_SetLayout_Success (0.00s)
 === RUN   TestDashboardHandler_SetLayout_MissingLayout
---- PASS: TestDashboardHandler_SetLayout_MissingLayout (0.01s)
+--- PASS: TestDashboardHandler_SetLayout_MissingLayout (0.00s)
 === RUN   TestDashboardHandler_SetLayout_NotOwner
---- PASS: TestDashboardHandler_SetLayout_NotOwner (0.01s)
+--- PASS: TestDashboardHandler_SetLayout_NotOwner (0.00s)
 === RUN   TestEpicHandler_Create_Success
 --- PASS: TestEpicHandler_Create_Success (0.01s)
 === RUN   TestEpicHandler_Create_MissingTicketID
 --- PASS: TestEpicHandler_Create_MissingTicketID (0.00s)
 === RUN   TestEpicHandler_Create_TicketNotFound
---- PASS: TestEpicHandler_Create_TicketNotFound (0.01s)
+--- PASS: TestEpicHandler_Create_TicketNotFound (0.00s)
 === RUN   TestEpicHandler_Create_DefaultColor
 --- PASS: TestEpicHandler_Create_DefaultColor (0.01s)
 === RUN   TestEpicHandler_Read_Success
@@ -977,7 +977,7 @@ testing.tRunner
 === RUN   TestEpicHandler_List_Success
 --- PASS: TestEpicHandler_List_Success (0.01s)
 === RUN   TestEpicHandler_Modify_Success
---- PASS: TestEpicHandler_Modify_Success (0.01s)
+--- PASS: TestEpicHandler_Modify_Success (0.00s)
 === RUN   TestEpicHandler_Remove_Success
 --- PASS: TestEpicHandler_Remove_Success (0.01s)
 === RUN   TestEpicHandler_AddStory_Success
@@ -1109,7 +1109,7 @@ testing.tRunner
 === RUN   TestHandler_DoAction_Authenticate/Missing_username
 === RUN   TestHandler_DoAction_Authenticate/Missing_password
 === RUN   TestHandler_DoAction_Authenticate/Invalid_credentials
-2025-10-12T13:00:37.146+0300	ERROR	logger/logger.go:131	Authentication failed	{"error": "assert.AnError general error for testing", "username": "wronguser"}
+2025-10-12T16:32:14.250+0300	ERROR	logger/logger.go:131	Authentication failed	{"error": "assert.AnError general error for testing", "username": "wronguser"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleAuthenticate
@@ -1137,7 +1137,7 @@ testing.tRunner
 === RUN   TestHandler_DoAction_Create/Missing_object
 === RUN   TestHandler_DoAction_Create/Unauthorized_(no_username_in_context)
 === RUN   TestHandler_DoAction_Create/Successful_with_username
-2025-10-12T13:00:37.147+0300	ERROR	logger/logger.go:131	Failed to get default workflow	{"error": "no such table: workflow"}
+2025-10-12T16:32:14.251+0300	ERROR	logger/logger.go:131	Failed to get default workflow	{"error": "no such table: workflow"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleCreateProject
@@ -1155,7 +1155,7 @@ testing.tRunner
 === RUN   TestHandler_DoAction_InvalidAction
 --- PASS: TestHandler_DoAction_InvalidAction (0.00s)
 === RUN   TestHandler_DoAction_InvalidJSON
-2025-10-12T13:00:37.147+0300	ERROR	logger/logger.go:131	Request not found in context
+2025-10-12T16:32:14.251+0300	ERROR	logger/logger.go:131	Request not found in context
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).DoAction
@@ -1192,7 +1192,7 @@ testing.tRunner
 === RUN   TestHandler_Read
 === RUN   TestHandler_Read/Unauthorized
 === RUN   TestHandler_Read/With_username
-2025-10-12T13:00:37.149+0300	ERROR	logger/logger.go:131	Project not found	{"error": "no such table: project"}
+2025-10-12T16:32:14.253+0300	ERROR	logger/logger.go:131	Project not found	{"error": "no such table: project"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleReadProject
@@ -1209,7 +1209,7 @@ testing.tRunner
 === RUN   TestHandler_List
 === RUN   TestHandler_List/Unauthorized
 === RUN   TestHandler_List/With_username
-2025-10-12T13:00:37.149+0300	ERROR	logger/logger.go:131	Failed to list projects	{"error": "no such table: project"}
+2025-10-12T16:32:14.253+0300	ERROR	logger/logger.go:131	Failed to list projects	{"error": "no such table: project"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleListProjects
@@ -1302,7 +1302,7 @@ testing.tRunner
 === RUN   TestMentionHandler_Mention_MissingUserID
 --- PASS: TestMentionHandler_Mention_MissingUserID (0.01s)
 === RUN   TestMentionHandler_Mention_CommentNotFound
-2025-10-12T13:00:37.196+0300	ERROR	logger/logger.go:131	Comment not found	{"commentId": "nonexistent-id"}
+2025-10-12T16:32:14.302+0300	ERROR	logger/logger.go:131	Comment not found	{"commentId": "nonexistent-id"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleCommentMention
@@ -1317,9 +1317,9 @@ testing.tRunner
 === RUN   TestMentionHandler_Mention_Unauthorized
 --- PASS: TestMentionHandler_Mention_Unauthorized (0.01s)
 === RUN   TestMentionHandler_Unmention_Success
---- PASS: TestMentionHandler_Unmention_Success (0.01s)
+--- PASS: TestMentionHandler_Unmention_Success (0.00s)
 === RUN   TestMentionHandler_Unmention_NotFound
---- PASS: TestMentionHandler_Unmention_NotFound (0.01s)
+--- PASS: TestMentionHandler_Unmention_NotFound (0.00s)
 === RUN   TestMentionHandler_ListMentions_Success
 --- PASS: TestMentionHandler_ListMentions_Success (0.01s)
 === RUN   TestMentionHandler_ListMentions_Empty
@@ -1329,15 +1329,15 @@ testing.tRunner
 === RUN   TestMentionHandler_GetMentions_DefaultsToCurrentUser
 --- PASS: TestMentionHandler_GetMentions_DefaultsToCurrentUser (0.01s)
 === RUN   TestMentionHandler_ParseMentions_Success
---- PASS: TestMentionHandler_ParseMentions_Success (0.01s)
+--- PASS: TestMentionHandler_ParseMentions_Success (0.00s)
 === RUN   TestMentionHandler_ParseMentions_NoMentions
---- PASS: TestMentionHandler_ParseMentions_NoMentions (0.01s)
+--- PASS: TestMentionHandler_ParseMentions_NoMentions (0.00s)
 === RUN   TestMentionHandler_ParseMentions_MissingText
---- PASS: TestMentionHandler_ParseMentions_MissingText (0.00s)
+--- PASS: TestMentionHandler_ParseMentions_MissingText (0.01s)
 === RUN   TestMentionHandler_ParseMentions_WithValidation
 --- PASS: TestMentionHandler_ParseMentions_WithValidation (0.01s)
 === RUN   TestNotificationHandler_SchemeCreate_Success
---- PASS: TestNotificationHandler_SchemeCreate_Success (0.01s)
+--- PASS: TestNotificationHandler_SchemeCreate_Success (0.00s)
 === RUN   TestNotificationHandler_SchemeCreate_WithProject
 --- PASS: TestNotificationHandler_SchemeCreate_WithProject (0.01s)
 === RUN   TestNotificationHandler_SchemeCreate_MissingTitle
@@ -1351,11 +1351,11 @@ testing.tRunner
 === RUN   TestNotificationHandler_SchemeModify_Success
 --- PASS: TestNotificationHandler_SchemeModify_Success (0.00s)
 === RUN   TestNotificationHandler_SchemeRemove_Success
---- PASS: TestNotificationHandler_SchemeRemove_Success (0.00s)
+--- PASS: TestNotificationHandler_SchemeRemove_Success (0.01s)
 === RUN   TestNotificationHandler_SchemeAddRule_Success
 --- PASS: TestNotificationHandler_SchemeAddRule_Success (0.01s)
 === RUN   TestNotificationHandler_SchemeRemoveRule_Success
---- PASS: TestNotificationHandler_SchemeRemoveRule_Success (0.01s)
+--- PASS: TestNotificationHandler_SchemeRemoveRule_Success (0.00s)
 === RUN   TestNotificationHandler_SchemeListRules_Success
 --- PASS: TestNotificationHandler_SchemeListRules_Success (0.01s)
 === RUN   TestNotificationHandler_EventList_Success
@@ -1551,7 +1551,7 @@ testing.tRunner
 === RUN   TestProjectHandler_Create_MissingKey
 --- PASS: TestProjectHandler_Create_MissingKey (0.00s)
 === RUN   TestProjectHandler_Create_DuplicateKey
-2025-10-12T13:00:37.426+0300	ERROR	logger/logger.go:131	Failed to create project	{"error": "UNIQUE constraint failed: project.identifier"}
+2025-10-12T16:32:14.529+0300	ERROR	logger/logger.go:131	Failed to create project	{"error": "UNIQUE constraint failed: project.identifier"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleCreateProject
@@ -1584,7 +1584,7 @@ testing.tRunner
 === RUN   TestProjectHandler_Read_MissingID
 --- PASS: TestProjectHandler_Read_MissingID (0.00s)
 === RUN   TestProjectHandler_Read_NotFound
-2025-10-12T13:00:37.432+0300	ERROR	logger/logger.go:131	Project not found	{"error": "sql: no rows in result set"}
+2025-10-12T16:32:14.535+0300	ERROR	logger/logger.go:131	Project not found	{"error": "sql: no rows in result set"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleReadProject
@@ -1599,7 +1599,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 --- PASS: TestProjectHandler_Read_NotFound (0.00s)
 === RUN   TestProjectHandler_Read_DeletedProject
-2025-10-12T13:00:37.433+0300	ERROR	logger/logger.go:131	Project not found	{"error": "sql: no rows in result set"}
+2025-10-12T16:32:14.536+0300	ERROR	logger/logger.go:131	Project not found	{"error": "sql: no rows in result set"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleReadProject
@@ -1656,9 +1656,9 @@ testing.tRunner
 === RUN   TestProjectRoleHandler_Read_Success
 --- PASS: TestProjectRoleHandler_Read_Success (0.01s)
 === RUN   TestProjectRoleHandler_Read_MissingRoleID
---- PASS: TestProjectRoleHandler_Read_MissingRoleID (0.00s)
+--- PASS: TestProjectRoleHandler_Read_MissingRoleID (0.01s)
 === RUN   TestProjectRoleHandler_Read_NotFound
---- PASS: TestProjectRoleHandler_Read_NotFound (0.01s)
+--- PASS: TestProjectRoleHandler_Read_NotFound (0.00s)
 === RUN   TestProjectRoleHandler_List_Success_AllRoles
 --- PASS: TestProjectRoleHandler_List_Success_AllRoles (0.01s)
 === RUN   TestProjectRoleHandler_List_Success_FilterByProject
@@ -1666,15 +1666,15 @@ testing.tRunner
 === RUN   TestProjectRoleHandler_Modify_Success
 --- PASS: TestProjectRoleHandler_Modify_Success (0.01s)
 === RUN   TestProjectRoleHandler_Modify_MissingRoleID
---- PASS: TestProjectRoleHandler_Modify_MissingRoleID (0.01s)
+--- PASS: TestProjectRoleHandler_Modify_MissingRoleID (0.00s)
 === RUN   TestProjectRoleHandler_Modify_NotFound
 --- PASS: TestProjectRoleHandler_Modify_NotFound (0.01s)
 === RUN   TestProjectRoleHandler_Modify_NoFieldsToUpdate
 --- PASS: TestProjectRoleHandler_Modify_NoFieldsToUpdate (0.01s)
 === RUN   TestProjectRoleHandler_Remove_Success
---- PASS: TestProjectRoleHandler_Remove_Success (0.01s)
+--- PASS: TestProjectRoleHandler_Remove_Success (0.00s)
 === RUN   TestProjectRoleHandler_Remove_NotFound
---- PASS: TestProjectRoleHandler_Remove_NotFound (0.01s)
+--- PASS: TestProjectRoleHandler_Remove_NotFound (0.00s)
 === RUN   TestProjectRoleHandler_Remove_AlsoRemovesUserMappings
 --- PASS: TestProjectRoleHandler_Remove_AlsoRemovesUserMappings (0.01s)
 === RUN   TestProjectRoleHandler_AssignUser_Success
@@ -1682,7 +1682,7 @@ testing.tRunner
 === RUN   TestProjectRoleHandler_AssignUser_MissingRoleID
 --- PASS: TestProjectRoleHandler_AssignUser_MissingRoleID (0.01s)
 === RUN   TestProjectRoleHandler_AssignUser_MissingUserID
---- PASS: TestProjectRoleHandler_AssignUser_MissingUserID (0.01s)
+--- PASS: TestProjectRoleHandler_AssignUser_MissingUserID (0.00s)
 === RUN   TestProjectRoleHandler_AssignUser_MissingProjectID
 --- PASS: TestProjectRoleHandler_AssignUser_MissingProjectID (0.01s)
 === RUN   TestProjectRoleHandler_AssignUser_RoleNotFound
@@ -1856,11 +1856,11 @@ testing.tRunner
 === RUN   TestSecurityLevelHandler_Create_InvalidLevel
 --- PASS: TestSecurityLevelHandler_Create_InvalidLevel (0.00s)
 === RUN   TestSecurityLevelHandler_Create_ProjectNotFound
---- PASS: TestSecurityLevelHandler_Create_ProjectNotFound (0.01s)
+--- PASS: TestSecurityLevelHandler_Create_ProjectNotFound (0.00s)
 === RUN   TestSecurityLevelHandler_Read_Success
 --- PASS: TestSecurityLevelHandler_Read_Success (0.01s)
 === RUN   TestSecurityLevelHandler_Read_MissingID
---- PASS: TestSecurityLevelHandler_Read_MissingID (0.00s)
+--- PASS: TestSecurityLevelHandler_Read_MissingID (0.01s)
 === RUN   TestSecurityLevelHandler_Read_NotFound
 --- PASS: TestSecurityLevelHandler_Read_NotFound (0.00s)
 === RUN   TestSecurityLevelHandler_List_Success
@@ -1880,9 +1880,9 @@ testing.tRunner
 === RUN   TestSecurityLevelHandler_Remove_Success
 --- PASS: TestSecurityLevelHandler_Remove_Success (0.01s)
 === RUN   TestSecurityLevelHandler_Remove_MissingID
---- PASS: TestSecurityLevelHandler_Remove_MissingID (0.00s)
+--- PASS: TestSecurityLevelHandler_Remove_MissingID (0.01s)
 === RUN   TestSecurityLevelHandler_Remove_NotFound
---- PASS: TestSecurityLevelHandler_Remove_NotFound (0.00s)
+--- PASS: TestSecurityLevelHandler_Remove_NotFound (0.01s)
 === RUN   TestSecurityLevelHandler_Grant_UserSuccess
 --- PASS: TestSecurityLevelHandler_Grant_UserSuccess (0.01s)
 === RUN   TestSecurityLevelHandler_Grant_TeamSuccess
@@ -1890,7 +1890,7 @@ testing.tRunner
 === RUN   TestSecurityLevelHandler_Grant_ProjectRoleSuccess
 --- PASS: TestSecurityLevelHandler_Grant_ProjectRoleSuccess (0.01s)
 === RUN   TestSecurityLevelHandler_Grant_MissingSecurityLevelID
---- PASS: TestSecurityLevelHandler_Grant_MissingSecurityLevelID (0.00s)
+--- PASS: TestSecurityLevelHandler_Grant_MissingSecurityLevelID (0.01s)
 === RUN   TestSecurityLevelHandler_Grant_SecurityLevelNotFound
 --- PASS: TestSecurityLevelHandler_Grant_SecurityLevelNotFound (0.01s)
 === RUN   TestSecurityLevelHandler_Grant_NoRecipient
@@ -1924,17 +1924,17 @@ testing.tRunner
 === RUN   TestSecurityLevelHandler_PermissionDenied
 --- PASS: TestSecurityLevelHandler_PermissionDenied (0.00s)
 === RUN   TestServiceDiscoveryHandler_RegisterService_MissingAdminToken
---- PASS: TestServiceDiscoveryHandler_RegisterService_MissingAdminToken (0.30s)
+--- PASS: TestServiceDiscoveryHandler_RegisterService_MissingAdminToken (0.24s)
 === RUN   TestServiceDiscoveryHandler_DiscoverServices_EmptyList
---- PASS: TestServiceDiscoveryHandler_DiscoverServices_EmptyList (0.13s)
+--- PASS: TestServiceDiscoveryHandler_DiscoverServices_EmptyList (0.19s)
 === RUN   TestServiceDiscoveryHandler_DiscoverServices_FilterByType
---- PASS: TestServiceDiscoveryHandler_DiscoverServices_FilterByType (0.15s)
+--- PASS: TestServiceDiscoveryHandler_DiscoverServices_FilterByType (0.05s)
 === RUN   TestServiceDiscoveryHandler_DecommissionService_Success
---- PASS: TestServiceDiscoveryHandler_DecommissionService_Success (0.10s)
+--- PASS: TestServiceDiscoveryHandler_DecommissionService_Success (0.15s)
 === RUN   TestServiceDiscoveryHandler_DecommissionService_NotFound
---- PASS: TestServiceDiscoveryHandler_DecommissionService_NotFound (0.21s)
+--- PASS: TestServiceDiscoveryHandler_DecommissionService_NotFound (0.18s)
 === RUN   TestServiceDiscoveryHandler_GetServiceHealth_Success
-2025-10-12T13:00:38.806+0300	ERROR	logger/logger.go:131	Failed to get health history	{"error": "failed to query health check history: no such column: timestamp"}
+2025-10-12T16:32:15.898+0300	ERROR	logger/logger.go:131	Failed to get health history	{"error": "failed to query health check history: no such column: timestamp"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*ServiceDiscoveryHandler).GetServiceHealth
@@ -1943,23 +1943,23 @@ helixtrack.ru/core/internal/handlers.TestServiceDiscoveryHandler_GetServiceHealt
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/service_discovery_handler_test.go:261
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestServiceDiscoveryHandler_GetServiceHealth_Success (0.05s)
+--- PASS: TestServiceDiscoveryHandler_GetServiceHealth_Success (0.13s)
 === RUN   TestServiceDiscoveryHandler_GetServiceHealth_NotFound
---- PASS: TestServiceDiscoveryHandler_GetServiceHealth_NotFound (0.14s)
+--- PASS: TestServiceDiscoveryHandler_GetServiceHealth_NotFound (0.08s)
 === RUN   TestServiceDiscoveryHandler_ListServices_EmptyList
---- PASS: TestServiceDiscoveryHandler_ListServices_EmptyList (0.19s)
+--- PASS: TestServiceDiscoveryHandler_ListServices_EmptyList (0.27s)
 === RUN   TestServiceDiscoveryHandler_ListServices_MultipleServices
---- PASS: TestServiceDiscoveryHandler_ListServices_MultipleServices (0.29s)
+--- PASS: TestServiceDiscoveryHandler_ListServices_MultipleServices (0.16s)
 === RUN   TestServiceDiscoveryHandler_UpdateService_NotFound
---- PASS: TestServiceDiscoveryHandler_UpdateService_NotFound (0.11s)
+--- PASS: TestServiceDiscoveryHandler_UpdateService_NotFound (0.07s)
 === RUN   TestServiceDiscoveryHandler_UpdateService_NoFields
---- PASS: TestServiceDiscoveryHandler_UpdateService_NoFields (0.09s)
+--- PASS: TestServiceDiscoveryHandler_UpdateService_NoFields (0.53s)
 === RUN   TestSubtaskHandler_Create_Success
 --- PASS: TestSubtaskHandler_Create_Success (0.01s)
 === RUN   TestSubtaskHandler_Create_MissingParentTicketID
 --- PASS: TestSubtaskHandler_Create_MissingParentTicketID (0.01s)
 === RUN   TestSubtaskHandler_Create_ParentNotFound
---- PASS: TestSubtaskHandler_Create_ParentNotFound (0.01s)
+--- PASS: TestSubtaskHandler_Create_ParentNotFound (0.00s)
 === RUN   TestSubtaskHandler_Create_ParentIsSubtask
 --- PASS: TestSubtaskHandler_Create_ParentIsSubtask (0.01s)
 === RUN   TestSubtaskHandler_List_Success
@@ -1979,7 +1979,7 @@ testing.tRunner
 === RUN   TestSubtaskHandler_ListByParent_MissingParentID
 --- PASS: TestSubtaskHandler_ListByParent_MissingParentID (0.01s)
 === RUN   TestSubtaskHandler_Unauthorized
---- PASS: TestSubtaskHandler_Unauthorized (0.01s)
+--- PASS: TestSubtaskHandler_Unauthorized (0.00s)
 === RUN   TestTeamHandler_Create_Success
 --- PASS: TestTeamHandler_Create_Success (0.00s)
 === RUN   TestTeamHandler_Create_MissingTitle
@@ -2039,7 +2039,7 @@ testing.tRunner
 === RUN   TestTicketHandler_Create_MissingTitle
 --- PASS: TestTicketHandler_Create_MissingTitle (0.00s)
 === RUN   TestTicketHandler_Create_InvalidTicketType
-2025-10-12T13:00:39.716+0300	ERROR	logger/logger.go:131	Ticket type not found	{"error": "sql: no rows in result set", "type": "invalid_type"}
+2025-10-12T16:32:17.081+0300	ERROR	logger/logger.go:131	Ticket type not found	{"error": "sql: no rows in result set", "type": "invalid_type"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleCreateTicket
@@ -2074,7 +2074,7 @@ testing.tRunner
 === RUN   TestTicketHandler_Read_MissingID
 --- PASS: TestTicketHandler_Read_MissingID (0.00s)
 === RUN   TestTicketHandler_Read_NotFound
-2025-10-12T13:00:39.731+0300	ERROR	logger/logger.go:131	Ticket not found	{"error": "sql: no rows in result set"}
+2025-10-12T16:32:17.095+0300	ERROR	logger/logger.go:131	Ticket not found	{"error": "sql: no rows in result set"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleReadTicket
@@ -2089,7 +2089,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 --- PASS: TestTicketHandler_Read_NotFound (0.00s)
 === RUN   TestTicketHandler_Read_DeletedTicket
-2025-10-12T13:00:39.733+0300	ERROR	logger/logger.go:131	Ticket not found	{"error": "sql: no rows in result set"}
+2025-10-12T16:32:17.097+0300	ERROR	logger/logger.go:131	Ticket not found	{"error": "sql: no rows in result set"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleReadTicket
@@ -2122,7 +2122,7 @@ testing.tRunner
 === RUN   TestTicketHandler_Modify_NoEventOnFailure
 --- PASS: TestTicketHandler_Modify_NoEventOnFailure (0.00s)
 === RUN   TestTicketHandler_Remove_NoEventOnFailure
-2025-10-12T13:00:39.747+0300	ERROR	logger/logger.go:131	Ticket not found	{"error": "sql: no rows in result set"}
+2025-10-12T16:32:17.110+0300	ERROR	logger/logger.go:131	Ticket not found	{"error": "sql: no rows in result set"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleRemoveTicket
@@ -2333,7 +2333,7 @@ testing.tRunner
 === RUN   TestVoteHandler_Count_Success
 --- PASS: TestVoteHandler_Count_Success (0.01s)
 === RUN   TestVoteHandler_Count_TicketNotFound
---- PASS: TestVoteHandler_Count_TicketNotFound (0.00s)
+--- PASS: TestVoteHandler_Count_TicketNotFound (0.01s)
 === RUN   TestVoteHandler_List_Success
 --- PASS: TestVoteHandler_List_Success (0.01s)
 === RUN   TestVoteHandler_List_Empty
@@ -2477,7 +2477,7 @@ testing.tRunner
 === RUN   TestWorkLogHandler_Add_TicketNotFound
 --- PASS: TestWorkLogHandler_Add_TicketNotFound (0.01s)
 === RUN   TestWorkLogHandler_Add_Unauthorized
---- PASS: TestWorkLogHandler_Add_Unauthorized (0.00s)
+--- PASS: TestWorkLogHandler_Add_Unauthorized (0.01s)
 === RUN   TestWorkLogHandler_Modify_Success
 --- PASS: TestWorkLogHandler_Modify_Success (0.01s)
 === RUN   TestWorkLogHandler_Modify_OnlyTimeSpent
@@ -2487,9 +2487,9 @@ testing.tRunner
 === RUN   TestWorkLogHandler_Modify_OnlyWorkDate
 --- PASS: TestWorkLogHandler_Modify_OnlyWorkDate (0.01s)
 === RUN   TestWorkLogHandler_Modify_MissingID
---- PASS: TestWorkLogHandler_Modify_MissingID (0.01s)
+--- PASS: TestWorkLogHandler_Modify_MissingID (0.00s)
 === RUN   TestWorkLogHandler_Modify_WorkLogNotFound
---- PASS: TestWorkLogHandler_Modify_WorkLogNotFound (0.01s)
+--- PASS: TestWorkLogHandler_Modify_WorkLogNotFound (0.00s)
 === RUN   TestWorkLogHandler_Modify_NoFieldsToUpdate
 --- PASS: TestWorkLogHandler_Modify_NoFieldsToUpdate (0.01s)
 === RUN   TestWorkLogHandler_Modify_Unauthorized
@@ -2517,9 +2517,9 @@ testing.tRunner
 === RUN   TestWorkLogHandler_ListByTicket_Empty
 --- PASS: TestWorkLogHandler_ListByTicket_Empty (0.01s)
 === RUN   TestWorkLogHandler_ListByTicket_MissingTicketID
---- PASS: TestWorkLogHandler_ListByTicket_MissingTicketID (0.01s)
+--- PASS: TestWorkLogHandler_ListByTicket_MissingTicketID (0.00s)
 === RUN   TestWorkLogHandler_ListByTicket_Unauthorized
---- PASS: TestWorkLogHandler_ListByTicket_Unauthorized (0.01s)
+--- PASS: TestWorkLogHandler_ListByTicket_Unauthorized (0.00s)
 === RUN   TestWorkLogHandler_ListByUser_Success
 --- PASS: TestWorkLogHandler_ListByUser_Success (0.01s)
 === RUN   TestWorkLogHandler_ListByUser_DefaultsToCurrentUser
@@ -2527,7 +2527,7 @@ testing.tRunner
 === RUN   TestWorkLogHandler_ListByUser_Empty
 --- PASS: TestWorkLogHandler_ListByUser_Empty (0.01s)
 === RUN   TestWorkLogHandler_ListByUser_Unauthorized
---- PASS: TestWorkLogHandler_ListByUser_Unauthorized (0.01s)
+--- PASS: TestWorkLogHandler_ListByUser_Unauthorized (0.00s)
 === RUN   TestWorkLogHandler_GetTotalTime_Success
 --- PASS: TestWorkLogHandler_GetTotalTime_Success (0.01s)
 === RUN   TestWorkLogHandler_GetTotalTime_NoWorkLogs
@@ -2540,16 +2540,16 @@ testing.tRunner
 --- PASS: TestWorkLogHandler_GetTotalTime_Unauthorized (0.01s)
 PASS
 coverage: 66.1% of statements
-ok  	helixtrack.ru/core/internal/handlers	62.222s	coverage: 66.1% of statements
+ok  	helixtrack.ru/core/internal/handlers	62.925s	coverage: 66.1% of statements
 === RUN   TestInitialize
 === RUN   TestInitialize/Valid_configuration
-2025-10-12T12:59:39.000+0300	INFO	logger/logger.go:121	Test log message
+2025-10-12T16:31:15.661+0300	INFO	logger/logger.go:121	Test log message
 === RUN   TestInitialize/Debug_level
-2025-10-12T12:59:39.001+0300	INFO	logger/logger.go:121	Test log message
+2025-10-12T16:31:15.662+0300	INFO	logger/logger.go:121	Test log message
 === RUN   TestInitialize/Warn_level
-2025-10-12T12:59:39.001+0300	WARN	logger/logger.go:126	Test log message
+2025-10-12T16:31:15.662+0300	WARN	logger/logger.go:126	Test log message
 === RUN   TestInitialize/Error_level
-2025-10-12T12:59:39.002+0300	ERROR	logger/logger.go:131	Test log message
+2025-10-12T16:31:15.662+0300	ERROR	logger/logger.go:131	Test log message
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/logger.TestInitialize.func1
@@ -2558,7 +2558,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 === RUN   TestInitialize/Invalid_level
 === RUN   TestInitialize/Empty_basename
-2025-10-12T12:59:39.002+0300	INFO	logger/logger.go:121	Test log message
+2025-10-12T16:31:15.663+0300	INFO	logger/logger.go:121	Test log message
 --- PASS: TestInitialize (0.00s)
     --- PASS: TestInitialize/Valid_configuration (0.00s)
     --- PASS: TestInitialize/Debug_level (0.00s)
@@ -2572,13 +2572,13 @@ testing.tRunner
 --- PASS: TestGetSugared (0.00s)
 === RUN   TestLoggingFunctions
 === RUN   TestLoggingFunctions/Debug
-2025-10-12T12:59:39.006+0300	DEBUG	logger/logger.go:116	debug message	{"key": "value"}
+2025-10-12T16:31:15.667+0300	DEBUG	logger/logger.go:116	debug message	{"key": "value"}
 === RUN   TestLoggingFunctions/Info
-2025-10-12T12:59:39.006+0300	INFO	logger/logger.go:121	info message	{"key": "value"}
+2025-10-12T16:31:15.667+0300	INFO	logger/logger.go:121	info message	{"key": "value"}
 === RUN   TestLoggingFunctions/Warn
-2025-10-12T12:59:39.007+0300	WARN	logger/logger.go:126	warn message	{"key": "value"}
+2025-10-12T16:31:15.667+0300	WARN	logger/logger.go:126	warn message	{"key": "value"}
 === RUN   TestLoggingFunctions/Error
-2025-10-12T12:59:39.007+0300	ERROR	logger/logger.go:131	error message	{"key": "value"}
+2025-10-12T16:31:15.667+0300	ERROR	logger/logger.go:131	error message	{"key": "value"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/logger.TestLoggingFunctions.func4.1
@@ -2592,13 +2592,13 @@ helixtrack.ru/core/internal/logger.TestLoggingFunctions.func4
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 === RUN   TestLoggingFunctions/Debugf
-2025-10-12T12:59:39.007+0300	DEBUG	logger/logger.go:141	debug test 123
+2025-10-12T16:31:15.668+0300	DEBUG	logger/logger.go:141	debug test 123
 === RUN   TestLoggingFunctions/Infof
-2025-10-12T12:59:39.007+0300	INFO	logger/logger.go:146	info test 123
+2025-10-12T16:31:15.668+0300	INFO	logger/logger.go:146	info test 123
 === RUN   TestLoggingFunctions/Warnf
-2025-10-12T12:59:39.008+0300	WARN	logger/logger.go:151	warn test 123
+2025-10-12T16:31:15.668+0300	WARN	logger/logger.go:151	warn test 123
 === RUN   TestLoggingFunctions/Errorf
-2025-10-12T12:59:39.008+0300	ERROR	logger/logger.go:156	error test 123
+2025-10-12T16:31:15.668+0300	ERROR	logger/logger.go:156	error test 123
 helixtrack.ru/core/internal/logger.Errorf
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:156
 helixtrack.ru/core/internal/logger.TestLoggingFunctions.func8.1
@@ -2621,16 +2621,16 @@ testing.tRunner
     --- PASS: TestLoggingFunctions/Warnf (0.00s)
     --- PASS: TestLoggingFunctions/Errorf (0.00s)
 === RUN   TestSync
-2025-10-12T12:59:39.008+0300	INFO	logger/logger.go:121	test message
+2025-10-12T16:31:15.669+0300	INFO	logger/logger.go:121	test message
 --- PASS: TestSync (0.00s)
 === RUN   TestSync_Uninitialized
 --- PASS: TestSync_Uninitialized (0.00s)
 === RUN   TestInitialize_CreatesDirectory
-2025-10-12T12:59:39.009+0300	INFO	logger/logger.go:121	test message
+2025-10-12T16:31:15.670+0300	INFO	logger/logger.go:121	test message
 --- PASS: TestInitialize_CreatesDirectory (0.00s)
 PASS
 coverage: 90.7% of statements
-ok  	helixtrack.ru/core/internal/logger	1.033s	coverage: 90.7% of statements
+ok  	helixtrack.ru/core/internal/logger	1.031s	coverage: 90.7% of statements
 === RUN   TestNewMetrics
 --- PASS: TestNewMetrics (0.00s)
 === RUN   TestMetrics_RecordRequest
@@ -2665,7 +2665,7 @@ ok  	helixtrack.ru/core/internal/logger	1.033s	coverage: 90.7% of statements
 --- PASS: TestMetrics_ConcurrentAccess (0.00s)
 PASS
 coverage: 100.0% of statements
-ok  	helixtrack.ru/core/internal/metrics	1.254s	coverage: 100.0% of statements
+ok  	helixtrack.ru/core/internal/metrics	1.255s	coverage: 100.0% of statements
 === RUN   TestJWTMiddleware_Validate
 === RUN   TestJWTMiddleware_Validate/Missing_Authorization_header
 === RUN   TestJWTMiddleware_Validate/Invalid_Authorization_header_format
@@ -2721,7 +2721,7 @@ ok  	helixtrack.ru/core/internal/metrics	1.254s	coverage: 100.0% of statements
 === RUN   TestTimeoutMiddleware
 ==================
 WARNING: DATA RACE
-Write at 0x00c000504a68 by goroutine 52:
+Write at 0x00c0004f4c68 by goroutine 52:
   github.com/gin-gonic/gin.(*Context).Abort()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:200 +0x2f
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3()
@@ -2739,7 +2739,7 @@ Write at 0x00c000504a68 by goroutine 52:
   testing.(*T).Run.gowrap1()
       /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
 
-Previous write at 0x00c000504a68 by goroutine 54:
+Previous write at 0x00c0004f4c68 by goroutine 54:
   github.com/gin-gonic/gin.(*Context).Next()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:183 +0x53
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
@@ -2790,7 +2790,7 @@ Goroutine 54 (running) created at:
 === RUN   TestRateLimiter_Cleanup
 ==================
 WARNING: DATA RACE
-Read at 0x00c000504a18 by goroutine 54:
+Read at 0x00c0004f4c18 by goroutine 54:
   github.com/gin-gonic/gin.(*responseWriter).WriteHeader()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:65 +0x4b
   github.com/gin-gonic/gin.(*Context).Status()
@@ -2802,7 +2802,7 @@ Read at 0x00c000504a18 by goroutine 54:
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/middleware/performance.go:412 +0x44
 
-Previous write at 0x00c000504a18 by goroutine 52:
+Previous write at 0x00c0004f4c18 by goroutine 52:
   github.com/gin-gonic/gin.(*responseWriter).WriteHeader()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:70 +0x18c
   github.com/gin-gonic/gin.(*Context).Status()
@@ -2858,7 +2858,7 @@ Goroutine 52 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Read at 0x00c000504a10 by goroutine 54:
+Read at 0x00c0004f4c10 by goroutine 54:
   github.com/gin-gonic/gin.(*responseWriter).Written()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:104 +0x75
   github.com/gin-gonic/gin.(*responseWriter).WriteHeader()
@@ -2872,7 +2872,7 @@ Read at 0x00c000504a10 by goroutine 54:
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/middleware/performance.go:412 +0x44
 
-Previous write at 0x00c000504a10 by goroutine 52:
+Previous write at 0x00c0004f4c10 by goroutine 52:
   github.com/gin-gonic/gin.(*responseWriter).WriteHeaderNow()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:76 +0x5e
   github.com/gin-gonic/gin.(*responseWriter).Write()
@@ -2934,13 +2934,13 @@ Goroutine 52 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Read at 0x00c000504a68 by goroutine 54:
+Read at 0x00c0004f4c68 by goroutine 54:
   github.com/gin-gonic/gin.(*Context).Next()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:186 +0x9c
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/middleware/performance.go:412 +0x44
 
-Previous write at 0x00c000504a68 by goroutine 52:
+Previous write at 0x00c0004f4c68 by goroutine 52:
   github.com/gin-gonic/gin.(*Context).Next()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:186 +0xeb4
   github.com/gin-gonic/gin.(*Engine).handleHTTPRequest()
@@ -3058,7 +3058,7 @@ Goroutine 52 (finished) created at:
     --- PASS: TestPermissionMiddleware_Integration/User_denied_permission (0.00s)
 FAIL
 coverage: 92.6% of statements
-FAIL	helixtrack.ru/core/internal/middleware	0.615s
+FAIL	helixtrack.ru/core/internal/middleware	0.616s
 === RUN   TestCustomField_IsValidFieldType
 === RUN   TestCustomField_IsValidFieldType/Text_type
 === RUN   TestCustomField_IsValidFieldType/TextArea_type
@@ -3759,7 +3759,7 @@ FAIL	helixtrack.ru/core/internal/middleware	0.615s
 --- PASS: TestWebSocketConfig_PingPeriodLessThanPongWait (0.00s)
 PASS
 coverage: 53.8% of statements
-ok  	helixtrack.ru/core/internal/models	1.078s	coverage: 53.8% of statements
+ok  	helixtrack.ru/core/internal/models	1.079s	coverage: 53.8% of statements
 === RUN   TestLogSecurityEvent
 --- PASS: TestLogSecurityEvent (0.00s)
 === RUN   TestDetermineSeverity
@@ -3816,7 +3816,7 @@ ok  	helixtrack.ru/core/internal/models	1.078s	coverage: 53.8% of statements
 === RUN   TestRegisterCallback
 ==================
 WARNING: DATA RACE
-Read at 0x00c00019e11f by goroutine 48:
+Read at 0x00c0004e618f by goroutine 48:
   helixtrack.ru/core/internal/security.TestRegisterCallback()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:181 +0x19a
   testing.tRunner()
@@ -3824,7 +3824,7 @@ Read at 0x00c00019e11f by goroutine 48:
   testing.(*T).Run.gowrap1()
       /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
 
-Previous write at 0x00c00019e11f by goroutine 49:
+Previous write at 0x00c0004e618f by goroutine 49:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:171 +0x37
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
@@ -3973,19 +3973,19 @@ Goroutine 49 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Write at 0x00c00019e11f by goroutine 58:
+Write at 0x00c0004e618f by goroutine 55:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:171 +0x37
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log.go:59 +0xb4
 
-Previous write at 0x00c00019e11f by goroutine 54:
+Previous write at 0x00c0004e618f by goroutine 54:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:171 +0x37
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log.go:59 +0xb4
 
-Goroutine 58 (running) created at:
+Goroutine 55 (running) created at:
   helixtrack.ru/core/internal/security.LogSecurityEvent()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log.go:59 +0x1064
   helixtrack.ru/core/internal/security.TestMaxEventsLimit()
@@ -4280,15 +4280,15 @@ Goroutine 54 (finished) created at:
 --- PASS: TestCSPReportHandler (0.00s)
 === RUN   TestNewServiceSigner
 === RUN   TestNewServiceSigner/Successful_creation
---- PASS: TestNewServiceSigner (0.11s)
-    --- PASS: TestNewServiceSigner/Successful_creation (0.11s)
+--- PASS: TestNewServiceSigner (0.16s)
+    --- PASS: TestNewServiceSigner/Successful_creation (0.16s)
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Sign_service_registration
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Verify_valid_signature
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Reject_tampered_service
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Reject_invalid_public_key_format
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Reject_invalid_signature_format
---- PASS: TestServiceSigner_SignAndVerifyServiceRegistration (0.24s)
+--- PASS: TestServiceSigner_SignAndVerifyServiceRegistration (0.12s)
     --- PASS: TestServiceSigner_SignAndVerifyServiceRegistration/Sign_service_registration (0.01s)
     --- PASS: TestServiceSigner_SignAndVerifyServiceRegistration/Verify_valid_signature (0.00s)
     --- PASS: TestServiceSigner_SignAndVerifyServiceRegistration/Reject_tampered_service (0.00s)
@@ -4303,7 +4303,7 @@ Goroutine 54 (finished) created at:
 === RUN   TestServiceSigner_VerifyServiceRotation/Reject_rotation_with_mismatched_service_types
 === RUN   TestServiceSigner_VerifyServiceRotation/Reject_rotation_when_new_service_is_not_healthy
 === RUN   TestServiceSigner_VerifyServiceRotation/Reject_rotation_when_service_registered_too_recently
---- PASS: TestServiceSigner_VerifyServiceRotation (0.11s)
+--- PASS: TestServiceSigner_VerifyServiceRotation (0.17s)
     --- PASS: TestServiceSigner_VerifyServiceRotation/Successful_rotation_with_valid_admin_token (0.00s)
     --- PASS: TestServiceSigner_VerifyServiceRotation/Reject_rotation_with_short_admin_token (0.00s)
     --- PASS: TestServiceSigner_VerifyServiceRotation/Reject_rotation_when_old_service_is_rotating (0.00s)
@@ -4325,13 +4325,13 @@ Goroutine 54 (finished) created at:
 === RUN   TestServiceSigner_GetKeys
 === RUN   TestServiceSigner_GetKeys/Get_public_key_PEM
 === RUN   TestServiceSigner_GetKeys/Get_private_key_PEM
---- PASS: TestServiceSigner_GetKeys (0.13s)
+--- PASS: TestServiceSigner_GetKeys (0.21s)
     --- PASS: TestServiceSigner_GetKeys/Get_public_key_PEM (0.00s)
     --- PASS: TestServiceSigner_GetKeys/Get_private_key_PEM (0.00s)
 === RUN   TestServiceSigner_MultipleSigners
 === RUN   TestServiceSigner_MultipleSigners/Service_with_swapped_public_key_fails_verification
---- PASS: TestServiceSigner_MultipleSigners (0.46s)
-    --- PASS: TestServiceSigner_MultipleSigners/Service_with_swapped_public_key_fails_verification (0.46s)
+--- PASS: TestServiceSigner_MultipleSigners (0.35s)
+    --- PASS: TestServiceSigner_MultipleSigners/Service_with_swapped_public_key_fails_verification (0.35s)
 === RUN   TestGenerateAdminToken
 === RUN   TestGenerateAdminToken/Generate_admin_token
 === RUN   TestGenerateAdminToken/Different_users_generate_different_tokens
@@ -4343,7 +4343,7 @@ Goroutine 54 (finished) created at:
 === RUN   TestServiceSigner_EdgeCases
 === RUN   TestServiceSigner_EdgeCases/Sign_service_with_empty_fields
 === RUN   TestServiceSigner_EdgeCases/Sign_service_with_special_characters
---- PASS: TestServiceSigner_EdgeCases (0.23s)
+--- PASS: TestServiceSigner_EdgeCases (0.17s)
     --- PASS: TestServiceSigner_EdgeCases/Sign_service_with_empty_fields (0.01s)
     --- PASS: TestServiceSigner_EdgeCases/Sign_service_with_special_characters (0.01s)
 === RUN   TestDefaultTLSConfig
@@ -4402,24 +4402,24 @@ Goroutine 54 (finished) created at:
 --- PASS: TestTLSAuditMiddleware (0.00s)
 FAIL
 coverage: 78.0% of statements
-FAIL	helixtrack.ru/core/internal/security	2.998s
+FAIL	helixtrack.ru/core/internal/security	2.905s
 === RUN   TestNewServer
-2025-10-12T12:59:42.473+0300	ERROR	logger/logger.go:131	Failed to query services for health check	{"error": "sql: database is closed"}
+2025-10-12T16:31:18.970+0300	ERROR	logger/logger.go:131	Failed to query services for health check	{"error": "sql: database is closed"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/services.(*HealthChecker).checkAllServices
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:122
 helixtrack.ru/core/internal/services.(*HealthChecker).checkLoop
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:97
---- PASS: TestNewServer (3.45s)
+--- PASS: TestNewServer (3.28s)
 === RUN   TestServer_HealthEndpoint
---- PASS: TestServer_HealthEndpoint (3.55s)
+--- PASS: TestServer_HealthEndpoint (3.26s)
 === RUN   TestServer_DoEndpoint_Version
---- PASS: TestServer_DoEndpoint_Version (3.22s)
+--- PASS: TestServer_DoEndpoint_Version (3.23s)
 === RUN   TestServer_DoEndpoint_MissingJWT
---- PASS: TestServer_DoEndpoint_MissingJWT (3.45s)
+--- PASS: TestServer_DoEndpoint_MissingJWT (3.39s)
 === RUN   TestServer_DoEndpoint_InvalidJSON
-2025-10-12T12:59:56.060+0300	ERROR	logger/logger.go:131	Failed to bind JSON request	{"error": "invalid character 'i' looking for beginning of object key string", "error_details": "invalid character 'i' looking for beginning of object key string", "body": "{invalid json}"}
+2025-10-12T16:31:32.344+0300	ERROR	logger/logger.go:131	Failed to bind JSON request	{"error": "invalid character 'i' looking for beginning of object key string", "error_details": "invalid character 'i' looking for beginning of object key string", "body": "{invalid json}"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/server.(*Server).setupRouter.func1
@@ -4446,23 +4446,23 @@ helixtrack.ru/core/internal/server.TestServer_DoEndpoint_InvalidJSON
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:226
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestServer_DoEndpoint_InvalidJSON (3.36s)
+--- PASS: TestServer_DoEndpoint_InvalidJSON (3.50s)
 === RUN   TestServer_CORSMiddleware
---- PASS: TestServer_CORSMiddleware (3.37s)
+--- PASS: TestServer_CORSMiddleware (3.41s)
 === RUN   TestServer_Shutdown
---- PASS: TestServer_Shutdown (3.37s)
+--- PASS: TestServer_Shutdown (3.60s)
 === RUN   TestServer_GetRouter
-2025-10-12T13:00:06.126+0300	ERROR	logger/logger.go:131	Failed to query services for health check	{"error": "sql: database is closed"}
+2025-10-12T16:31:42.777+0300	ERROR	logger/logger.go:131	Failed to query services for health check	{"error": "sql: database is closed"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/services.(*HealthChecker).checkAllServices
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:122
 helixtrack.ru/core/internal/services.(*HealthChecker).checkLoop
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:97
---- PASS: TestServer_GetRouter (3.34s)
+--- PASS: TestServer_GetRouter (3.42s)
 PASS
 coverage: 67.4% of statements
-ok  	helixtrack.ru/core/internal/server	28.152s	coverage: 67.4% of statements
+ok  	helixtrack.ru/core/internal/server	28.141s	coverage: 67.4% of statements
 === RUN   TestNewAuthService
 --- PASS: TestNewAuthService (0.00s)
 === RUN   TestAuthService_IsEnabled
@@ -4524,11 +4524,11 @@ ok  	helixtrack.ru/core/internal/server	28.152s	coverage: 67.4% of statements
     --- PASS: TestNewHealthChecker/Create_health_checker_with_valid_parameters (0.00s)
 === RUN   TestHealthChecker_StartStop
 === RUN   TestHealthChecker_StartStop/Start_health_checker
-{"level":"info","ts":1760263181.0138714,"caller":"logger/logger.go:121","msg":"Starting service health checker","interval":0.1}
+{"level":"info","ts":1760275877.6773071,"caller":"logger/logger.go:121","msg":"Starting service health checker","interval":0.1}
 === RUN   TestHealthChecker_StartStop/Cannot_start_already_running_checker
-{"level":"error","ts":1760263181.013989,"caller":"logger/logger.go:131","msg":"Failed to query services for health check","error":"Query() not mockable - use real database for integration tests","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkAllServices\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:122\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkLoop\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:97"}
+{"level":"error","ts":1760275877.677437,"caller":"logger/logger.go:131","msg":"Failed to query services for health check","error":"Query() not mockable - use real database for integration tests","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkAllServices\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:122\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkLoop\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:97"}
 === RUN   TestHealthChecker_StartStop/Stop_health_checker
-{"level":"info","ts":1760263181.0140843,"caller":"logger/logger.go:121","msg":"Service health checker stopped"}
+{"level":"info","ts":1760275877.6776621,"caller":"logger/logger.go:121","msg":"Service health checker stopped"}
 === RUN   TestHealthChecker_StartStop/Stop_non-running_checker_is_safe
 --- PASS: TestHealthChecker_StartStop (0.00s)
     --- PASS: TestHealthChecker_StartStop/Start_health_checker (0.00s)
@@ -4706,13 +4706,13 @@ ok  	helixtrack.ru/core/internal/server	28.152s	coverage: 67.4% of statements
 --- PASS: TestMockAuthService (0.00s)
 PASS
 coverage: 41.8% of statements
-ok  	helixtrack.ru/core/internal/services	5.054s	coverage: 41.8% of statements
+ok  	helixtrack.ru/core/internal/services	5.057s	coverage: 41.8% of statements
 === RUN   TestWebSocketConnection_Integration
-{"level":"info","ts":1760263179.0208702,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760263179.0223224,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"7b52b6cc-887b-4ec1-b34b-1812a9c20eb7","username":"testuser","activeClients":1}
-{"level":"info","ts":1760263179.1234367,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"7b52b6cc-887b-4ec1-b34b-1812a9c20eb7","username":"testuser","activeClients":0}
-{"level":"info","ts":1760263179.1235318,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760263179.1236055,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+{"level":"info","ts":1760275875.6851661,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760275875.6864655,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"cf05ee19-d074-4833-bf6d-f46e44ecce91","username":"testuser","activeClients":1}
+{"level":"info","ts":1760275875.786755,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"cf05ee19-d074-4833-bf6d-f46e44ecce91","username":"testuser","activeClients":0}
+{"level":"info","ts":1760275875.7868423,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760275875.7869408,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
 --- PASS: TestWebSocketConnection_Integration (0.10s)
 === RUN   TestWebSocketSubscription_Integration
     manager_integration_test.go:121: Integration test with timing/race conditions - requires improved test infrastructure
@@ -4733,29 +4733,29 @@ ok  	helixtrack.ru/core/internal/services	5.054s	coverage: 41.8% of statements
     manager_integration_test.go:151: Integration test with timing/race conditions - requires improved test infrastructure
 --- SKIP: TestWebSocketConcurrentEventDelivery_Integration (0.00s)
 === RUN   TestWebSocketDisconnect_Integration
-{"level":"info","ts":1760263179.1242714,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760263179.1248794,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"ce30bf0e-3eda-48f4-a406-d10a609f7aa8","username":"testuser","activeClients":1}
-{"level":"info","ts":1760263179.2255344,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"ce30bf0e-3eda-48f4-a406-d10a609f7aa8","username":"testuser","activeClients":0}
-{"level":"info","ts":1760263179.4257388,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760263179.4258337,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+{"level":"info","ts":1760275875.787812,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760275875.7884538,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"6f897b61-72ad-4bd2-b520-684fbd3b7fef","username":"testuser","activeClients":1}
+{"level":"info","ts":1760275875.8890555,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"6f897b61-72ad-4bd2-b520-684fbd3b7fef","username":"testuser","activeClients":0}
+{"level":"info","ts":1760275876.089399,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760275876.0895112,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
 --- PASS: TestWebSocketDisconnect_Integration (0.30s)
 === RUN   TestWebSocketProjectContextFiltering_Integration
     manager_integration_test.go:195: Project context filtering not yet implemented in manager
 --- SKIP: TestWebSocketProjectContextFiltering_Integration (0.00s)
 === RUN   TestWebSocketPingPong_Integration
-{"level":"info","ts":1760263179.4262245,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760263179.4269137,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"ee10efce-7b94-4798-a341-c8951531d3c5","username":"testuser","activeClients":1}
-{"level":"info","ts":1760263179.6276495,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"ee10efce-7b94-4798-a341-c8951531d3c5","username":"testuser","activeClients":0}
-{"level":"info","ts":1760263179.6277435,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760263179.6277986,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+{"level":"info","ts":1760275876.0898087,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760275876.090506,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"338bae72-b6de-4994-be38-faa298dbe05c","username":"testuser","activeClients":1}
+{"level":"info","ts":1760275876.2912483,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"338bae72-b6de-4994-be38-faa298dbe05c","username":"testuser","activeClients":0}
+{"level":"info","ts":1760275876.2913303,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760275876.2913868,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
 --- PASS: TestWebSocketPingPong_Integration (0.20s)
 === RUN   TestWebSocketInvalidMessage_Integration
-{"level":"info","ts":1760263179.6279633,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760263179.6285946,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"a5a8423b-5821-4b6b-acfa-ec3a5501085e","username":"testuser","activeClients":1}
-{"level":"error","ts":1760263179.6288013,"caller":"logger/logger.go:131","msg":"Failed to unmarshal WebSocket message","error":"invalid character 'i' looking for beginning of object key string","clientId":"a5a8423b-5821-4b6b-acfa-ec3a5501085e","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/websocket.(*Manager).readPump\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/websocket/manager.go:413"}
-{"level":"info","ts":1760263179.729235,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"a5a8423b-5821-4b6b-acfa-ec3a5501085e","username":"testuser","activeClients":0}
-{"level":"info","ts":1760263179.7293212,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760263179.7293813,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+{"level":"info","ts":1760275876.2915785,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760275876.2922735,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"1ea47005-2dfa-49d8-9c78-5733476f8e84","username":"testuser","activeClients":1}
+{"level":"error","ts":1760275876.2925,"caller":"logger/logger.go:131","msg":"Failed to unmarshal WebSocket message","error":"invalid character 'i' looking for beginning of object key string","clientId":"1ea47005-2dfa-49d8-9c78-5733476f8e84","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/websocket.(*Manager).readPump\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/websocket/manager.go:413"}
+{"level":"info","ts":1760275876.3929873,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"1ea47005-2dfa-49d8-9c78-5733476f8e84","username":"testuser","activeClients":0}
+{"level":"info","ts":1760275876.3930957,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760275876.3931553,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
 --- PASS: TestWebSocketInvalidMessage_Integration (0.10s)
 === RUN   TestNewPublisher
 --- PASS: TestNewPublisher (0.00s)
@@ -4799,4 +4799,4 @@ ok  	helixtrack.ru/core/internal/services	5.054s	coverage: 41.8% of statements
 --- PASS: TestPublisher_ConcurrentPublishing (0.01s)
 PASS
 coverage: 50.9% of statements
-ok  	helixtrack.ru/core/internal/websocket	1.766s	coverage: 50.9% of statements
+ok  	helixtrack.ru/core/internal/websocket	1.767s	coverage: 50.9% of statements
