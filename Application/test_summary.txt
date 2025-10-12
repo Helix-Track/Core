@@ -1,0 +1,13 @@
+	helixtrack.ru/core		coverage: 0.0% of statements
+ok  	helixtrack.ru/core/internal/cache	0.359s	coverage: 96.4% of statements
+ok  	helixtrack.ru/core/internal/config	0.027s	coverage: 83.5% of statements
+ok  	helixtrack.ru/core/internal/database	0.110s	coverage: 79.6% of statements
+ok  	helixtrack.ru/core/internal/handlers	7.056s	coverage: 66.1% of statements
+ok  	helixtrack.ru/core/internal/logger	0.008s	coverage: 90.7% of statements
+ok  	helixtrack.ru/core/internal/metrics	0.222s	coverage: 100.0% of statements
+ok  	helixtrack.ru/core/internal/middleware	0.567s	coverage: 92.6% of statements
+ok  	helixtrack.ru/core/internal/models	0.035s	coverage: 53.8% of statements
+ok  	helixtrack.ru/core/internal/security	2.384s	coverage: 78.0% of statements
+ok  	helixtrack.ru/core/internal/server	7.540s	coverage: 67.4% of statements
+ok  	helixtrack.ru/core/internal/services	4.017s	coverage: 41.8% of statements
+ok  	helixtrack.ru/core/internal/websocket	0.720s	coverage: 50.9% of statements
