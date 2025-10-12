@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelixTrack Core - Test Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+        .status-passed {
+            background-color: #10b981;
+            color: white;
+        }
+        .status-failed {
+            background-color: #ef4444;
+            color: white;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metric-card h3 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .metric-passed { color: #10b981; }
+        .metric-failed { color: #ef4444; }
+        .metric-coverage { color: #3b82f6; }
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 HelixTrack Core - Test Execution Report</h1>
+        <p>Generated: Sun Oct 12 10:38:38 AM MSK 2025</p>
+        <span class="status-badge status-failed">FAILED</span>
+    </div>
+
+    <div class="metrics">
+        <div class="metric-card">
+            <h3>Total Tests</h3>
+            <div class="metric-value">1685</div>
+        </div>
+        <div class="metric-card">
+            <h3>Passed</h3>
+            <div class="metric-value metric-passed">1630</div>
+        </div>
+        <div class="metric-card">
+            <h3>Failed</h3>
+            <div class="metric-value metric-failed">27</div>
+        </div>
+        <div class="metric-card">
+            <h3>Coverage</h3>
+            <div class="metric-value metric-coverage">65.8%</div>
+        </div>
+        <div class="metric-card">
+            <h3>Duration</h3>
+            <div class="metric-value">601s</div>
+        </div>
+        <div class="metric-card">
+            <h3>Packages</h3>
+            <div class="metric-value">15</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📊 Coverage Analysis</h2>
+        <p><strong>Total Coverage:</strong> 65.8%</p>
+        <p><strong>Quality:</strong> Poor</p>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 65.8%">65.8%</div>
+        </div>
+        <p style="margin-top: 20px;">
+            <a href="../coverage/coverage.html" style="color: #667eea; text-decoration: none; font-weight: bold;">
+                → View Detailed Coverage Report
+            </a>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>📦 Test Summary</h2>
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Go Version</td>
+                <td>1.22.2</td>
+            </tr>
+            <tr>
+                <td>Total Packages Tested</td>
+                <td>15</td>
+            </tr>
+            <tr>
+                <td>Total Test Cases</td>
+                <td>1685</td>
+            </tr>
+            <tr>
+                <td>Tests Passed</td>
+                <td style="color: #10b981; font-weight: bold;">1630</td>
+            </tr>
+            <tr>
+                <td>Tests Failed</td>
+                <td style="color: #ef4444; font-weight: bold;">27</td>
+            </tr>
+            <tr>
+                <td>Tests Skipped</td>
+                <td>22</td>
+            </tr>
+            <tr>
+                <td>Execution Time</td>
+                <td>601 seconds</td>
+            </tr>
+            <tr>
+                <td>Coverage</td>
+                <td style="color: #3b82f6; font-weight: bold;">65.8%</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📁 Generated Files</h2>
+        <ul>
+            <li><code>test-results.json</code> - Machine-readable results</li>
+            <li><code>test-output-verbose.txt</code> - Complete test output</li>
+            <li><code>coverage-detailed.txt</code> - Detailed coverage report</li>
+            <li><code>../coverage/coverage.out</code> - Coverage profile</li>
+            <li><code>../coverage/coverage.html</code> - HTML coverage visualization</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p><strong>HelixTrack Core Test Verification System</strong></p>
+        <p>Report generated: 2025-10-12T07:38:38Z</p>
+    </div>
+</body>
+</html>

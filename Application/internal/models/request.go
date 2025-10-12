@@ -370,4 +370,127 @@ const (
 	ActionTicketRelationshipCreate = "ticketRelationshipCreate" // Create relationship between tickets
 	ActionTicketRelationshipRemove = "ticketRelationshipRemove" // Remove relationship between tickets
 	ActionTicketRelationshipList   = "ticketRelationshipList"   // List relationships for a ticket
+
+	// =======================================================================
+	// PHASE 2: AGILE ENHANCEMENTS
+	// =======================================================================
+
+	// Epic actions
+	ActionEpicCreate      = "epicCreate"      // Create epic ticket
+	ActionEpicRead        = "epicRead"        // Read epic
+	ActionEpicList        = "epicList"        // List all epics
+	ActionEpicModify      = "epicModify"      // Update epic
+	ActionEpicRemove      = "epicRemove"      // Delete epic
+	ActionEpicAddStory    = "epicAddStory"    // Add story to epic
+	ActionEpicRemoveStory = "epicRemoveStory" // Remove story from epic
+	ActionEpicListStories = "epicListStories" // List stories in epic
+
+	// Subtask actions
+	ActionSubtaskCreate        = "subtaskCreate"        // Create subtask
+	ActionSubtaskList          = "subtaskList"          // List subtasks
+	ActionSubtaskMoveToParent  = "subtaskMoveToParent"  // Change parent
+	ActionSubtaskConvertToIssue = "subtaskConvertToIssue" // Convert to regular issue
+	ActionSubtaskListByParent  = "subtaskListByParent"  // List all subtasks of parent
+
+	// Work log actions
+	ActionWorkLogAdd         = "workLogAdd"         // Add work log
+	ActionWorkLogModify      = "workLogModify"      // Update work log
+	ActionWorkLogRemove      = "workLogRemove"      // Delete work log
+	ActionWorkLogList        = "workLogList"        // List work logs
+	ActionWorkLogListByTicket = "workLogListByTicket" // List work logs for ticket
+	ActionWorkLogListByUser  = "workLogListByUser"  // List work logs by user
+	ActionWorkLogGetTotalTime = "workLogGetTotalTime" // Get total time spent
+
+	// Project role actions
+	ActionProjectRoleCreate      = "projectRoleCreate"      // Create project role
+	ActionProjectRoleRead        = "projectRoleRead"        // Read project role
+	ActionProjectRoleList        = "projectRoleList"        // List project roles
+	ActionProjectRoleModify      = "projectRoleModify"      // Update project role
+	ActionProjectRoleRemove      = "projectRoleRemove"      // Delete project role
+	ActionProjectRoleAssignUser  = "projectRoleAssignUser"  // Assign user to role
+	ActionProjectRoleUnassignUser = "projectRoleUnassignUser" // Remove user from role
+	ActionProjectRoleListUsers   = "projectRoleListUsers"   // List users in role
+
+	// Security level actions
+	ActionSecurityLevelCreate = "securityLevelCreate" // Create security level
+	ActionSecurityLevelRead   = "securityLevelRead"   // Read security level
+	ActionSecurityLevelList   = "securityLevelList"   // List security levels
+	ActionSecurityLevelModify = "securityLevelModify" // Update security level
+	ActionSecurityLevelRemove = "securityLevelRemove" // Delete security level
+	ActionSecurityLevelGrant  = "securityLevelGrant"  // Grant access to user/team/role
+	ActionSecurityLevelRevoke = "securityLevelRevoke" // Revoke access
+	ActionSecurityLevelCheck  = "securityLevelCheck"  // Check if user has access
+
+	// Dashboard actions
+	ActionDashboardCreate       = "dashboardCreate"       // Create dashboard
+	ActionDashboardRead         = "dashboardRead"         // Read dashboard
+	ActionDashboardList         = "dashboardList"         // List dashboards
+	ActionDashboardModify       = "dashboardModify"       // Update dashboard
+	ActionDashboardRemove       = "dashboardRemove"       // Delete dashboard
+	ActionDashboardShare        = "dashboardShare"        // Share dashboard
+	ActionDashboardUnshare      = "dashboardUnshare"      // Unshare dashboard
+	ActionDashboardAddWidget    = "dashboardAddWidget"    // Add widget
+	ActionDashboardRemoveWidget = "dashboardRemoveWidget" // Remove widget
+	ActionDashboardModifyWidget = "dashboardModifyWidget" // Update widget
+	ActionDashboardListWidgets  = "dashboardListWidgets"  // List widgets
+	ActionDashboardSetLayout    = "dashboardSetLayout"    // Update layout
+
+	// Advanced board configuration actions
+	ActionBoardConfigureColumns = "boardConfigureColumns" // Configure columns
+	ActionBoardAddColumn        = "boardAddColumn"        // Add column
+	ActionBoardRemoveColumn     = "boardRemoveColumn"     // Remove column
+	ActionBoardModifyColumn     = "boardModifyColumn"     // Update column
+	ActionBoardListColumns      = "boardListColumns"      // List columns
+	ActionBoardAddSwimlane      = "boardAddSwimlane"      // Add swimlane
+	ActionBoardRemoveSwimlane   = "boardRemoveSwimlane"   // Remove swimlane
+	ActionBoardListSwimlanes    = "boardListSwimlanes"    // List swimlanes
+	ActionBoardAddQuickFilter   = "boardAddQuickFilter"   // Add quick filter
+	ActionBoardRemoveQuickFilter = "boardRemoveQuickFilter" // Remove quick filter
+	ActionBoardListQuickFilters = "boardListQuickFilters" // List quick filters
+	ActionBoardSetType          = "boardSetType"          // Set board type (scrum/kanban)
+
+	// =======================================================================
+	// PHASE 3: COLLABORATION FEATURES
+	// =======================================================================
+
+	// Vote actions
+	ActionVoteAdd    = "voteAdd"    // Add vote
+	ActionVoteRemove = "voteRemove" // Remove vote
+	ActionVoteCount  = "voteCount"  // Get vote count
+	ActionVoteList   = "voteList"   // List voters
+	ActionVoteCheck  = "voteCheck"  // Check if user voted
+
+	// Project category actions
+	ActionProjectCategoryCreate = "projectCategoryCreate" // Create category
+	ActionProjectCategoryRead   = "projectCategoryRead"   // Read category
+	ActionProjectCategoryList   = "projectCategoryList"   // List categories
+	ActionProjectCategoryModify = "projectCategoryModify" // Update category
+	ActionProjectCategoryRemove = "projectCategoryRemove" // Delete category
+	ActionProjectCategoryAssign = "projectCategoryAssign" // Assign to project
+
+	// Notification scheme actions
+	ActionNotificationSchemeCreate     = "notificationSchemeCreate"     // Create scheme
+	ActionNotificationSchemeRead       = "notificationSchemeRead"       // Read scheme
+	ActionNotificationSchemeList       = "notificationSchemeList"       // List schemes
+	ActionNotificationSchemeModify     = "notificationSchemeModify"     // Update scheme
+	ActionNotificationSchemeRemove     = "notificationSchemeRemove"     // Delete scheme
+	ActionNotificationSchemeAddRule    = "notificationSchemeAddRule"    // Add rule
+	ActionNotificationSchemeRemoveRule = "notificationSchemeRemoveRule" // Remove rule
+	ActionNotificationSchemeListRules  = "notificationSchemeListRules"  // List rules
+	ActionNotificationEventList        = "notificationEventList"        // List event types
+	ActionNotificationSend             = "notificationSend"             // Send notification (manual trigger)
+
+	// Activity stream actions (enhancements to audit)
+	ActionActivityStreamGet          = "activityStreamGet"          // Get activity stream
+	ActionActivityStreamGetByProject = "activityStreamGetByProject" // Get project activity
+	ActionActivityStreamGetByUser    = "activityStreamGetByUser"    // Get user activity
+	ActionActivityStreamGetByTicket  = "activityStreamGetByTicket"  // Get ticket activity
+	ActionActivityStreamFilter       = "activityStreamFilter"       // Filter by activity type
+
+	// Comment mention actions
+	ActionCommentMention       = "commentMention"       // Add mention to comment
+	ActionCommentUnmention     = "commentUnmention"     // Remove mention
+	ActionCommentListMentions  = "commentListMentions"  // List mentioned users
+	ActionCommentGetMentions   = "commentGetMentions"   // Get mentions for user
+	ActionCommentParseMentions = "commentParseMentions" // Parse @mentions from text
 )

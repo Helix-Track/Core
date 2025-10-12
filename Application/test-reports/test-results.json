@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-10-12T07:38:38Z",
+  "status": "FAILED",
+  "go_version": "1.22.2",
+  "duration_seconds": 601,
+  "statistics": {
+    "total_packages": 15,
+    "total_tests": 1685,
+    "passed": 1630,
+    "failed": 27,
+    "skipped": 22
+  },
+  "coverage": {
+    "total": "65.8%",
+    "percent": 65.8,
+    "quality": "Poor"
+  }
+}
