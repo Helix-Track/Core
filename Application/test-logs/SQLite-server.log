@@ -1,0 +1,19 @@
+2025-10-12T13:13:12.469+0300	INFO	logger/logger.go:146	Starting Helix Track Core v1.0.0
+2025-10-12T13:13:12.469+0300	INFO	logger/logger.go:146	Configuration loaded from: /home/milosvasic/Projects/HelixTrack/Core/Application/../Configurations/dev.json
+2025-10-12T13:13:12.588+0300	INFO	logger/logger.go:121	WebSocket disabled
+2025-10-12T13:13:13.264+0300	INFO	logger/logger.go:121	Initializing service discovery tables
+2025-10-12T13:13:13.358+0300	INFO	logger/logger.go:121	Service discovery tables created successfully
+2025-10-12T13:13:13.358+0300	INFO	logger/logger.go:121	Starting service health checker	{"interval": 60}
+2025-10-12T13:13:13.358+0300	INFO	logger/logger.go:121	Service health checker started
+2025-10-12T13:13:13.358+0300	INFO	logger/logger.go:121	Starting HTTP server	{"address": "0.0.0.0:8081"}
+2025-10-12T13:13:42.706+0300	INFO	logger/logger.go:121	Shutting down server...
+2025-10-12T13:13:42.706+0300	INFO	logger/logger.go:121	Shutting down server...
+2025-10-12T13:13:42.706+0300	INFO	logger/logger.go:121	Stopping service health checker...
+2025-10-12T13:13:42.706+0300	INFO	logger/logger.go:121	Service health checker stopped
+2025-10-12T13:13:42.706+0300	FATAL	logger/logger.go:161	Server error: http: Server closed
+helixtrack.ru/core/internal/logger.Fatalf
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:161
+main.main.func1
+	/home/milosvasic/Projects/HelixTrack/Core/Application/main.go:63
+2025-10-12T13:13:42.706+0300	INFO	logger/logger.go:121	Server shutdown complete
+2025-10-12T13:13:42.707+0300	INFO	logger/logger.go:121	Server exited successfully
