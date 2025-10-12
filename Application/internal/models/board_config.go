@@ -36,12 +36,6 @@ type BoardQuickFilter struct {
 	Deleted  bool    `json:"deleted" db:"deleted"`
 }
 
-// Board type constants
-const (
-	BoardTypeScrum  = "scrum"
-	BoardTypeKanban = "kanban"
-)
-
 // HasWIPLimit checks if the column has a WIP (Work In Progress) limit
 func (bc *BoardColumn) HasWIPLimit() bool {
 	return bc.MaxItems != nil && *bc.MaxItems > 0

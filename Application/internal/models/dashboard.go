@@ -55,11 +55,6 @@ const (
 	WidgetTypeHeatMap        = "heat_map"
 )
 
-// IsPublic checks if the dashboard is public
-func (d *Dashboard) IsPublic() bool {
-	return d.IsPublic
-}
-
 // IsOwner checks if the given userID is the owner
 func (d *Dashboard) IsOwner(userID string) bool {
 	return d.OwnerID == userID

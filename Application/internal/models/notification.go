@@ -32,19 +32,19 @@ type NotificationRule struct {
 	Deleted              bool    `json:"deleted" db:"deleted"`
 }
 
-// Event type constants (must match database seed data)
+// Notification event type constants (must match database seed data)
 const (
-	EventIssueCreated    = "issue_created"
-	EventIssueUpdated    = "issue_updated"
-	EventIssueDeleted    = "issue_deleted"
-	EventCommentAdded    = "comment_added"
-	EventCommentUpdated  = "comment_updated"
-	EventCommentDeleted  = "comment_deleted"
-	EventStatusChanged   = "status_changed"
-	EventAssigneeChanged = "assignee_changed"
-	EventPriorityChanged = "priority_changed"
-	EventWorkLogged      = "work_logged"
-	EventUserMentioned   = "user_mentioned"
+	NotificationEventIssueCreated    = "issue_created"
+	NotificationEventIssueUpdated    = "issue_updated"
+	NotificationEventIssueDeleted    = "issue_deleted"
+	NotificationEventCommentAdded    = "comment_added"
+	NotificationEventCommentUpdated  = "comment_updated"
+	NotificationEventCommentDeleted  = "comment_deleted"
+	NotificationEventStatusChanged   = "status_changed"
+	NotificationEventAssigneeChanged = "assignee_changed"
+	NotificationEventPriorityChanged = "priority_changed"
+	NotificationEventWorkLogged      = "work_logged"
+	NotificationEventUserMentioned   = "user_mentioned"
 )
 
 // Recipient type constants
@@ -70,17 +70,17 @@ func (ns *NotificationScheme) IsProjectSpecific() bool {
 // IsValidEventType checks if the event type is valid
 func (ne *NotificationEvent) IsValidEventType() bool {
 	validEvents := map[string]bool{
-		EventIssueCreated:    true,
-		EventIssueUpdated:    true,
-		EventIssueDeleted:    true,
-		EventCommentAdded:    true,
-		EventCommentUpdated:  true,
-		EventCommentDeleted:  true,
-		EventStatusChanged:   true,
-		EventAssigneeChanged: true,
-		EventPriorityChanged: true,
-		EventWorkLogged:      true,
-		EventUserMentioned:   true,
+		NotificationEventIssueCreated:    true,
+		NotificationEventIssueUpdated:    true,
+		NotificationEventIssueDeleted:    true,
+		NotificationEventCommentAdded:    true,
+		NotificationEventCommentUpdated:  true,
+		NotificationEventCommentDeleted:  true,
+		NotificationEventStatusChanged:   true,
+		NotificationEventAssigneeChanged: true,
+		NotificationEventPriorityChanged: true,
+		NotificationEventWorkLogged:      true,
+		NotificationEventUserMentioned:   true,
 	}
 	return validEvents[ne.EventType]
 }

@@ -551,6 +551,140 @@ func (h *Handler) DoAction(c *gin.Context) {
 	case models.ActionTicketRelationshipList:
 		h.handleTicketRelationshipList(c, req)
 
+	// Vote actions (Phase 3)
+	case models.ActionVoteAdd:
+		h.handleVoteAdd(c, req)
+	case models.ActionVoteRemove:
+		h.handleVoteRemove(c, req)
+	case models.ActionVoteCount:
+		h.handleVoteCount(c, req)
+	case models.ActionVoteList:
+		h.handleVoteList(c, req)
+	case models.ActionVoteCheck:
+		h.handleVoteCheck(c, req)
+
+	// Project Category actions (Phase 3)
+	case models.ActionProjectCategoryCreate:
+		h.handleProjectCategoryCreate(c, req)
+	case models.ActionProjectCategoryRead:
+		h.handleProjectCategoryRead(c, req)
+	case models.ActionProjectCategoryList:
+		h.handleProjectCategoryList(c, req)
+	case models.ActionProjectCategoryModify:
+		h.handleProjectCategoryModify(c, req)
+	case models.ActionProjectCategoryRemove:
+		h.handleProjectCategoryRemove(c, req)
+	case models.ActionProjectCategoryAssign:
+		h.handleProjectCategoryAssign(c, req)
+
+	// Work Log actions (Phase 2)
+	case models.ActionWorkLogAdd:
+		h.handleWorkLogAdd(c, req)
+	case models.ActionWorkLogModify:
+		h.handleWorkLogModify(c, req)
+	case models.ActionWorkLogRemove:
+		h.handleWorkLogRemove(c, req)
+	case models.ActionWorkLogList:
+		h.handleWorkLogList(c, req)
+	case models.ActionWorkLogListByTicket:
+		h.handleWorkLogListByTicket(c, req)
+	case models.ActionWorkLogListByUser:
+		h.handleWorkLogListByUser(c, req)
+	case models.ActionWorkLogGetTotalTime:
+		h.handleWorkLogGetTotalTime(c, req)
+
+	// Epic actions (Phase 2)
+	case models.ActionEpicCreate:
+		h.handleEpicCreate(c, req)
+	case models.ActionEpicRead:
+		h.handleEpicRead(c, req)
+	case models.ActionEpicList:
+		h.handleEpicList(c, req)
+	case models.ActionEpicModify:
+		h.handleEpicModify(c, req)
+	case models.ActionEpicRemove:
+		h.handleEpicRemove(c, req)
+	case models.ActionEpicAddStory:
+		h.handleEpicAddStory(c, req)
+	case models.ActionEpicRemoveStory:
+		h.handleEpicRemoveStory(c, req)
+	case models.ActionEpicListStories:
+		h.handleEpicListStories(c, req)
+
+	// Subtask actions (Phase 2)
+	case models.ActionSubtaskCreate:
+		h.handleSubtaskCreate(c, req)
+	case models.ActionSubtaskList:
+		h.handleSubtaskList(c, req)
+	case models.ActionSubtaskMoveToParent:
+		h.handleSubtaskMoveToParent(c, req)
+	case models.ActionSubtaskConvertToIssue:
+		h.handleSubtaskConvertToIssue(c, req)
+	case models.ActionSubtaskListByParent:
+		h.handleSubtaskListByParent(c, req)
+
+	// Project Role actions (Phase 2)
+	case models.ActionProjectRoleCreate:
+		h.handleProjectRoleCreate(c, req)
+	case models.ActionProjectRoleRead:
+		h.handleProjectRoleRead(c, req)
+	case models.ActionProjectRoleList:
+		h.handleProjectRoleList(c, req)
+	case models.ActionProjectRoleModify:
+		h.handleProjectRoleModify(c, req)
+	case models.ActionProjectRoleRemove:
+		h.handleProjectRoleRemove(c, req)
+	case models.ActionProjectRoleAssignUser:
+		h.handleProjectRoleAssignUser(c, req)
+	case models.ActionProjectRoleUnassignUser:
+		h.handleProjectRoleUnassignUser(c, req)
+	case models.ActionProjectRoleListUsers:
+		h.handleProjectRoleListUsers(c, req)
+
+	// Security Level actions (Phase 2)
+	case models.ActionSecurityLevelCreate:
+		h.handleSecurityLevelCreate(c, req)
+	case models.ActionSecurityLevelRead:
+		h.handleSecurityLevelRead(c, req)
+	case models.ActionSecurityLevelList:
+		h.handleSecurityLevelList(c, req)
+	case models.ActionSecurityLevelModify:
+		h.handleSecurityLevelModify(c, req)
+	case models.ActionSecurityLevelRemove:
+		h.handleSecurityLevelRemove(c, req)
+	case models.ActionSecurityLevelGrant:
+		h.handleSecurityLevelGrant(c, req)
+	case models.ActionSecurityLevelRevoke:
+		h.handleSecurityLevelRevoke(c, req)
+	case models.ActionSecurityLevelCheck:
+		h.handleSecurityLevelCheck(c, req)
+
+	// Dashboard actions (Phase 2)
+	case models.ActionDashboardCreate:
+		h.handleDashboardCreate(c, req)
+	case models.ActionDashboardRead:
+		h.handleDashboardRead(c, req)
+	case models.ActionDashboardList:
+		h.handleDashboardList(c, req)
+	case models.ActionDashboardModify:
+		h.handleDashboardModify(c, req)
+	case models.ActionDashboardRemove:
+		h.handleDashboardRemove(c, req)
+	case models.ActionDashboardShare:
+		h.handleDashboardShare(c, req)
+	case models.ActionDashboardUnshare:
+		h.handleDashboardUnshare(c, req)
+	case models.ActionDashboardAddWidget:
+		h.handleDashboardAddWidget(c, req)
+	case models.ActionDashboardRemoveWidget:
+		h.handleDashboardRemoveWidget(c, req)
+	case models.ActionDashboardModifyWidget:
+		h.handleDashboardModifyWidget(c, req)
+	case models.ActionDashboardListWidgets:
+		h.handleDashboardListWidgets(c, req)
+	case models.ActionDashboardSetLayout:
+		h.handleDashboardSetLayout(c, req)
+
 	default:
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidAction,
