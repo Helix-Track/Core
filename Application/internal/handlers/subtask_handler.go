@@ -101,23 +101,66 @@ func (h *Handler) handleSubtaskCreate(c *gin.Context, req *models.Request) {
 		}
 	}
 
+	// Get default ticket type and status
+	var ticketTypeID, ticketStatusID string
+	err = h.db.QueryRow(c.Request.Context(), "SELECT id FROM ticket_type WHERE title = 'task' LIMIT 1").Scan(&ticketTypeID)
+	if err != nil {
+		logger.Error("Failed to get default ticket type", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to get default ticket type",
+			"",
+		))
+		return
+	}
+
+	err = h.db.QueryRow(c.Request.Context(), "SELECT id FROM ticket_status WHERE title = 'open' LIMIT 1").Scan(&ticketStatusID)
+	if err != nil {
+		logger.Error("Failed to get default ticket status", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to get default ticket status",
+			"",
+		))
+		return
+	}
+
+	// Get next ticket number for this project
+	var maxTicketNumber int
+	err = h.db.QueryRow(c.Request.Context(),
+		"SELECT COALESCE(MAX(ticket_number), 0) FROM ticket WHERE project_id = ?",
+		projectID).Scan(&maxTicketNumber)
+	if err != nil {
+		logger.Error("Failed to get max ticket number", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
+			models.ErrorCodeInternalError,
+			"Failed to get max ticket number",
+			"",
+		))
+		return
+	}
+	ticketNumber := maxTicketNumber + 1
+
 	// Create subtask (new ticket with is_subtask=true)
 	subtaskID := uuid.New().String()
 	now := time.Now().Unix()
 
 	query := `
 		INSERT INTO ticket (
-			id, title, description, project_id, parent_ticket_id,
-			is_subtask, created_by, created, modified, deleted
-		) VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, 0)
+			id, ticket_number, title, description, project_id, parent_ticket_id,
+			ticket_type_id, ticket_status_id, is_subtask, creator, created, modified, deleted
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, 0)
 	`
 
 	_, err = h.db.Exec(c.Request.Context(), query,
 		subtaskID,
+		ticketNumber,
 		title,
 		description,
 		projectID,
 		parentTicketID,
+		ticketTypeID,
+		ticketStatusID,
 		username,
 		now,
 		now,
@@ -478,7 +521,7 @@ func (h *Handler) handleSubtaskListByParent(c *gin.Context, req *models.Request)
 
 	// Query subtasks for this parent
 	query := `
-		SELECT id, title, description, status_id, assignee_id, created, modified
+		SELECT id, title, description, status_id, user_id, created, modified
 		FROM ticket
 		WHERE parent_ticket_id = ? AND deleted = 0 AND is_subtask = 1
 		ORDER BY created ASC
@@ -516,10 +559,10 @@ func (h *Handler) handleSubtaskListByParent(c *gin.Context, req *models.Request)
 		if statusID.Valid {
 			// This is a placeholder - you should check if the status represents completion
 			// For example, check if status is "Done" or "Closed"
-			var statusName string
-			statusQuery := `SELECT name FROM ticket_status WHERE id = ?`
-			if err := h.db.QueryRow(c.Request.Context(), statusQuery, statusID.String).Scan(&statusName); err == nil {
-				if statusName == "Done" || statusName == "Closed" || statusName == "Resolved" {
+			var statusTitle string
+			statusQuery := `SELECT title FROM ticket_status WHERE id = ?`
+			if err := h.db.QueryRow(c.Request.Context(), statusQuery, statusID.String).Scan(&statusTitle); err == nil {
+				if statusTitle == "done" || statusTitle == "closed" {
 					isCompleted = true
 					completedCount++
 				}

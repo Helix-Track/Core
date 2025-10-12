@@ -459,8 +459,7 @@ UPDATE audit SET is_public = TRUE WHERE is_public IS NULL;
 
 -- Update schema version information
 UPDATE system_info
-SET description = 'Database schema version 3 - Complete JIRA Feature Parity (Phases 2 & 3)',
-    modified = strftime('%s', 'now')
+SET description = 'Database schema version 3 - Complete JIRA Feature Parity (Phases 2 & 3)'
 WHERE id = (SELECT id FROM system_info ORDER BY created DESC LIMIT 1);
 
 /*
