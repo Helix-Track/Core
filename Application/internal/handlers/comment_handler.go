@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -46,8 +47,8 @@ func (h *Handler) handleCreateComment(c *gin.Context, req *models.Request) {
 	now := time.Now().Unix()
 
 	query := `
-		INSERT INTO comment (id, comment, created, modified, deleted)
-		VALUES (?, ?, ?, ?, ?)
+		INSERT INTO comment (id, comment, created, modified, deleted, version)
+		VALUES (?, ?, ?, ?, ?, ?)
 	`
 
 	_, err := h.db.Exec(
@@ -58,6 +59,7 @@ func (h *Handler) handleCreateComment(c *gin.Context, req *models.Request) {
 		now,
 		now,
 		0,
+		1, // initial version
 	)
 
 	if err != nil {
@@ -151,6 +153,51 @@ func (h *Handler) handleModifyComment(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get expected version for optimistic locking
+	expectedVersion, _ := commentData["version"].(float64)
+	if expectedVersion == 0 {
+		// If no version provided, get current version (backward compatibility)
+		err := h.db.QueryRow(context.Background(),
+			"SELECT version FROM comment WHERE id = ? AND deleted = 0", commentID).Scan(&expectedVersion)
+		if err != nil {
+			c.JSON(http.StatusNotFound, models.NewErrorResponse(
+				models.ErrorCodeEntityNotFound,
+				"Comment not found",
+				"",
+			))
+			return
+		}
+	}
+
+	// Get current comment data for history
+	var currentComment models.Comment
+	err := h.db.QueryRow(context.Background(), `
+		SELECT id, title, description, user_id, parent_id, created, modified, deleted, version
+		FROM comment WHERE id = ? AND deleted = 0
+	`, commentID).Scan(
+		&currentComment.ID, &currentComment.Title, &currentComment.Description,
+		&currentComment.UserID, &currentComment.ParentID, &currentComment.Created,
+		&currentComment.Modified, &currentComment.Deleted, &currentComment.Version,
+	)
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Comment not found",
+			"",
+		))
+		return
+	}
+
+	// Check version conflict
+	if int(expectedVersion) != currentComment.Version {
+		c.JSON(http.StatusConflict, models.NewErrorResponse(
+			models.ErrorCodeVersionConflict,
+			fmt.Sprintf("Version conflict: expected %d, got %d", int(expectedVersion), currentComment.Version),
+			"",
+		))
+		return
+	}
+
 	commentText, _ := commentData["comment"].(string)
 	if commentText == "" {
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
@@ -161,8 +208,10 @@ func (h *Handler) handleModifyComment(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	query := "UPDATE comment SET comment = ?, modified = ? WHERE id = ? AND deleted = 0"
-	_, err := h.db.Exec(context.Background(), query, commentText, time.Now().Unix(), commentID)
+	// Update comment with version increment
+	newVersion := currentComment.Version + 1
+	query := "UPDATE comment SET comment = ?, modified = ?, version = ? WHERE id = ? AND version = ? AND deleted = 0"
+	_, err = h.db.Exec(context.Background(), query, commentText, time.Now().Unix(), newVersion, commentID, currentComment.Version)
 	if err != nil {
 		logger.Error("Failed to update comment", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
@@ -173,15 +222,46 @@ func (h *Handler) handleModifyComment(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Get username from context
+	username, _ := middleware.GetUsername(c)
+
+	// Log comment history
+	oldData := map[string]interface{}{
+		"id":          currentComment.ID,
+		"title":       currentComment.Title,
+		"description": currentComment.Description,
+		"user_id":     currentComment.UserID,
+		"parent_id":   currentComment.ParentID,
+		"version":     currentComment.Version,
+	}
+	newData := map[string]interface{}{
+		"id":          currentComment.ID,
+		"title":       currentComment.Title,
+		"description": commentText,
+		"user_id":     currentComment.UserID,
+		"parent_id":   currentComment.ParentID,
+		"version":     newVersion,
+	}
+	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
+
+	historyID := uuid.New().String()
+	_, err = h.db.Exec(context.Background(), `
+		INSERT INTO comment_history (id, comment_id, version, action, user_id, timestamp, old_data, new_data, change_summary)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`, historyID, commentID, newVersion, models.ActionModify, username, time.Now().Unix(),
+		oldData, newData, changeSummary)
+
+	if err != nil {
+		logger.Error("Failed to record comment history", zap.Error(err))
+		// Don't fail the request for history recording errors
+	}
+
 	// Get project_id from ticket for event context
 	var ticketID, projectID string
 	h.db.QueryRow(context.Background(),
 		`SELECT t.id, t.project_id FROM ticket t
 		 JOIN comment_ticket_mapping ctm ON t.id = ctm.ticket_id
 		 WHERE ctm.comment_id = ? AND t.deleted = 0`, commentID).Scan(&ticketID, &projectID)
-
-	// Get username from context
-	username, _ := middleware.GetUsername(c)
 
 	// Publish comment updated event
 	if projectID != "" {

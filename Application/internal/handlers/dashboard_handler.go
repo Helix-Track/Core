@@ -72,14 +72,14 @@ func (h *Handler) handleDashboardCreate(c *gin.Context, req *models.Request) {
 
 	if layout != "" {
 		query = `
-			INSERT INTO dashboard (id, title, description, owner_id, is_public, is_favorite, layout, created, modified, deleted)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+			INSERT INTO dashboard (id, title, description, owner_id, is_public, is_favorite, layout, created, modified, deleted, version)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)
 		`
 		args = []interface{}{dashboardID, title, description, username, isPublic, isFavorite, layout, now, now}
 	} else {
 		query = `
-			INSERT INTO dashboard (id, title, description, owner_id, is_public, is_favorite, layout, created, modified, deleted)
-			VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, 0)
+			INSERT INTO dashboard (id, title, description, owner_id, is_public, is_favorite, layout, created, modified, deleted, version)
+			VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ?, 0, 1)
 		`
 		args = []interface{}{dashboardID, title, description, username, isPublic, isFavorite, now, now}
 	}

@@ -22,16 +22,17 @@ import (
 
 // Server represents the HTTP server
 type Server struct {
-	config                    *config.Config
-	router                    *gin.Engine
-	httpServer                *http.Server
-	db                        database.Database
-	authService               services.AuthService
-	permService               services.PermissionService
-	serviceDiscoveryHandler   *handlers.ServiceDiscoveryHandler
-	wsManager                 *websocket.Manager
-	wsPublisher               websocket.EventPublisher
-	wsHandler                 *websocket.Handler
+	config                  *config.Config
+	router                  *gin.Engine
+	httpServer              *http.Server
+	db                      database.Database
+	authService             services.AuthService
+	permService             services.PermissionService
+	serviceDiscoveryHandler *handlers.ServiceDiscoveryHandler
+	networkDiscoveryService *services.NetworkDiscoveryService
+	wsManager               *websocket.Manager
+	wsPublisher             websocket.EventPublisher
+	wsHandler               *websocket.Handler
 }
 
 // NewServer creates a new server instance
@@ -61,6 +62,16 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		return nil, fmt.Errorf("failed to initialize service discovery handler: %w", err)
 	}
 
+	// Initialize network discovery service
+	listener := cfg.GetPrimaryListener()
+	host := "localhost"
+	port := 8080
+	if listener != nil {
+		host = listener.Address
+		port = listener.Port
+	}
+	networkDiscoveryService := services.NewNetworkDiscoveryService(port, host)
+
 	// Initialize WebSocket manager and publisher
 	var wsManager *websocket.Manager
 	var wsPublisher websocket.EventPublisher
@@ -87,6 +98,7 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		authService:             authService,
 		permService:             permService,
 		serviceDiscoveryHandler: serviceDiscoveryHandler,
+		networkDiscoveryService: networkDiscoveryService,
 		wsManager:               wsManager,
 		wsPublisher:             wsPublisher,
 		wsHandler:               wsHandler,
@@ -303,6 +315,12 @@ func (s *Server) Start() error {
 		logger.Info("WebSocket manager started")
 	}
 
+	// Start network discovery service
+	if err := s.networkDiscoveryService.Start(); err != nil {
+		return fmt.Errorf("failed to start network discovery service: %w", err)
+	}
+	logger.Info("Network discovery service started")
+
 	addr := s.config.GetListenerAddress()
 
 	s.httpServer = &http.Server{
@@ -337,6 +355,12 @@ func (s *Server) Shutdown(ctx context.Context) error {
 		if err := s.wsManager.Stop(); err != nil {
 			logger.Error("Error stopping WebSocket manager", zap.Error(err))
 		}
+	}
+
+	// Stop network discovery service
+	logger.Info("Stopping network discovery service...")
+	if err := s.networkDiscoveryService.Stop(); err != nil {
+		logger.Error("Error stopping network discovery service", zap.Error(err))
 	}
 
 	// Stop health checker

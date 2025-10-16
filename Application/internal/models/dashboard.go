@@ -12,6 +12,7 @@ type Dashboard struct {
 	Created     int64   `json:"created" db:"created"`
 	Modified    int64   `json:"modified" db:"modified"`
 	Deleted     bool    `json:"deleted" db:"deleted"`
+	Version     int     `json:"version" db:"version"` // Optimistic locking version
 }
 
 // DashboardWidget represents a widget on a dashboard

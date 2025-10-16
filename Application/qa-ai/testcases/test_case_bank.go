@@ -6,42 +6,42 @@ import (
 
 // TestCase represents a single test case
 type TestCase struct {
-	ID              string
-	Name            string
-	Description     string
-	Suite           string
-	Priority        int
-	Tags            []string
-	Prerequisites   []string
-	Steps           []TestStep
-	ExpectedResult  string
-	CleanupSteps    []TestStep
-	Timeout         time.Duration
-	RetryOnFailure  bool
-	DatabaseChecks  []DatabaseCheck
+	ID             string
+	Name           string
+	Description    string
+	Suite          string
+	Priority       int
+	Tags           []string
+	Prerequisites  []string
+	Steps          []TestStep
+	ExpectedResult string
+	CleanupSteps   []TestStep
+	Timeout        time.Duration
+	RetryOnFailure bool
+	DatabaseChecks []DatabaseCheck
 }
 
 // TestStep represents a single step in a test case
 type TestStep struct {
-	ID          string
-	Description string
-	Action      string
-	Method      string
-	Endpoint    string
-	Payload     interface{}
-	Headers     map[string]string
-	Expected    ExpectedResult
+	ID           string
+	Description  string
+	Action       string
+	Method       string
+	Endpoint     string
+	Payload      interface{}
+	Headers      map[string]string
+	Expected     ExpectedResult
 	SaveResponse string // Variable name to save response
 }
 
 // ExpectedResult defines what to expect from a test step
 type ExpectedResult struct {
-	StatusCode    int
-	BodyContains  []string
+	StatusCode      int
+	BodyContains    []string
 	BodyNotContains []string
-	HeadersContain map[string]string
-	JSONPath      map[string]interface{} // JSONPath expressions to verify
-	ResponseTime  time.Duration // Maximum response time
+	HeadersContain  map[string]string
+	JSONPath        map[string]interface{} // JSONPath expressions to verify
+	ResponseTime    time.Duration          // Maximum response time
 }
 
 // DatabaseCheck represents a database verification
@@ -158,12 +158,12 @@ func getRegistrationTestCase() TestCase {
 
 func getLoginTestCase() TestCase {
 	return TestCase{
-		ID:          "AUTH-002",
-		Name:        "User Login",
-		Description: "Test user login with valid credentials",
-		Suite:       "authentication",
-		Priority:    1,
-		Tags:        []string{"critical", "authentication"},
+		ID:            "AUTH-002",
+		Name:          "User Login",
+		Description:   "Test user login with valid credentials",
+		Suite:         "authentication",
+		Priority:      1,
+		Tags:          []string{"critical", "authentication"},
 		Prerequisites: []string{"AUTH-001"},
 		Steps: []TestStep{
 			{
@@ -231,12 +231,12 @@ func getLoginInvalidCredsTestCase() TestCase {
 
 func getJWTValidationTestCase() TestCase {
 	return TestCase{
-		ID:          "AUTH-004",
-		Name:        "JWT Token Validation",
-		Description: "Test JWT token validation for authenticated requests",
-		Suite:       "authentication",
-		Priority:    1,
-		Tags:        []string{"critical", "authentication", "jwt"},
+		ID:            "AUTH-004",
+		Name:          "JWT Token Validation",
+		Description:   "Test JWT token validation for authenticated requests",
+		Suite:         "authentication",
+		Priority:      1,
+		Tags:          []string{"critical", "authentication", "jwt"},
 		Prerequisites: []string{"AUTH-002"},
 		Steps: []TestStep{
 			{
@@ -265,12 +265,12 @@ func getJWTValidationTestCase() TestCase {
 
 func getLogoutTestCase() TestCase {
 	return TestCase{
-		ID:          "AUTH-005",
-		Name:        "User Logout",
-		Description: "Test user logout functionality",
-		Suite:       "authentication",
-		Priority:    2,
-		Tags:        []string{"authentication"},
+		ID:            "AUTH-005",
+		Name:          "User Logout",
+		Description:   "Test user logout functionality",
+		Suite:         "authentication",
+		Priority:      2,
+		Tags:          []string{"authentication"},
 		Prerequisites: []string{"AUTH-002"},
 		Steps: []TestStep{
 			{
@@ -297,12 +297,12 @@ func getLogoutTestCase() TestCase {
 
 func getCreateProjectTestCase() TestCase {
 	return TestCase{
-		ID:          "PROJ-001",
-		Name:        "Create Project",
-		Description: "Test project creation with valid data",
-		Suite:       "projects",
-		Priority:    2,
-		Tags:        []string{"core", "projects", "crud"},
+		ID:            "PROJ-001",
+		Name:          "Create Project",
+		Description:   "Test project creation with valid data",
+		Suite:         "projects",
+		Priority:      2,
+		Tags:          []string{"core", "projects", "crud"},
 		Prerequisites: []string{"AUTH-002"},
 		Steps: []TestStep{
 			{
@@ -350,12 +350,12 @@ func getCreateProjectTestCase() TestCase {
 
 func getUpdateProjectTestCase() TestCase {
 	return TestCase{
-		ID:          "PROJ-002",
-		Name:        "Update Project",
-		Description: "Test project update functionality",
-		Suite:       "projects",
-		Priority:    2,
-		Tags:        []string{"core", "projects", "crud"},
+		ID:            "PROJ-002",
+		Name:          "Update Project",
+		Description:   "Test project update functionality",
+		Suite:         "projects",
+		Priority:      2,
+		Tags:          []string{"core", "projects", "crud"},
 		Prerequisites: []string{"PROJ-001"},
 		Steps: []TestStep{
 			{
@@ -376,7 +376,7 @@ func getUpdateProjectTestCase() TestCase {
 					},
 				},
 				Expected: ExpectedResult{
-					StatusCode:   200,
+					StatusCode: 200,
 					JSONPath: map[string]interface{}{
 						"errorCode": -1,
 					},
@@ -399,12 +399,12 @@ func getUpdateProjectTestCase() TestCase {
 
 func getDeleteProjectTestCase() TestCase {
 	return TestCase{
-		ID:          "PROJ-003",
-		Name:        "Delete Project",
-		Description: "Test project deletion functionality",
-		Suite:       "projects",
-		Priority:    2,
-		Tags:        []string{"core", "projects", "crud"},
+		ID:            "PROJ-003",
+		Name:          "Delete Project",
+		Description:   "Test project deletion functionality",
+		Suite:         "projects",
+		Priority:      2,
+		Tags:          []string{"core", "projects", "crud"},
 		Prerequisites: []string{"PROJ-001"},
 		Steps: []TestStep{
 			{
@@ -424,7 +424,7 @@ func getDeleteProjectTestCase() TestCase {
 					},
 				},
 				Expected: ExpectedResult{
-					StatusCode:   200,
+					StatusCode: 200,
 					JSONPath: map[string]interface{}{
 						"errorCode": -1,
 					},
@@ -447,12 +447,12 @@ func getDeleteProjectTestCase() TestCase {
 
 func getListProjectsTestCase() TestCase {
 	return TestCase{
-		ID:          "PROJ-004",
-		Name:        "List Projects",
-		Description: "Test listing all projects",
-		Suite:       "projects",
-		Priority:    2,
-		Tags:        []string{"core", "projects"},
+		ID:            "PROJ-004",
+		Name:          "List Projects",
+		Description:   "Test listing all projects",
+		Suite:         "projects",
+		Priority:      2,
+		Tags:          []string{"core", "projects"},
 		Prerequisites: []string{"AUTH-002"},
 		Steps: []TestStep{
 			{
@@ -482,12 +482,12 @@ func getListProjectsTestCase() TestCase {
 
 func getProjectPermissionsTestCase() TestCase {
 	return TestCase{
-		ID:          "PROJ-005",
-		Name:        "Project Permissions",
-		Description: "Test project permission enforcement",
-		Suite:       "projects",
-		Priority:    1,
-		Tags:        []string{"critical", "security", "permissions"},
+		ID:            "PROJ-005",
+		Name:          "Project Permissions",
+		Description:   "Test project permission enforcement",
+		Suite:         "projects",
+		Priority:      1,
+		Tags:          []string{"critical", "security", "permissions"},
 		Prerequisites: []string{"PROJ-001"},
 		Steps: []TestStep{
 			{
@@ -525,12 +525,12 @@ func getProjectPermissionsTestCase() TestCase {
 
 func getCreateTicketTestCase() TestCase {
 	return TestCase{
-		ID:          "TICKET-001",
-		Name:        "Create Ticket",
-		Description: "Test ticket creation with valid data",
-		Suite:       "tickets",
-		Priority:    2,
-		Tags:        []string{"core", "tickets", "crud"},
+		ID:            "TICKET-001",
+		Name:          "Create Ticket",
+		Description:   "Test ticket creation with valid data",
+		Suite:         "tickets",
+		Priority:      2,
+		Tags:          []string{"core", "tickets", "crud"},
 		Prerequisites: []string{"PROJ-001"},
 		Steps: []TestStep{
 			{
@@ -579,12 +579,12 @@ func getCreateTicketTestCase() TestCase {
 
 func getUpdateTicketTestCase() TestCase {
 	return TestCase{
-		ID:          "TICKET-002",
-		Name:        "Update Ticket",
-		Description: "Test ticket update functionality",
-		Suite:       "tickets",
-		Priority:    2,
-		Tags:        []string{"core", "tickets", "crud"},
+		ID:            "TICKET-002",
+		Name:          "Update Ticket",
+		Description:   "Test ticket update functionality",
+		Suite:         "tickets",
+		Priority:      2,
+		Tags:          []string{"core", "tickets", "crud"},
 		Prerequisites: []string{"TICKET-001"},
 		Steps: []TestStep{
 			{
@@ -605,7 +605,7 @@ func getUpdateTicketTestCase() TestCase {
 					},
 				},
 				Expected: ExpectedResult{
-					StatusCode:   200,
+					StatusCode: 200,
 					JSONPath: map[string]interface{}{
 						"errorCode": -1,
 					},
@@ -649,8 +649,101 @@ func getSQLInjectionTestCase() TestCase        { return TestCase{ID: "SEC-003"} 
 func getRateLimitingTestCase() TestCase        { return TestCase{ID: "SEC-004"} }
 func getBruteForceTestCase() TestCase          { return TestCase{ID: "SEC-005"} }
 func getInvalidInputTestCase() TestCase        { return TestCase{ID: "EDGE-001"} }
-func getConcurrentUpdatesTestCase() TestCase   { return TestCase{ID: "EDGE-002"} }
-func getLargeDatasetTestCase() TestCase        { return TestCase{ID: "EDGE-003"} }
-func getDataConsistencyTestCase() TestCase     { return TestCase{ID: "DB-001"} }
-func getForeignKeyTestCase() TestCase          { return TestCase{ID: "DB-002"} }
-func getTransactionTestCase() TestCase         { return TestCase{ID: "DB-003"} }
+func getConcurrentUpdatesTestCase() TestCase {
+	return TestCase{
+		ID:          "EDGE-002",
+		Name:        "Concurrent Updates with Version Control",
+		Description: "Test parallel editing with version conflict detection",
+		Suite:       "Edge Cases",
+		Priority:    1,
+		Tags:        []string{"concurrent", "versioning", "conflict"},
+		Prerequisites: []string{
+			"Database schema V4 applied",
+			"Core API running",
+		},
+		Steps: []TestStep{
+			{
+				ID:          "CU-001",
+				Description: "Create test project",
+				Action:      "Create project for concurrent testing",
+				Method:      "POST",
+				Endpoint:    "/do",
+				Payload: map[string]interface{}{
+					"action": "create",
+					"object": "project",
+					"data": map[string]interface{}{
+						"title": "Concurrent Updates Test Project",
+					},
+				},
+				Expected: ExpectedResult{
+					StatusCode: 200,
+				},
+				SaveResponse: "project_response",
+			},
+			{
+				ID:          "CU-002",
+				Description: "Create test ticket",
+				Action:      "Create ticket for concurrent testing",
+				Method:      "POST",
+				Endpoint:    "/do",
+				Payload: map[string]interface{}{
+					"action": "create",
+					"object": "ticket",
+					"data": map[string]interface{}{
+						"project_id": "project_response.data.project.id",
+						"title":      "Concurrent Updates Test Ticket",
+					},
+				},
+				Expected: ExpectedResult{
+					StatusCode: 200,
+				},
+				SaveResponse: "ticket_response",
+			},
+			{
+				ID:          "CU-003",
+				Description: "First modification (should succeed)",
+				Action:      "First user modifies ticket",
+				Method:      "POST",
+				Endpoint:    "/do",
+				Payload: map[string]interface{}{
+					"action": "modify",
+					"object": "ticket",
+					"data": map[string]interface{}{
+						"id":      "ticket_response.data.ticket.id",
+						"version": 1,
+						"title":   "Modified by User 1",
+					},
+				},
+				Expected: ExpectedResult{
+					StatusCode: 200,
+				},
+			},
+			{
+				ID:          "CU-004",
+				Description: "Second modification with stale version (should fail)",
+				Action:      "Second user tries to modify with old version",
+				Method:      "POST",
+				Endpoint:    "/do",
+				Payload: map[string]interface{}{
+					"action": "modify",
+					"object": "ticket",
+					"data": map[string]interface{}{
+						"id":      "ticket_response.data.ticket.id",
+						"version": 1, // Stale version
+						"title":   "Modified by User 2",
+					},
+				},
+				Expected: ExpectedResult{
+					StatusCode: 409, // Conflict
+				},
+			},
+		},
+		ExpectedResult: "Version conflicts properly detected in concurrent scenarios",
+		Timeout:        30 * time.Second,
+		RetryOnFailure: false,
+	}
+}
+func getLargeDatasetTestCase() TestCase    { return TestCase{ID: "EDGE-003"} }
+func getDataConsistencyTestCase() TestCase { return TestCase{ID: "DB-001"} }
+func getForeignKeyTestCase() TestCase      { return TestCase{ID: "DB-002"} }
+func getTransactionTestCase() TestCase     { return TestCase{ID: "DB-003"} }

@@ -68,8 +68,8 @@ func (h *Handler) handleCreateProject(c *gin.Context, req *models.Request) {
 	now := time.Now().Unix()
 
 	query := `
-		INSERT INTO project (id, identifier, title, description, workflow_id, created, modified, deleted)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO project (id, identifier, title, description, workflow_id, created, modified, deleted, version)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
 	_, err = h.db.Exec(
@@ -83,6 +83,7 @@ func (h *Handler) handleCreateProject(c *gin.Context, req *models.Request) {
 		now,
 		now,
 		0,
+		1, // initial version
 	)
 
 	if err != nil {
@@ -146,16 +147,46 @@ func (h *Handler) handleModifyProject(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// Check if project exists
-	var exists int
-	err := h.db.QueryRow(context.Background(),
-		"SELECT COUNT(*) FROM project WHERE id = ? AND deleted = 0",
-		projectID).Scan(&exists)
+	// Get expected version for optimistic locking
+	expectedVersion, _ := projectData["version"].(float64)
+	if expectedVersion == 0 {
+		// If no version provided, get current version (backward compatibility)
+		err := h.db.QueryRow(context.Background(),
+			"SELECT version FROM project WHERE id = ? AND deleted = 0", projectID).Scan(&expectedVersion)
+		if err != nil {
+			c.JSON(http.StatusNotFound, models.NewErrorResponse(
+				models.ErrorCodeEntityNotFound,
+				"Project not found",
+				"",
+			))
+			return
+		}
+	}
 
-	if err != nil || exists == 0 {
+	// Get current project data for history
+	var currentProject models.Project
+	err := h.db.QueryRow(context.Background(), `
+		SELECT id, identifier, title, description, workflow_id, created, modified, deleted, version
+		FROM project WHERE id = ? AND deleted = 0
+	`, projectID).Scan(
+		&currentProject.ID, &currentProject.Identifier, &currentProject.Title,
+		&currentProject.Description, &currentProject.WorkflowID, &currentProject.Created,
+		&currentProject.Modified, &currentProject.Deleted, &currentProject.Version,
+	)
+	if err != nil {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
 			models.ErrorCodeEntityNotFound,
 			"Project not found",
+			"",
+		))
+		return
+	}
+
+	// Check version conflict
+	if int(expectedVersion) != currentProject.Version {
+		c.JSON(http.StatusConflict, models.NewErrorResponse(
+			models.ErrorCodeVersionConflict,
+			fmt.Sprintf("Version conflict: expected %d, got %d", int(expectedVersion), currentProject.Version),
 			"",
 		))
 		return
@@ -180,14 +211,18 @@ func (h *Handler) handleModifyProject(c *gin.Context, req *models.Request) {
 		args = append(args, identifier)
 	}
 
-	// Always update modified timestamp
+	// Always update modified timestamp and version
 	updates = append(updates, "modified = ?")
 	args = append(args, time.Now().Unix())
+	updates = append(updates, "version = ?")
+	newVersion := currentProject.Version + 1
+	args = append(args, newVersion)
 
-	// Add project ID to args
+	// Add project ID and current version to args for WHERE
 	args = append(args, projectID)
+	args = append(args, currentProject.Version)
 
-	query := fmt.Sprintf("UPDATE project SET %s WHERE id = ?",
+	query := fmt.Sprintf("UPDATE project SET %s WHERE id = ? AND version = ?",
 		joinWithComma(updates))
 
 	_, err = h.db.Exec(context.Background(), query, args...)
@@ -204,6 +239,37 @@ func (h *Handler) handleModifyProject(c *gin.Context, req *models.Request) {
 	// Get username from context
 	username, _ := middleware.GetUsername(c)
 
+	// Log project history
+	oldData := map[string]interface{}{
+		"id":          currentProject.ID,
+		"identifier":  currentProject.Identifier,
+		"title":       currentProject.Title,
+		"description": currentProject.Description,
+		"workflow_id": currentProject.WorkflowID,
+		"version":     currentProject.Version,
+	}
+	newData := map[string]interface{}{
+		"id":          currentProject.ID,
+		"identifier":  projectData["identifier"],
+		"title":       projectData["title"],
+		"description": projectData["description"],
+		"workflow_id": currentProject.WorkflowID,
+		"version":     newVersion,
+	}
+	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
+
+	historyID := uuid.New().String()
+	_, err = h.db.Exec(context.Background(), `
+		INSERT INTO project_history (id, project_id, version, action, user_id, timestamp, old_data, new_data, change_summary)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`, historyID, projectID, newVersion, models.ActionModify, username, time.Now().Unix(),
+		oldData, newData, changeSummary)
+
+	if err != nil {
+		logger.Error("Failed to record project history", zap.Error(err))
+		// Don't fail the request for history recording errors
+	}
+
 	// Publish project updated event
 	h.publisher.PublishEntityEvent(
 		models.ActionModify,
@@ -218,6 +284,7 @@ func (h *Handler) handleModifyProject(c *gin.Context, req *models.Request) {
 		"project": map[string]interface{}{
 			"id":      projectID,
 			"updated": true,
+			"version": newVersion,
 		},
 	})
 

@@ -7,11 +7,12 @@ type Comment struct {
 	ID          string `json:"id" db:"id"`
 	Title       string `json:"title" db:"title"`
 	Description string `json:"description" db:"description"`
-	UserID      string `json:"userId" db:"user_id"`   // Comment author
+	UserID      string `json:"userId" db:"user_id"`     // Comment author
 	ParentID    string `json:"parentId" db:"parent_id"` // For nested comments
 	Created     int64  `json:"created" db:"created"`
 	Modified    int64  `json:"modified" db:"modified"`
 	Deleted     bool   `json:"deleted" db:"deleted"`
+	Version     int    `json:"version" db:"version"` // Optimistic locking version
 }
 
 // NewComment creates a new comment with current timestamps
@@ -26,5 +27,6 @@ func NewComment(id, title, description, userID, parentID string) *Comment {
 		Created:     now,
 		Modified:    now,
 		Deleted:     false,
+		Version:     1,
 	}
 }

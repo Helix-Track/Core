@@ -12,6 +12,7 @@ type Project struct {
 	Created     int64  `json:"created" db:"created"`
 	Modified    int64  `json:"modified" db:"modified"`
 	Deleted     bool   `json:"deleted" db:"deleted"`
+	Version     int    `json:"version" db:"version"` // Optimistic locking version
 }
 
 // NewProject creates a new project with current timestamps
@@ -26,5 +27,6 @@ func NewProject(id, title, description, identifier, workflowID string) *Project 
 		Created:     now,
 		Modified:    now,
 		Deleted:     false,
+		Version:     1,
 	}
 }

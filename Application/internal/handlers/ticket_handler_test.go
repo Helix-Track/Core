@@ -361,7 +361,7 @@ func TestTicketHandler_Create_TicketNumberIncrement(t *testing.T) {
 		c.Request = req
 		c.Set("username", "testuser")
 
-	c.Set("request", &reqBody)
+		c.Set("request", &reqBody)
 		handler.DoAction(c)
 
 		var resp models.Response
@@ -396,7 +396,7 @@ func TestTicketHandler_Create_DifferentTypes(t *testing.T) {
 		c.Request = req
 		c.Set("username", "testuser")
 
-	c.Set("request", &reqBody)
+		c.Set("request", &reqBody)
 		handler.DoAction(c)
 
 		assert.Equal(t, http.StatusOK, w.Code)
@@ -597,6 +597,214 @@ func TestTicketHandler_Modify_OnlyTitle(t *testing.T) {
 	handler.DoAction(cModify)
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
+}
+
+func TestTicketHandler_Modify_VersionConflict(t *testing.T) {
+	handler, projectID := setupTicketTestHandler(t)
+
+	// Create ticket first
+	createReq := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"project_id": projectID,
+			"title":      "Version Conflict Test",
+		},
+	}
+	createBody, _ := json.Marshal(createReq)
+	createHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(createBody))
+	createHttpReq.Header.Set("Content-Type", "application/json")
+	wCreate := httptest.NewRecorder()
+	cCreate, _ := gin.CreateTestContext(wCreate)
+	cCreate.Request = createHttpReq
+	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
+	handler.DoAction(cCreate)
+
+	var createResp models.Response
+	json.NewDecoder(wCreate.Body).Decode(&createResp)
+	ticketID := createResp.Data["ticket"].(map[string]interface{})["id"].(string)
+
+	// First modify with correct version (should succeed)
+	modifyReq1 := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":      ticketID,
+			"version": 1.0, // Correct version
+			"title":   "Updated by User 1",
+		},
+	}
+	modifyBody1, _ := json.Marshal(modifyReq1)
+	modifyHttpReq1 := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(modifyBody1))
+	modifyHttpReq1.Header.Set("Content-Type", "application/json")
+	wModify1 := httptest.NewRecorder()
+	cModify1, _ := gin.CreateTestContext(wModify1)
+	cModify1.Request = modifyHttpReq1
+	cModify1.Set("username", "user1")
+	cModify1.Set("request", &modifyReq1)
+	handler.DoAction(cModify1)
+
+	assert.Equal(t, http.StatusOK, wModify1.Code)
+
+	// Second modify with stale version (should fail)
+	modifyReq2 := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":      ticketID,
+			"version": 1.0, // Stale version
+			"title":   "Updated by User 2",
+		},
+	}
+	modifyBody2, _ := json.Marshal(modifyReq2)
+	modifyHttpReq2 := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(modifyBody2))
+	modifyHttpReq2.Header.Set("Content-Type", "application/json")
+	wModify2 := httptest.NewRecorder()
+	cModify2, _ := gin.CreateTestContext(wModify2)
+	cModify2.Request = modifyHttpReq2
+	cModify2.Set("username", "user2")
+	cModify2.Set("request", &modifyReq2)
+	handler.DoAction(cModify2)
+
+	assert.Equal(t, http.StatusConflict, wModify2.Code)
+
+	var conflictResp models.Response
+	json.NewDecoder(wModify2.Body).Decode(&conflictResp)
+	assert.Equal(t, models.ErrorCodeVersionConflict, conflictResp.ErrorCode)
+}
+
+func TestTicketHandler_Modify_BackwardCompatibility(t *testing.T) {
+	handler, projectID := setupTicketTestHandler(t)
+
+	// Create ticket first
+	createReq := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"project_id": projectID,
+			"title":      "Backward Compatibility Test",
+		},
+	}
+	createBody, _ := json.Marshal(createReq)
+	createHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(createBody))
+	createHttpReq.Header.Set("Content-Type", "application/json")
+	wCreate := httptest.NewRecorder()
+	cCreate, _ := gin.CreateTestContext(wCreate)
+	cCreate.Request = createHttpReq
+	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
+	handler.DoAction(cCreate)
+
+	var createResp models.Response
+	json.NewDecoder(wCreate.Body).Decode(&createResp)
+	ticketID := createResp.Data["ticket"].(map[string]interface{})["id"].(string)
+
+	// Modify without version (backward compatibility)
+	modifyReq := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":    ticketID,
+			"title": "Updated without version",
+		},
+	}
+	modifyBody, _ := json.Marshal(modifyReq)
+	modifyHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(modifyBody))
+	modifyHttpReq.Header.Set("Content-Type", "application/json")
+	wModify := httptest.NewRecorder()
+	cModify, _ := gin.CreateTestContext(wModify)
+	cModify.Request = modifyHttpReq
+	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
+	handler.DoAction(cModify)
+
+	assert.Equal(t, http.StatusOK, wModify.Code)
+
+	var modifyResp models.Response
+	json.NewDecoder(wModify.Body).Decode(&modifyResp)
+	assert.Equal(t, models.ErrorCodeNoError, modifyResp.ErrorCode)
+	modifiedTicket := modifyResp.Data["ticket"].(map[string]interface{})
+	assert.Equal(t, float64(2), modifiedTicket["version"]) // Version should be incremented
+}
+
+func TestTicketHandler_Modify_HistoryRecording(t *testing.T) {
+	handler, projectID := setupTicketTestHandler(t)
+
+	// Create ticket first
+	createReq := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"project_id": projectID,
+			"title":      "History Test",
+		},
+	}
+	createBody, _ := json.Marshal(createReq)
+	createHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(createBody))
+	createHttpReq.Header.Set("Content-Type", "application/json")
+	wCreate := httptest.NewRecorder()
+	cCreate, _ := gin.CreateTestContext(wCreate)
+	cCreate.Request = createHttpReq
+	cCreate.Set("username", "testuser")
+	cCreate.Set("request", &createReq)
+	handler.DoAction(cCreate)
+
+	var createResp models.Response
+	json.NewDecoder(wCreate.Body).Decode(&createResp)
+	ticketID := createResp.Data["ticket"].(map[string]interface{})["id"].(string)
+
+	// Modify ticket
+	modifyReq := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":          ticketID,
+			"version":     1.0,
+			"title":       "Modified Title",
+			"description": "Modified description",
+		},
+	}
+	modifyBody, _ := json.Marshal(modifyReq)
+	modifyHttpReq := httptest.NewRequest(http.MethodPost, "/do", bytes.NewBuffer(modifyBody))
+	modifyHttpReq.Header.Set("Content-Type", "application/json")
+	wModify := httptest.NewRecorder()
+	cModify, _ := gin.CreateTestContext(wModify)
+	cModify.Request = modifyHttpReq
+	cModify.Set("username", "testuser")
+	cModify.Set("request", &modifyReq)
+	handler.DoAction(cModify)
+
+	assert.Equal(t, http.StatusOK, wModify.Code)
+
+	// Verify history was recorded
+	var historyCount int
+	err := handler.db.QueryRow(context.Background(),
+		"SELECT COUNT(*) FROM ticket_history WHERE ticket_id = ?", ticketID).Scan(&historyCount)
+	require.NoError(t, err)
+	assert.Equal(t, 2, historyCount) // One for create, one for modify
+
+	// Verify history content
+	rows, err := handler.db.Query(context.Background(),
+		"SELECT action, user_id, change_summary FROM ticket_history WHERE ticket_id = ? ORDER BY timestamp",
+		ticketID)
+	require.NoError(t, err)
+	defer rows.Close()
+
+	var actions []string
+	var users []string
+	var summaries []string
+	for rows.Next() {
+		var action, user, summary string
+		rows.Scan(&action, &user, &summary)
+		actions = append(actions, action)
+		users = append(users, user)
+		summaries = append(summaries, summary)
+	}
+
+	assert.Equal(t, []string{"create", "modify"}, actions)
+	assert.Equal(t, []string{"testuser", "testuser"}, users)
+	assert.Contains(t, summaries[1], "title changed")
 }
 
 // =============================================================================
@@ -941,7 +1149,7 @@ func TestTicketHandler_List_Multiple(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
-	cCreate.Set("request", &createReq)
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -1004,7 +1212,7 @@ func TestTicketHandler_List_FilterByProject(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
-	cCreate.Set("request", &createReq)
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 	}
 
@@ -1082,7 +1290,7 @@ func TestTicketHandler_List_ExcludesDeleted(t *testing.T) {
 		cCreate, _ := gin.CreateTestContext(wCreate)
 		cCreate.Request = createHttpReq
 		cCreate.Set("username", "testuser")
-	cCreate.Set("request", &createReq)
+		cCreate.Set("request", &createReq)
 		handler.DoAction(cCreate)
 
 		if i == 1 {

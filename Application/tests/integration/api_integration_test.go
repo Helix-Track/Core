@@ -562,3 +562,111 @@ func performRequestWithAuth(router *gin.Engine, method, path string, body interf
 
 	return w
 }
+
+// TestAPI_ParallelEditing_ConcurrentModifications tests parallel editing with version conflicts
+func TestAPI_ParallelEditing_ConcurrentModifications(t *testing.T) {
+	db, authService, permService := setupIntegrationTest(t)
+	defer db.Close()
+
+	handler := handlers.NewHandler(db, authService, permService, "4.0.0-test")
+
+	router := gin.New()
+	router.POST("/do", func(c *gin.Context) {
+		bodyBytes, _ := c.GetRawData()
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+		var req models.Request
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+				models.ErrorCodeInvalidRequest,
+				"Invalid request format",
+				"",
+			))
+			return
+		}
+
+		c.Set("request", &req)
+		c.Set("username", "testuser") // Set test user
+		handler.DoAction(c)
+	})
+
+	// Create a project first
+	projectReq := models.Request{
+		Action: models.ActionCreate,
+		Object: "project",
+		Data: map[string]interface{}{
+			"title":       "Parallel Editing Test Project",
+			"description": "Testing parallel editing features",
+		},
+	}
+	w := performRequest(router, "POST", "/do", projectReq)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var projectResp models.Response
+	json.NewDecoder(w.Body).Decode(&projectResp)
+	projectID := projectResp.Data["project"].(map[string]interface{})["id"].(string)
+
+	// Create a ticket
+	ticketReq := models.Request{
+		Action: models.ActionCreate,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"project_id": projectID,
+			"title":      "Parallel Editing Test Ticket",
+		},
+	}
+	w = performRequest(router, "POST", "/do", ticketReq)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var ticketResp models.Response
+	json.NewDecoder(w.Body).Decode(&ticketResp)
+	ticketID := ticketResp.Data["ticket"].(map[string]interface{})["id"].(string)
+
+	// First modification (should succeed)
+	modifyReq1 := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":      ticketID,
+			"version": 1.0,
+			"title":   "Modified by User 1",
+		},
+	}
+	w1 := performRequest(router, "POST", "/do", modifyReq1)
+	assert.Equal(t, http.StatusOK, w1.Code)
+
+	var modifyResp1 models.Response
+	json.NewDecoder(w1.Body).Decode(&modifyResp1)
+	assert.Equal(t, models.ErrorCodeNoError, modifyResp1.ErrorCode)
+	assert.Equal(t, float64(2), modifyResp1.Data["ticket"].(map[string]interface{})["version"])
+
+	// Second modification with correct version (should succeed)
+	modifyReq2 := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":      ticketID,
+			"version": 2.0,
+			"title":   "Modified by User 2",
+		},
+	}
+	w2 := performRequest(router, "POST", "/do", modifyReq2)
+	assert.Equal(t, http.StatusOK, w2.Code)
+
+	// Third modification with stale version (should fail)
+	modifyReq3 := models.Request{
+		Action: models.ActionModify,
+		Object: "ticket",
+		Data: map[string]interface{}{
+			"id":      ticketID,
+			"version": 1.0, // Stale version
+			"title":   "Modified by User 3",
+		},
+	}
+	w3 := performRequest(router, "POST", "/do", modifyReq3)
+	assert.Equal(t, http.StatusConflict, w3.Code)
+
+	var conflictResp models.Response
+	json.NewDecoder(w3.Body).Decode(&conflictResp)
+	assert.Equal(t, models.ErrorCodeVersionConflict, conflictResp.ErrorCode)
+}

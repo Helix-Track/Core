@@ -99,10 +99,10 @@ func (h *Handler) handleCreateTicket(c *gin.Context, req *models.Request) {
 	now := time.Now().Unix()
 
 	query := `
-		INSERT INTO ticket (id, ticket_number, position, title, description, created, modified, 
-		                    ticket_type_id, ticket_status_id, project_id, user_id, 
-		                    estimation, story_points, creator, deleted)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO ticket (id, ticket_number, position, title, description, created, modified,
+		                    ticket_type_id, ticket_status_id, project_id, user_id,
+		                    estimation, story_points, creator, deleted, version)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
 	_, err = h.db.Exec(
@@ -123,6 +123,7 @@ func (h *Handler) handleCreateTicket(c *gin.Context, req *models.Request) {
 		0,   // story_points
 		username,
 		0, // not deleted
+		1, // initial version
 	)
 
 	if err != nil {
@@ -133,6 +134,29 @@ func (h *Handler) handleCreateTicket(c *gin.Context, req *models.Request) {
 			"",
 		))
 		return
+	}
+
+	// Record creation history
+	historyID := uuid.New().String()
+	newData := map[string]interface{}{
+		"id":            ticketID,
+		"ticket_number": ticketNumber,
+		"title":         title,
+		"description":   description,
+		"type":          ticketTypeStr,
+		"status":        "open",
+		"project_id":    projectID,
+		"version":       1,
+	}
+
+	_, err = h.db.Exec(context.Background(), `
+		INSERT INTO ticket_history (id, ticket_id, version, action, user_id, timestamp, new_data, change_summary)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+	`, historyID, ticketID, 1, models.ActionCreate, username, now, newData, "Ticket created")
+
+	if err != nil {
+		logger.Error("Failed to record ticket creation history", zap.Error(err))
+		// Don't fail the request for history recording errors
 	}
 
 	// Publish ticket created event
@@ -171,7 +195,7 @@ func (h *Handler) handleCreateTicket(c *gin.Context, req *models.Request) {
 	c.JSON(http.StatusOK, response)
 }
 
-// handleModifyTicket updates an existing ticket
+// handleModifyTicket updates an existing ticket with optimistic locking
 func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 	ticketData, ok := req.Data["data"].(map[string]interface{})
 	if !ok {
@@ -188,9 +212,72 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// Build update query
+	// Get expected version for optimistic locking
+	expectedVersion, _ := ticketData["version"].(float64)
+	if expectedVersion == 0 {
+		// If no version provided, get current version (backward compatibility)
+		err := h.db.QueryRow(context.Background(),
+			"SELECT version FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&expectedVersion)
+		if err != nil {
+			c.JSON(http.StatusNotFound, models.NewErrorResponse(
+				models.ErrorCodeEntityNotFound,
+				"Ticket not found",
+				"",
+			))
+			return
+		}
+	}
+
+	// Get current ticket data for history
+	var currentTicket models.Ticket
+	var currentStatusTitle string
+	err := h.db.QueryRow(context.Background(), `
+		SELECT t.id, t.ticket_number, t.title, t.description, t.ticket_type_id, t.ticket_status_id,
+		       t.project_id, t.user_id, t.creator, t.estimation, t.story_points, t.created,
+		       t.modified, t.deleted, t.version, ts.title
+		FROM ticket t
+		JOIN ticket_status ts ON t.ticket_status_id = ts.id
+		WHERE t.id = ? AND t.deleted = 0
+	`, ticketID).Scan(
+		&currentTicket.ID, &currentTicket.TicketNumber, &currentTicket.Title,
+		&currentTicket.Description, &currentTicket.TicketTypeID, &currentTicket.TicketStatusID,
+		&currentTicket.ProjectID, &currentTicket.UserID, &currentTicket.Creator,
+		&currentTicket.Estimation, &currentTicket.StoryPoints, &currentTicket.Created,
+		&currentTicket.Modified, &currentTicket.Deleted, &currentTicket.Version, &currentStatusTitle,
+	)
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.NewErrorResponse(
+			models.ErrorCodeEntityNotFound,
+			"Ticket not found",
+			"",
+		))
+		return
+	}
+
+	// Check version conflict
+	if int(expectedVersion) != currentTicket.Version {
+		c.JSON(http.StatusConflict, models.NewErrorResponse(
+			models.ErrorCodeVersionConflict,
+			"Version conflict detected",
+			fmt.Sprintf("Current version: %d, Expected: %d", currentTicket.Version, int(expectedVersion)),
+		))
+		return
+	}
+
+	// Build update query with optimistic locking
 	updates := []string{}
 	args := []interface{}{}
+	newVersion := currentTicket.Version + 1
+
+	// Create old data snapshot
+	oldData := map[string]interface{}{
+		"id":            currentTicket.ID,
+		"ticket_number": currentTicket.TicketNumber,
+		"title":         currentTicket.Title,
+		"description":   currentTicket.Description,
+		"status":        currentStatusTitle,
+		"version":       currentTicket.Version,
+	}
 
 	if title, ok := ticketData["title"].(string); ok && title != "" {
 		updates = append(updates, "title = ?")
@@ -222,26 +309,17 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// Always update modified timestamp
+	// Always update modified timestamp and version
 	updates = append(updates, "modified = ?")
 	args = append(args, time.Now().Unix())
-	args = append(args, ticketID)
+	updates = append(updates, "version = ?")
+	args = append(args, newVersion)
 
-	// Check if ticket exists first
-	var count int
-	err := h.db.QueryRow(context.Background(),
-		"SELECT COUNT(*) FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&count)
-	if err != nil || count == 0 {
-		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
-			models.ErrorCodeInternalError,
-			"Failed to update ticket",
-			"",
-		))
-		return
-	}
+	// Add optimistic locking condition
+	args = append(args, ticketID, int(expectedVersion))
 
-	query := fmt.Sprintf("UPDATE ticket SET %s WHERE id = ?", joinWithComma(updates))
-	_, err = h.db.Exec(context.Background(), query, args...)
+	query := fmt.Sprintf("UPDATE ticket SET %s WHERE id = ? AND version = ?", joinWithComma(updates))
+	result, err := h.db.Exec(context.Background(), query, args...)
 	if err != nil {
 		logger.Error("Failed to update ticket", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
@@ -252,30 +330,77 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// Get project_id for event context
-	var projectID string
-	err = h.db.QueryRow(context.Background(),
-		"SELECT project_id FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&projectID)
+	// Check if update actually happened (optimistic locking)
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		// Version conflict occurred during update
+		var latestVersion int
+		h.db.QueryRow(context.Background(),
+			"SELECT version FROM ticket WHERE id = ? AND deleted = 0", ticketID).Scan(&latestVersion)
+
+		c.JSON(http.StatusConflict, models.NewErrorResponse(
+			models.ErrorCodeVersionConflict,
+			"Version conflict detected",
+			fmt.Sprintf("Current version: %d, Expected: %d", latestVersion, int(expectedVersion)),
+		))
+		return
+	}
+
+	// Get updated ticket data for history
+	var newStatusTitle string
+	h.db.QueryRow(context.Background(),
+		"SELECT ts.title FROM ticket t JOIN ticket_status ts ON t.ticket_status_id = ts.id WHERE t.id = ?",
+		ticketID).Scan(&newStatusTitle)
+
+	newData := map[string]interface{}{
+		"id":            currentTicket.ID,
+		"ticket_number": currentTicket.TicketNumber,
+		"title":         ticketData["title"],
+		"description":   ticketData["description"],
+		"status":        ticketData["status"],
+		"version":       newVersion,
+	}
 
 	// Get username from context
 	username, _ := middleware.GetUsername(c)
+	if username == "" {
+		username = "system"
+	}
+
+	// Record history
+	historyID := uuid.New().String()
+	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
+
+	_, err = h.db.Exec(context.Background(), `
+		INSERT INTO ticket_history (id, ticket_id, version, action, user_id, timestamp, old_data, new_data, change_summary)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`, historyID, ticketID, newVersion, models.ActionModify, username, time.Now().Unix(),
+		oldData, newData, changeSummary)
+
+	if err != nil {
+		logger.Error("Failed to record ticket history", zap.Error(err))
+		// Don't fail the request for history recording errors
+	}
 
 	// Publish ticket updated event
-	if err == nil {
-		h.publisher.PublishEntityEvent(
-			models.ActionModify,
-			"ticket",
-			ticketID,
-			username,
-			ticketData,
-			websocket.NewProjectContext(projectID, []string{"READ"}),
-		)
-	}
+	h.publisher.PublishEntityEvent(
+		models.ActionModify,
+		"ticket",
+		ticketID,
+		username,
+		map[string]interface{}{
+			"ticket_data": ticketData,
+			"new_version": newVersion,
+			"old_version": currentTicket.Version,
+		},
+		websocket.NewProjectContext(currentTicket.ProjectID, []string{"READ"}),
+	)
 
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"ticket": map[string]interface{}{
 			"id":      ticketID,
 			"updated": true,
+			"version": newVersion,
 		},
 	})
 

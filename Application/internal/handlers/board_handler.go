@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -64,6 +65,7 @@ func (h *Handler) handleBoardCreate(c *gin.Context, req *models.Request) {
 		Created:     time.Now().Unix(),
 		Modified:    time.Now().Unix(),
 		Deleted:     false,
+		Version:     1,
 	}
 
 	// Validate board
@@ -78,8 +80,8 @@ func (h *Handler) handleBoardCreate(c *gin.Context, req *models.Request) {
 
 	// Insert into database
 	query := `
-		INSERT INTO board (id, title, description, created, modified, deleted)
-		VALUES (?, ?, ?, ?, ?, ?)
+		INSERT INTO board (id, title, description, created, modified, deleted, version)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
 
 	_, err = h.db.Exec(c.Request.Context(), query,
@@ -89,6 +91,7 @@ func (h *Handler) handleBoardCreate(c *gin.Context, req *models.Request) {
 		board.Created,
 		board.Modified,
 		board.Deleted,
+		board.Version,
 	)
 
 	if err != nil {
@@ -289,14 +292,45 @@ func (h *Handler) handleBoardModify(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// Check if board exists
-	checkQuery := `SELECT COUNT(*) FROM board WHERE id = ? AND deleted = 0`
-	var count int
-	err = h.db.QueryRow(c.Request.Context(), checkQuery, boardID).Scan(&count)
-	if err != nil || count == 0 {
+	// Get expected version for optimistic locking
+	expectedVersion, _ := req.Data["version"].(float64)
+	if expectedVersion == 0 {
+		// If no version provided, get current version (backward compatibility)
+		err = h.db.QueryRow(c.Request.Context(),
+			"SELECT version FROM board WHERE id = ? AND deleted = 0", boardID).Scan(&expectedVersion)
+		if err != nil {
+			c.JSON(http.StatusNotFound, models.NewErrorResponse(
+				models.ErrorCodeEntityNotFound,
+				"Board not found",
+				"",
+			))
+			return
+		}
+	}
+
+	// Get current board data for history
+	var currentBoard models.Board
+	err = h.db.QueryRow(c.Request.Context(), `
+		SELECT id, title, description, created, modified, deleted, version
+		FROM board WHERE id = ? AND deleted = 0
+	`, boardID).Scan(
+		&currentBoard.ID, &currentBoard.Title, &currentBoard.Description,
+		&currentBoard.Created, &currentBoard.Modified, &currentBoard.Deleted, &currentBoard.Version,
+	)
+	if err != nil {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
 			models.ErrorCodeEntityNotFound,
 			"Board not found",
+			"",
+		))
+		return
+	}
+
+	// Check version conflict
+	if int(expectedVersion) != currentBoard.Version {
+		c.JSON(http.StatusConflict, models.NewErrorResponse(
+			models.ErrorCodeVersionConflict,
+			fmt.Sprintf("Version conflict: expected %d, got %d", int(expectedVersion), currentBoard.Version),
 			"",
 		))
 		return
@@ -313,8 +347,10 @@ func (h *Handler) handleBoardModify(c *gin.Context, req *models.Request) {
 	}
 
 	updates["modified"] = time.Now().Unix()
+	newVersion := currentBoard.Version + 1
+	updates["version"] = newVersion
 
-	if len(updates) == 1 { // Only modified was set
+	if len(updates) == 2 { // Only modified and version were set
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeMissingData,
 			"No fields to update",
@@ -337,8 +373,9 @@ func (h *Handler) handleBoardModify(c *gin.Context, req *models.Request) {
 		first = false
 	}
 
-	query += " WHERE id = ?"
+	query += " WHERE id = ? AND version = ?"
 	args = append(args, boardID)
+	args = append(args, currentBoard.Version)
 
 	_, err = h.db.Exec(c.Request.Context(), query, args...)
 	if err != nil {
@@ -351,6 +388,33 @@ func (h *Handler) handleBoardModify(c *gin.Context, req *models.Request) {
 		return
 	}
 
+	// Log board history
+	oldData := map[string]interface{}{
+		"id":          currentBoard.ID,
+		"title":       currentBoard.Title,
+		"description": currentBoard.Description,
+		"version":     currentBoard.Version,
+	}
+	newData := map[string]interface{}{
+		"id":          currentBoard.ID,
+		"title":       req.Data["title"],
+		"description": req.Data["description"],
+		"version":     newVersion,
+	}
+	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
+
+	historyID := uuid.New().String()
+	_, err = h.db.Exec(c.Request.Context(), `
+		INSERT INTO board_history (id, board_id, version, action, user_id, timestamp, old_data, new_data, change_summary)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`, historyID, boardID, newVersion, models.ActionModify, username, time.Now().Unix(),
+		oldData, newData, changeSummary)
+
+	if err != nil {
+		logger.Error("Failed to record board history", zap.Error(err))
+		// Don't fail the request for history recording errors
+	}
+
 	logger.Info("Board updated",
 		zap.String("board_id", boardID),
 		zap.String("username", username),
@@ -359,6 +423,7 @@ func (h *Handler) handleBoardModify(c *gin.Context, req *models.Request) {
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"updated": true,
 		"id":      boardID,
+		"version": newVersion,
 	})
 	c.JSON(http.StatusOK, response)
 }
