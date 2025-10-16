@@ -1,6 +1,6 @@
 # HelixTrack Core - Test Execution Report
 
-**Generated:** Sun Oct 12 10:38:38 AM MSK 2025
+**Generated:** Thu Oct 16 02:49:41 PM MSK 2025
 **Status:** FAILED
 **Go Version:** 1.22.2
 **Duration:** 601 seconds
@@ -10,11 +10,11 @@
 | Metric | Value |
 |--------|-------|
 | Total Packages | 15 |
-| Total Tests | 1685 |
-| Passed | 1630 ✓ |
+| Total Tests | 1998 |
+| Passed | 1943 ✓ |
 | Failed | 27 |
 | Skipped | 22 |
-| Coverage | 65.8% |
+| Coverage | 67.1% |
 | Coverage Quality | Poor |
 
 ## Test Status
@@ -25,7 +25,7 @@ FAILED
 
 ## Coverage Details
 
-Total coverage: **65.8%**
+Total coverage: **67.1%**
 
 Coverage quality: **Poor**
 
@@ -95,6 +95,11 @@ helixtrack.ru/core/internal/handlers/account_handler.go:59:			AccountRead				100
 helixtrack.ru/core/internal/handlers/account_handler.go:78:			AccountList				100.0%
 helixtrack.ru/core/internal/handlers/account_handler.go:93:			AccountModify				60.0%
 helixtrack.ru/core/internal/handlers/account_handler.go:132:			AccountRemove				100.0%
+helixtrack.ru/core/internal/handlers/activity_stream_handler.go:28:		handleActivityStreamGet			71.4%
+helixtrack.ru/core/internal/handlers/activity_stream_handler.go:142:		handleActivityStreamGetByProject	65.2%
+helixtrack.ru/core/internal/handlers/activity_stream_handler.go:273:		handleActivityStreamGetByUser		65.2%
+helixtrack.ru/core/internal/handlers/activity_stream_handler.go:400:		handleActivityStreamGetByTicket		65.2%
+helixtrack.ru/core/internal/handlers/activity_stream_handler.go:527:		handleActivityStreamFilter		73.0%
 helixtrack.ru/core/internal/handlers/asset_handler.go:17:			handleAssetCreate			69.2%
 helixtrack.ru/core/internal/handlers/asset_handler.go:107:			handleAssetRead				76.2%
 helixtrack.ru/core/internal/handlers/asset_handler.go:177:			handleAssetList				68.2%
@@ -119,6 +124,18 @@ helixtrack.ru/core/internal/handlers/auth_handler.go:34:			Register				84.2%
 helixtrack.ru/core/internal/handlers/auth_handler.go:115:			Login					88.9%
 helixtrack.ru/core/internal/handlers/auth_handler.go:199:			Logout					100.0%
 helixtrack.ru/core/internal/handlers/auth_handler.go:209:			InitializeUserTable			78.3%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:18:		handleBoardConfigureColumns		81.4%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:172:		handleBoardAddColumn			81.8%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:296:		handleBoardRemoveColumn			73.3%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:387:		handleBoardModifyColumn			80.7%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:525:		handleBoardListColumns			81.2%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:612:		handleBoardAddSwimlane			79.5%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:729:		handleBoardRemoveSwimlane		73.3%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:820:		handleBoardListSwimlanes		82.8%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:900:		handleBoardAddQuickFilter		79.5%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:1017:		handleBoardRemoveQuickFilter		73.3%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:1108:		handleBoardListQuickFilters		82.8%
+helixtrack.ru/core/internal/handlers/board_config_handler.go:1187:		handleBoardSetType			76.5%
 helixtrack.ru/core/internal/handlers/board_handler.go:17:			handleBoardCreate			65.5%
 helixtrack.ru/core/internal/handlers/board_handler.go:117:			handleBoardRead				76.2%
 helixtrack.ru/core/internal/handlers/board_handler.go:187:			handleBoardList				68.2%
@@ -173,8 +190,28 @@ helixtrack.ru/core/internal/handlers/cycle_handler.go:789:			handleCycleListProj
 helixtrack.ru/core/internal/handlers/cycle_handler.go:864:			handleCycleAddTicket			56.5%
 helixtrack.ru/core/internal/handlers/cycle_handler.go:1001:			handleCycleRemoveTicket			51.5%
 helixtrack.ru/core/internal/handlers/cycle_handler.go:1096:			handleCycleListTickets			66.7%
-helixtrack.ru/core/internal/handlers/db_init.go:12:				InitializeProjectTables			0.0%
-helixtrack.ru/core/internal/handlers/db_init.go:150:				seedDefaultData				0.0%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:18:			handleDashboardCreate			84.2%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:134:			handleDashboardRead			86.1%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:248:			handleDashboardList			79.2%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:317:			handleDashboardModify			87.0%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:448:			handleDashboardRemove			81.8%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:549:			handleDashboardShare			89.3%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:713:			handleDashboardUnshare			84.8%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:851:			handleDashboardAddWidget		83.7%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:999:			handleDashboardRemoveWidget		66.7%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:1090:			handleDashboardModifyWidget		68.5%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:1226:			handleDashboardListWidgets		73.5%
+helixtrack.ru/core/internal/handlers/dashboard_handler.go:1349:			handleDashboardSetLayout		71.0%
+helixtrack.ru/core/internal/handlers/db_init.go:12:				InitializeProjectTables			67.7%
+helixtrack.ru/core/internal/handlers/db_init.go:618:				seedDefaultData				80.0%
+helixtrack.ru/core/internal/handlers/epic_handler.go:17:			handleEpicCreate			77.8%
+helixtrack.ru/core/internal/handlers/epic_handler.go:134:			handleEpicRead				66.7%
+helixtrack.ru/core/internal/handlers/epic_handler.go:214:			handleEpicList				70.8%
+helixtrack.ru/core/internal/handlers/epic_handler.go:280:			handleEpicModify			68.6%
+helixtrack.ru/core/internal/handlers/epic_handler.go:408:			handleEpicRemove			54.5%
+helixtrack.ru/core/internal/handlers/epic_handler.go:514:			handleEpicAddStory			56.1%
+helixtrack.ru/core/internal/handlers/epic_handler.go:634:			handleEpicRemoveStory			53.3%
+helixtrack.ru/core/internal/handlers/epic_handler.go:725:			handleEpicListStories			67.9%
 helixtrack.ru/core/internal/handlers/extension_handler.go:18:			handleExtensionCreate			65.7%
 helixtrack.ru/core/internal/handlers/extension_handler.go:133:			handleExtensionRead			66.7%
 helixtrack.ru/core/internal/handlers/extension_handler.go:205:			handleExtensionList			68.2%
@@ -192,17 +229,17 @@ helixtrack.ru/core/internal/handlers/filter_handler.go:805:			handleFilterRemove
 helixtrack.ru/core/internal/handlers/filter_handler.go:918:			getBoolFromData				100.0%
 helixtrack.ru/core/internal/handlers/handler.go:29:				NewHandler				100.0%
 helixtrack.ru/core/internal/handlers/handler.go:40:				SetEventPublisher			100.0%
-helixtrack.ru/core/internal/handlers/handler.go:45:				DoAction				62.9%
-helixtrack.ru/core/internal/handlers/handler.go:564:				handleVersion				100.0%
-helixtrack.ru/core/internal/handlers/handler.go:573:				handleJWTCapable			100.0%
-helixtrack.ru/core/internal/handlers/handler.go:583:				handleDBCapable				77.8%
-helixtrack.ru/core/internal/handlers/handler.go:603:				handleHealth				65.2%
-helixtrack.ru/core/internal/handlers/handler.go:652:				handleAuthenticate			42.5%
-helixtrack.ru/core/internal/handlers/handler.go:767:				handleCreate				66.7%
-helixtrack.ru/core/internal/handlers/handler.go:831:				handleModify				66.7%
-helixtrack.ru/core/internal/handlers/handler.go:893:				handleRemove				60.0%
-helixtrack.ru/core/internal/handlers/handler.go:966:				handleRead				80.0%
-helixtrack.ru/core/internal/handlers/handler.go:999:				handleList				80.0%
+helixtrack.ru/core/internal/handlers/handler.go:45:				DoAction				43.9%
+helixtrack.ru/core/internal/handlers/handler.go:770:				handleVersion				100.0%
+helixtrack.ru/core/internal/handlers/handler.go:779:				handleJWTCapable			100.0%
+helixtrack.ru/core/internal/handlers/handler.go:789:				handleDBCapable				77.8%
+helixtrack.ru/core/internal/handlers/handler.go:809:				handleHealth				65.2%
+helixtrack.ru/core/internal/handlers/handler.go:858:				handleAuthenticate			42.5%
+helixtrack.ru/core/internal/handlers/handler.go:973:				handleCreate				66.7%
+helixtrack.ru/core/internal/handlers/handler.go:1037:				handleModify				66.7%
+helixtrack.ru/core/internal/handlers/handler.go:1099:				handleRemove				60.0%
+helixtrack.ru/core/internal/handlers/handler.go:1172:				handleRead				80.0%
+helixtrack.ru/core/internal/handlers/handler.go:1205:				handleList				80.0%
 helixtrack.ru/core/internal/handlers/label_handler.go:17:			handleLabelCreate			61.5%
 helixtrack.ru/core/internal/handlers/label_handler.go:108:			handleLabelRead				66.7%
 helixtrack.ru/core/internal/handlers/label_handler.go:178:			handleLabelList				68.2%
@@ -219,6 +256,21 @@ helixtrack.ru/core/internal/handlers/label_handler.go:1037:			handleLabelListTic
 helixtrack.ru/core/internal/handlers/label_handler.go:1103:			handleLabelAssignCategory		61.3%
 helixtrack.ru/core/internal/handlers/label_handler.go:1190:			handleLabelUnassignCategory		57.6%
 helixtrack.ru/core/internal/handlers/label_handler.go:1281:			handleLabelListCategories		64.0%
+helixtrack.ru/core/internal/handlers/mention_handler.go:34:			handleCommentMention			81.0%
+helixtrack.ru/core/internal/handlers/mention_handler.go:165:			handleCommentUnmention			57.6%
+helixtrack.ru/core/internal/handlers/mention_handler.go:270:			handleCommentListMentions		57.6%
+helixtrack.ru/core/internal/handlers/mention_handler.go:364:			handleCommentGetMentions		60.0%
+helixtrack.ru/core/internal/handlers/mention_handler.go:470:			handleCommentParseMentions		92.9%
+helixtrack.ru/core/internal/handlers/notification_handler.go:18:		handleNotificationSchemeCreate		72.2%
+helixtrack.ru/core/internal/handlers/notification_handler.go:97:		handleNotificationSchemeRead		66.7%
+helixtrack.ru/core/internal/handlers/notification_handler.go:139:		handleNotificationSchemeList		71.4%
+helixtrack.ru/core/internal/handlers/notification_handler.go:187:		handleNotificationSchemeModify		73.2%
+helixtrack.ru/core/internal/handlers/notification_handler.go:249:		handleNotificationSchemeRemove		57.7%
+helixtrack.ru/core/internal/handlers/notification_handler.go:291:		handleNotificationSchemeAddRule		61.1%
+helixtrack.ru/core/internal/handlers/notification_handler.go:350:		handleNotificationSchemeRemoveRule	56.0%
+helixtrack.ru/core/internal/handlers/notification_handler.go:390:		handleNotificationSchemeListRules	69.2%
+helixtrack.ru/core/internal/handlers/notification_handler.go:433:		handleNotificationEventList		71.4%
+helixtrack.ru/core/internal/handlers/notification_handler.go:469:		handleNotificationSend			70.0%
 helixtrack.ru/core/internal/handlers/organization_handler.go:17:		OrganizationCreate			65.2%
 helixtrack.ru/core/internal/handlers/organization_handler.go:57:		OrganizationRead			100.0%
 helixtrack.ru/core/internal/handlers/organization_handler.go:76:		OrganizationList			100.0%
@@ -247,12 +299,26 @@ helixtrack.ru/core/internal/handlers/priority_handler.go:224:			handlePriorityLi
 helixtrack.ru/core/internal/handlers/priority_handler.go:289:			handlePriorityModify			77.0%
 helixtrack.ru/core/internal/handlers/priority_handler.go:435:			handlePriorityRemove			57.5%
 helixtrack.ru/core/internal/handlers/priority_handler.go:560:			getStringFromData			100.0%
+helixtrack.ru/core/internal/handlers/project_category_handler.go:18:		handleProjectCategoryCreate		70.4%
+helixtrack.ru/core/internal/handlers/project_category_handler.go:122:		handleProjectCategoryRead		66.7%
+helixtrack.ru/core/internal/handlers/project_category_handler.go:192:		handleProjectCategoryList		68.2%
+helixtrack.ru/core/internal/handlers/project_category_handler.go:254:		handleProjectCategoryModify		72.5%
+helixtrack.ru/core/internal/handlers/project_category_handler.go:382:		handleProjectCategoryRemove		52.5%
+helixtrack.ru/core/internal/handlers/project_category_handler.go:501:		handleProjectCategoryAssign		37.5%
 helixtrack.ru/core/internal/handlers/project_handler.go:19:			handleCreateProject			100.0%
 helixtrack.ru/core/internal/handlers/project_handler.go:133:			handleModifyProject			86.1%
 helixtrack.ru/core/internal/handlers/project_handler.go:228:			handleRemoveProject			86.4%
 helixtrack.ru/core/internal/handlers/project_handler.go:297:			handleReadProject			100.0%
 helixtrack.ru/core/internal/handlers/project_handler.go:351:			handleListProjects			88.9%
 helixtrack.ru/core/internal/handlers/project_handler.go:403:			joinWithComma				100.0%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:18:		handleProjectRoleCreate			86.0%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:145:		handleProjectRoleRead			75.0%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:227:		handleProjectRoleList			76.7%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:312:		handleProjectRoleModify			80.4%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:440:		handleProjectRoleRemove			60.6%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:541:		handleProjectRoleAssignUser		80.8%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:698:		handleProjectRoleUnassignUser		57.9%
+helixtrack.ru/core/internal/handlers/project_role_handler.go:820:		handleProjectRoleListUsers		79.4%
 helixtrack.ru/core/internal/handlers/report_handler.go:18:			handleReportCreate			61.1%
 helixtrack.ru/core/internal/handlers/report_handler.go:135:			handleReportRead			66.7%
 helixtrack.ru/core/internal/handlers/report_handler.go:206:			handleReportList			68.0%
@@ -284,6 +350,14 @@ helixtrack.ru/core/internal/handlers/resolution_handler.go:122:			handleResoluti
 helixtrack.ru/core/internal/handlers/resolution_handler.go:192:			handleResolutionList			68.2%
 helixtrack.ru/core/internal/handlers/resolution_handler.go:254:			handleResolutionModify			72.5%
 helixtrack.ru/core/internal/handlers/resolution_handler.go:382:			handleResolutionRemove			57.5%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:18:		handleSecurityLevelCreate		87.0%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:170:		handleSecurityLevelRead			76.2%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:248:		handleSecurityLevelList			76.7%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:331:		handleSecurityLevelModify		82.1%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:470:		handleSecurityLevelRemove		66.7%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:571:		handleSecurityLevelGrant		85.9%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:773:		handleSecurityLevelRevoke		73.3%
+helixtrack.ru/core/internal/handlers/security_level_handler.go:910:		handleSecurityLevelCheck		88.5%
 helixtrack.ru/core/internal/handlers/service_discovery_db.go:12:		InitializeServiceDiscoveryTables	0.0%
 helixtrack.ru/core/internal/handlers/service_discovery_db.go:184:		SeedDefaultServices			0.0%
 helixtrack.ru/core/internal/handlers/service_discovery_handler.go:28:		NewServiceDiscoveryHandler		80.0%
@@ -298,6 +372,11 @@ helixtrack.ru/core/internal/handlers/service_discovery_handler.go:599:		ListServ
 helixtrack.ru/core/internal/handlers/service_discovery_handler.go:663:		getServiceByID				71.4%
 helixtrack.ru/core/internal/handlers/service_discovery_handler.go:726:		UpdateService				58.5%
 helixtrack.ru/core/internal/handlers/service_discovery_handler.go:820:		joinStrings				83.3%
+helixtrack.ru/core/internal/handlers/subtask_handler.go:18:			handleSubtaskCreate			65.6%
+helixtrack.ru/core/internal/handlers/subtask_handler.go:212:			handleSubtaskList			70.8%
+helixtrack.ru/core/internal/handlers/subtask_handler.go:279:			handleSubtaskMoveToParent		65.9%
+helixtrack.ru/core/internal/handlers/subtask_handler.go:399:			handleSubtaskConvertToIssue		62.5%
+helixtrack.ru/core/internal/handlers/subtask_handler.go:500:			handleSubtaskListByParent		68.3%
 helixtrack.ru/core/internal/handlers/team_handler.go:17:			TeamCreate				65.2%
 helixtrack.ru/core/internal/handlers/team_handler.go:57:			TeamRead				62.5%
 helixtrack.ru/core/internal/handlers/team_handler.go:76:			TeamList				100.0%
@@ -354,6 +433,11 @@ helixtrack.ru/core/internal/handlers/version_handler.go:1025:			handleVersionLis
 helixtrack.ru/core/internal/handlers/version_handler.go:1105:			handleVersionAddFix			53.3%
 helixtrack.ru/core/internal/handlers/version_handler.go:1204:			handleVersionRemoveFix			51.5%
 helixtrack.ru/core/internal/handlers/version_handler.go:1298:			handleVersionListFix			65.4%
+helixtrack.ru/core/internal/handlers/vote_handler.go:18:			handleVoteAdd				75.0%
+helixtrack.ru/core/internal/handlers/vote_handler.go:158:			handleVoteRemove			70.7%
+helixtrack.ru/core/internal/handlers/vote_handler.go:277:			handleVoteCount				66.7%
+helixtrack.ru/core/internal/handlers/vote_handler.go:336:			handleVoteList				66.7%
+helixtrack.ru/core/internal/handlers/vote_handler.go:410:			handleVoteCheck				65.0%
 helixtrack.ru/core/internal/handlers/watcher_handler.go:17:			handleWatcherAdd			77.1%
 helixtrack.ru/core/internal/handlers/watcher_handler.go:136:			handleWatcherRemove			82.1%
 helixtrack.ru/core/internal/handlers/watcher_handler.go:225:			handleWatcherList			73.1%
@@ -367,6 +451,13 @@ helixtrack.ru/core/internal/handlers/workflow_step_handler.go:129:		handleWorkfl
 helixtrack.ru/core/internal/handlers/workflow_step_handler.go:200:		handleWorkflowStepList			75.0%
 helixtrack.ru/core/internal/handlers/workflow_step_handler.go:279:		handleWorkflowStepModify		76.0%
 helixtrack.ru/core/internal/handlers/workflow_step_handler.go:397:		handleWorkflowStepRemove		58.6%
+helixtrack.ru/core/internal/handlers/worklog_handler.go:18:			handleWorkLogAdd			80.5%
+helixtrack.ru/core/internal/handlers/worklog_handler.go:162:			handleWorkLogModify			84.9%
+helixtrack.ru/core/internal/handlers/worklog_handler.go:293:			handleWorkLogRemove			67.5%
+helixtrack.ru/core/internal/handlers/worklog_handler.go:414:			handleWorkLogList			77.3%
+helixtrack.ru/core/internal/handlers/worklog_handler.go:478:			handleWorkLogListByTicket		82.1%
+helixtrack.ru/core/internal/handlers/worklog_handler.go:560:			handleWorkLogListByUser			81.5%
+helixtrack.ru/core/internal/handlers/worklog_handler.go:637:			handleWorkLogGetTotalTime		83.3%
 helixtrack.ru/core/internal/logger/logger.go:22:				Initialize				95.0%
 helixtrack.ru/core/internal/logger/logger.go:81:				Get					100.0%
 helixtrack.ru/core/internal/logger/logger.go:91:				GetSugared				100.0%
@@ -423,10 +514,14 @@ helixtrack.ru/core/internal/middleware/permission.go:109:			CheckPermissionForAc
 helixtrack.ru/core/internal/middleware/permission.go:138:			GetUserPermissions			100.0%
 helixtrack.ru/core/internal/models/asset.go:54:					GetDisplayName				0.0%
 helixtrack.ru/core/internal/models/asset.go:65:					IsValid					0.0%
-helixtrack.ru/core/internal/models/audit.go:49:					IsValidAction				0.0%
-helixtrack.ru/core/internal/models/audit.go:54:					HasEntity				0.0%
+helixtrack.ru/core/internal/models/audit.go:51:					IsValidAction				0.0%
+helixtrack.ru/core/internal/models/audit.go:56:					HasEntity				0.0%
 helixtrack.ru/core/internal/models/board.go:52:					GetDisplayName				0.0%
 helixtrack.ru/core/internal/models/board.go:60:					IsValid					0.0%
+helixtrack.ru/core/internal/models/board_config.go:40:				HasWIPLimit				0.0%
+helixtrack.ru/core/internal/models/board_config.go:45:				IsWIPLimitExceeded			0.0%
+helixtrack.ru/core/internal/models/board_config.go:53:				HasQuery				0.0%
+helixtrack.ru/core/internal/models/board_config.go:58:				HasQuery				0.0%
 helixtrack.ru/core/internal/models/comment.go:18:				NewComment				0.0%
 helixtrack.ru/core/internal/models/component.go:35:				GetDisplayName				0.0%
 helixtrack.ru/core/internal/models/component.go:43:				IsValid					0.0%
@@ -437,6 +532,13 @@ helixtrack.ru/core/internal/models/customfield.go:96:				RequiresOptions				100.
 helixtrack.ru/core/internal/models/cycle.go:44:					IsValidType				0.0%
 helixtrack.ru/core/internal/models/cycle.go:49:					GetTypeName				0.0%
 helixtrack.ru/core/internal/models/cycle.go:64:					IsValidParent				0.0%
+helixtrack.ru/core/internal/models/dashboard.go:59:				IsOwner					0.0%
+helixtrack.ru/core/internal/models/dashboard.go:64:				IsValidWidgetType			0.0%
+helixtrack.ru/core/internal/models/dashboard.go:81:				GetShareType				0.0%
+helixtrack.ru/core/internal/models/epic.go:32:					IsEpicTicket				0.0%
+helixtrack.ru/core/internal/models/epic.go:37:					GetColor				0.0%
+helixtrack.ru/core/internal/models/epic.go:45:					GetName					0.0%
+helixtrack.ru/core/internal/models/epic.go:53:					HasName					0.0%
 helixtrack.ru/core/internal/models/errors.go:67:				GetErrorMessage				100.0%
 helixtrack.ru/core/internal/models/event.go:152:				NewEvent				100.0%
 helixtrack.ru/core/internal/models/event.go:167:				WithContext				100.0%
@@ -464,11 +566,24 @@ helixtrack.ru/core/internal/models/label.go:75:					GetDisplayName				0.0%
 helixtrack.ru/core/internal/models/label.go:83:					IsValid					0.0%
 helixtrack.ru/core/internal/models/label.go:88:					GetDisplayName				0.0%
 helixtrack.ru/core/internal/models/label.go:96:					IsValid					0.0%
+helixtrack.ru/core/internal/models/mention.go:21:				IsValid					0.0%
+helixtrack.ru/core/internal/models/mention.go:26:				HasMentions				0.0%
+helixtrack.ru/core/internal/models/mention.go:31:				ContainsUser				0.0%
+helixtrack.ru/core/internal/models/notification.go:61:				IsGlobal				0.0%
+helixtrack.ru/core/internal/models/notification.go:66:				IsProjectSpecific			0.0%
+helixtrack.ru/core/internal/models/notification.go:71:				IsValidEventType			0.0%
+helixtrack.ru/core/internal/models/notification.go:89:				IsValidRecipientType			0.0%
+helixtrack.ru/core/internal/models/notification.go:102:				RequiresRecipientID			0.0%
+helixtrack.ru/core/internal/models/notification.go:109:				IsRoleBasedRecipient			0.0%
 helixtrack.ru/core/internal/models/permission.go:45:				IsValidPermissionValue			0.0%
 helixtrack.ru/core/internal/models/permission.go:51:				IsValidContext				0.0%
 helixtrack.ru/core/internal/models/priority.go:35:				IsValidLevel				100.0%
 helixtrack.ru/core/internal/models/priority.go:40:				GetDisplayName				100.0%
 helixtrack.ru/core/internal/models/project.go:18:				NewProject				0.0%
+helixtrack.ru/core/internal/models/project_category.go:26:			IsValid					0.0%
+helixtrack.ru/core/internal/models/project_category.go:31:			GetDisplayName				0.0%
+helixtrack.ru/core/internal/models/project_role.go:25:				IsGlobal				0.0%
+helixtrack.ru/core/internal/models/project_role.go:30:				IsProjectSpecific			0.0%
 helixtrack.ru/core/internal/models/report.go:26:				IsValid					0.0%
 helixtrack.ru/core/internal/models/report.go:31:				HasQuery				0.0%
 helixtrack.ru/core/internal/models/request.go:13:				IsAuthenticationRequired		100.0%
@@ -477,14 +592,24 @@ helixtrack.ru/core/internal/models/resolution.go:24:				GetDisplayName				100.0%
 helixtrack.ru/core/internal/models/response.go:12:				NewSuccessResponse			100.0%
 helixtrack.ru/core/internal/models/response.go:20:				NewErrorResponse			100.0%
 helixtrack.ru/core/internal/models/response.go:29:				IsSuccess				100.0%
+helixtrack.ru/core/internal/models/security_level.go:37:			IsValidLevel				0.0%
+helixtrack.ru/core/internal/models/security_level.go:42:			GetRecipientType			0.0%
 helixtrack.ru/core/internal/models/service_registry.go:111:			ComputeServiceSignature			0.0%
 helixtrack.ru/core/internal/models/service_registry.go:118:			VerifySignature				0.0%
 helixtrack.ru/core/internal/models/service_registry.go:124:			IsHealthy				0.0%
 helixtrack.ru/core/internal/models/service_registry.go:129:			CanRotate				0.0%
+helixtrack.ru/core/internal/models/subtask.go:21:				IsSubtaskTicket				0.0%
+helixtrack.ru/core/internal/models/subtask.go:26:				HasParent				0.0%
+helixtrack.ru/core/internal/models/subtask.go:31:				CalculatePercentComplete		0.0%
+helixtrack.ru/core/internal/models/subtask.go:40:				IsComplete				0.0%
+helixtrack.ru/core/internal/models/subtask.go:45:				HasSubtasks				0.0%
 helixtrack.ru/core/internal/models/ticket.go:24:				NewTicket				0.0%
 helixtrack.ru/core/internal/models/version.go:28:				IsReleased				100.0%
 helixtrack.ru/core/internal/models/version.go:33:				IsArchived				100.0%
 helixtrack.ru/core/internal/models/version.go:38:				IsActive				100.0%
+helixtrack.ru/core/internal/models/vote.go:21:					IsValid					0.0%
+helixtrack.ru/core/internal/models/vote.go:26:					HasVotes				0.0%
+helixtrack.ru/core/internal/models/vote.go:31:					IsPopular				0.0%
 helixtrack.ru/core/internal/models/watcher.go:13:				IsWatching				100.0%
 helixtrack.ru/core/internal/models/watcher.go:23:				GetWatcherCount				100.0%
 helixtrack.ru/core/internal/models/websocket.go:32:				NewClient				100.0%
@@ -500,6 +625,9 @@ helixtrack.ru/core/internal/models/websocket.go:146:				NewWebSocketMessage			10
 helixtrack.ru/core/internal/models/websocket.go:155:				NewErrorMessage				100.0%
 helixtrack.ru/core/internal/models/websocket.go:163:				NewEventMessage				100.0%
 helixtrack.ru/core/internal/models/websocket.go:192:				DefaultWebSocketConfig			100.0%
+helixtrack.ru/core/internal/models/worklog.go:17:				GetTimeSpentHours			0.0%
+helixtrack.ru/core/internal/models/worklog.go:22:				GetTimeSpentDays			0.0%
+helixtrack.ru/core/internal/models/worklog.go:27:				IsValid					0.0%
 helixtrack.ru/core/internal/security/audit_log.go:36:				LogSecurityEvent			90.0%
 helixtrack.ru/core/internal/security/audit_log.go:69:				RegisterCallback			100.0%
 helixtrack.ru/core/internal/security/audit_log.go:76:				GetRecentEvents				100.0%
@@ -709,7 +837,7 @@ helixtrack.ru/core/internal/websocket/publisher.go:118:				NewTeamContext				100
 helixtrack.ru/core/internal/websocket/publisher.go:127:				NewAccountContext			100.0%
 helixtrack.ru/core/internal/websocket/publisher.go:135:				NewFullContext				100.0%
 helixtrack.ru/core/main.go:22:							main					0.0%
-total:										(statements)				65.8%
+total:										(statements)				67.1%
 ```
 
 ## Test Output
@@ -727,4 +855,4 @@ Full test output available in: [test-output-verbose.txt](test-output-verbose.txt
 ---
 
 **Report Generated by:** HelixTrack Core Test Verification Script
-**Date:** 2025-10-12T07:38:38Z
+**Date:** 2025-10-16T11:49:41Z
