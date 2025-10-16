@@ -1,0 +1,22 @@
+{
+  "log": {
+    "log_path": "/tmp/htCoreLogs_DEV",
+    "logfile_base_name": "",
+    "log_size_limit": 5000000
+  },
+  "listeners": [
+    {
+      "address": "0.0.0.0",
+      "port": 8082,
+      "https": false
+    }
+  ],
+  "plugins": [
+    {
+      "name": "JWT",
+      "dependencies": [],
+      "config": {
+      }
+    }
+  ]
+}

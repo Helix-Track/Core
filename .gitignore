@@ -33,3 +33,6 @@ Recipes/Project/pre_open.sh
 Recipes/Project/project_pre_open.sh
 
 Formatted.*.json
+
+htcore.log
+htcore.pid
