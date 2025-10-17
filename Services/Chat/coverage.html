@@ -1,0 +1,2424 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>handlers: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">helixtrack.ru/chat/internal/handlers/chatroom_handler.go (80.1%)</option>
+				
+				<option value="file1">helixtrack.ru/chat/internal/handlers/handler.go (60.9%)</option>
+				
+				<option value="file2">helixtrack.ru/chat/internal/handlers/message_handler.go (58.3%)</option>
+				
+				<option value="file3">helixtrack.ru/chat/internal/handlers/participant_handler.go (62.4%)</option>
+				
+				<option value="file4">helixtrack.ru/chat/internal/handlers/realtime_handler.go (0.0%)</option>
+				
+				<option value="file5">helixtrack.ru/chat/internal/handlers/test_helpers.go (43.4%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handlers
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "go.uber.org/zap"
+
+        "helixtrack.ru/chat/internal/logger"
+        "helixtrack.ru/chat/internal/models"
+)
+
+// ChatRoomCreate creates a new chat room
+func (h *Handler) ChatRoomCreate(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        // Parse request
+        <span class="cov8" title="1">name, _ := getString(data, "name")
+        description, _ := getString(data, "description")
+        roomType, _ := getString(data, "type")
+        entityType, _ := getString(data, "entity_type")
+        entityIDStr, _ := getString(data, "entity_id")
+        isPrivate, _ := getBool(data, "is_private")
+
+        if name == "" || roomType == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "name and type are required"))
+                return
+        }</span>
+
+        // Create chat room
+        <span class="cov8" title="1">room := &amp;models.ChatRoom{
+                Name:        name,
+                Description: description,
+                Type:        models.ChatRoomType(roomType),
+                EntityType:  entityType,
+                CreatedBy:   claims.UserID,
+                IsPrivate:   isPrivate,
+                IsArchived:  false,
+        }
+
+        if entityIDStr != "" </span><span class="cov8" title="1">{
+                entityID, err := uuid.Parse(entityIDStr)
+                if err != nil </span><span class="cov0" title="0">{
+                        c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid entity_id"))
+                        return
+                }</span>
+                <span class="cov8" title="1">room.EntityID = &amp;entityID</span>
+        }
+
+        // Validate room type
+        <span class="cov8" title="1">roomReq := &amp;models.ChatRoomRequest{
+                Name: name,
+                Type: models.ChatRoomType(roomType),
+        }
+        if err := roomReq.Validate(); err != nil </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, err.Error()))
+                return
+        }</span>
+
+        // Create in database
+        <span class="cov8" title="1">if err := h.db.ChatRoomCreate(c.Request.Context(), room); err != nil </span><span class="cov8" title="1">{
+                logger.Error("Failed to create chat room", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to create chat room"))
+                return
+        }</span>
+
+        // Add creator as owner participant
+        <span class="cov8" title="1">participant := &amp;models.ChatParticipant{
+                ChatRoomID: room.ID,
+                UserID:     claims.UserID,
+                Role:       models.ParticipantRoleOwner,
+                IsMuted:    false,
+        }
+
+        if err := h.db.ParticipantAdd(c.Request.Context(), participant); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to add creator as participant", zap.Error(err))
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Chat room created",
+                zap.String("room_id", room.ID.String()),
+                zap.String("name", room.Name),
+                zap.String("created_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(room))</span>
+}
+
+// ChatRoomRead retrieves a chat room
+func (h *Handler) ChatRoomRead(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">roomID, ok := getString(data, "id")
+        if !ok || roomID == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get room
+        <span class="cov8" title="1">room, err := h.db.ChatRoomRead(c.Request.Context(), roomID)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Chat room not found"))
+                }</span> else<span class="cov8" title="1"> {
+                        logger.Error("Failed to read chat room", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read chat room"))
+                }</span>
+                <span class="cov8" title="1">return</span>
+        }
+
+        // Check if user is participant
+        <span class="cov8" title="1">_, err = h.db.ParticipantGet(c.Request.Context(), roomID, claims.UserID.String())
+        if err != nil </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant of this chat room"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(200, models.SuccessResponse(room))</span>
+}
+
+// ChatRoomList lists chat rooms
+func (h *Handler) ChatRoomList(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, _ := getDataMap(req)
+
+        limit, _ := getInt(data, "limit")
+        offset, _ := getInt(data, "offset")
+
+        if limit &lt;= 0 || limit &gt; 100 </span><span class="cov8" title="1">{
+                limit = 20
+        }</span>
+        <span class="cov8" title="1">if offset &lt; 0 </span><span class="cov0" title="0">{
+                offset = 0
+        }</span>
+
+        // Get rooms
+        <span class="cov8" title="1">rooms, total, err := h.db.ChatRoomList(c.Request.Context(), limit, offset)
+        if err != nil </span><span class="cov8" title="1">{
+                logger.Error("Failed to list chat rooms", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to list chat rooms"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">response := models.ListResponse{
+                Items: rooms,
+                Pagination: &amp;models.PaginationMeta{
+                        Total:   total,
+                        Limit:   limit,
+                        Offset:  offset,
+                        HasMore: offset+limit &lt; total,
+                },
+        }
+
+        if offset+limit &lt; total </span><span class="cov0" title="0">{
+                response.Pagination.NextOffset = offset + limit
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(200, models.SuccessResponse(response))</span>
+}
+
+// ChatRoomUpdate updates a chat room
+func (h *Handler) ChatRoomUpdate(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">roomID, ok := getString(data, "id")
+        if !ok || roomID == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get existing room
+        <span class="cov8" title="1">room, err := h.db.ChatRoomRead(c.Request.Context(), roomID)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Chat room not found"))
+                }</span> else<span class="cov8" title="1"> {
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read chat room"))
+                }</span>
+                <span class="cov8" title="1">return</span>
+        }
+
+        // Check if user has permission (must be owner or admin)
+        <span class="cov8" title="1">participant, err := h.db.ParticipantGet(c.Request.Context(), roomID, claims.UserID.String())
+        if err != nil || (participant.Role != models.ParticipantRoleOwner &amp;&amp; participant.Role != models.ParticipantRoleAdmin) </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Insufficient permissions"))
+                return
+        }</span>
+
+        // Update fields
+        <span class="cov8" title="1">if name, ok := getString(data, "name"); ok </span><span class="cov8" title="1">{
+                room.Name = name
+        }</span>
+        <span class="cov8" title="1">if description, ok := getString(data, "description"); ok </span><span class="cov8" title="1">{
+                room.Description = description
+        }</span>
+        <span class="cov8" title="1">if isPrivate, ok := getBool(data, "is_private"); ok </span><span class="cov0" title="0">{
+                room.IsPrivate = isPrivate
+        }</span>
+        <span class="cov8" title="1">if isArchived, ok := getBool(data, "is_archived"); ok </span><span class="cov0" title="0">{
+                room.IsArchived = isArchived
+        }</span>
+
+        // Update in database
+        <span class="cov8" title="1">if err := h.db.ChatRoomUpdate(c.Request.Context(), room); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to update chat room", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to update chat room"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Chat room updated",
+                zap.String("room_id", roomID),
+                zap.String("updated_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(room))</span>
+}
+
+// ChatRoomDelete deletes a chat room
+func (h *Handler) ChatRoomDelete(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">roomID, ok := getString(data, "id")
+        if !ok || roomID == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Check if user has permission (must be owner)
+        <span class="cov8" title="1">participant, err := h.db.ParticipantGet(c.Request.Context(), roomID, claims.UserID.String())
+        if err != nil || participant.Role != models.ParticipantRoleOwner </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Only room owner can delete"))
+                return
+        }</span>
+
+        // Delete room
+        <span class="cov8" title="1">if err := h.db.ChatRoomDelete(c.Request.Context(), roomID); err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Chat room not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        logger.Error("Failed to delete chat room", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to delete chat room"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov8" title="1">logger.Info("Chat room deleted",
+                zap.String("room_id", roomID),
+                zap.String("deleted_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(gin.H{"deleted": true}))</span>
+}
+
+// ChatRoomGetByEntity gets chat room by entity
+func (h *Handler) ChatRoomGetByEntity(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">entityType, ok := getString(data, "entity_type")
+        if !ok || entityType == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "entity_type is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">entityID, ok := getString(data, "entity_id")
+        if !ok || entityID == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "entity_id is required"))
+                return
+        }</span>
+
+        // Get room
+        <span class="cov8" title="1">room, err := h.db.ChatRoomGetByEntity(c.Request.Context(), entityType, entityID)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Chat room not found"))
+                }</span> else<span class="cov8" title="1"> {
+                        logger.Error("Failed to get chat room by entity", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to get chat room"))
+                }</span>
+                <span class="cov8" title="1">return</span>
+        }
+
+        <span class="cov8" title="1">c.JSON(200, models.SuccessResponse(room))</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handlers
+
+import (
+        "github.com/gin-gonic/gin"
+        "go.uber.org/zap"
+
+        "helixtrack.ru/chat/internal/database"
+        "helixtrack.ru/chat/internal/logger"
+        "helixtrack.ru/chat/internal/middleware"
+        "helixtrack.ru/chat/internal/models"
+        "helixtrack.ru/chat/internal/services"
+)
+
+// Handler handles all API requests
+type Handler struct {
+        db          database.Database
+        coreService services.CoreService
+}
+
+// NewHandler creates a new handler
+func NewHandler(db database.Database, coreService services.CoreService) *Handler <span class="cov8" title="1">{
+        return &amp;Handler{
+                db:          db,
+                coreService: coreService,
+        }
+}</span>
+
+// DoAction handles the unified /do endpoint
+func (h *Handler) DoAction(c *gin.Context) <span class="cov8" title="1">{
+        // Parse request
+        var req map[string]interface{}
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Invalid request body", zap.Error(err))
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidRequest, "Invalid request body"))
+                return
+        }</span>
+
+        // Extract action
+        <span class="cov8" title="1">action, ok := req["action"].(string)
+        if !ok || action == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing action parameter"))
+                return
+        }</span>
+
+        // Get user info from JWT
+        <span class="cov8" title="1">claims, err := middleware.GetClaims(c)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(401, models.ErrorResponse(models.ErrorCodeUnauthorized, "Unauthorized"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Debug("Processing action",
+                zap.String("action", action),
+                zap.String("username", claims.Username),
+        )
+
+        // Route to appropriate handler
+        switch action </span>{
+        // Chat Room actions
+        case "chatRoomCreate":<span class="cov8" title="1">
+                h.ChatRoomCreate(c, req, claims)</span>
+        case "chatRoomRead":<span class="cov8" title="1">
+                h.ChatRoomRead(c, req, claims)</span>
+        case "chatRoomList":<span class="cov8" title="1">
+                h.ChatRoomList(c, req, claims)</span>
+        case "chatRoomUpdate":<span class="cov8" title="1">
+                h.ChatRoomUpdate(c, req, claims)</span>
+        case "chatRoomDelete":<span class="cov8" title="1">
+                h.ChatRoomDelete(c, req, claims)</span>
+        case "chatRoomGetByEntity":<span class="cov8" title="1">
+                h.ChatRoomGetByEntity(c, req, claims)</span>
+
+        // Message actions
+        case "messageSend":<span class="cov8" title="1">
+                h.MessageSend(c, req, claims)</span>
+        case "messageList":<span class="cov8" title="1">
+                h.MessageList(c, req, claims)</span>
+        case "messageRead":<span class="cov0" title="0">
+                h.MessageRead(c, req, claims)</span>
+        case "messageUpdate":<span class="cov8" title="1">
+                h.MessageUpdate(c, req, claims)</span>
+        case "messageDelete":<span class="cov8" title="1">
+                h.MessageDelete(c, req, claims)</span>
+        case "messageReply":<span class="cov8" title="1">
+                h.MessageReply(c, req, claims)</span>
+        case "messageQuote":<span class="cov0" title="0">
+                h.MessageQuote(c, req, claims)</span>
+        case "messageSearch":<span class="cov8" title="1">
+                h.MessageSearch(c, req, claims)</span>
+        case "messagePin":<span class="cov8" title="1">
+                h.MessagePin(c, req, claims)</span>
+        case "messageUnpin":<span class="cov8" title="1">
+                h.MessageUnpin(c, req, claims)</span>
+
+        // Participant actions
+        case "participantAdd":<span class="cov8" title="1">
+                h.ParticipantAdd(c, req, claims)</span>
+        case "participantRemove":<span class="cov8" title="1">
+                h.ParticipantRemove(c, req, claims)</span>
+        case "participantList":<span class="cov8" title="1">
+                h.ParticipantList(c, req, claims)</span>
+        case "participantUpdateRole":<span class="cov8" title="1">
+                h.ParticipantUpdateRole(c, req, claims)</span>
+        case "participantMute":<span class="cov8" title="1">
+                h.ParticipantMute(c, req, claims)</span>
+        case "participantUnmute":<span class="cov8" title="1">
+                h.ParticipantUnmute(c, req, claims)</span>
+
+        // Real-time actions
+        case "typingStart":<span class="cov0" title="0">
+                h.TypingStart(c, req, claims)</span>
+        case "typingStop":<span class="cov0" title="0">
+                h.TypingStop(c, req, claims)</span>
+        case "presenceUpdate":<span class="cov0" title="0">
+                h.PresenceUpdate(c, req, claims)</span>
+        case "presenceGet":<span class="cov0" title="0">
+                h.PresenceGet(c, req, claims)</span>
+        case "readReceiptMark":<span class="cov0" title="0">
+                h.ReadReceiptMark(c, req, claims)</span>
+        case "readReceiptGet":<span class="cov0" title="0">
+                h.ReadReceiptGet(c, req, claims)</span>
+        case "reactionAdd":<span class="cov0" title="0">
+                h.ReactionAdd(c, req, claims)</span>
+        case "reactionRemove":<span class="cov0" title="0">
+                h.ReactionRemove(c, req, claims)</span>
+        case "reactionList":<span class="cov0" title="0">
+                h.ReactionList(c, req, claims)</span>
+
+        // Attachment actions
+        case "attachmentUpload":<span class="cov0" title="0">
+                h.AttachmentUpload(c, req, claims)</span>
+        case "attachmentDelete":<span class="cov0" title="0">
+                h.AttachmentDelete(c, req, claims)</span>
+        case "attachmentList":<span class="cov0" title="0">
+                h.AttachmentList(c, req, claims)</span>
+
+        default:<span class="cov0" title="0">
+                c.JSON(400, models.ErrorResponse(
+                        models.ErrorCodeInvalidParameter,
+                        "Unknown action: "+action,
+                ))</span>
+        }
+}
+
+// getDataMap extracts data map from request
+func getDataMap(req map[string]interface{}) (map[string]interface{}, error) <span class="cov8" title="1">{
+        data, ok := req["data"].(map[string]interface{})
+        if !ok </span><span class="cov0" title="0">{
+                return nil, models.ErrMissingParameter
+        }</span>
+        <span class="cov8" title="1">return data, nil</span>
+}
+
+// getString extracts string value from map
+func getString(m map[string]interface{}, key string) (string, bool) <span class="cov8" title="1">{
+        val, ok := m[key].(string)
+        return val, ok
+}</span>
+
+// getInt extracts int value from map
+func getInt(m map[string]interface{}, key string) (int, bool) <span class="cov8" title="1">{
+        switch v := m[key].(type) </span>{
+        case int:<span class="cov0" title="0">
+                return v, true</span>
+        case float64:<span class="cov8" title="1">
+                return int(v), true</span>
+        case string:<span class="cov0" title="0">
+                // Try to parse string to int
+                return 0, false</span>
+        default:<span class="cov8" title="1">
+                return 0, false</span>
+        }
+}
+
+// getBool extracts bool value from map
+func getBool(m map[string]interface{}, key string) (bool, bool) <span class="cov8" title="1">{
+        val, ok := m[key].(bool)
+        return val, ok
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package handlers
+
+import (
+        "encoding/json"
+
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "go.uber.org/zap"
+
+        "helixtrack.ru/chat/internal/logger"
+        "helixtrack.ru/chat/internal/models"
+)
+
+// MessageSend sends a new message
+func (h *Handler) MessageSend(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomID, err := uuid.Parse(chatRoomIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid chat_room_id"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">content, ok := getString(data, "content")
+        if !ok || content == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "content is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">messageType, _ := getString(data, "type")
+        if messageType == "" </span><span class="cov8" title="1">{
+                messageType = string(models.MessageTypeText)
+        }</span>
+
+        // Check if user is participant
+        <span class="cov8" title="1">_, err = h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant of this chat room"))
+                return
+        }</span>
+
+        // Create message
+        <span class="cov8" title="1">message := &amp;models.Message{
+                ChatRoomID:    chatRoomID,
+                SenderID:      claims.UserID,
+                Type:          models.MessageType(messageType),
+                Content:       content,
+                ContentFormat: models.ContentFormatPlain,
+                IsEdited:      false,
+                IsPinned:      false,
+        }
+
+        // Handle optional fields
+        if contentFormat, ok := getString(data, "content_format"); ok </span><span class="cov8" title="1">{
+                message.ContentFormat = models.ContentFormat(contentFormat)
+        }</span>
+
+        <span class="cov8" title="1">if metadata, ok := data["metadata"]; ok </span><span class="cov0" title="0">{
+                metadataBytes, _ := json.Marshal(metadata)
+                message.Metadata = json.RawMessage(metadataBytes)
+        }</span>
+
+        // Validate message
+        <span class="cov8" title="1">msgReq := &amp;models.MessageRequest{
+                ChatRoomID:    chatRoomID,
+                Type:          models.MessageType(messageType),
+                Content:       content,
+                ContentFormat: message.ContentFormat,
+        }
+
+        if err := msgReq.Validate(); err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, err.Error()))
+                return
+        }</span>
+
+        // Save to database
+        <span class="cov8" title="1">if err := h.db.MessageCreate(c.Request.Context(), message); err != nil </span><span class="cov8" title="1">{
+                logger.Error("Failed to create message", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to send message"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Message sent",
+                zap.String("message_id", message.ID.String()),
+                zap.String("chat_room_id", chatRoomIDStr),
+                zap.String("sender", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(message))</span>
+}
+
+// MessageList lists messages in a chat room
+func (h *Handler) MessageList(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomID, err := uuid.Parse(chatRoomIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid chat_room_id"))
+                return
+        }</span>
+
+        // Check if user is participant
+        <span class="cov8" title="1">_, err = h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant of this chat room"))
+                return
+        }</span>
+
+        // Build request
+        <span class="cov8" title="1">listReq := &amp;models.MessageListRequest{
+                ChatRoomID: chatRoomID,
+                Limit:      50,
+                Offset:     0,
+        }
+
+        if limit, ok := getInt(data, "limit"); ok &amp;&amp; limit &gt; 0 </span><span class="cov8" title="1">{
+                listReq.Limit = limit
+        }</span>
+
+        <span class="cov8" title="1">if offset, ok := getInt(data, "offset"); ok &amp;&amp; offset &gt;= 0 </span><span class="cov8" title="1">{
+                listReq.Offset = offset
+        }</span>
+
+        // Get messages
+        <span class="cov8" title="1">messages, total, err := h.db.MessageList(c.Request.Context(), listReq)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to list messages", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to list messages"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">response := models.ListResponse{
+                Items: messages,
+                Pagination: &amp;models.PaginationMeta{
+                        Total:   total,
+                        Limit:   listReq.Limit,
+                        Offset:  listReq.Offset,
+                        HasMore: listReq.Offset+listReq.Limit &lt; total,
+                },
+        }
+
+        if listReq.Offset+listReq.Limit &lt; total </span><span class="cov0" title="0">{
+                response.Pagination.NextOffset = listReq.Offset + listReq.Limit
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(200, models.SuccessResponse(response))</span>
+}
+
+// MessageRead retrieves a single message
+func (h *Handler) MessageRead(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageID, ok := getString(data, "id")
+        if !ok || messageID == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get message
+        <span class="cov0" title="0">message, err := h.db.MessageRead(c.Request.Context(), messageID)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Message not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        logger.Error("Failed to read message", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read message"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Check if user is participant of the chat room
+        <span class="cov0" title="0">chatRoomIDStr := message.ChatRoomID.String()
+        _, err = h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant of this chat room"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(message))</span>
+}
+
+// MessageUpdate updates a message
+func (h *Handler) MessageUpdate(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">messageID, ok := getString(data, "id")
+        if !ok || messageID == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">content, ok := getString(data, "content")
+        if !ok || content == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "content is required"))
+                return
+        }</span>
+
+        // Get existing message
+        <span class="cov8" title="1">message, err := h.db.MessageRead(c.Request.Context(), messageID)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Message not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read message"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Check if user is the sender
+        <span class="cov8" title="1">if message.SenderID != claims.UserID </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Can only edit your own messages"))
+                return
+        }</span>
+
+        // Update content
+        <span class="cov8" title="1">message.Content = content
+        message.IsEdited = true
+
+        if contentFormat, ok := getString(data, "content_format"); ok </span><span class="cov0" title="0">{
+                message.ContentFormat = models.ContentFormat(contentFormat)
+        }</span>
+
+        // Update in database
+        <span class="cov8" title="1">if err := h.db.MessageUpdate(c.Request.Context(), message); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to update message", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to update message"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Message updated",
+                zap.String("message_id", messageID),
+                zap.String("updated_by", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(message))</span>
+}
+
+// MessageDelete deletes a message
+func (h *Handler) MessageDelete(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">messageID, ok := getString(data, "id")
+        if !ok || messageID == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get message to check ownership
+        <span class="cov8" title="1">message, err := h.db.MessageRead(c.Request.Context(), messageID)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Message not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read message"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Check if user is sender or room admin/owner
+        <span class="cov8" title="1">if message.SenderID != claims.UserID </span><span class="cov8" title="1">{
+                // Check if user is admin/owner of the room
+                chatRoomIDStr := message.ChatRoomID.String()
+                participant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+                if err != nil || (participant.Role != models.ParticipantRoleOwner &amp;&amp; participant.Role != models.ParticipantRoleAdmin) </span><span class="cov8" title="1">{
+                        c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Insufficient permissions"))
+                        return
+                }</span>
+        }
+
+        // Delete message
+        <span class="cov8" title="1">if err := h.db.MessageDelete(c.Request.Context(), messageID); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to delete message", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to delete message"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Message deleted",
+                zap.String("message_id", messageID),
+                zap.String("deleted_by", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(gin.H{"deleted": true}))</span>
+}
+
+// MessageReply creates a reply to a message
+func (h *Handler) MessageReply(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "chat_room_id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">parentIDStr, ok := getString(data, "parent_id")
+        if !ok || parentIDStr == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "parent_id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">content, ok := getString(data, "content")
+        if !ok || content == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "content is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomID, err := uuid.Parse(chatRoomIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid chat_room_id"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">parentID, err := uuid.Parse(parentIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid parent_id"))
+                return
+        }</span>
+
+        // Check if user is participant
+        <span class="cov8" title="1">_, err = h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant of this chat room"))
+                return
+        }</span>
+
+        // Verify parent message exists
+        <span class="cov8" title="1">_, err = h.db.MessageRead(c.Request.Context(), parentIDStr)
+        if err != nil </span><span class="cov8" title="1">{
+                logger.Error("Failed to read parent message", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read parent message"))
+                return
+        }</span>
+
+        // Create reply message
+        <span class="cov8" title="1">message := &amp;models.Message{
+                ChatRoomID:    chatRoomID,
+                SenderID:      claims.UserID,
+                Type:          models.MessageTypeReply,
+                Content:       content,
+                ContentFormat: models.ContentFormatPlain,
+                ParentID:      &amp;parentID,
+        }
+
+        // Handle optional content format
+        if contentFormat, ok := getString(data, "content_format"); ok </span><span class="cov0" title="0">{
+                message.ContentFormat = models.ContentFormat(contentFormat)
+        }</span>
+
+        // Save to database
+        <span class="cov8" title="1">if err := h.db.MessageCreate(c.Request.Context(), message); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to create reply", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to create reply"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Reply created",
+                zap.String("message_id", message.ID.String()),
+                zap.String("parent_id", parentIDStr),
+                zap.String("sender", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(message))</span>
+}
+
+// MessageQuote creates a quote of a message
+func (h *Handler) MessageQuote(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        // Inject quoted_message_id and type for quote
+        <span class="cov0" title="0">data["type"] = string(models.MessageTypeQuote)
+        req["data"] = data
+
+        // Use MessageSend with quoted_message_id
+        h.MessageSend(c, req, claims)</span>
+}
+
+// MessageSearch performs full-text search
+func (h *Handler) MessageSearch(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">query, ok := getString(data, "query")
+        if !ok || query == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "query is required"))
+                return
+        }</span>
+
+        // Check if user is participant
+        <span class="cov8" title="1">_, err = h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant of this chat room"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">limit, _ := getInt(data, "limit")
+        if limit &lt;= 0 || limit &gt; 100 </span><span class="cov8" title="1">{
+                limit = 50
+        }</span>
+
+        <span class="cov8" title="1">offset, _ := getInt(data, "offset")
+        if offset &lt; 0 </span><span class="cov0" title="0">{
+                offset = 0
+        }</span>
+
+        // Search messages
+        <span class="cov8" title="1">messages, total, err := h.db.MessageSearch(c.Request.Context(), chatRoomIDStr, query, limit, offset)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to search messages", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to search messages"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">response := models.ListResponse{
+                Items: messages,
+                Pagination: &amp;models.PaginationMeta{
+                        Total:   total,
+                        Limit:   limit,
+                        Offset:  offset,
+                        HasMore: offset+limit &lt; total,
+                },
+        }
+
+        if offset+limit &lt; total </span><span class="cov0" title="0">{
+                response.Pagination.NextOffset = offset + limit
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(200, models.SuccessResponse(response))</span>
+}
+
+// MessagePin pins a message
+func (h *Handler) MessagePin(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">messageID, ok := getString(data, "id")
+        if !ok || messageID == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get message
+        <span class="cov8" title="1">message, err := h.db.MessageRead(c.Request.Context(), messageID)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Message not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        logger.Error("Failed to read message", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read message"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Check if user is admin/moderator of the room
+        <span class="cov8" title="1">chatRoomIDStr := message.ChatRoomID.String()
+        participant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil || (participant.Role != models.ParticipantRoleOwner &amp;&amp;
+                participant.Role != models.ParticipantRoleAdmin &amp;&amp;
+                participant.Role != models.ParticipantRoleModerator) </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Only admins and moderators can pin messages"))
+                return
+        }</span>
+
+        // Pin the message
+        <span class="cov8" title="1">message.IsPinned = true
+        message.PinnedBy = &amp;claims.UserID
+
+        if err := h.db.MessageUpdate(c.Request.Context(), message); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to pin message", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to pin message"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Message pinned",
+                zap.String("message_id", messageID),
+                zap.String("pinned_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(message))</span>
+}
+
+// MessageUnpin unpins a message
+func (h *Handler) MessageUnpin(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">messageID, ok := getString(data, "id")
+        if !ok || messageID == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get message
+        <span class="cov8" title="1">message, err := h.db.MessageRead(c.Request.Context(), messageID)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Message not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        logger.Error("Failed to read message", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to read message"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Check if user is admin/moderator of the room
+        <span class="cov8" title="1">chatRoomIDStr := message.ChatRoomID.String()
+        participant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil || (participant.Role != models.ParticipantRoleOwner &amp;&amp;
+                participant.Role != models.ParticipantRoleAdmin &amp;&amp;
+                participant.Role != models.ParticipantRoleModerator) </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Only admins and moderators can unpin messages"))
+                return
+        }</span>
+
+        // Unpin the message
+        <span class="cov8" title="1">message.IsPinned = false
+        message.PinnedBy = nil
+
+        if err := h.db.MessageUpdate(c.Request.Context(), message); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to unpin message", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to unpin message"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Message unpinned",
+                zap.String("message_id", messageID),
+                zap.String("unpinned_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(message))</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handlers
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "go.uber.org/zap"
+
+        "helixtrack.ru/chat/internal/logger"
+        "helixtrack.ru/chat/internal/models"
+)
+
+// ParticipantAdd adds a user to a chat room
+func (h *Handler) ParticipantAdd(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">userIDStr, ok := getString(data, "user_id")
+        if !ok || userIDStr == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomID, err := uuid.Parse(chatRoomIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid chat_room_id"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">userID, err := uuid.Parse(userIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid user_id"))
+                return
+        }</span>
+
+        // Check if current user has permission (must be owner or admin)
+        <span class="cov8" title="1">currentParticipant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil || (currentParticipant.Role != models.ParticipantRoleOwner &amp;&amp; currentParticipant.Role != models.ParticipantRoleAdmin) </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Insufficient permissions"))
+                return
+        }</span>
+
+        // Determine role (default to member)
+        <span class="cov8" title="1">role := models.ParticipantRoleMember
+        if roleStr, ok := getString(data, "role"); ok </span><span class="cov8" title="1">{
+                role = models.ParticipantRole(roleStr)
+        }</span>
+
+        // Add participant
+        <span class="cov8" title="1">participant := &amp;models.ChatParticipant{
+                ChatRoomID: chatRoomID,
+                UserID:     userID,
+                Role:       role,
+                IsMuted:    false,
+        }
+
+        if err := h.db.ParticipantAdd(c.Request.Context(), participant); err != nil </span><span class="cov8" title="1">{
+                logger.Error("Failed to add participant", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to add participant"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Participant added",
+                zap.String("chat_room_id", chatRoomIDStr),
+                zap.String("user_id", userIDStr),
+                zap.String("added_by", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(participant))</span>
+}
+
+// ParticipantRemove removes a user from a chat room
+func (h *Handler) ParticipantRemove(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">userIDStr, ok := getString(data, "user_id")
+        if !ok || userIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Check if trying to remove the owner
+        <span class="cov8" title="1">targetParticipant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, userIDStr)
+        if err == nil &amp;&amp; targetParticipant.Role == models.ParticipantRoleOwner </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Cannot remove room owner"))
+                return
+        }</span>
+
+        // Check if current user has permission or is removing themselves
+        <span class="cov8" title="1">if userIDStr != claims.UserID.String() </span><span class="cov8" title="1">{
+                currentParticipant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+                if err != nil || (currentParticipant.Role != models.ParticipantRoleOwner &amp;&amp; currentParticipant.Role != models.ParticipantRoleAdmin) </span><span class="cov8" title="1">{
+                        c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Insufficient permissions"))
+                        return
+                }</span>
+        }
+
+        // Remove participant
+        <span class="cov8" title="1">if err := h.db.ParticipantRemove(c.Request.Context(), chatRoomIDStr, userIDStr); err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Participant not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        logger.Error("Failed to remove participant", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to remove participant"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov8" title="1">logger.Info("Participant removed",
+                zap.String("chat_room_id", chatRoomIDStr),
+                zap.String("user_id", userIDStr),
+                zap.String("removed_by", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(gin.H{"removed": true}))</span>
+}
+
+// ParticipantList lists all participants in a chat room
+func (h *Handler) ParticipantList(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Check if user is participant
+        <span class="cov8" title="1">_, err = h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant of this chat room"))
+                return
+        }</span>
+
+        // Get participants
+        <span class="cov8" title="1">participants, err := h.db.ParticipantList(c.Request.Context(), chatRoomIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to list participants", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to list participants"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(200, models.SuccessResponse(gin.H{"items": participants}))</span>
+}
+
+// ParticipantUpdateRole updates a participant's role
+func (h *Handler) ParticipantUpdateRole(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">userIDStr, ok := getString(data, "user_id")
+        if !ok || userIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">roleStr, ok := getString(data, "role")
+        if !ok || roleStr == "" </span><span class="cov8" title="1">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "role is required"))
+                return
+        }</span>
+
+        // Check if current user has permission (must be owner or admin)
+        <span class="cov8" title="1">currentParticipant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil || (currentParticipant.Role != models.ParticipantRoleOwner &amp;&amp; currentParticipant.Role != models.ParticipantRoleAdmin) </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Only room owner or admin can change roles"))
+                return
+        }</span>
+
+        // Get participant to update
+        <span class="cov8" title="1">participant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, userIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Participant not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to get participant"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Update role
+        <span class="cov8" title="1">participant.Role = models.ParticipantRole(roleStr)
+
+        if err := h.db.ParticipantUpdate(c.Request.Context(), participant); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to update participant role", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to update role"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Participant role updated",
+                zap.String("chat_room_id", chatRoomIDStr),
+                zap.String("user_id", userIDStr),
+                zap.String("new_role", roleStr),
+                zap.String("updated_by", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(participant))</span>
+}
+
+// ParticipantMute mutes a participant
+func (h *Handler) ParticipantMute(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">userIDStr, ok := getString(data, "user_id")
+        if !ok || userIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Check if current user has permission (must be moderator, admin, or owner)
+        <span class="cov8" title="1">currentParticipant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">if currentParticipant.Role != models.ParticipantRoleOwner &amp;&amp;
+                currentParticipant.Role != models.ParticipantRoleAdmin &amp;&amp;
+                currentParticipant.Role != models.ParticipantRoleModerator </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Insufficient permissions"))
+                return
+        }</span>
+
+        // Get participant to mute
+        <span class="cov8" title="1">participant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, userIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Participant not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to get participant"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Mute participant
+        <span class="cov8" title="1">participant.IsMuted = true
+
+        if err := h.db.ParticipantUpdate(c.Request.Context(), participant); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to mute participant", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to mute participant"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Participant muted",
+                zap.String("chat_room_id", chatRoomIDStr),
+                zap.String("user_id", userIDStr),
+                zap.String("muted_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(participant))</span>
+}
+
+// ParticipantUnmute unmutes a participant
+func (h *Handler) ParticipantUnmute(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov8" title="1">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">userIDStr, ok := getString(data, "user_id")
+        if !ok || userIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Check if current user has permission (must be moderator, admin, or owner)
+        <span class="cov8" title="1">currentParticipant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, claims.UserID.String())
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Not a participant"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">if currentParticipant.Role != models.ParticipantRoleOwner &amp;&amp;
+                currentParticipant.Role != models.ParticipantRoleAdmin &amp;&amp;
+                currentParticipant.Role != models.ParticipantRoleModerator </span><span class="cov8" title="1">{
+                c.JSON(403, models.ErrorResponse(models.ErrorCodeForbidden, "Insufficient permissions"))
+                return
+        }</span>
+
+        // Get participant to unmute
+        <span class="cov8" title="1">participant, err := h.db.ParticipantGet(c.Request.Context(), chatRoomIDStr, userIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Participant not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to get participant"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        // Unmute participant
+        <span class="cov8" title="1">participant.IsMuted = false
+
+        if err := h.db.ParticipantUpdate(c.Request.Context(), participant); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to unmute participant", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to unmute participant"))
+                return
+        }</span>
+
+        <span class="cov8" title="1">logger.Info("Participant unmuted",
+                zap.String("chat_room_id", chatRoomIDStr),
+                zap.String("user_id", userIDStr),
+                zap.String("unmuted_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(participant))</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package handlers
+
+import (
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "go.uber.org/zap"
+
+        "helixtrack.ru/chat/internal/logger"
+        "helixtrack.ru/chat/internal/models"
+)
+
+// TypingStart indicates user started typing
+func (h *Handler) TypingStart(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">chatRoomID, err := uuid.Parse(chatRoomIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid chat_room_id"))
+                return
+        }</span>
+
+        // Upsert typing indicator
+        <span class="cov0" title="0">indicator := &amp;models.TypingIndicator{
+                ChatRoomID: chatRoomID,
+                UserID:     claims.UserID,
+                IsTyping:   true,
+        }
+
+        if err := h.db.TypingUpsert(c.Request.Context(), indicator); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to create typing indicator", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to update typing status"))
+                return
+        }</span>
+
+        // TODO: Broadcast WebSocket event
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(gin.H{"typing": true}))</span>
+}
+
+// TypingStop indicates user stopped typing
+func (h *Handler) TypingStop(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">chatRoomIDStr, ok := getString(data, "chat_room_id")
+        if !ok || chatRoomIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Delete typing indicator
+        <span class="cov0" title="0">if err := h.db.TypingDelete(c.Request.Context(), chatRoomIDStr, claims.UserID.String()); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to delete typing indicator", zap.Error(err))
+        }</span>
+
+        // TODO: Broadcast WebSocket event
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(gin.H{"typing": false}))</span>
+}
+
+// PresenceUpdate updates user presence
+func (h *Handler) PresenceUpdate(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">statusStr, ok := getString(data, "status")
+        if !ok || statusStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "status is required"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">statusMessage, _ := getString(data, "status_message")
+
+        // Update presence
+        presence := &amp;models.UserPresence{
+                UserID:        claims.UserID,
+                Status:        models.PresenceStatus(statusStr),
+                StatusMessage: statusMessage,
+        }
+
+        // Validate status
+        presReq := &amp;models.PresenceRequest{
+                Status:        models.PresenceStatus(statusStr),
+                StatusMessage: statusMessage,
+        }
+
+        if err := presReq.Validate(); err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, err.Error()))
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := h.db.PresenceUpsert(c.Request.Context(), presence); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to update presence", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to update presence"))
+                return
+        }</span>
+
+        // TODO: Broadcast WebSocket event
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(presence))</span>
+}
+
+// PresenceGet gets user presence
+func (h *Handler) PresenceGet(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">userIDStr, ok := getString(data, "user_id")
+        if !ok || userIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get presence
+        <span class="cov0" title="0">presence, err := h.db.PresenceGet(c.Request.Context(), userIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Presence not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        logger.Error("Failed to get presence", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to get presence"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(presence))</span>
+}
+
+// ReadReceiptMark marks a message as read
+func (h *Handler) ReadReceiptMark(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageIDStr, ok := getString(data, "message_id")
+        if !ok || messageIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageID, err := uuid.Parse(messageIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid message_id"))
+                return
+        }</span>
+
+        // Create read receipt
+        <span class="cov0" title="0">receipt := &amp;models.MessageReadReceipt{
+                MessageID: messageID,
+                UserID:    claims.UserID,
+        }
+
+        if err := h.db.ReadReceiptCreate(c.Request.Context(), receipt); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to create read receipt", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to mark as read"))
+                return
+        }</span>
+
+        // TODO: Broadcast WebSocket event
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(receipt))</span>
+}
+
+// ReadReceiptGet gets read receipts for a message
+func (h *Handler) ReadReceiptGet(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageIDStr, ok := getString(data, "message_id")
+        if !ok || messageIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get read receipts
+        <span class="cov0" title="0">receipts, err := h.db.ReadReceiptGet(c.Request.Context(), messageIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to get read receipts", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to get read receipts"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(receipts))</span>
+}
+
+// ReactionAdd adds a reaction to a message
+func (h *Handler) ReactionAdd(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageIDStr, ok := getString(data, "message_id")
+        if !ok || messageIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">emoji, ok := getString(data, "emoji")
+        if !ok || emoji == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "emoji is required"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageID, err := uuid.Parse(messageIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "Invalid message_id"))
+                return
+        }</span>
+
+        // Create reaction
+        <span class="cov0" title="0">reaction := &amp;models.MessageReaction{
+                MessageID: messageID,
+                UserID:    claims.UserID,
+                Emoji:     emoji,
+        }
+
+        if err := h.db.ReactionCreate(c.Request.Context(), reaction); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to create reaction", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to add reaction"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">logger.Info("Reaction added",
+                zap.String("message_id", messageIDStr),
+                zap.String("emoji", emoji),
+                zap.String("user", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(reaction))</span>
+}
+
+// ReactionRemove removes a reaction from a message
+func (h *Handler) ReactionRemove(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageIDStr, ok := getString(data, "message_id")
+        if !ok || messageIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">emoji, ok := getString(data, "emoji")
+        if !ok || emoji == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "emoji is required"))
+                return
+        }</span>
+
+        // Delete reaction
+        <span class="cov0" title="0">if err := h.db.ReactionDelete(c.Request.Context(), messageIDStr, claims.UserID.String(), emoji); err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to delete reaction", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to remove reaction"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">logger.Info("Reaction removed",
+                zap.String("message_id", messageIDStr),
+                zap.String("emoji", emoji),
+                zap.String("user", claims.Username),
+        )
+
+        // TODO: Broadcast WebSocket event
+
+        c.JSON(200, models.SuccessResponse(gin.H{"removed": true}))</span>
+}
+
+// ReactionList lists reactions for a message
+func (h *Handler) ReactionList(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageIDStr, ok := getString(data, "message_id")
+        if !ok || messageIDStr == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get reactions
+        <span class="cov0" title="0">reactions, err := h.db.ReactionList(c.Request.Context(), messageIDStr)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to list reactions", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to list reactions"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(reactions))</span>
+}
+
+// AttachmentUpload handles file upload
+func (h *Handler) AttachmentUpload(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        // TODO: Implement file upload with multipart/form-data
+        c.JSON(501, models.ErrorResponse(models.ErrorCodeInternalError, "Not yet implemented"))
+}</span>
+
+// AttachmentDelete deletes an attachment
+func (h *Handler) AttachmentDelete(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">attachmentID, ok := getString(data, "attachment_id")
+        if !ok || attachmentID == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Delete attachment
+        <span class="cov0" title="0">if err := h.db.AttachmentDelete(c.Request.Context(), attachmentID); err != nil </span><span class="cov0" title="0">{
+                if err == models.ErrNotFound </span><span class="cov0" title="0">{
+                        c.JSON(404, models.ErrorResponse(models.ErrorCodeNotFound, "Attachment not found"))
+                }</span> else<span class="cov0" title="0"> {
+                        logger.Error("Failed to delete attachment", zap.Error(err))
+                        c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to delete attachment"))
+                }</span>
+                <span class="cov0" title="0">return</span>
+        }
+
+        <span class="cov0" title="0">logger.Info("Attachment deleted",
+                zap.String("attachment_id", attachmentID),
+                zap.String("deleted_by", claims.Username),
+        )
+
+        c.JSON(200, models.SuccessResponse(gin.H{"deleted": true}))</span>
+}
+
+// AttachmentList lists attachments for a message
+func (h *Handler) AttachmentList(c *gin.Context, req map[string]interface{}, claims *models.JWTClaims) <span class="cov0" title="0">{
+        data, err := getDataMap(req)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeMissingParameter, "Missing data"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">messageID, ok := getString(data, "message_id")
+        if !ok || messageID == "" </span><span class="cov0" title="0">{
+                c.JSON(400, models.ErrorResponse(models.ErrorCodeInvalidParameter, "id is required"))
+                return
+        }</span>
+
+        // Get attachments
+        <span class="cov0" title="0">attachments, err := h.db.AttachmentList(c.Request.Context(), messageID)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error("Failed to list attachments", zap.Error(err))
+                c.JSON(500, models.ErrorResponse(models.ErrorCodeDatabaseError, "Failed to list attachments"))
+                return
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(200, models.SuccessResponse(attachments))</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package handlers
+
+import (
+        "bytes"
+        "context"
+        "database/sql"
+        "encoding/json"
+        "net/http/httptest"
+        "testing"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "github.com/stretchr/testify/assert"
+        "helixtrack.ru/chat/internal/models"
+)
+
+// MockDatabase implements the database.Database interface for testing
+type MockDatabase struct {
+        // Chat Room methods
+        ChatRoomCreateFunc    func(ctx context.Context, room *models.ChatRoom) error
+        ChatRoomReadFunc      func(ctx context.Context, id string) (*models.ChatRoom, error)
+        ChatRoomListFunc      func(ctx context.Context, limit, offset int) ([]*models.ChatRoom, int, error)
+        ChatRoomUpdateFunc    func(ctx context.Context, room *models.ChatRoom) error
+        ChatRoomDeleteFunc    func(ctx context.Context, id string) error
+        ChatRoomGetByEntityFunc func(ctx context.Context, entityType, entityID string) (*models.ChatRoom, error)
+
+        // Message methods
+        MessageCreateFunc    func(ctx context.Context, message *models.Message) error
+        MessageReadFunc      func(ctx context.Context, id string) (*models.Message, error)
+        MessageListFunc      func(ctx context.Context, req *models.MessageListRequest) ([]*models.Message, int, error)
+        MessageUpdateFunc    func(ctx context.Context, message *models.Message) error
+        MessageDeleteFunc    func(ctx context.Context, id string) error
+        MessageSearchFunc    func(ctx context.Context, chatRoomID, query string, limit, offset int) ([]*models.Message, int, error)
+
+        // Participant methods
+        ParticipantAddFunc       func(ctx context.Context, participant *models.ChatParticipant) error
+        ParticipantRemoveFunc    func(ctx context.Context, chatRoomID, userID string) error
+        ParticipantGetFunc       func(ctx context.Context, chatRoomID, userID string) (*models.ChatParticipant, error)
+        ParticipantListFunc      func(ctx context.Context, chatRoomID string) ([]*models.ChatParticipant, error)
+        ParticipantUpdateFunc    func(ctx context.Context, participant *models.ChatParticipant) error
+        ParticipantUpdateRoleFunc func(ctx context.Context, chatRoomID, userID string, role models.ParticipantRole) error
+        ParticipantMuteFunc      func(ctx context.Context, chatRoomID, userID string, muted bool) error
+
+        // Presence methods
+        PresenceUpsertFunc      func(ctx context.Context, presence *models.UserPresence) error
+        PresenceGetFunc         func(ctx context.Context, userID string) (*models.UserPresence, error)
+        PresenceGetMultipleFunc func(ctx context.Context, userIDs []string) ([]*models.UserPresence, error)
+
+        // Typing indicator methods
+        TypingUpsertFunc    func(ctx context.Context, indicator *models.TypingIndicator) error
+        TypingDeleteFunc    func(ctx context.Context, chatRoomID, userID string) error
+        TypingGetActiveFunc func(ctx context.Context, chatRoomID string) ([]*models.TypingIndicator, error)
+
+        // Read receipt methods
+        ReadReceiptCreateFunc    func(ctx context.Context, receipt *models.MessageReadReceipt) error
+        ReadReceiptGetFunc       func(ctx context.Context, messageID string) ([]*models.MessageReadReceipt, error)
+        ReadReceiptGetByUserFunc func(ctx context.Context, messageID, userID string) (*models.MessageReadReceipt, error)
+
+        // Reaction methods
+        ReactionCreateFunc func(ctx context.Context, reaction *models.MessageReaction) error
+        ReactionDeleteFunc func(ctx context.Context, messageID, userID, emoji string) error
+        ReactionListFunc   func(ctx context.Context, messageID string) ([]*models.MessageReaction, error)
+
+        // Attachment methods
+        AttachmentCreateFunc func(ctx context.Context, attachment *models.MessageAttachment) error
+        AttachmentDeleteFunc func(ctx context.Context, id string) error
+        AttachmentListFunc   func(ctx context.Context, messageID string) ([]*models.MessageAttachment, error)
+
+        // Other methods
+        CloseFunc    func() error
+        PingFunc     func() error
+        BeginTxFunc  func(ctx context.Context) (*sql.Tx, error)
+}
+
+// Implement database.Database interface
+func (m *MockDatabase) Close() error <span class="cov0" title="0">{
+        if m.CloseFunc != nil </span><span class="cov0" title="0">{
+                return m.CloseFunc()
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) Ping() error <span class="cov0" title="0">{
+        if m.PingFunc != nil </span><span class="cov0" title="0">{
+                return m.PingFunc()
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) BeginTx(ctx context.Context) (*sql.Tx, error) <span class="cov0" title="0">{
+        if m.BeginTxFunc != nil </span><span class="cov0" title="0">{
+                return m.BeginTxFunc(ctx)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// Chat Room methods
+func (m *MockDatabase) ChatRoomCreate(ctx context.Context, room *models.ChatRoom) error <span class="cov8" title="1">{
+        if m.ChatRoomCreateFunc != nil </span><span class="cov8" title="1">{
+                return m.ChatRoomCreateFunc(ctx, room)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ChatRoomRead(ctx context.Context, id string) (*models.ChatRoom, error) <span class="cov8" title="1">{
+        if m.ChatRoomReadFunc != nil </span><span class="cov8" title="1">{
+                return m.ChatRoomReadFunc(ctx, id)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockDatabase) ChatRoomList(ctx context.Context, limit, offset int) ([]*models.ChatRoom, int, error) <span class="cov8" title="1">{
+        if m.ChatRoomListFunc != nil </span><span class="cov8" title="1">{
+                return m.ChatRoomListFunc(ctx, limit, offset)
+        }</span>
+        <span class="cov0" title="0">return nil, 0, nil</span>
+}
+
+func (m *MockDatabase) ChatRoomUpdate(ctx context.Context, room *models.ChatRoom) error <span class="cov8" title="1">{
+        if m.ChatRoomUpdateFunc != nil </span><span class="cov8" title="1">{
+                return m.ChatRoomUpdateFunc(ctx, room)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ChatRoomDelete(ctx context.Context, id string) error <span class="cov8" title="1">{
+        if m.ChatRoomDeleteFunc != nil </span><span class="cov8" title="1">{
+                return m.ChatRoomDeleteFunc(ctx, id)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ChatRoomGetByEntity(ctx context.Context, entityType, entityID string) (*models.ChatRoom, error) <span class="cov8" title="1">{
+        if m.ChatRoomGetByEntityFunc != nil </span><span class="cov8" title="1">{
+                return m.ChatRoomGetByEntityFunc(ctx, entityType, entityID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// Message methods
+func (m *MockDatabase) MessageCreate(ctx context.Context, message *models.Message) error <span class="cov8" title="1">{
+        if m.MessageCreateFunc != nil </span><span class="cov8" title="1">{
+                return m.MessageCreateFunc(ctx, message)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) MessageRead(ctx context.Context, id string) (*models.Message, error) <span class="cov8" title="1">{
+        if m.MessageReadFunc != nil </span><span class="cov8" title="1">{
+                return m.MessageReadFunc(ctx, id)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockDatabase) MessageList(ctx context.Context, req *models.MessageListRequest) ([]*models.Message, int, error) <span class="cov8" title="1">{
+        if m.MessageListFunc != nil </span><span class="cov8" title="1">{
+                return m.MessageListFunc(ctx, req)
+        }</span>
+        <span class="cov0" title="0">return nil, 0, nil</span>
+}
+
+func (m *MockDatabase) MessageUpdate(ctx context.Context, message *models.Message) error <span class="cov8" title="1">{
+        if m.MessageUpdateFunc != nil </span><span class="cov8" title="1">{
+                return m.MessageUpdateFunc(ctx, message)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) MessageDelete(ctx context.Context, id string) error <span class="cov8" title="1">{
+        if m.MessageDeleteFunc != nil </span><span class="cov8" title="1">{
+                return m.MessageDeleteFunc(ctx, id)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) MessageSearch(ctx context.Context, chatRoomID, query string, limit, offset int) ([]*models.Message, int, error) <span class="cov8" title="1">{
+        if m.MessageSearchFunc != nil </span><span class="cov8" title="1">{
+                return m.MessageSearchFunc(ctx, chatRoomID, query, limit, offset)
+        }</span>
+        <span class="cov0" title="0">return nil, 0, nil</span>
+}
+
+// Participant methods
+func (m *MockDatabase) ParticipantAdd(ctx context.Context, participant *models.ChatParticipant) error <span class="cov8" title="1">{
+        if m.ParticipantAddFunc != nil </span><span class="cov8" title="1">{
+                return m.ParticipantAddFunc(ctx, participant)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ParticipantRemove(ctx context.Context, chatRoomID, userID string) error <span class="cov8" title="1">{
+        if m.ParticipantRemoveFunc != nil </span><span class="cov8" title="1">{
+                return m.ParticipantRemoveFunc(ctx, chatRoomID, userID)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ParticipantGet(ctx context.Context, chatRoomID, userID string) (*models.ChatParticipant, error) <span class="cov8" title="1">{
+        if m.ParticipantGetFunc != nil </span><span class="cov8" title="1">{
+                return m.ParticipantGetFunc(ctx, chatRoomID, userID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockDatabase) ParticipantList(ctx context.Context, chatRoomID string) ([]*models.ChatParticipant, error) <span class="cov8" title="1">{
+        if m.ParticipantListFunc != nil </span><span class="cov8" title="1">{
+                return m.ParticipantListFunc(ctx, chatRoomID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockDatabase) ParticipantUpdate(ctx context.Context, participant *models.ChatParticipant) error <span class="cov8" title="1">{
+        if m.ParticipantUpdateFunc != nil </span><span class="cov0" title="0">{
+                return m.ParticipantUpdateFunc(ctx, participant)
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (m *MockDatabase) ParticipantUpdateRole(ctx context.Context, chatRoomID, userID string, role models.ParticipantRole) error <span class="cov0" title="0">{
+        if m.ParticipantUpdateRoleFunc != nil </span><span class="cov0" title="0">{
+                return m.ParticipantUpdateRoleFunc(ctx, chatRoomID, userID, role)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ParticipantMute(ctx context.Context, chatRoomID, userID string, muted bool) error <span class="cov0" title="0">{
+        if m.ParticipantMuteFunc != nil </span><span class="cov0" title="0">{
+                return m.ParticipantMuteFunc(ctx, chatRoomID, userID, muted)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+// Presence methods
+func (m *MockDatabase) PresenceUpsert(ctx context.Context, presence *models.UserPresence) error <span class="cov0" title="0">{
+        if m.PresenceUpsertFunc != nil </span><span class="cov0" title="0">{
+                return m.PresenceUpsertFunc(ctx, presence)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) PresenceGet(ctx context.Context, userID string) (*models.UserPresence, error) <span class="cov0" title="0">{
+        if m.PresenceGetFunc != nil </span><span class="cov0" title="0">{
+                return m.PresenceGetFunc(ctx, userID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockDatabase) PresenceGetMultiple(ctx context.Context, userIDs []string) ([]*models.UserPresence, error) <span class="cov0" title="0">{
+        if m.PresenceGetMultipleFunc != nil </span><span class="cov0" title="0">{
+                return m.PresenceGetMultipleFunc(ctx, userIDs)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// Typing indicator methods
+func (m *MockDatabase) TypingUpsert(ctx context.Context, indicator *models.TypingIndicator) error <span class="cov0" title="0">{
+        if m.TypingUpsertFunc != nil </span><span class="cov0" title="0">{
+                return m.TypingUpsertFunc(ctx, indicator)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) TypingDelete(ctx context.Context, chatRoomID, userID string) error <span class="cov0" title="0">{
+        if m.TypingDeleteFunc != nil </span><span class="cov0" title="0">{
+                return m.TypingDeleteFunc(ctx, chatRoomID, userID)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) TypingGetActive(ctx context.Context, chatRoomID string) ([]*models.TypingIndicator, error) <span class="cov0" title="0">{
+        if m.TypingGetActiveFunc != nil </span><span class="cov0" title="0">{
+                return m.TypingGetActiveFunc(ctx, chatRoomID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// Read receipt methods
+func (m *MockDatabase) ReadReceiptCreate(ctx context.Context, receipt *models.MessageReadReceipt) error <span class="cov0" title="0">{
+        if m.ReadReceiptCreateFunc != nil </span><span class="cov0" title="0">{
+                return m.ReadReceiptCreateFunc(ctx, receipt)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ReadReceiptGet(ctx context.Context, messageID string) ([]*models.MessageReadReceipt, error) <span class="cov0" title="0">{
+        if m.ReadReceiptGetFunc != nil </span><span class="cov0" title="0">{
+                return m.ReadReceiptGetFunc(ctx, messageID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockDatabase) ReadReceiptGetByUser(ctx context.Context, messageID, userID string) (*models.MessageReadReceipt, error) <span class="cov0" title="0">{
+        if m.ReadReceiptGetByUserFunc != nil </span><span class="cov0" title="0">{
+                return m.ReadReceiptGetByUserFunc(ctx, messageID, userID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// Reaction methods
+func (m *MockDatabase) ReactionCreate(ctx context.Context, reaction *models.MessageReaction) error <span class="cov0" title="0">{
+        if m.ReactionCreateFunc != nil </span><span class="cov0" title="0">{
+                return m.ReactionCreateFunc(ctx, reaction)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ReactionDelete(ctx context.Context, messageID, userID, emoji string) error <span class="cov0" title="0">{
+        if m.ReactionDeleteFunc != nil </span><span class="cov0" title="0">{
+                return m.ReactionDeleteFunc(ctx, messageID, userID, emoji)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) ReactionList(ctx context.Context, messageID string) ([]*models.MessageReaction, error) <span class="cov0" title="0">{
+        if m.ReactionListFunc != nil </span><span class="cov0" title="0">{
+                return m.ReactionListFunc(ctx, messageID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// Attachment methods
+func (m *MockDatabase) AttachmentCreate(ctx context.Context, attachment *models.MessageAttachment) error <span class="cov0" title="0">{
+        if m.AttachmentCreateFunc != nil </span><span class="cov0" title="0">{
+                return m.AttachmentCreateFunc(ctx, attachment)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) AttachmentDelete(ctx context.Context, id string) error <span class="cov0" title="0">{
+        if m.AttachmentDeleteFunc != nil </span><span class="cov0" title="0">{
+                return m.AttachmentDeleteFunc(ctx, id)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockDatabase) AttachmentList(ctx context.Context, messageID string) ([]*models.MessageAttachment, error) <span class="cov0" title="0">{
+        if m.AttachmentListFunc != nil </span><span class="cov0" title="0">{
+                return m.AttachmentListFunc(ctx, messageID)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// MockCoreService implements services.CoreService for testing
+type MockCoreService struct {
+        GetUserInfoFunc           func(ctx context.Context, userID uuid.UUID, jwt string) (*models.UserInfo, error)
+        ValidateEntityAccessFunc  func(ctx context.Context, userID, entityID uuid.UUID, entityType, jwt string) (bool, error)
+        GetEntityDetailsFunc      func(ctx context.Context, entityID uuid.UUID, entityType, jwt string) (map[string]interface{}, error)
+}
+
+func (m *MockCoreService) GetUserInfo(ctx context.Context, userID uuid.UUID, jwt string) (*models.UserInfo, error) <span class="cov0" title="0">{
+        if m.GetUserInfoFunc != nil </span><span class="cov0" title="0">{
+                return m.GetUserInfoFunc(ctx, userID, jwt)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockCoreService) ValidateEntityAccess(ctx context.Context, userID, entityID uuid.UUID, entityType, jwt string) (bool, error) <span class="cov0" title="0">{
+        if m.ValidateEntityAccessFunc != nil </span><span class="cov0" title="0">{
+                return m.ValidateEntityAccessFunc(ctx, userID, entityID, entityType, jwt)
+        }</span>
+        <span class="cov0" title="0">return true, nil</span>
+}
+
+func (m *MockCoreService) GetEntityDetails(ctx context.Context, entityID uuid.UUID, entityType, jwt string) (map[string]interface{}, error) <span class="cov0" title="0">{
+        if m.GetEntityDetailsFunc != nil </span><span class="cov0" title="0">{
+                return m.GetEntityDetailsFunc(ctx, entityID, entityType, jwt)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+// TestHelpers provides utility functions for handler tests
+type TestHelpers struct {
+        t   *testing.T
+        db  *MockDatabase
+        svc *MockCoreService
+        h   *Handler
+}
+
+// NewTestHelpers creates a new test helper instance
+func NewTestHelpers(t *testing.T) *TestHelpers <span class="cov8" title="1">{
+        db := &amp;MockDatabase{}
+        svc := &amp;MockCoreService{}
+        h := NewHandler(db, svc)
+
+        return &amp;TestHelpers{
+                t:   t,
+                db:  db,
+                svc: svc,
+                h:   h,
+        }
+}</span>
+
+// CreateTestContext creates a test Gin context with request
+func (th *TestHelpers) CreateTestContext(method, path string, body interface{}) (*gin.Context, *httptest.ResponseRecorder) <span class="cov8" title="1">{
+        gin.SetMode(gin.TestMode)
+
+        w := httptest.NewRecorder()
+        c, _ := gin.CreateTestContext(w)
+
+        var bodyBytes []byte
+        if body != nil </span><span class="cov8" title="1">{
+                bodyBytes, _ = json.Marshal(body)
+        }</span>
+
+        <span class="cov8" title="1">c.Request = httptest.NewRequest(method, path, bytes.NewBuffer(bodyBytes))
+        c.Request.Header.Set("Content-Type", "application/json")
+
+        return c, w</span>
+}
+
+// SetClaims sets JWT claims in the context
+func (th *TestHelpers) SetClaims(c *gin.Context, userID uuid.UUID, username, role string) <span class="cov8" title="1">{
+        claims := &amp;models.JWTClaims{
+                UserID:   userID,
+                Username: username,
+                Role:     role,
+        }
+        c.Set("claims", claims)
+        c.Set("user_id", userID.String())
+        c.Set("username", username)
+        c.Set("role", role)
+}</span>
+
+// AssertJSONResponse asserts the HTTP response
+func (th *TestHelpers) AssertJSONResponse(w *httptest.ResponseRecorder, expectedStatus int, expectedErrorCode int) models.APIResponse <span class="cov8" title="1">{
+        assert.Equal(th.t, expectedStatus, w.Code, "HTTP status code mismatch")
+
+        var response models.APIResponse
+        err := json.Unmarshal(w.Body.Bytes(), &amp;response)
+        assert.NoError(th.t, err, "Failed to unmarshal response")
+
+        if expectedErrorCode != 0 </span><span class="cov8" title="1">{
+                assert.Equal(th.t, expectedErrorCode, response.ErrorCode, "Error code mismatch")
+        }</span>
+
+        <span class="cov8" title="1">return response</span>
+}
+
+// CreateMockChatRoom creates a mock chat room for testing
+func CreateMockChatRoom(id, name string, createdBy uuid.UUID) *models.ChatRoom <span class="cov8" title="1">{
+        roomID := uuid.MustParse(id)
+        return &amp;models.ChatRoom{
+                ID:          roomID,
+                Name:        name,
+                Description: "Test room",
+                Type:        models.ChatRoomTypeGroup,
+                CreatedBy:   createdBy,
+                IsPrivate:   false,
+                CreatedAt:   time.Now().Unix(),
+                UpdatedAt:   time.Now().Unix(),
+                Deleted:     false,
+        }
+}</span>
+
+// CreateMockMessage creates a mock message for testing
+func CreateMockMessage(id, chatRoomID string, senderID uuid.UUID, content string) *models.Message <span class="cov8" title="1">{
+        msgID := uuid.MustParse(id)
+        roomID := uuid.MustParse(chatRoomID)
+        return &amp;models.Message{
+                ID:            msgID,
+                ChatRoomID:    roomID,
+                SenderID:      senderID,
+                Type:          models.MessageTypeText,
+                Content:       content,
+                ContentFormat: models.ContentFormatPlain,
+                IsEdited:      false,
+                IsPinned:      false,
+                CreatedAt:     time.Now().Unix(),
+                UpdatedAt:     time.Now().Unix(),
+                Deleted:       false,
+        }
+}</span>
+
+// CreateMockParticipant creates a mock participant for testing
+func CreateMockParticipant(chatRoomID string, userID uuid.UUID, role models.ParticipantRole) *models.ChatParticipant <span class="cov8" title="1">{
+        roomID := uuid.MustParse(chatRoomID)
+        return &amp;models.ChatParticipant{
+                ChatRoomID: roomID,
+                UserID:     userID,
+                Role:       role,
+                JoinedAt:   time.Now().Unix(),
+                IsMuted:    false,
+        }
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

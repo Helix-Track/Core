@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database for Chat service
+  chat-db:
+    image: postgres:15-alpine
+    container_name: helixtrack-chat-db
+    environment:
+      POSTGRES_DB: helixtrack_chat
+      POSTGRES_USER: chat_user
+      POSTGRES_PASSWORD: ${CHAT_DB_PASSWORD:-chat_secure_password}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+      - ../../Database/DDL/Extensions/Chats/Definition.V2.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    ports:
+      - "5433:5432"  # External port 5433 to avoid conflict with Core
+    networks:
+      - helixtrack-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chat_user -d helixtrack_chat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Chat microservice
+  chat-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: helixtrack-chat-service
+    environment:
+      DB_PASSWORD: ${CHAT_DB_PASSWORD:-chat_secure_password}
+      JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-key}
+    ports:
+      - "9090:9090"  # HTTP/3 QUIC + HTTPS
+    volumes:
+      - ./configs/prod.json:/app/configs/prod.json:ro
+      - ./certs:/app/certs:ro
+      - chat-logs:/var/log/helixtrack/chat
+    depends_on:
+      chat-db:
+        condition: service_healthy
+    networks:
+      - helixtrack-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  chat-db-data:
+    name: helixtrack-chat-db-data
+  chat-logs:
+    name: helixtrack-chat-logs
+
+networks:
+  helixtrack-network:
+    name: helixtrack-network
+    external: true

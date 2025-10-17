@@ -29,7 +29,8 @@ echo ""
 echo "Services started successfully!"
 echo ""
 echo "Core API:     http://localhost:8080"
-echo "Metrics:      http://localhost:9090"
+echo "Chat API:     http://localhost:9090"
+echo "Chat DB:      localhost:5433"
 echo "Mock Auth:    http://localhost:8081"
 echo "Mock Perm:    http://localhost:8082"
 echo ""
@@ -58,6 +59,28 @@ if [ $counter -eq $timeout ]; then
     exit 1
 fi
 
+# Wait for Chat service to be healthy
 echo ""
-echo "✓ HelixTrack Core (SQLite) is ready!"
+echo "Waiting for Chat service to be healthy..."
+timeout=60
+counter=0
+
+while [ $counter -lt $timeout ]; do
+    if curl -s http://localhost:9090/health > /dev/null 2>&1; then
+        echo "✓ Chat service is healthy!"
+        break
+    fi
+    sleep 1
+    counter=$((counter + 1))
+    echo -n "."
+done
+
+if [ $counter -eq $timeout ]; then
+    echo "✗ Chat service did not become healthy within ${timeout}s"
+    echo "Check logs: docker-compose -f docker-compose.yml logs chat-service"
+    # Don't exit - allow Core to run even if Chat fails
+fi
+
+echo ""
+echo "✓ HelixTrack (SQLite) is ready!"
 echo ""

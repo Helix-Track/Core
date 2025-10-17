@@ -206,6 +206,77 @@ if __name__ == \"__main__\":
     profiles:
       - monitoring
 
+  # PostgreSQL database for Chat service
+  chat-db:
+    image: postgres:15-alpine
+    container_name: helixtrack-chat-db
+    hostname: chat-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=helixtrack_chat
+      - POSTGRES_USER=chat_user
+      - POSTGRES_PASSWORD=${CHAT_DB_PASSWORD:-chat_secure_password_change_me}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --lc-collate=C --lc-ctype=C
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+      - ../Services/Chat/../../Database/DDL/Extensions/Chats/Definition.V2.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "5433:5432"
+    networks:
+      - helixtrack-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chat_user -d helixtrack_chat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # Chat microservice
+  chat-service:
+    build:
+      context: ../Services/Chat
+      dockerfile: Dockerfile
+    container_name: helixtrack-chat-service
+    hostname: chat-service
+    restart: unless-stopped
+    depends_on:
+      chat-db:
+        condition: service_healthy
+    environment:
+      - DB_PASSWORD=${CHAT_DB_PASSWORD:-chat_secure_password_change_me}
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-key-change-in-production}
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../Services/Chat/configs/prod.json:/app/configs/prod.json:ro
+      - ../Services/Chat/certs:/app/certs:ro
+      - chat-logs:/var/log/helixtrack/chat
+    networks:
+      - helixtrack-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
 networks:
   helixtrack-network:
     driver: bridge
@@ -216,3 +287,7 @@ volumes:
     name: helixtrack-prometheus-data
   grafana-data:
     name: helixtrack-grafana-data
+  chat-db-data:
+    name: helixtrack-chat-db-data
+  chat-logs:
+    name: helixtrack-chat-logs

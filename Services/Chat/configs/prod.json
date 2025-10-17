@@ -1,0 +1,47 @@
+{
+  "server": {
+    "address": "0.0.0.0",
+    "port": 9090,
+    "https": true,
+    "cert_file": "/etc/helixtrack/chat/tls.crt",
+    "key_file": "/etc/helixtrack/chat/tls.key",
+    "enable_http3": true,
+    "read_timeout": 30,
+    "write_timeout": 30,
+    "max_header_bytes": 1048576
+  },
+  "database": {
+    "type": "postgres",
+    "host": "postgres.helixtrack.local",
+    "port": 5432,
+    "database": "helixtrack_chat",
+    "user": "chat_service",
+    "password": "${DB_PASSWORD}",
+    "ssl_mode": "verify-full",
+    "max_connections": 100,
+    "connection_timeout": 30
+  },
+  "jwt": {
+    "secret": "${JWT_SECRET}",
+    "issuer": "helixtrack-chat",
+    "audience": "helixtrack",
+    "expiry_hours": 24
+  },
+  "logger": {
+    "log_path": "/var/log/helixtrack/chat",
+    "logfile_base_name": "htChat",
+    "log_size_limit": 100000000,
+    "level": "info"
+  },
+  "security": {
+    "enable_ddos_protection": true,
+    "rate_limit_per_second": 50,
+    "rate_limit_burst": 100,
+    "max_message_size": 524288,
+    "max_attachment_size": 104857600,
+    "allowed_origins": [
+      "https://helixtrack.yourdomain.com",
+      "https://app.helixtrack.yourdomain.com"
+    ]
+  }
+}

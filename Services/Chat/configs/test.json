@@ -1,0 +1,44 @@
+{
+  "server": {
+    "address": "127.0.0.1",
+    "port": 9999,
+    "https": false,
+    "cert_file": "",
+    "key_file": "",
+    "enable_http3": false,
+    "read_timeout": 10,
+    "write_timeout": 10,
+    "max_header_bytes": 1048576
+  },
+  "database": {
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "database": "helixtrack_chat_test",
+    "user": "test_user",
+    "password": "test_password",
+    "ssl_mode": "disable",
+    "max_connections": 10,
+    "connection_timeout": 10
+  },
+  "jwt": {
+    "secret": "test-jwt-secret-key",
+    "issuer": "helixtrack-chat-test",
+    "audience": "helixtrack-test",
+    "expiry_hours": 1
+  },
+  "logger": {
+    "log_path": "/tmp/htChatTestLogs",
+    "logfile_base_name": "htChatTest",
+    "log_size_limit": 10000000,
+    "level": "debug"
+  },
+  "security": {
+    "enable_ddos_protection": false,
+    "rate_limit_per_second": 1000,
+    "rate_limit_burst": 2000,
+    "max_message_size": 524288,
+    "max_attachment_size": 104857600,
+    "allowed_origins": ["*"]
+  }
+}
