@@ -54,3 +54,20 @@ func TestNetworkDiscoveryService_Getters(t *testing.T) {
 	assert.Equal(t, "192.168.1.100", service.GetServiceHost())
 	assert.Equal(t, "http://192.168.1.100:9090", service.GetServiceURL())
 }
+
+func TestNetworkDiscoveryService_UpdatePort(t *testing.T) {
+	service := NewNetworkDiscoveryService(8080, "localhost")
+
+	// Update port
+	service.UpdatePort(9090)
+
+	assert.Equal(t, 9090, service.GetServicePort())
+	assert.Equal(t, "localhost", service.GetServiceHost())
+	assert.Equal(t, "http://localhost:9090", service.GetServiceURL())
+
+	// Update to another port
+	service.UpdatePort(10000)
+
+	assert.Equal(t, 10000, service.GetServicePort())
+	assert.Equal(t, "http://localhost:10000", service.GetServiceURL())
+}

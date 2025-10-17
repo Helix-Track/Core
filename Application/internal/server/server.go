@@ -305,7 +305,7 @@ func (s *Server) corsMiddleware() gin.HandlerFunc {
 	}
 }
 
-// Start starts the HTTP server
+// Start starts the HTTP server with port fallback mechanism
 func (s *Server) Start() error {
 	// Start WebSocket manager if enabled
 	if s.wsManager != nil {
@@ -321,28 +321,192 @@ func (s *Server) Start() error {
 	}
 	logger.Info("Network discovery service started")
 
-	addr := s.config.GetListenerAddress()
-
-	s.httpServer = &http.Server{
-		Addr:         addr,
-		Handler:      s.router,
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  60 * time.Second,
+	// Try to start server with port fallback
+	addr, err := s.startWithPortFallback()
+	if err != nil {
+		return err
 	}
 
-	logger.Info("Starting HTTP server", zap.String("address", addr))
+	// Update network discovery service with actual port
+	actualPort := s.extractPortFromAddress(addr)
+	s.networkDiscoveryService.UpdatePort(actualPort)
 
+	logger.Info("HTTP server started successfully", zap.String("address", addr))
+
+	// Broadcast availability to clients
+	s.broadcastAvailability(addr)
+
+	return nil
+}
+
+// startWithPortFallback attempts to start the server, trying multiple ports if needed
+func (s *Server) startWithPortFallback() (string, error) {
 	listener := s.config.GetPrimaryListener()
-	if listener != nil && listener.HTTPS {
-		logger.Info("Starting HTTPS server",
-			zap.String("cert", listener.CertFile),
-			zap.String("key", listener.KeyFile),
-		)
-		return s.httpServer.ListenAndServeTLS(listener.CertFile, listener.KeyFile)
+	if listener == nil {
+		return "", fmt.Errorf("no listener configured")
 	}
 
-	return s.httpServer.ListenAndServe()
+	basePort := listener.Port
+	maxAttempts := 100 // Try up to 100 different ports
+
+	for attempt := 0; attempt < maxAttempts; attempt++ {
+		port := basePort + attempt
+		if port > 65535 {
+			port = 1024 + (port - 65535 - 1) // Wrap around to higher ports
+		}
+
+		addr := fmt.Sprintf("%s:%d", listener.Address, port)
+
+		s.httpServer = &http.Server{
+			Addr:         addr,
+			Handler:      s.router,
+			ReadTimeout:  30 * time.Second,
+			WriteTimeout: 30 * time.Second,
+			IdleTimeout:  60 * time.Second,
+		}
+
+		logger.Info("Attempting to start server",
+			zap.String("address", addr),
+			zap.Int("attempt", attempt+1),
+		)
+
+		var err error
+		if listener.HTTPS {
+			logger.Info("Starting HTTPS server",
+				zap.String("cert", listener.CertFile),
+				zap.String("key", listener.KeyFile),
+			)
+			err = s.httpServer.ListenAndServeTLS(listener.CertFile, listener.KeyFile)
+		} else {
+			err = s.httpServer.ListenAndServe()
+		}
+
+		// Check if the error is due to port already in use
+		if err != nil && s.isPortInUseError(err) {
+			logger.Warn("Port already in use, trying next port",
+				zap.Int("port", port),
+				zap.Error(err),
+			)
+			// Stop the current server before trying next port
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			s.httpServer.Shutdown(ctx)
+			cancel()
+			continue
+		}
+
+		if err != nil {
+			return "", fmt.Errorf("failed to start server on %s: %w", addr, err)
+		}
+
+		// Server started successfully
+		return addr, nil
+	}
+
+	return "", fmt.Errorf("failed to start server after trying %d different ports starting from %d", maxAttempts, basePort)
+}
+
+// isPortInUseError checks if the error indicates the port is already in use
+func (s *Server) isPortInUseError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	// Check for common "address already in use" errors
+	errStr := err.Error()
+	return contains(errStr, "address already in use") ||
+		contains(errStr, "bind: address already in use") ||
+		contains(errStr, "listen tcp") && contains(errStr, "address already in use")
+}
+
+// contains checks if a string contains a substring (case-insensitive helper)
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr ||
+		len(s) > len(substr) &&
+			(s[:len(substr)] == substr ||
+				s[len(s)-len(substr):] == substr ||
+				containsInMiddle(s, substr)))
+}
+
+// containsInMiddle checks if substring exists in the middle of the string
+func containsInMiddle(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
+
+// extractPortFromAddress extracts the port number from an address string
+func (s *Server) extractPortFromAddress(addr string) int {
+	// Simple port extraction from "host:port" format
+	if len(addr) == 0 {
+		return 0
+	}
+
+	// Find the last colon
+	lastColon := -1
+	for i := len(addr) - 1; i >= 0; i-- {
+		if addr[i] == ':' {
+			lastColon = i
+			break
+		}
+	}
+
+	if lastColon == -1 || lastColon == len(addr)-1 {
+		return 0
+	}
+
+	// Parse the port number
+	var port int
+	for i := lastColon + 1; i < len(addr); i++ {
+		if addr[i] >= '0' && addr[i] <= '9' {
+			port = port*10 + int(addr[i]-'0')
+		} else {
+			break
+		}
+	}
+
+	return port
+}
+
+// broadcastAvailability broadcasts the server availability to clients
+func (s *Server) broadcastAvailability(addr string) {
+	// Create availability event
+	eventData := map[string]interface{}{
+		"type":      "server_available",
+		"address":   addr,
+		"timestamp": time.Now().Unix(),
+		"version":   s.config.Version,
+	}
+
+	// Create models.Event for WebSocket publishing
+	event := &models.Event{
+		ID:       generateEventID(),
+		Type:     models.EventSystemHealthCheck,
+		Action:   "server_started",
+		Object:   "server",
+		EntityID: addr,
+		Username: "system",
+		Data:     eventData,
+	}
+
+	// Broadcast via WebSocket if available
+	if s.wsPublisher != nil && s.wsPublisher.IsEnabled() {
+		s.wsPublisher.PublishEvent(event)
+		logger.Info("Server availability broadcasted via WebSocket")
+	}
+
+	// Log the availability
+	logger.Info("Server is now available",
+		zap.String("address", addr),
+		zap.String("version", s.config.Version),
+	)
+}
+
+// generateEventID generates a unique event ID
+func generateEventID() string {
+	return fmt.Sprintf("evt_%d", time.Now().UnixNano())
 }
 
 // Shutdown gracefully shuts down the server

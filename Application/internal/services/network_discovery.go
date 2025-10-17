@@ -211,3 +211,18 @@ func (s *NetworkDiscoveryService) GetServicePort() int {
 func (s *NetworkDiscoveryService) GetServiceHost() string {
 	return s.host
 }
+
+// UpdatePort updates the service port and service info
+func (s *NetworkDiscoveryService) UpdatePort(port int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.port = port
+	s.serviceInfo.Port = port
+	s.serviceInfo.Host = s.host
+
+	logger.Info("Network discovery service port updated",
+		zap.Int("port", port),
+		zap.String("host", s.host),
+	)
+}

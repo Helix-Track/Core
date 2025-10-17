@@ -23,6 +23,8 @@ HelixTrack Core is the main microservice for the HelixTrack project - a JIRA alt
 - **Production Ready**: Proper logging, health checks, graceful shutdown
 - **Docker Support**: Container-ready with Docker and Kubernetes configurations
 - **Extensive Documentation**: Complete user manual, API docs, and deployment guides
+- **Port Fallback**: Automatically tries next available port if desired port is occupied
+- **Service Discovery**: UDP-based service discovery with availability broadcasting
 
 ## Quick Start
 
@@ -48,7 +50,7 @@ go build -o htCore main.go
 ./htCore
 ```
 
-The API will be available at `http://localhost:8080`
+The API will be available at `http://localhost:8080` (or the next available port if 8080 is occupied)
 
 ### Quick Test
 
