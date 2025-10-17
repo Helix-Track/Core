@@ -146,3 +146,53 @@ func (p *PostgresDB) ParticipantGet(ctx context.Context, chatRoomID, userID stri
 
 	return participant, err
 }
+
+// ParticipantMute mutes a participant in a chat room
+func (p *PostgresDB) ParticipantMute(ctx context.Context, chatRoomID, userID string) error {
+	query := `
+		UPDATE chat_participant
+		SET is_muted = true, updated_at = NOW()
+		WHERE chat_room_id = $1 AND user_id = $2 AND deleted = false
+	`
+
+	result, err := p.db.ExecContext(ctx, query, chatRoomID, userID)
+	if err != nil {
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return models.ErrNotFound
+	}
+
+	return nil
+}
+
+// ParticipantUnmute unmutes a participant in a chat room
+func (p *PostgresDB) ParticipantUnmute(ctx context.Context, chatRoomID, userID string) error {
+	query := `
+		UPDATE chat_participant
+		SET is_muted = false, updated_at = NOW()
+		WHERE chat_room_id = $1 AND user_id = $2 AND deleted = false
+	`
+
+	result, err := p.db.ExecContext(ctx, query, chatRoomID, userID)
+	if err != nil {
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return models.ErrNotFound
+	}
+
+	return nil
+}

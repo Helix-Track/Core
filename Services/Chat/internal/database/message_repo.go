@@ -249,3 +249,93 @@ func (p *PostgresDB) MessageSearch(ctx context.Context, chatRoomID, query string
 
 	return messages, total, rows.Err()
 }
+
+// MessageEditHistoryCreate creates a new edit history entry
+func (p *PostgresDB) MessageEditHistoryCreate(ctx context.Context, history *models.MessageEditHistory) error {
+	history.ID = uuid.New()
+	history.CreatedAt = getNow()
+
+	query := `
+		INSERT INTO message_edit_history (
+			id, message_id, previous_content, previous_content_format,
+			previous_metadata, editor_id, created_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+
+	_, err := p.db.ExecContext(ctx, query,
+		history.ID, history.MessageID, history.PreviousContent,
+		history.PreviousContentFormat, history.PreviousMetadata,
+		history.EditorID, history.CreatedAt,
+	)
+
+	return err
+}
+
+// MessageEditHistoryList retrieves edit history for a message
+func (p *PostgresDB) MessageEditHistoryList(ctx context.Context, messageID string) ([]*models.MessageEditHistory, error) {
+	query := `
+		SELECT id, message_id, previous_content, previous_content_format,
+		       previous_metadata, editor_id, created_at
+		FROM message_edit_history
+		WHERE message_id = $1
+		ORDER BY created_at DESC
+	`
+
+	rows, err := p.db.QueryContext(ctx, query, messageID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var histories []*models.MessageEditHistory
+	for rows.Next() {
+		history := &models.MessageEditHistory{}
+		err := rows.Scan(
+			&history.ID, &history.MessageID, &history.PreviousContent,
+			&history.PreviousContentFormat, &history.PreviousMetadata,
+			&history.EditorID, &history.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		histories = append(histories, history)
+	}
+
+	return histories, rows.Err()
+}
+
+// MessageEditHistoryGet retrieves a specific edit history entry
+func (p *PostgresDB) MessageEditHistoryGet(ctx context.Context, id string) (*models.MessageEditHistory, error) {
+	history := &models.MessageEditHistory{}
+
+	query := `
+		SELECT id, message_id, previous_content, previous_content_format,
+		       previous_metadata, editor_id, created_at
+		FROM message_edit_history
+		WHERE id = $1
+	`
+
+	err := p.db.QueryRowContext(ctx, query, id).Scan(
+		&history.ID, &history.MessageID, &history.PreviousContent,
+		&history.PreviousContentFormat, &history.PreviousMetadata,
+		&history.EditorID, &history.CreatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, models.ErrNotFound
+	}
+
+	return history, err
+}
+
+// MessageEditHistoryCount returns the count of edit history entries for a message
+func (p *PostgresDB) MessageEditHistoryCount(ctx context.Context, messageID string) (int, error) {
+	var count int
+	query := `
+		SELECT COUNT(*)
+		FROM message_edit_history
+		WHERE message_id = $1
+	`
+	err := p.db.QueryRowContext(ctx, query, messageID).Scan(&count)
+	return count, err
+}

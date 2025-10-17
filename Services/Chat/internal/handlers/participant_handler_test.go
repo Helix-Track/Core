@@ -148,9 +148,9 @@ func TestParticipantAdd(t *testing.T) {
 			tt.setupMock(th)
 
 			request := map[string]interface{}{
-			"action": "participantAdd",
-			"data":   tt.requestData,
-		}
+				"action": "participantAdd",
+				"data":   tt.requestData,
+			}
 
 			c, w := th.CreateTestContext("POST", "/api/do", request)
 			th.SetClaims(c, tt.adderID, "testuser", "user")
@@ -279,9 +279,9 @@ func TestParticipantRemove(t *testing.T) {
 			tt.setupMock(th)
 
 			request := map[string]interface{}{
-			"action": "participantRemove",
-			"data":   tt.requestData,
-		}
+				"action": "participantRemove",
+				"data":   tt.requestData,
+			}
 
 			c, w := th.CreateTestContext("POST", "/api/do", request)
 			th.SetClaims(c, tt.removerID, "testuser", "user")
@@ -363,9 +363,9 @@ func TestParticipantList(t *testing.T) {
 			tt.setupMock(th)
 
 			request := map[string]interface{}{
-			"action": "participantList",
-			"data":   tt.requestData,
-		}
+				"action": "participantList",
+				"data":   tt.requestData,
+			}
 
 			c, w := th.CreateTestContext("POST", "/api/do", request)
 			th.SetClaims(c, userID, "testuser", "user")
@@ -498,9 +498,9 @@ func TestParticipantUpdateRole(t *testing.T) {
 			tt.setupMock(th)
 
 			request := map[string]interface{}{
-			"action": "participantUpdateRole",
-			"data":   tt.requestData,
-		}
+				"action": "participantUpdateRole",
+				"data":   tt.requestData,
+			}
 
 			c, w := th.CreateTestContext("POST", "/api/do", request)
 			th.SetClaims(c, tt.updaterID, "testuser", "user")
@@ -547,8 +547,7 @@ func TestParticipantMute(t *testing.T) {
 					}
 					return CreateMockParticipant(chatRoomID, memberID, models.ParticipantRoleMember), nil
 				}
-				th.db.ParticipantMuteFunc = func(ctx context.Context, chatRoomID, userID string, muted bool) error {
-					assert.True(t, muted)
+				th.db.ParticipantMuteFunc = func(ctx context.Context, chatRoomID, userID string) error {
 					return nil
 				}
 			},
@@ -583,9 +582,9 @@ func TestParticipantMute(t *testing.T) {
 			tt.setupMock(th)
 
 			request := map[string]interface{}{
-			"action": "participantMute",
-			"data":   tt.requestData,
-		}
+				"action": "participantMute",
+				"data":   tt.requestData,
+			}
 
 			c, w := th.CreateTestContext("POST", "/api/do", request)
 			th.SetClaims(c, tt.muterID, "testuser", "user")
@@ -634,8 +633,7 @@ func TestParticipantUnmute(t *testing.T) {
 					p.IsMuted = true
 					return p, nil
 				}
-				th.db.ParticipantMuteFunc = func(ctx context.Context, chatRoomID, userID string, muted bool) error {
-					assert.False(t, muted)
+				th.db.ParticipantMuteFunc = func(ctx context.Context, chatRoomID, userID string) error {
 					return nil
 				}
 			},
@@ -670,9 +668,9 @@ func TestParticipantUnmute(t *testing.T) {
 			tt.setupMock(th)
 
 			request := map[string]interface{}{
-			"action": "participantUnmute",
-			"data":   tt.requestData,
-		}
+				"action": "participantUnmute",
+				"data":   tt.requestData,
+			}
 
 			c, w := th.CreateTestContext("POST", "/api/do", request)
 			th.SetClaims(c, tt.unmuterID, "testuser", "user")

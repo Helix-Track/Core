@@ -81,6 +81,11 @@ func extractToken(c *gin.Context) string {
 	return ""
 }
 
+// ValidateJWT validates JWT token and returns claims
+func ValidateJWT(tokenString, jwtSecret string) (*models.JWTClaims, error) {
+	return validateJWT(tokenString, jwtSecret)
+}
+
 // validateJWT validates JWT token and returns claims
 func validateJWT(tokenString, jwtSecret string) (*models.JWTClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {

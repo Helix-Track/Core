@@ -493,4 +493,83 @@ const (
 	ActionCommentListMentions  = "commentListMentions"  // List mentioned users
 	ActionCommentGetMentions   = "commentGetMentions"   // Get mentions for user
 	ActionCommentParseMentions = "commentParseMentions" // Parse @mentions from text
+
+	// =======================================================================
+	// CHAT EXTENSION: REAL-TIME MESSAGING
+	// =======================================================================
+
+	// User presence actions
+	ActionPresenceUpdate      = "presenceUpdate"      // Update user presence status
+	ActionPresenceGet         = "presenceGet"         // Get user presence
+	ActionPresenceList        = "presenceList"        // List presence for multiple users
+	ActionPresenceGetByStatus = "presenceGetByStatus" // Get users by presence status
+
+	// Chat room management actions
+	ActionChatRoomCreate        = "chatRoomCreate"        // Create chat room
+	ActionChatRoomRead          = "chatRoomRead"          // Get chat room details
+	ActionChatRoomList          = "chatRoomList"          // List accessible chat rooms
+	ActionChatRoomModify        = "chatRoomModify"        // Modify chat room
+	ActionChatRoomRemove        = "chatRoomRemove"        // Delete chat room
+	ActionChatRoomArchive       = "chatRoomArchive"       // Archive chat room
+	ActionChatRoomUnarchive     = "chatRoomUnarchive"     // Unarchive chat room
+	ActionChatRoomGetByEntity   = "chatRoomGetByEntity"   // Get chat room for entity (project, ticket, etc.)
+	ActionChatRoomListByType    = "chatRoomListByType"    // List rooms by type
+	ActionChatRoomSearch        = "chatRoomSearch"        // Search chat rooms
+
+	// Chat participant actions
+	ActionChatParticipantAdd       = "chatParticipantAdd"       // Add participant to room
+	ActionChatParticipantRemove    = "chatParticipantRemove"    // Remove participant from room
+	ActionChatParticipantList      = "chatParticipantList"      // List participants in room
+	ActionChatParticipantSetRole   = "chatParticipantSetRole"   // Change participant role
+	ActionChatParticipantMute      = "chatParticipantMute"      // Mute chat room for user
+	ActionChatParticipantUnmute    = "chatParticipantUnmute"    // Unmute chat room for user
+	ActionChatParticipantLeave     = "chatParticipantLeave"     // Leave chat room
+	ActionChatParticipantGetRooms  = "chatParticipantGetRooms"  // Get all rooms for user
+
+	// Message management actions
+	ActionMessageCreate       = "messageCreate"       // Send message
+	ActionMessageRead         = "messageRead"         // Get message details
+	ActionMessageList         = "messageList"         // List messages in room
+	ActionMessageModify       = "messageModify"       // Edit message
+	ActionMessageRemove       = "messageRemove"       // Delete message
+	ActionMessagePin          = "messagePin"          // Pin message
+	ActionMessageUnpin        = "messageUnpin"        // Unpin message
+	ActionMessageGetPinned    = "messageGetPinned"    // Get pinned messages
+	ActionMessageReply        = "messageReply"        // Reply to message (threading)
+	ActionMessageQuote        = "messageQuote"        // Quote message
+	ActionMessageGetThread    = "messageGetThread"    // Get message thread (replies)
+	ActionMessageSearch       = "messageSearch"       // Full-text search messages
+	ActionMessageGetRecent    = "messageGetRecent"    // Get recent messages
+	ActionMessageMarkAsRead   = "messageMarkAsRead"   // Mark message as read
+	ActionMessageGetUnread    = "messageGetUnread"    // Get unread messages count
+
+	// Typing indicator actions
+	ActionTypingStart  = "typingStart"  // User starts typing
+	ActionTypingStop   = "typingStop"   // User stops typing
+	ActionTypingGetAll = "typingGetAll" // Get all typing users in room
+
+	// Read receipt actions
+	ActionReadReceiptCreate = "readReceiptCreate" // Create read receipt
+	ActionReadReceiptList   = "readReceiptList"   // List read receipts for message
+	ActionReadReceiptGet    = "readReceiptGet"    // Get read status for user
+
+	// Message attachment actions
+	ActionAttachmentUpload = "attachmentUpload" // Upload file attachment
+	ActionAttachmentList   = "attachmentList"   // List attachments for message
+	ActionAttachmentRemove = "attachmentRemove" // Remove attachment
+	ActionAttachmentGet    = "attachmentGet"    // Get attachment details
+
+	// Message reaction actions
+	ActionReactionAdd    = "reactionAdd"    // Add emoji reaction
+	ActionReactionRemove = "reactionRemove" // Remove emoji reaction
+	ActionReactionList   = "reactionList"   // List reactions for message
+	ActionReactionGet    = "reactionGet"    // Get reactions grouped by emoji
+
+	// External chat integration actions
+	ActionChatIntegrationCreate = "chatIntegrationCreate" // Create external integration
+	ActionChatIntegrationRead   = "chatIntegrationRead"   // Get integration details
+	ActionChatIntegrationList   = "chatIntegrationList"   // List integrations for room
+	ActionChatIntegrationModify = "chatIntegrationModify" // Modify integration
+	ActionChatIntegrationRemove = "chatIntegrationRemove" // Remove integration
+	ActionChatIntegrationSync   = "chatIntegrationSync"   // Sync with external provider
 )

@@ -226,8 +226,20 @@ func (m *Manager) registerClient(client *models.Client) {
 	go m.writePump(client)
 }
 
-// UnregisterClient unregisters a WebSocket client
+// UnregisterClient unregistersa WebSocket client
 func (m *Manager) UnregisterClient(client *models.Client) {
+	// Check if manager is running before trying to send on channel
+	m.mu.RLock()
+	running := m.running
+	m.mu.RUnlock()
+
+	if !running {
+		// Manager is stopped, handle unregistration directly
+		m.unregisterClient(client)
+		return
+	}
+
+	// Manager is running, send through channel
 	select {
 	case m.unregister <- client:
 	case <-time.After(5 * time.Second):

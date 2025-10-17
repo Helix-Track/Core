@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"helixtrack.ru/chat/internal/models"
 )
 
 func TestLoadConfig(t *testing.T) {
@@ -78,22 +80,22 @@ func TestExpandEnvVars(t *testing.T) {
 
 func TestValidateConfig(t *testing.T) {
 	tests := []struct {
-		name        string
-		modifyConfig func(*models.Config)
-		expectError bool
+		name          string
+		modifyConfig  func(*models.Config)
+		expectError   bool
 		errorContains string
 	}{
 		{
-			name: "valid config",
+			name:         "valid config",
 			modifyConfig: func(c *models.Config) {},
-			expectError: false,
+			expectError:  false,
 		},
 		{
 			name: "invalid port - too low",
 			modifyConfig: func(c *models.Config) {
 				c.Server.Port = 0
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "invalid server port",
 		},
 		{
@@ -101,7 +103,7 @@ func TestValidateConfig(t *testing.T) {
 			modifyConfig: func(c *models.Config) {
 				c.Server.Port = 70000
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "invalid server port",
 		},
 		{
@@ -110,7 +112,7 @@ func TestValidateConfig(t *testing.T) {
 				c.Server.HTTPS = true
 				c.Server.CertFile = ""
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "cert_file is required",
 		},
 		{
@@ -120,7 +122,7 @@ func TestValidateConfig(t *testing.T) {
 				c.Server.CertFile = "cert.crt"
 				c.Server.KeyFile = ""
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "key_file is required",
 		},
 		{
@@ -128,7 +130,7 @@ func TestValidateConfig(t *testing.T) {
 			modifyConfig: func(c *models.Config) {
 				c.Database.Type = "mysql"
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "unsupported database type",
 		},
 		{
@@ -136,7 +138,7 @@ func TestValidateConfig(t *testing.T) {
 			modifyConfig: func(c *models.Config) {
 				c.Database.Host = ""
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "database host is required",
 		},
 		{
@@ -144,7 +146,7 @@ func TestValidateConfig(t *testing.T) {
 			modifyConfig: func(c *models.Config) {
 				c.Database.Database = ""
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "database name is required",
 		},
 		{
@@ -152,7 +154,7 @@ func TestValidateConfig(t *testing.T) {
 			modifyConfig: func(c *models.Config) {
 				c.Database.User = ""
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "database user is required",
 		},
 		{
@@ -160,7 +162,7 @@ func TestValidateConfig(t *testing.T) {
 			modifyConfig: func(c *models.Config) {
 				c.JWT.Secret = ""
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "JWT secret is required",
 		},
 		{
@@ -168,7 +170,7 @@ func TestValidateConfig(t *testing.T) {
 			modifyConfig: func(c *models.Config) {
 				c.Logger.Level = "invalid"
 			},
-			expectError: true,
+			expectError:   true,
 			errorContains: "invalid log level",
 		},
 	}

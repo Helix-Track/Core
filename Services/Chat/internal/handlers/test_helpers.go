@@ -18,29 +18,30 @@ import (
 // MockDatabase implements the database.Database interface for testing
 type MockDatabase struct {
 	// Chat Room methods
-	ChatRoomCreateFunc    func(ctx context.Context, room *models.ChatRoom) error
-	ChatRoomReadFunc      func(ctx context.Context, id string) (*models.ChatRoom, error)
-	ChatRoomListFunc      func(ctx context.Context, limit, offset int) ([]*models.ChatRoom, int, error)
-	ChatRoomUpdateFunc    func(ctx context.Context, room *models.ChatRoom) error
-	ChatRoomDeleteFunc    func(ctx context.Context, id string) error
+	ChatRoomCreateFunc      func(ctx context.Context, room *models.ChatRoom) error
+	ChatRoomReadFunc        func(ctx context.Context, id string) (*models.ChatRoom, error)
+	ChatRoomListFunc        func(ctx context.Context, limit, offset int) ([]*models.ChatRoom, int, error)
+	ChatRoomUpdateFunc      func(ctx context.Context, room *models.ChatRoom) error
+	ChatRoomDeleteFunc      func(ctx context.Context, id string) error
 	ChatRoomGetByEntityFunc func(ctx context.Context, entityType, entityID string) (*models.ChatRoom, error)
 
 	// Message methods
-	MessageCreateFunc    func(ctx context.Context, message *models.Message) error
-	MessageReadFunc      func(ctx context.Context, id string) (*models.Message, error)
-	MessageListFunc      func(ctx context.Context, req *models.MessageListRequest) ([]*models.Message, int, error)
-	MessageUpdateFunc    func(ctx context.Context, message *models.Message) error
-	MessageDeleteFunc    func(ctx context.Context, id string) error
-	MessageSearchFunc    func(ctx context.Context, chatRoomID, query string, limit, offset int) ([]*models.Message, int, error)
+	MessageCreateFunc func(ctx context.Context, message *models.Message) error
+	MessageReadFunc   func(ctx context.Context, id string) (*models.Message, error)
+	MessageListFunc   func(ctx context.Context, req *models.MessageListRequest) ([]*models.Message, int, error)
+	MessageUpdateFunc func(ctx context.Context, message *models.Message) error
+	MessageDeleteFunc func(ctx context.Context, id string) error
+	MessageSearchFunc func(ctx context.Context, chatRoomID, query string, limit, offset int) ([]*models.Message, int, error)
 
 	// Participant methods
-	ParticipantAddFunc       func(ctx context.Context, participant *models.ChatParticipant) error
-	ParticipantRemoveFunc    func(ctx context.Context, chatRoomID, userID string) error
-	ParticipantGetFunc       func(ctx context.Context, chatRoomID, userID string) (*models.ChatParticipant, error)
-	ParticipantListFunc      func(ctx context.Context, chatRoomID string) ([]*models.ChatParticipant, error)
-	ParticipantUpdateFunc    func(ctx context.Context, participant *models.ChatParticipant) error
+	ParticipantAddFunc        func(ctx context.Context, participant *models.ChatParticipant) error
+	ParticipantRemoveFunc     func(ctx context.Context, chatRoomID, userID string) error
+	ParticipantGetFunc        func(ctx context.Context, chatRoomID, userID string) (*models.ChatParticipant, error)
+	ParticipantListFunc       func(ctx context.Context, chatRoomID string) ([]*models.ChatParticipant, error)
+	ParticipantUpdateFunc     func(ctx context.Context, participant *models.ChatParticipant) error
 	ParticipantUpdateRoleFunc func(ctx context.Context, chatRoomID, userID string, role models.ParticipantRole) error
-	ParticipantMuteFunc      func(ctx context.Context, chatRoomID, userID string, muted bool) error
+	ParticipantMuteFunc       func(ctx context.Context, chatRoomID, userID string) error
+	ParticipantUnmuteFunc     func(ctx context.Context, chatRoomID, userID string) error
 
 	// Presence methods
 	PresenceUpsertFunc      func(ctx context.Context, presence *models.UserPresence) error
@@ -74,9 +75,9 @@ type MockDatabase struct {
 	MessageEditHistoryCountFunc  func(ctx context.Context, messageID string) (int, error)
 
 	// Other methods
-	CloseFunc    func() error
-	PingFunc     func() error
-	BeginTxFunc  func(ctx context.Context) (*sql.Tx, error)
+	CloseFunc   func() error
+	PingFunc    func() error
+	BeginTxFunc func(ctx context.Context) (*sql.Tx, error)
 }
 
 // Implement database.Database interface
@@ -230,9 +231,16 @@ func (m *MockDatabase) ParticipantUpdateRole(ctx context.Context, chatRoomID, us
 	return nil
 }
 
-func (m *MockDatabase) ParticipantMute(ctx context.Context, chatRoomID, userID string, muted bool) error {
+func (m *MockDatabase) ParticipantMute(ctx context.Context, chatRoomID, userID string) error {
 	if m.ParticipantMuteFunc != nil {
-		return m.ParticipantMuteFunc(ctx, chatRoomID, userID, muted)
+		return m.ParticipantMuteFunc(ctx, chatRoomID, userID)
+	}
+	return nil
+}
+
+func (m *MockDatabase) ParticipantUnmute(ctx context.Context, chatRoomID, userID string) error {
+	if m.ParticipantUnmuteFunc != nil {
+		return m.ParticipantUnmuteFunc(ctx, chatRoomID, userID)
 	}
 	return nil
 }
@@ -378,9 +386,9 @@ func (m *MockDatabase) MessageEditHistoryCount(ctx context.Context, messageID st
 
 // MockCoreService implements services.CoreService for testing
 type MockCoreService struct {
-	GetUserInfoFunc           func(ctx context.Context, userID uuid.UUID, jwt string) (*models.UserInfo, error)
-	ValidateEntityAccessFunc  func(ctx context.Context, userID, entityID uuid.UUID, entityType, jwt string) (bool, error)
-	GetEntityDetailsFunc      func(ctx context.Context, entityID uuid.UUID, entityType, jwt string) (map[string]interface{}, error)
+	GetUserInfoFunc          func(ctx context.Context, userID uuid.UUID, jwt string) (*models.UserInfo, error)
+	ValidateEntityAccessFunc func(ctx context.Context, userID, entityID uuid.UUID, entityType, jwt string) (bool, error)
+	GetEntityDetailsFunc     func(ctx context.Context, entityID uuid.UUID, entityType, jwt string) (map[string]interface{}, error)
 }
 
 func (m *MockCoreService) GetUserInfo(ctx context.Context, userID uuid.UUID, jwt string) (*models.UserInfo, error) {

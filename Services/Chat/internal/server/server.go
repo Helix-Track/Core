@@ -5,9 +5,11 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/quic-go/quic-go"
 	"github.com/quic-go/quic-go/http3"
 	"go.uber.org/zap"
@@ -20,6 +22,16 @@ import (
 	"helixtrack.ru/chat/internal/services"
 )
 
+// WebSocket upgrader
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		// Allow all origins for now - in production, check against allowed origins
+		return true
+	},
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
 // Server represents the HTTP/3 QUIC server
 type Server struct {
 	config      *models.Config
@@ -29,6 +41,8 @@ type Server struct {
 	db          database.Database
 	coreService services.CoreService
 	handler     *handlers.Handler
+	connections map[string]*websocket.Conn // userID -> connection
+	connMutex   sync.RWMutex
 }
 
 // NewServer creates a new HTTP/3 QUIC server
@@ -98,7 +112,7 @@ func (s *Server) startHTTPS(addr string) error {
 			Addr:      addr,
 			Handler:   s.router,
 			TLSConfig: tlsConfig,
-			QuicConfig: &quic.Config{
+			QUICConfig: &quic.Config{
 				MaxIdleTimeout:  30 * time.Second,
 				KeepAlivePeriod: 10 * time.Second,
 			},
@@ -231,9 +245,119 @@ func (s *Server) doHandler(c *gin.Context) {
 	s.handler.DoAction(c)
 }
 
-// websocketHandler will handle WebSocket connections (to be implemented)
+// websocketHandler handles WebSocket connections
 func (s *Server) websocketHandler(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"error": "WebSocket not yet implemented",
-	})
+	// Get JWT token from query parameter or header
+	token := c.Query("jwt")
+	if token == "" {
+		token = c.GetHeader("Authorization")
+		if len(token) > 7 && token[:7] == "Bearer " {
+			token = token[7:]
+		}
+	}
+
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "JWT token required",
+		})
+		return
+	}
+
+	// Validate JWT and get claims
+	claims, err := middleware.ValidateJWT(token, s.config.JWT.Secret)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid JWT token",
+		})
+		return
+	}
+
+	// Upgrade to WebSocket
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		logger.Error("Failed to upgrade connection to WebSocket", zap.Error(err))
+		return
+	}
+	defer conn.Close()
+
+	// Handle WebSocket connection
+	s.handleWebSocketConnection(conn, claims)
+}
+
+// handleWebSocketConnection handles an active WebSocket connection
+func (s *Server) handleWebSocketConnection(conn *websocket.Conn, claims *models.JWTClaims) {
+	userID := claims.UserID.String()
+
+	// Register connection
+	s.connMutex.Lock()
+	s.connections[userID] = conn
+	s.connMutex.Unlock()
+
+	logger.Info("WebSocket connection established",
+		zap.String("user_id", userID),
+		zap.String("username", claims.Username),
+	)
+
+	// Handle incoming messages
+	defer func() {
+		s.connMutex.Lock()
+		delete(s.connections, userID)
+		s.connMutex.Unlock()
+		conn.Close()
+		logger.Info("WebSocket connection closed", zap.String("user_id", userID))
+	}()
+
+	for {
+		var msg models.WSEvent
+		err := conn.ReadJSON(&msg)
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				logger.Error("WebSocket error", zap.Error(err))
+			}
+			break
+		}
+
+		// Handle WebSocket message
+		s.handleWebSocketMessage(conn, &msg, claims)
+	}
+}
+
+// handleWebSocketMessage handles incoming WebSocket messages
+func (s *Server) handleWebSocketMessage(conn *websocket.Conn, msg *models.WSEvent, claims *models.JWTClaims) {
+	switch msg.Type {
+	case "subscribe":
+		// Subscribe to chat room events
+		if chatRoomID, ok := msg.Data.(map[string]interface{})["chat_room_id"].(string); ok {
+			logger.Info("User subscribed to chat room",
+				zap.String("user_id", claims.UserID.String()),
+				zap.String("chat_room_id", chatRoomID),
+			)
+		}
+	case "unsubscribe":
+		// Unsubscribe from chat room events
+		if chatRoomID, ok := msg.Data.(map[string]interface{})["chat_room_id"].(string); ok {
+			logger.Info("User unsubscribed from chat room",
+				zap.String("user_id", claims.UserID.String()),
+				zap.String("chat_room_id", chatRoomID),
+			)
+		}
+	default:
+		logger.Warn("Unknown WebSocket message type", zap.String("type", msg.Type))
+	}
+}
+
+// broadcastToRoom sends a WebSocket event to all users in a chat room
+func (s *Server) broadcastToRoom(chatRoomID string, event *models.WSEvent) {
+	s.connMutex.RLock()
+	defer s.connMutex.RUnlock()
+
+	for userID, conn := range s.connections {
+		// TODO: Check if user is in the chat room before broadcasting
+		if err := conn.WriteJSON(event); err != nil {
+			logger.Error("Failed to send WebSocket message",
+				zap.String("user_id", userID),
+				zap.Error(err),
+			)
+		}
+	}
 }

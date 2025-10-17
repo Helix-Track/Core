@@ -42,6 +42,8 @@ type Database interface {
 	ParticipantList(ctx context.Context, chatRoomID string) ([]*models.ChatParticipant, error)
 	ParticipantUpdate(ctx context.Context, participant *models.ChatParticipant) error
 	ParticipantGet(ctx context.Context, chatRoomID, userID string) (*models.ChatParticipant, error)
+	ParticipantMute(ctx context.Context, chatRoomID, userID string) error
+	ParticipantUnmute(ctx context.Context, chatRoomID, userID string) error
 
 	// Presence operations
 	PresenceUpsert(ctx context.Context, presence *models.UserPresence) error

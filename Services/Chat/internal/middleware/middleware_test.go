@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -31,10 +30,10 @@ func TestJWTMiddleware(t *testing.T) {
 	})
 
 	tests := []struct {
-		name           string
-		token          string
-		expectStatus   int
-		expectAbort    bool
+		name         string
+		token        string
+		expectStatus int
+		expectAbort  bool
 	}{
 		{
 			name:         "valid token in header",
