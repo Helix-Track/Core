@@ -252,6 +252,123 @@ Tbd.
 
 Tbd.
 
+## REST API Endpoints
+
+### Authentication Endpoints
+
+#### Register User
+- **Endpoint**: `POST /api/auth/register`
+- **Description**: Register a new user account
+- **Request Body**:
+  ```json
+  {
+    "username": "string",
+    "password": "string",
+    "email": "string",
+    "name": "string"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "id": "string",
+    "username": "string",
+    "email": "string",
+    "name": "string",
+    "role": "string"
+  }
+  ```
+
+#### Login User
+- **Endpoint**: `POST /api/auth/login`
+- **Description**: Authenticate user and get JWT token
+- **Request Body**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "token": "string",
+    "username": "string",
+    "email": "string",
+    "name": "string",
+    "role": "string"
+  }
+  ```
+
+#### Logout User
+- **Endpoint**: `POST /api/auth/logout`
+- **Description**: Logout user (stateless JWT system)
+- **Response**:
+  ```json
+  {
+    "message": "Successfully logged out"
+  }
+  ```
+
+### Service Discovery Endpoints
+
+#### Register Service
+- **Endpoint**: `POST /api/services/register`
+- **Description**: Register a new service in the discovery system
+- **Authentication**: Required (Admin)
+
+#### Discover Services
+- **Endpoint**: `POST /api/services/discover`
+- **Description**: Discover available services
+- **Authentication**: Required (Admin)
+
+#### Rotate Service
+- **Endpoint**: `POST /api/services/rotate`
+- **Description**: Rotate service instances
+- **Authentication**: Required (Admin)
+
+#### Decommission Service
+- **Endpoint**: `POST /api/services/decommission`
+- **Description**: Remove a service from discovery
+- **Authentication**: Required (Admin)
+
+#### Update Service
+- **Endpoint**: `POST /api/services/update`
+- **Description**: Update service information
+- **Authentication**: Required (Admin)
+
+#### List Services
+- **Endpoint**: `GET /api/services/list`
+- **Description**: Get list of all registered services
+- **Authentication**: Required (Admin)
+
+#### Get Service Health
+- **Endpoint**: `GET /api/services/health/:id`
+- **Description**: Get health status of a specific service
+- **Authentication**: Required (Admin)
+
+### WebSocket Endpoints (if enabled)
+
+#### WebSocket Connection
+- **Endpoint**: `GET /ws` (configurable path)
+- **Description**: Establish WebSocket connection for real-time events
+
+#### WebSocket Stats
+- **Endpoint**: `GET /ws/stats`
+- **Description**: Get WebSocket connection statistics
+
+### System Endpoints
+
+#### Health Check
+- **Endpoint**: `GET /health`
+- **Description**: Check system health status
+- **Response**:
+  ```json
+  {
+    "status": "ok"
+  }
+  ```
+
 ## HashiCorp Vault API
 
 [HashiCorp Vault](https://github.com/hashicorp/vault) API documentation can be found [here](https://developer.hashicorp.com/vault/api-docs).

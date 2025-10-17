@@ -261,9 +261,13 @@ Built for production from day one:
 
 ## Architecture Deep Dive
 
-### The Unified /do Endpoint
+### API Architecture
 
-Unlike traditional REST APIs with multiple endpoints (`/users`, `/projects`, `/tickets`), HelixTrack Core uses a single unified endpoint: `/do`
+HelixTrack Core provides a hybrid API architecture that combines the simplicity of a unified endpoint with the clarity of RESTful endpoints:
+
+#### The Unified /do Endpoint
+
+The primary interface uses a single unified endpoint: `/do`
 
 **Benefits:**
 - Simplified routing and middleware
@@ -274,18 +278,35 @@ Unlike traditional REST APIs with multiple endpoints (`/users`, `/projects`, `/t
 
 **Example:**
 ```json
-// Traditional REST
-POST /api/v1/tickets
-GET /api/v1/tickets/123
-PUT /api/v1/tickets/123
-DELETE /api/v1/tickets/123
-
 // HelixTrack Core unified endpoint
 POST /do {"action": "create", "object": "ticket", ...}
 POST /do {"action": "read", "data": {"id": "123"}}
 POST /do {"action": "modify", "data": {"id": "123", ...}}
 POST /do {"action": "remove", "data": {"id": "123"}}
 ```
+
+#### RESTful Endpoints
+
+For common operations, HelixTrack Core also provides RESTful endpoints:
+
+**Authentication:**
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User authentication
+- `POST /api/auth/logout` - User logout
+
+**Service Discovery:**
+- `POST /api/services/register` - Register services
+- `GET /api/services/list` - List services
+- `GET /api/services/health/:id` - Service health
+
+**System:**
+- `GET /health` - Health check
+
+**WebSocket (if enabled):**
+- `GET /ws` - WebSocket connection
+- `GET /ws/stats` - Connection statistics
+
+This hybrid approach provides flexibility for different use cases while maintaining the core philosophy of simplicity and consistency.
 
 ### JWT Authentication
 
