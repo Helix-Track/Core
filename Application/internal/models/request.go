@@ -572,4 +572,177 @@ const (
 	ActionChatIntegrationModify = "chatIntegrationModify" // Modify integration
 	ActionChatIntegrationRemove = "chatIntegrationRemove" // Remove integration
 	ActionChatIntegrationSync   = "chatIntegrationSync"   // Sync with external provider
+
+	// ========================================================================
+	// DOCUMENTS EXTENSION V2 ACTIONS (90 actions)
+	// Requires: Documents Extension V2 + Core V5
+	// ========================================================================
+
+	// Core document actions (22)
+	ActionDocumentCreate          = "documentCreate"          // Create new document
+	ActionDocumentRead            = "documentRead"            // Get document by ID
+	ActionDocumentList            = "documentList"            // List documents (filtered)
+	ActionDocumentModify          = "documentModify"          // Update document
+	ActionDocumentUpdate          = "documentModify"          // Alias for Modify (backwards compatibility)
+	ActionDocumentRemove          = "documentRemove"          // Delete document (soft)
+	ActionDocumentDelete          = "documentRemove"          // Alias for Remove (backwards compatibility)
+	ActionDocumentRestore         = "documentRestore"         // Restore deleted document
+	ActionDocumentArchive         = "documentArchive"         // Archive document
+	ActionDocumentUnarchive       = "documentUnarchive"       // Unarchive document
+	ActionDocumentDuplicate       = "documentDuplicate"       // Duplicate document
+	ActionDocumentMove            = "documentMove"            // Move to different space
+	ActionDocumentGetHierarchy    = "documentGetHierarchy"    // Get document tree
+	ActionDocumentSearch          = "documentSearch"          // Full-text search
+	ActionDocumentGetRelated      = "documentGetRelated"      // Get related documents
+	ActionDocumentSetParent       = "documentSetParent"       // Set parent document
+	ActionDocumentGetChildren     = "documentGetChildren"     // Get child documents
+	ActionDocumentGetBreadcrumb   = "documentGetBreadcrumb"   // Get breadcrumb trail
+	ActionDocumentGenerateTOC     = "documentGenerateTOC"     // Generate table of contents
+	ActionDocumentGetMetadata     = "documentGetMetadata"     // Get document metadata
+	ActionDocumentPublish            = "documentPublish"            // Publish document
+	ActionDocumentUnpublish          = "documentUnpublish"          // Unpublish document
+	ActionDocumentContentGet         = "documentContentGet"         // Get document content
+	ActionDocumentContentUpdate      = "documentContentUpdate"      // Update document content
+	ActionDocumentContentGetVersion  = "documentContentGetVersion"  // Get specific version content
+	ActionDocumentContentGetLatest   = "documentContentGetLatest"   // Get latest version content
+
+	// Document versioning actions (16)
+	ActionDocumentVersionCreate     = "documentVersionCreate"     // Create new version
+	ActionDocumentVersionList       = "documentVersionList"       // List all versions
+	ActionDocumentVersionGet        = "documentVersionGet"        // Get specific version
+	ActionDocumentVersionCompare    = "documentVersionCompare"    // Compare two versions
+	ActionDocumentVersionRestore    = "documentVersionRestore"    // Rollback to version
+	ActionDocumentVersionLabel         = "documentVersionLabel"         // Add label to version
+	ActionDocumentVersionLabelCreate   = "documentVersionLabel"         // Alias for Label (backwards compatibility)
+	ActionDocumentVersionLabelList     = "documentVersionLabelList"     // List labels for version
+	ActionDocumentVersionComment       = "documentVersionComment"       // Add comment to version
+	ActionDocumentVersionCommentCreate = "documentVersionComment"       // Alias for Comment (backwards compatibility)
+	ActionDocumentVersionCommentList   = "documentVersionCommentList"   // List comments for version
+	ActionDocumentVersionTag           = "documentVersionTag"           // Tag a version
+	ActionDocumentVersionTagCreate     = "documentVersionTag"           // Alias for Tag (backwards compatibility)
+	ActionDocumentVersionTagList       = "documentVersionTagList"       // List tags for version
+	ActionDocumentVersionMention       = "documentVersionMention"       // Mention users in version
+	ActionDocumentVersionMentionCreate = "documentVersionMention"       // Alias for Mention (backwards compatibility)
+	ActionDocumentVersionMentionList   = "documentVersionMentionList"   // List mentions for version
+	ActionDocumentVersionGetDiff       = "documentVersionGetDiff"       // Get diff between versions
+	ActionDocumentVersionDiffGet       = "documentVersionGetDiff"       // Alias for GetDiff (backwards compatibility)
+	ActionDocumentVersionDiffCreate    = "documentVersionDiffCreate"    // Create/store version diff
+	ActionDocumentVersionGetHistory  = "documentVersionGetHistory"  // Get full version history
+	ActionDocumentVersionSetMajor   = "documentVersionSetMajor"   // Mark as major version
+	ActionDocumentVersionSetMinor   = "documentVersionSetMinor"   // Mark as minor version
+	ActionDocumentVersionGetLabels  = "documentVersionGetLabels"  // Get version labels
+	ActionDocumentVersionGetComments = "documentVersionGetComments" // Get version comments
+	ActionDocumentVersionGetTags    = "documentVersionGetTags"    // Get version tags
+
+	// Document collaboration actions (12) - uses core entities
+	ActionDocumentCommentAdd           = "documentCommentAdd"           // Add comment (uses core comment)
+	ActionDocumentCommentReply         = "documentCommentReply"         // Reply to comment
+	ActionDocumentCommentEdit          = "documentCommentEdit"          // Edit comment
+	ActionDocumentCommentRemove        = "documentCommentRemove"        // Delete comment
+	ActionDocumentCommentList            = "documentCommentList"            // List all comments
+	ActionDocumentInlineCommentAdd       = "documentInlineCommentAdd"       // Add inline comment
+	ActionDocumentInlineCommentCreate    = "documentInlineCommentAdd"       // Alias for Add (backwards compatibility)
+	ActionDocumentInlineCommentResolve   = "documentInlineCommentResolve"   // Resolve inline comment
+	ActionDocumentInlineCommentList      = "documentInlineCommentList"      // List inline comments
+	ActionDocumentMention                = "documentMention"                // Mention user in document
+	ActionDocumentReact                  = "documentReact"                  // Add reaction/like (uses core vote)
+	ActionDocumentVoteAdd                = "documentReact"                  // Alias for React (backwards compatibility)
+	ActionDocumentVoteRemove             = "documentVoteRemove"             // Remove vote/reaction
+	ActionDocumentVoteCount              = "documentVoteCount"              // Get vote count
+	ActionDocumentGetReactions           = "documentGetReactions"           // Get all reactions
+	ActionDocumentWatch                  = "documentWatch"                  // Start watching document
+	ActionDocumentWatcherAdd             = "documentWatch"                  // Alias for Watch (backwards compatibility)
+	ActionDocumentUnwatch                = "documentUnwatch"                // Stop watching document
+	ActionDocumentWatcherRemove          = "documentUnwatch"                // Alias for Unwatch (backwards compatibility)
+	ActionDocumentWatcherList            = "documentWatcherList"            // List watchers
+
+	// Document organization actions (10) - tags + core labels
+	ActionDocumentLabelAdd    = "documentLabelAdd"    // Add label (uses core label)
+	ActionDocumentLabelRemove = "documentLabelRemove" // Remove label
+	ActionDocumentLabelList   = "documentLabelList"   // List document labels
+	ActionDocumentTagAdd                = "documentTagAdd"      // Add tag to document
+	ActionDocumentTagCreate             = "documentTagCreate"   // Create new tag
+	ActionDocumentTagAddToDocument      = "documentTagAdd"      // Alias for Add (backwards compatibility)
+	ActionDocumentTagGet                = "documentTagGet"      // Get tag details
+	ActionDocumentTagRemove             = "documentTagRemove"   // Remove tag
+	ActionDocumentTagRemoveFromDocument = "documentTagRemove"   // Alias for Remove (backwards compatibility)
+	ActionDocumentTagList               = "documentTagList"     // List document tags
+	ActionDocumentCategoryAssign        = "documentCategoryAssign" // Assign document to category
+	ActionDocumentCategoryList          = "documentCategoryList"   // List document categories
+	ActionDocumentSpaceCreate = "documentSpaceCreate" // Create document space
+	ActionDocumentSpaceRead   = "documentSpaceRead"   // Read/get space
+	ActionDocumentSpaceList   = "documentSpaceList"   // List spaces
+	ActionDocumentSpaceModify = "documentSpaceModify" // Modify space
+	ActionDocumentSpaceUpdate = "documentSpaceModify" // Alias for Modify (backwards compatibility)
+	ActionDocumentSpaceRemove = "documentSpaceRemove" // Remove space
+	ActionDocumentSpaceDelete = "documentSpaceRemove" // Alias for Remove (backwards compatibility)
+
+	// Document export actions (8)
+	ActionDocumentExportPDF             = "documentExportPDF"             // Export to PDF
+	ActionDocumentExportWord            = "documentExportWord"            // Export to Word (DOCX)
+	ActionDocumentExportHTML            = "documentExportHTML"            // Export to HTML
+	ActionDocumentExportXML             = "documentExportXML"             // Export to XML
+	ActionDocumentExportMarkdown        = "documentExportMarkdown"        // Export to Markdown
+	ActionDocumentExportPlainText       = "documentExportPlainText"       // Export to plain text
+	ActionDocumentExportText            = "documentExportPlainText"       // Alias for Plain Text export
+	ActionDocumentBulkExport            = "documentBulkExport"            // Bulk export documents
+	ActionDocumentExportWithAttachments = "documentExportWithAttachments" // Export with attachments
+	ActionDocumentExportStatus          = "documentExportStatus"          // Get export job status
+	ActionDocumentExportDownload        = "documentExportDownload"        // Download exported file
+	ActionDocumentExportCancel          = "documentExportCancel"          // Cancel export job
+	ActionDocumentExportList            = "documentExportList"            // List export jobs
+
+	// Document entity connection actions (10)
+	ActionDocumentLinkToTicket       = "documentLinkToTicket"       // Link to ticket
+	ActionDocumentLinkToProject      = "documentLinkToProject"      // Link to project
+	ActionDocumentLinkToUser         = "documentLinkToUser"         // Link to user
+	ActionDocumentLinkToLabel        = "documentLinkToLabel"        // Link to label
+	ActionDocumentLinkToAny          = "documentLinkToAny"          // Link to any entity
+	ActionDocumentEntityLinkCreate   = "documentLinkToAny"          // Alias for generic link creation
+	ActionDocumentUnlink             = "documentUnlink"             // Remove link
+	ActionDocumentEntityLinkDelete   = "documentUnlink"             // Alias for generic link deletion
+	ActionDocumentEntityLinkRemove   = "documentUnlink"             // Another alias for removing link
+	ActionDocumentGetLinks           = "documentGetLinks"           // Get all links
+	ActionDocumentEntityLinkList       = "documentGetLinks"              // Alias for GetLinks
+	ActionDocumentGetLinkedBy          = "documentGetLinkedBy"           // Get entities linking to doc
+	ActionDocumentRelationshipCreate   = "documentRelationshipCreate"    // Create document relationship
+	ActionDocumentRelationshipList     = "documentRelationshipList"      // List document relationships
+	ActionDocumentRelationshipRemove   = "documentRelationshipRemove"    // Remove document relationship
+	ActionDocumentEntityDocumentsList  = "documentEntityDocumentsList"   // List entity documents
+	ActionDocumentProjectWikiGet       = "documentProjectWikiGet"        // Get project wiki
+
+	// Document template & blueprint actions (11)
+	ActionDocumentTemplateCreate     = "documentTemplateCreate"     // Create template
+	ActionDocumentTemplateRead       = "documentTemplateGet"        // Read template (alias)
+	ActionDocumentTemplateList       = "documentTemplateList"       // List templates
+	ActionDocumentTemplateGet        = "documentTemplateGet"        // Get template
+	ActionDocumentTemplateModify     = "documentTemplateModify"     // Modify template
+	ActionDocumentTemplateUpdate     = "documentTemplateModify"     // Alias for Modify (backwards compatibility)
+	ActionDocumentTemplateRemove     = "documentTemplateRemove"     // Remove template
+	ActionDocumentTemplateDelete     = "documentTemplateRemove"     // Alias for Remove (backwards compatibility)
+	ActionDocumentCreateFromTemplate = "documentCreateFromTemplate" // Create from template
+	ActionDocumentBlueprintCreate    = "documentBlueprintCreate"    // Create blueprint
+	ActionDocumentBlueprintList      = "documentBlueprintList"      // List blueprints
+	ActionDocumentBlueprintGet       = "documentBlueprintGet"       // Get blueprint
+
+	// Document analytics actions (9)
+	ActionDocumentGetViews         = "documentGetViews"         // Get view count/history
+	ActionDocumentGetPopular       = "documentGetPopular"       // Get popular documents
+	ActionDocumentPopularGet       = "documentGetPopular"       // Alias for GetPopular
+	ActionDocumentGetActivity      = "documentGetActivity"      // Get activity stream
+	ActionDocumentTrackView        = "documentTrackView"        // Track document view
+	ActionDocumentViewRecord       = "documentTrackView"        // Alias for TrackView
+	ActionDocumentGetStatistics    = "documentGetStatistics"    // Get document statistics
+	ActionDocumentAnalyticsGet     = "documentAnalyticsGet"     // Get analytics data
+	ActionDocumentAnalyticsUpdate  = "documentAnalyticsUpdate"  // Update analytics
+	ActionDocumentViewHistoryGet   = "documentViewHistoryGet"   // Get view history
+
+	// Document attachment actions (7)
+	ActionDocumentAttachmentAdd    = "documentAttachmentAdd"    // Add attachment
+	ActionDocumentAttachmentUpload = "documentAttachmentAdd"    // Alias for Add (backwards compatibility)
+	ActionDocumentAttachmentRemove = "documentAttachmentRemove" // Remove attachment
+	ActionDocumentAttachmentDelete = "documentAttachmentRemove" // Alias for Remove (backwards compatibility)
+	ActionDocumentAttachmentList   = "documentAttachmentList"   // List attachments
+	ActionDocumentAttachmentGet    = "documentAttachmentGet"    // Get attachment
+	ActionDocumentAttachmentUpdate = "documentAttachmentUpdate" // Update attachment
 )

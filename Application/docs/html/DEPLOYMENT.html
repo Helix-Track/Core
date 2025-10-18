@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelixTrack Core Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+        h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+        h3 { font-size: 1.25em; }
+        code {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            font-size: 85%;
+            margin: 0;
+            padding: 0.2em 0.4em;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+        pre {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            font-size: 85%;
+            line-height: 1.45;
+            overflow: auto;
+            padding: 16px;
+        }
+        pre code {
+            background-color: transparent;
+            border: 0;
+            display: inline;
+            line-height: inherit;
+            margin: 0;
+            overflow: visible;
+            padding: 0;
+            word-wrap: normal;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+        }
+        table th, table td {
+            border: 1px solid #dfe2e5;
+            padding: 6px 13px;
+        }
+        table th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+        }
+        blockquote {
+            border-left: 4px solid #dfe2e5;
+            color: #6a737d;
+            padding: 0 1em;
+            margin: 0;
+        }
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .toc {
+            background-color: #f6f8fa;
+            border: 1px solid #dfe2e5;
+            border-radius: 3px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>HelixTrack Core - Deployment Guide</h1>
+
+<h2>Table of Contents</h2>
+
+1. [Prerequisites](#prerequisites)
+2. [Build and Installation](#build-and-installation)
+3. [Database Setup](#database-setup)
+4. [Service Configuration](#service-configuration)
+5. [Deployment Options](#deployment-options)
+6. [Production Checklist](#production-checklist)
+7. [Monitoring and Maintenance](#monitoring-and-maintenance)
+
+<h2>Visual Documentation</h2>
+
+Before deploying, review the architecture diagrams to understand the system structure:
+
+**Quick Access:** [Documentation Portal](index.html) | [All Diagrams](diagrams/README.md) | [Architecture Docs](ARCHITECTURE.md)
+
+<h3>Key Diagrams for Deployment</h3>
+
+1. **[System Architecture](diagrams/01-system-architecture.drawio)** - Complete overview of all system layers, components, and how they interact. Essential for understanding deployment topology.
+
+2. **[Microservices Interaction](diagrams/05-microservices-interaction.drawio)** - Shows Core service, Authentication service, Permissions engine, and optional extensions. Includes 3 deployment scenarios:
+   - Development (single machine)
+   - Production (distributed services)
+   - High Availability (multiple replicas)
+
+3. **[Database Schema Overview](diagrams/02-database-schema-overview.drawio)** - All 89 tables for database setup and migration planning.
+
+These diagrams include:
+<li>Service topology and communication patterns</li>
+<li>Port configurations (Core: 8080, Auth: 8081, Permissions: 8082)</li>
+<li>HTTP/JSON communication details</li>
+<li>Deployment architecture examples</li>
+<li>Docker Compose and Kubernetes configurations</li>
+
+**Additional Resources:**
+<li>[Architecture Documentation](ARCHITECTURE.md) - Section 8: Deployment Architecture</li>
+<li>[User Manual](USER_MANUAL.md) - API reference and service configuration</li>
+
+<h2>Prerequisites</h2>
+
+<h3>System Requirements</h3>
+
+<li>**Operating System**: Linux (recommended), macOS, or Windows</li>
+<li>**Go**: Version 1.22 or higher (for building from source)</li>
+<li>**Database**: SQLite 3 or PostgreSQL 12+</li>
+<li>**Memory**: Minimum 512MB RAM (2GB+ recommended for production)</li>
+<li>**Disk Space**: 100MB for application + database size</li>
+<li>**Network**: Open port for HTTP/HTTPS (default: 8080)</li>
+
+<h3>Optional Dependencies</h3>
+
+<li>Docker and Docker Compose (for containerized deployment)</li>
+<li>Nginx or Apache (for reverse proxy)</li>
+<li>systemd (for service management on Linux)</li>
+
+<h2>Build and Installation</h2>
+
+<h3>Option 1: Build from Source</h3>
+
+<pre><code>
+<h1>Clone repository</h1>
+git clone <repository-url>
+cd Core/Application
+
+<h1>Download dependencies</h1>
+go mod download
+
+<h1>Build binary</h1>
+go build -o htCore main.go
+
+<h1>Install to system (optional)</h1>
+sudo cp htCore /usr/local/bin/
+sudo chmod +x /usr/local/bin/htCore
+<pre><code>
+
+<h3>Option 2: Cross-Platform Build</h3>
+
+<pre><code>
+<h1>Build for Linux (64-bit)</h1>
+GOOS=linux GOARCH=amd64 go build -o htCore-linux-amd64 main.go
+
+<h1>Build for macOS (64-bit)</h1>
+GOOS=darwin GOARCH=amd64 go build -o htCore-darwin-amd64 main.go
+
+<h1>Build for Windows (64-bit)</h1>
+GOOS=windows GOARCH=amd64 go build -o htCore-windows-amd64.exe main.go
+
+<h1>Build for ARM (Raspberry Pi, etc.)</h1>
+GOOS=linux GOARCH=arm64 go build -o htCore-linux-arm64 main.go
+<pre><code>
+
+<h3>Option 3: Optimized Production Build</h3>
+
+<pre><code>
+<h1>Build with optimizations</h1>
+go build -ldflags="-s -w" -o htCore main.go
+
+<h1>Further compress with upx (optional)</h1>
+upx --best --lzma htCore
+<pre><code>
+
+<h2>Database Setup</h2>
+
+<h3>SQLite Setup (Development/Small Deployments)</h3>
+
+<pre><code>
+<h1>Create database directory</h1>
+mkdir -p Database
+
+<h1>Copy database file (if provided)</h1>
+cp path/to/Definition.sqlite Database/
+
+<h1>Or let the application create it on first run</h1>
+<h1>Ensure directory has write permissions</h1>
+chmod 755 Database
+<pre><code>
+
+<h3>PostgreSQL Setup (Production)</h3>
+
+<pre><code>
+<h1>Install PostgreSQL</h1>
+sudo apt-get install postgresql postgresql-contrib  # Ubuntu/Debian
+sudo yum install postgresql-server postgresql-contrib  # CentOS/RHEL
+
+<h1>Start PostgreSQL</h1>
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+<h1>Create database and user</h1>
+sudo -u postgres psql << EOF
+CREATE USER htcore WITH PASSWORD 'your-secure-password';
+CREATE DATABASE htcore OWNER htcore;
+GRANT ALL PRIVILEGES ON DATABASE htcore TO htcore;
+\q
+EOF
+
+<h1>Import schema</h1>
+psql -U htcore -d htcore -f Database/DDL/Definition.V1.sql
+
+<h1>Configure PostgreSQL for network access (if needed)</h1>
+sudo nano /etc/postgresql/*/main/postgresql.conf
+<h1>Set: listen_addresses = '*'</h1>
+
+sudo nano /etc/postgresql/*/main/pg_hba.conf
+<h1>Add: host  htcore  htcore  0.0.0.0/0  md5</h1>
+
+<h1>Restart PostgreSQL</h1>
+sudo systemctl restart postgresql
+<pre><code>
+
+<h2>Service Configuration</h2>
+
+<h3>Create Production Configuration</h3>
+
+<pre><code>
+<h1>Create configuration directory</h1>
+sudo mkdir -p /etc/htcore
+sudo cp Configurations/default.json /etc/htcore/production.json
+
+<h1>Edit configuration</h1>
+sudo nano /etc/htcore/production.json
+<pre><code>
+
+**Production Configuration Example:**
+
+<pre><code>
+{
+  "log": {
+    "log_path": "/var/log/htcore",
+    "logfile_base_name": "htCore",
+    "log_size_limit": 100000000,
+    "level": "warn"
+  },
+  "listeners": [
+    {
+      "address": "127.0.0.1",
+      "port": 8080,
+      "https": false
+    }
+  ],
+  "database": {
+    "type": "postgres",
+    "postgres_host": "localhost",
+    "postgres_port": 5432,
+    "postgres_user": "htcore",
+    "postgres_password": "your-secure-password",
+    "postgres_database": "htcore",
+    "postgres_ssl_mode": "require"
+  },
+  "services": {
+    "authentication": {
+      "enabled": true,
+      "url": "http://auth-service:8081",
+      "timeout": 30
+    },
+    "permissions": {
+      "enabled": true,
+      "url": "http://perm-service:8082",
+      "timeout": 30
+    }
+  }
+}
+<pre><code>
+
+<h3>Create Log Directory</h3>
+
+<pre><code>
+<h1>Create log directory</h1>
+sudo mkdir -p /var/log/htcore
+
+<h1>Set permissions</h1>
+sudo chown htcore:htcore /var/log/htcore
+sudo chmod 755 /var/log/htcore
+<pre><code>
+
+<h2>Deployment Options</h2>
+
+<h3>Option 1: Systemd Service (Recommended for Linux)</h3>
+
+**Create service file:**
+
+<pre><code>
+sudo nano /etc/systemd/system/htcore.service
+<pre><code>
+
+**Service Configuration:**
+
+<pre><code>
+[Unit]
+Description=HelixTrack Core Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=htcore
+Group=htcore
+WorkingDirectory=/opt/htcore
+ExecStart=/usr/local/bin/htCore -config=/etc/htcore/production.json
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+<h1>Security hardening</h1>
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/htcore /opt/htcore/Database
+
+[Install]
+WantedBy=multi-user.target
+<pre><code>
+
+**Enable and start service:**
+
+<pre><code>
+<h1>Reload systemd</h1>
+sudo systemctl daemon-reload
+
+<h1>Enable service on boot</h1>
+sudo systemctl enable htcore
+
+<h1>Start service</h1>
+sudo systemctl start htcore
+
+<h1>Check status</h1>
+sudo systemctl status htcore
+
+<h1>View logs</h1>
+sudo journalctl -u htcore -f
+<pre><code>
+
+<h3>Option 2: Docker Deployment</h3>
+
+**Create Dockerfile:**
+
+<pre><code>
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /build
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-s -w" -o htCore main.go
+
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates sqlite-libs
+
+WORKDIR /app
+
+COPY --from=builder /build/htCore .
+COPY --from=builder /build/Configurations ./Configurations
+COPY --from=builder /build/Database ./Database
+
+RUN addgroup -g 1000 htcore && \
+    adduser -D -u 1000 -G htcore htcore && \
+    chown -R htcore:htcore /app
+
+USER htcore
+
+EXPOSE 8080
+
+CMD ["./htCore", "-config=Configurations/default.json"]
+<pre><code>
+
+**Build and run:**
+
+<pre><code>
+<h1>Build image</h1>
+docker build -t helixtrack-core:1.0.0 .
+
+<h1>Run container</h1>
+docker run -d \
+  --name htcore \
+  -p 8080:8080 \
+  -v /path/to/config.json:/app/Configurations/production.json \
+  -v /path/to/database:/app/Database \
+  -v /path/to/logs:/var/log/htcore \
+  --restart unless-stopped \
+  helixtrack-core:1.0.0
+<pre><code>
+
+<h3>Option 3: Docker Compose</h3>
+
+**docker-compose.yml:**
+
+<pre><code>
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: htcore
+      POSTGRES_USER: htcore
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./Database/DDL:/docker-entrypoint-initdb.d
+    networks:
+      - htcore-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U htcore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  htcore:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./Configurations/production.json:/app/Configurations/production.json:ro
+      - htcore-logs:/var/log/htcore
+    environment:
+      - CONFIG_PATH=/app/Configurations/production.json
+    networks:
+      - htcore-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - htcore
+    networks:
+      - htcore-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  htcore-logs:
+
+networks:
+  htcore-network:
+    driver: bridge
+<pre><code>
+
+**Deploy:**
+
+<pre><code>
+<h1>Set environment variables</h1>
+export DB_PASSWORD=your-secure-password
+
+<h1>Start services</h1>
+docker-compose up -d
+
+<h1>View logs</h1>
+docker-compose logs -f htcore
+
+<h1>Stop services</h1>
+docker-compose down
+<pre><code>
+
+<h3>Option 4: Kubernetes Deployment</h3>
+
+**deployment.yaml:**
+
+<pre><code>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: htcore
+  labels:
+    app: htcore
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: htcore
+  template:
+    metadata:
+      labels:
+        app: htcore
+    spec:
+      containers:
+      - name: htcore
+        image: helixtrack-core:1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: CONFIG_PATH
+          value: /config/production.json
+        volumeMounts:
+        - name: config
+          mountPath: /config
+          readOnly: true
+        - name: logs
+          mountPath: /var/log/htcore
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: config
+        configMap:
+          name: htcore-config
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: htcore
+spec:
+  selector:
+    app: htcore
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
+<pre><code>
+
+**Deploy to Kubernetes:**
+
+<pre><code>
+<h1>Create ConfigMap</h1>
+kubectl create configmap htcore-config \
+  --from-file=production.json=Configurations/production.json
+
+<h1>Deploy</h1>
+kubectl apply -f deployment.yaml
+
+<h1>Check status</h1>
+kubectl get pods -l app=htcore
+kubectl logs -l app=htcore -f
+
+<h1>Get service URL</h1>
+kubectl get service htcore
+<pre><code>
+
+<h3>Option 5: Nginx Reverse Proxy</h3>
+
+**nginx.conf:**
+
+<pre><code>
+upstream htcore {
+    server 127.0.0.1:8080;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name your-domain.com;
+
+    # Redirect to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name your-domain.com;
+
+    # SSL configuration
+    ssl_certificate /etc/nginx/ssl/cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/key.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    # Logging
+    access_log /var/log/nginx/htcore-access.log;
+    error_log /var/log/nginx/htcore-error.log;
+
+    # Proxy settings
+    location / {
+        proxy_pass http://htcore;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+
+        # WebSocket support (if needed)
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    # Health check endpoint
+    location /health {
+        proxy_pass http://htcore/health;
+        access_log off;
+    }
+}
+<pre><code>
+
+<h2>Production Checklist</h2>
+
+<h3>Security</h3>
+
+<li>[ ] Use HTTPS in production</li>
+<li>[ ] Set strong database passwords</li>
+<li>[ ] Enable authentication service</li>
+<li>[ ] Enable permission service</li>
+<li>[ ] Configure firewall rules</li>
+<li>[ ] Use non-root user for service</li>
+<li>[ ] Enable PostgreSQL SSL mode</li>
+<li>[ ] Restrict database network access</li>
+<li>[ ] Set appropriate file permissions</li>
+<li>[ ] Disable debug logging</li>
+
+<h3>Performance</h3>
+
+<li>[ ] Use PostgreSQL for production</li>
+<li>[ ] Configure database connection pooling</li>
+<li>[ ] Enable database query caching</li>
+<li>[ ] Set up reverse proxy (Nginx/Apache)</li>
+<li>[ ] Configure log rotation</li>
+<li>[ ] Optimize database indexes</li>
+<li>[ ] Monitor memory usage</li>
+<li>[ ] Set resource limits</li>
+
+<h3>Reliability</h3>
+
+<li>[ ] Configure service auto-restart</li>
+<li>[ ] Set up health check monitoring</li>
+<li>[ ] Configure log rotation</li>
+<li>[ ] Set up automated backups</li>
+<li>[ ] Test disaster recovery</li>
+<li>[ ] Document rollback procedures</li>
+<li>[ ] Set up monitoring/alerting</li>
+<li>[ ] Configure rate limiting</li>
+
+<h3>Monitoring</h3>
+
+<li>[ ] Set up application monitoring</li>
+<li>[ ] Monitor system resources</li>
+<li>[ ] Monitor database performance</li>
+<li>[ ] Set up log aggregation</li>
+<li>[ ] Configure alerts</li>
+<li>[ ] Monitor API response times</li>
+<li>[ ] Track error rates</li>
+<li>[ ] Set up uptime monitoring</li>
+
+<h2>Monitoring and Maintenance</h2>
+
+<h3>Health Checks</h3>
+
+<pre><code>
+<h1>Check application health</h1>
+curl http://localhost:8080/health
+
+<h1>Check via /do endpoint</h1>
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{"action": "health"}'
+<pre><code>
+
+<h3>Log Management</h3>
+
+<pre><code>
+<h1>View live logs (systemd)</h1>
+sudo journalctl -u htcore -f
+
+<h1>View application logs</h1>
+tail -f /var/log/htcore/htCore.log
+
+<h1>Search for errors</h1>
+grep ERROR /var/log/htcore/htCore.log
+
+<h1>Log rotation (create /etc/logrotate.d/htcore)</h1>
+/var/log/htcore/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 htcore htcore
+    sharedscripts
+    postrotate
+        systemctl reload htcore > /dev/null 2>&1 || true
+    endscript
+}
+<pre><code>
+
+<h3>Database Backup</h3>
+
+<pre><code>
+<h1>SQLite backup</h1>
+sqlite3 Database/Definition.sqlite ".backup backup-$(date +%Y%m%d).sqlite"
+
+<h1>PostgreSQL backup</h1>
+pg_dump -U htcore htcore > backup-$(date +%Y%m%d).sql
+
+<h1>Automated backup script</h1>
+#!/bin/bash
+BACKUP_DIR="/backups/htcore"
+DATE=$(date +%Y%m%d-%H%M%S)
+
+mkdir -p $BACKUP_DIR
+pg_dump -U htcore htcore | gzip > $BACKUP_DIR/htcore-$DATE.sql.gz
+
+<h1>Keep last 7 days</h1>
+find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
+<pre><code>
+
+<h3>Performance Monitoring</h3>
+
+<pre><code>
+<h1>Monitor system resources</h1>
+htop
+
+<h1>Monitor database connections</h1>
+psql -U htcore -c "SELECT count(*) FROM pg_stat_activity;"
+
+<h1>Monitor application metrics (if configured)</h1>
+curl http://localhost:8080/metrics
+<pre><code>
+
+<h3>Updating the Application</h3>
+
+<pre><code>
+<h1>Stop service</h1>
+sudo systemctl stop htcore
+
+<h1>Backup current binary</h1>
+sudo cp /usr/local/bin/htCore /usr/local/bin/htCore.backup
+
+<h1>Deploy new binary</h1>
+sudo cp htCore /usr/local/bin/
+
+<h1>Run database migrations (if needed)</h1>
+<h1>psql -U htcore -d htcore -f Database/DDL/Migration.VX.Y.sql</h1>
+
+<h1>Start service</h1>
+sudo systemctl start htcore
+
+<h1>Verify</h1>
+sudo systemctl status htcore
+curl http://localhost:8080/health
+<pre><code>
+
+---
+
+<h2>Extension Deployment</h2>
+
+HelixTrack Core supports optional extensions that add functionality without modifying the core codebase. This section covers deploying extensions, with a focus on the Documents V2 extension.
+
+<h3>Available Extensions</h3>
+
+<li>**Documents** (✅ Production Ready) - Confluence-style document management</li>
+<li>**Times** - Time tracking and work log management</li>
+<li>**Chats** - Integration with messaging platforms (Slack, Telegram, etc.)</li>
+<li>**Lokalisation** - Localization and internationalization support</li>
+
+<h3>Extension Architecture</h3>
+
+Extensions follow a modular architecture:
+
+1. **Self-Contained**: Each extension has its own database schema
+2. **HTTP-Based**: Extensions communicate with Core via REST API
+3. **Optional**: Can be enabled/disabled without affecting core functionality
+4. **Independent**: Extensions can run as separate services or within Core
+
+---
+
+<h2>Documents V2 Extension Deployment</h2>
+
+The Documents extension adds Confluence-style document management capabilities to HelixTrack with 102% feature parity.
+
+<h3>Features Overview</h3>
+
+<li>**90 API Actions**: Complete document lifecycle management</li>
+<li>**32 Database Tables**: Comprehensive document data model</li>
+<li>**Confluence Parity**: 46 features covering all major Confluence capabilities</li>
+<li>**Real-time Collaboration**: Comments, mentions, watchers, reactions</li>
+<li>**Version Control**: Full version history with diffs and rollback</li>
+<li>**Rich Content**: HTML, Markdown, Plain Text, Storage Format</li>
+<li>**Templates & Blueprints**: Reusable document templates with wizards</li>
+<li>**Analytics**: View tracking, popularity scoring, engagement metrics</li>
+<li>**Multi-format Export**: PDF, Markdown, HTML, DOCX</li>
+<li>**Hierarchical Organization**: Spaces, types, parent-child relationships</li>
+
+<h3>Database Schema Deployment</h3>
+
+<h4>SQLite Deployment</h4>
+
+<pre><code>
+<h1>Navigate to database directory</h1>
+cd Database/DDL/Extensions/Documents
+
+<h1>Import Documents extension schema</h1>
+sqlite3 /path/to/database.db < Documents.V1.sql
+
+<h1>Verify tables created</h1>
+sqlite3 /path/to/database.db "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'document%';"
+<pre><code>
+
+Expected output: 32 tables starting with <code>document</code>
+
+<h4>PostgreSQL Deployment</h4>
+
+<pre><code>
+<h1>Import Documents extension schema</h1>
+psql -U htcore -d htcore -f Database/DDL/Extensions/Documents/Documents.V1.sql
+
+<h1>Verify tables created</h1>
+psql -U htcore -d htcore -c "\dt document*"
+<pre><code>
+
+<h3>Documents Database Tables (32 tables)</h3>
+
+**Core Tables:**
+<li><code>document</code> - Main document metadata</li>
+<li><code>document_content</code> - Document content with versioning</li>
+<li><code>document_space</code> - Confluence-style spaces</li>
+<li><code>document_type</code> - Document type definitions</li>
+
+**Versioning Tables:**
+<li><code>document_version</code> - Version history</li>
+<li><code>document_version_label</code> - Version labels</li>
+<li><code>document_version_tag</code> - Version tags</li>
+<li><code>document_version_comment</code> - Version comments</li>
+<li><code>document_version_mention</code> - @mentions in versions</li>
+<li><code>document_version_diff</code> - Cached version diffs</li>
+
+**Collaboration Tables:**
+<li><code>comment_document_mapping</code> - Document comments</li>
+<li><code>document_inline_comment</code> - Inline/contextual comments</li>
+<li><code>document_watcher</code> - Watch subscriptions</li>
+<li><code>document_mention</code> - @mentions in documents</li>
+<li><code>document_reaction</code> - Emoji reactions</li>
+
+**Organization Tables:**
+<li><code>label_document_mapping</code> - Document labels</li>
+<li><code>document_tag</code> - Tag definitions</li>
+<li><code>document_tag_mapping</code> - Document tags</li>
+<li><code>vote_mapping</code> - Votes/reactions (generic system)</li>
+
+**Relationship Tables:**
+<li><code>document_entity_link</code> - Links to tickets/projects/etc.</li>
+<li><code>document_relationship</code> - Document-to-document relationships</li>
+
+**Template Tables:**
+<li><code>document_template</code> - Reusable templates</li>
+<li><code>document_blueprint</code> - Template wizards</li>
+
+**Analytics Tables:**
+<li><code>document_view_history</code> - View tracking</li>
+<li><code>document_analytics</code> - Aggregated metrics</li>
+
+**Attachment Tables:**
+<li><code>document_attachment</code> - File attachments</li>
+
+<h3>Configuration</h3>
+
+Documents extension requires no additional configuration - it uses the main Core configuration for database and services.
+
+**Optional Configuration** (for advanced deployments):
+
+<pre><code>
+{
+  "extensions": {
+    "documents": {
+      "enabled": true,
+      "max_document_size": 10485760,
+      "max_attachment_size": 52428800,
+      "allowed_attachment_types": ["pdf", "doc", "docx", "xls", "xlsx", "png", "jpg", "jpeg"],
+      "enable_realtime_collaboration": true,
+      "enable_export": true
+    }
+  }
+}
+<pre><code>
+
+<h3>API Actions (90 total)</h3>
+
+The Documents extension adds 90 new API actions to the Core <code>/do</code> endpoint:
+
+**Core Document Operations** (20 actions):
+<li><code>documentCreate</code>, <code>documentRead</code>, <code>documentList</code>, <code>documentUpdate</code>, <code>documentDelete</code></li>
+<li><code>documentRestore</code>, <code>documentArchive</code>, <code>documentUnarchive</code>, <code>documentPublish</code>, <code>documentUnpublish</code></li>
+<li><code>documentDuplicate</code>, <code>documentMove</code>, <code>documentSetParent</code>, <code>documentGetChildren</code>, <code>documentGetHierarchy</code></li>
+<li><code>documentGetBreadcrumb</code>, <code>documentSearch</code>, <code>documentGetRelated</code>, <code>documentGetTree</code>, <code>documentReorder</code></li>
+
+**Document Content** (4 actions):
+<li><code>documentContentCreate</code>, <code>documentContentGet</code>, <code>documentContentUpdate</code>, <code>documentContentGetLatest</code></li>
+
+**Document Spaces** (5 actions):
+<li><code>documentSpaceCreate</code>, <code>documentSpaceRead</code>, <code>documentSpaceList</code>, <code>documentSpaceUpdate</code>, <code>documentSpaceDelete</code></li>
+
+**Document Versioning** (15 actions):
+<li>Version management, labels, tags, comments, mentions, diffs, restore</li>
+
+**Document Collaboration** (12 actions):
+<li>Comments, inline comments, watchers, mentions</li>
+
+**Document Organization** (10 actions):
+<li>Labels, tags, reactions, voting</li>
+
+**Document Export** (8 actions):
+<li><code>documentExportPDF</code>, <code>documentExportMarkdown</code>, <code>documentExportHTML</code>, <code>documentExportDOCX</code></li>
+<li><code>documentExportSpace</code>, <code>documentExportBatch</code>, <code>documentExportSchedule</code>, <code>documentExportGetStatus</code></li>
+
+**Document Entity Links** (4 actions):
+<li><code>documentLinkCreate</code>, <code>documentLinkList</code>, <code>documentLinkDelete</code>, <code>documentRelationshipCreate</code></li>
+
+**Document Templates** (5 actions):
+<li><code>documentTemplateCreate</code>, <code>documentTemplateGet</code>, <code>documentTemplateList</code>, <code>documentTemplateUse</code>, <code>documentBlueprintCreate</code></li>
+
+**Document Analytics** (3 actions):
+<li><code>documentViewTrack</code>, <code>documentAnalyticsGet</code>, <code>documentGetPopular</code></li>
+
+**Document Attachments** (4 actions):
+<li><code>documentAttachmentUpload</code>, <code>documentAttachmentGet</code>, <code>documentAttachmentList</code>, <code>documentAttachmentDelete</code></li>
+
+<h3>Testing Documents Deployment</h3>
+
+<h4>Verify Schema</h4>
+
+<pre><code>
+<h1>Check table count</h1>
+sqlite3 /path/to/database.db "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE 'document%';"
+<h1>Expected: 32</h1>
+
+<h1>List all document tables</h1>
+sqlite3 /path/to/database.db "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'document%' ORDER BY name;"
+<pre><code>
+
+<h4>Test API Actions</h4>
+
+<pre><code>
+<h1>1. Create a document space</h1>
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentSpaceCreate",
+    "jwt": "your-jwt-token",
+    "data": {
+      "key": "DOCS",
+      "name": "Documentation",
+      "description": "Main documentation space",
+      "is_public": true
+    }
+  }'
+
+<h1>2. Create a document</h1>
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentCreate",
+    "jwt": "your-jwt-token",
+    "data": {
+      "title": "Getting Started",
+      "space_id": "space-id-from-step-1",
+      "type_id": "page",
+      "content": "<h1>Welcome</h1><p>Getting started with HelixTrack</p>",
+      "content_type": "html"
+    }
+  }'
+
+<h1>3. List documents</h1>
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type": application/json" \
+  -d '{
+    "action": "documentList",
+    "jwt": "your-jwt-token",
+    "data": {
+      "space_id": "space-id-from-step-1",
+      "limit": 10
+    }
+  }'
+<pre><code>
+
+<h4>Verify Analytics</h4>
+
+<pre><code>
+<h1>Track document view</h1>
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentViewTrack",
+    "jwt": "your-jwt-token",
+    "data": {
+      "document_id": "doc-id",
+      "duration": 30
+    }
+  }'
+
+<h1>Get analytics</h1>
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentAnalyticsGet",
+    "jwt": "your-jwt-token",
+    "data": {
+      "document_id": "doc-id"
+    }
+  }'
+<pre><code>
+
+<h3>Performance Considerations</h3>
+
+**Database Indexes** (recommended for production):
+
+<pre><code>
+-- Document lookup indexes
+CREATE INDEX IF NOT EXISTS idx_document_space ON document(space_id);
+CREATE INDEX IF NOT EXISTS idx_document_parent ON document(parent_id);
+CREATE INDEX IF NOT EXISTS idx_document_type ON document(type_id);
+CREATE INDEX IF NOT EXISTS idx_document_created ON document(created);
+
+-- Version history indexes
+CREATE INDEX IF NOT EXISTS idx_document_version_doc ON document_version(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_content_doc ON document_content(document_id);
+
+-- Collaboration indexes
+CREATE INDEX IF NOT EXISTS idx_watcher_document ON document_watcher(document_id);
+CREATE INDEX IF NOT EXISTS idx_comment_document ON comment_document_mapping(document_id);
+
+-- Analytics indexes
+CREATE INDEX IF NOT EXISTS idx_view_document ON document_view_history(document_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_document ON document_analytics(document_id);
+<pre><code>
+
+**Recommended Settings:**
+
+<li>**Max Document Size**: 10 MB (configurable)</li>
+<li>**Max Attachment Size**: 50 MB (configurable)</li>
+<li>**Version Retention**: Unlimited (soft delete)</li>
+<li>**Analytics Aggregation**: Every 5 minutes</li>
+<li>**Search Indexing**: Real-time</li>
+
+<h3>Troubleshooting</h3>
+
+<h4>Issue: Documents API actions return 404</h4>
+
+**Solution**: Verify handlers are registered in Core
+
+<pre><code>
+<h1>Check available actions</h1>
+curl http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{"action": "version"}'
+
+<h1>Look for "documentCreate" in response</h1>
+<pre><code>
+
+<h4>Issue: Database tables not found</h4>
+
+**Solution**: Import Documents schema
+
+<pre><code>
+<h1>Check if tables exist</h1>
+sqlite3 database.db "SELECT name FROM sqlite_master WHERE type='table' AND name='document';"
+
+<h1>If empty, import schema</h1>
+sqlite3 database.db < Database/DDL/Extensions/Documents/Documents.V1.sql
+<pre><code>
+
+<h4>Issue: Slow document searches</h4>
+
+**Solution**: Add search indexes
+
+<pre><code>
+-- Full-text search index (SQLite)
+CREATE VIRTUAL TABLE IF NOT EXISTS document_fts USING fts5(
+    document_id, title, content, tokenize='porter'
+);
+
+-- Keep FTS in sync with triggers
+CREATE TRIGGER IF NOT EXISTS document_fts_insert AFTER INSERT ON document BEGIN
+    INSERT INTO document_fts(document_id, title) VALUES (new.id, new.title);
+END;
+<pre><code>
+
+<h4>Issue: WebSocket events not working for documents</h4>
+
+**Solution**: Verify WebSocket endpoint is accessible
+
+<pre><code>
+<h1>Test WebSocket connection</h1>
+wscat -c ws://localhost:8080/ws
+
+<h1>Should receive connection confirmation</h1>
+<pre><code>
+
+<h3>Migration from Other Systems</h3>
+
+<h4>Confluence to HelixTrack Documents</h4>
+
+<pre><code>
+<h1>Export from Confluence (use Confluence REST API)</h1>
+curl -u admin:password \
+  "https://your-confluence.com/rest/api/content?limit=100" \
+  > confluence-export.json
+
+<h1>Convert and import (example script)</h1>
+python scripts/migrate-confluence.py \
+  --input confluence-export.json \
+  --helix-url http://localhost:8080 \
+  --jwt "your-token"
+<pre><code>
+
+<h4>Google Docs to HelixTrack Documents</h4>
+
+1. Export from Google Docs (File → Download → HTML)
+2. Use <code>documentCreate</code> API with HTML content
+3. Convert links and images to HelixTrack references
+
+<h3>Backup and Recovery</h3>
+
+<pre><code>
+<h1>Backup Documents tables (SQLite)</h1>
+sqlite3 database.db ".dump document" > documents-backup.sql
+sqlite3 database.db ".dump document_content" >> documents-backup.sql
+<h1>... repeat for all 32 tables</h1>
+
+<h1>Restore</h1>
+sqlite3 database.db < documents-backup.sql
+
+<h1>Backup Documents tables (PostgreSQL)</h1>
+pg_dump -U htcore -d htcore \
+  -t 'document*' \
+  > documents-backup.sql
+
+<h1>Restore</h1>
+psql -U htcore -d htcore < documents-backup.sql
+<pre><code>
+
+<h3>Monitoring</h3>
+
+**Key Metrics to Monitor:**
+
+<li>Document creation rate</li>
+<li>Document view count</li>
+<li>Search response time</li>
+<li>Attachment storage usage</li>
+<li>Version history size</li>
+<li>Collaboration activity (comments, watchers)</li>
+
+**Sample Monitoring Query:**
+
+<pre><code>
+-- Document statistics
+SELECT
+    COUNT(*) as total_documents,
+    COUNT(CASE WHEN is_published = 1 THEN 1 END) as published,
+    COUNT(CASE WHEN is_archived = 1 THEN 1 END) as archived,
+    COUNT(CASE WHEN deleted = 1 THEN 1 END) as deleted
+FROM document;
+
+-- Most popular documents
+SELECT d.title, da.total_views, da.unique_viewers, da.popularity_score
+FROM document d
+JOIN document_analytics da ON d.id = da.document_id
+ORDER BY da.popularity_score DESC
+LIMIT 10;
+<pre><code>
+
+---
+
+**Version:** 3.1.0 (Documents V2 Edition)
+**Last Updated:** 2025-10-18
+</body>
+</html>

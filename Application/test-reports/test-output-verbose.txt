@@ -35,7 +35,7 @@
 --- PASS: TestCache_ConcurrentAccess (0.00s)
 PASS
 coverage: 96.4% of statements
-ok  	helixtrack.ru/core/internal/cache	1.374s	coverage: 96.4% of statements
+ok  	helixtrack.ru/core/internal/cache	1.371s	coverage: 96.4% of statements
 === RUN   TestLoadConfig
 === RUN   TestLoadConfig/Valid_minimal_configuration
 === RUN   TestLoadConfig/PostgreSQL_configuration
@@ -83,6 +83,86 @@ ok  	helixtrack.ru/core/internal/cache	1.374s	coverage: 96.4% of statements
 PASS
 coverage: 83.5% of statements
 ok  	helixtrack.ru/core/internal/config	1.021s	coverage: 83.5% of statements
+=== RUN   TestCreateDocument
+--- PASS: TestCreateDocument (0.11s)
+=== RUN   TestCreateDocument_InvalidDocument
+--- PASS: TestCreateDocument_InvalidDocument (0.11s)
+=== RUN   TestGetDocument
+--- PASS: TestGetDocument (0.13s)
+=== RUN   TestGetDocument_NotFound
+--- PASS: TestGetDocument_NotFound (0.13s)
+=== RUN   TestListDocuments
+--- PASS: TestListDocuments (0.12s)
+=== RUN   TestUpdateDocument
+--- PASS: TestUpdateDocument (0.11s)
+=== RUN   TestUpdateDocument_VersionConflict
+--- PASS: TestUpdateDocument_VersionConflict (0.12s)
+=== RUN   TestDeleteDocument
+--- PASS: TestDeleteDocument (0.11s)
+=== RUN   TestDeleteDocument_NotFound
+--- PASS: TestDeleteDocument_NotFound (0.11s)
+=== RUN   TestRestoreDocument
+--- PASS: TestRestoreDocument (0.11s)
+=== RUN   TestArchiveDocument
+--- PASS: TestArchiveDocument (0.12s)
+=== RUN   TestUnarchiveDocument
+--- PASS: TestUnarchiveDocument (0.11s)
+=== RUN   TestPublishDocument
+--- PASS: TestPublishDocument (0.11s)
+=== RUN   TestUnpublishDocument
+--- PASS: TestUnpublishDocument (0.13s)
+=== RUN   TestMoveDocument
+--- PASS: TestMoveDocument (0.11s)
+=== RUN   TestSetDocumentParent
+--- PASS: TestSetDocumentParent (0.11s)
+=== RUN   TestGetDocumentChildren
+--- PASS: TestGetDocumentChildren (0.14s)
+=== RUN   TestCreateDocumentContent
+--- PASS: TestCreateDocumentContent (0.11s)
+=== RUN   TestGetDocumentContent
+--- PASS: TestGetDocumentContent (0.10s)
+=== RUN   TestGetLatestDocumentContent
+--- PASS: TestGetLatestDocumentContent (0.11s)
+=== RUN   TestCreateDocumentSpace
+--- PASS: TestCreateDocumentSpace (0.11s)
+=== RUN   TestGetDocumentSpace
+--- PASS: TestGetDocumentSpace (0.10s)
+=== RUN   TestListDocumentSpaces
+--- PASS: TestListDocumentSpaces (0.11s)
+=== RUN   TestCreateDocumentWatcher
+--- PASS: TestCreateDocumentWatcher (0.10s)
+=== RUN   TestGetDocumentWatchers
+--- PASS: TestGetDocumentWatchers (0.11s)
+=== RUN   TestDeleteDocumentWatcher
+--- PASS: TestDeleteDocumentWatcher (0.11s)
+=== RUN   TestCreateDocumentTag
+--- PASS: TestCreateDocumentTag (0.12s)
+=== RUN   TestGetDocumentTag
+--- PASS: TestGetDocumentTag (0.11s)
+=== RUN   TestGetOrCreateDocumentTag
+--- PASS: TestGetOrCreateDocumentTag (0.10s)
+=== RUN   TestCreateDocumentTemplate
+--- PASS: TestCreateDocumentTemplate (0.10s)
+=== RUN   TestGetDocumentTemplate
+--- PASS: TestGetDocumentTemplate (0.10s)
+=== RUN   TestIncrementTemplateUseCount
+--- PASS: TestIncrementTemplateUseCount (0.11s)
+=== RUN   TestCreateDocumentViewHistory
+--- PASS: TestCreateDocumentViewHistory (0.10s)
+=== RUN   TestGetDocumentViewHistory
+--- PASS: TestGetDocumentViewHistory (0.12s)
+=== RUN   TestCreateDocumentAnalytics
+--- PASS: TestCreateDocumentAnalytics (0.11s)
+=== RUN   TestGetDocumentAnalytics
+--- PASS: TestGetDocumentAnalytics (0.10s)
+=== RUN   TestCreateDocumentAttachment
+--- PASS: TestCreateDocumentAttachment (0.10s)
+=== RUN   TestGetDocumentAttachment
+--- PASS: TestGetDocumentAttachment (0.12s)
+=== RUN   TestListDocumentAttachments
+--- PASS: TestListDocumentAttachments (0.11s)
+=== RUN   TestDeleteDocumentAttachment
+--- PASS: TestDeleteDocumentAttachment (0.14s)
 === RUN   TestNewDatabase_SQLite
 --- PASS: TestNewDatabase_SQLite (0.00s)
 === RUN   TestNewDatabase_SQLite_ForeignKeys
@@ -108,7 +188,7 @@ ok  	helixtrack.ru/core/internal/config	1.021s	coverage: 83.5% of statements
 === RUN   TestDatabase_GetType
 --- PASS: TestDatabase_GetType (0.00s)
 === RUN   TestDatabase_ContextCancellation
---- PASS: TestDatabase_ContextCancellation (0.01s)
+--- PASS: TestDatabase_ContextCancellation (0.00s)
 === RUN   TestNewDatabase_SQLite_FileCreation
 --- PASS: TestNewDatabase_SQLite_FileCreation (0.00s)
 === RUN   TestDefaultOptimizationConfig
@@ -142,8 +222,8 @@ ok  	helixtrack.ru/core/internal/config	1.021s	coverage: 83.5% of statements
 === RUN   TestOptimizedDatabase_MultipleStatements
 --- PASS: TestOptimizedDatabase_MultipleStatements (0.00s)
 PASS
-coverage: 79.6% of statements
-ok  	helixtrack.ru/core/internal/database	1.103s	coverage: 79.6% of statements
+coverage: 37.6% of statements
+ok  	helixtrack.ru/core/internal/database	5.596s	coverage: 37.6% of statements
 === RUN   TestAccountHandler_Create_Success
 --- PASS: TestAccountHandler_Create_Success (0.00s)
 === RUN   TestAccountHandler_Create_MinimalFields
@@ -285,9 +365,9 @@ ok  	helixtrack.ru/core/internal/database	1.103s	coverage: 79.6% of statements
 === RUN   TestAuditHandler_AddMeta_MissingProperty
 --- PASS: TestAuditHandler_AddMeta_MissingProperty (0.00s)
 === RUN   TestAuthHandler_Register_Success
---- PASS: TestAuthHandler_Register_Success (3.10s)
+--- PASS: TestAuthHandler_Register_Success (3.17s)
 === RUN   TestAuthHandler_Register_MissingUsername
-2025-10-16T20:36:29.955+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
+2025-10-18T16:30:56.897+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -296,9 +376,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_MissingUsername
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:107
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_MissingUsername (2.51s)
+--- PASS: TestAuthHandler_Register_MissingUsername (2.55s)
 === RUN   TestAuthHandler_Register_MissingPassword
-2025-10-16T20:36:32.467+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
+2025-10-18T16:30:59.386+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -307,9 +387,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_MissingPassword
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:137
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_MissingPassword (2.51s)
+--- PASS: TestAuthHandler_Register_MissingPassword (2.49s)
 === RUN   TestAuthHandler_Register_MissingEmail
-2025-10-16T20:36:34.925+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'required' tag"}
+2025-10-18T16:31:02.053+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -318,9 +398,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_MissingEmail
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:167
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_MissingEmail (2.46s)
+--- PASS: TestAuthHandler_Register_MissingEmail (2.67s)
 === RUN   TestAuthHandler_Register_MissingName
-2025-10-16T20:36:37.384+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Name' Error:Field validation for 'Name' failed on the 'required' tag"}
+2025-10-18T16:31:04.678+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Name' Error:Field validation for 'Name' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -329,9 +409,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_MissingName
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:197
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_MissingName (2.46s)
+--- PASS: TestAuthHandler_Register_MissingName (2.62s)
 === RUN   TestAuthHandler_Register_InvalidEmail
-2025-10-16T20:36:39.855+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
+2025-10-18T16:31:07.286+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Email' Error:Field validation for 'Email' failed on the 'email' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -340,9 +420,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_InvalidEmail
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:228
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_InvalidEmail (2.47s)
+--- PASS: TestAuthHandler_Register_InvalidEmail (2.61s)
 === RUN   TestAuthHandler_Register_PasswordTooShort
-2025-10-16T20:36:42.317+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'min' tag"}
+2025-10-18T16:31:09.883+0300	ERROR	logger/logger.go:131	Failed to bind registration request	{"error": "Key: 'UserRegistrationRequest.Password' Error:Field validation for 'Password' failed on the 'min' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -351,9 +431,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_PasswordTooShort
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:259
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_PasswordTooShort (2.46s)
+--- PASS: TestAuthHandler_Register_PasswordTooShort (2.60s)
 === RUN   TestAuthHandler_Register_DuplicateUsername
-2025-10-16T20:36:46.037+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.username"}
+2025-10-18T16:31:13.887+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.username"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -362,9 +442,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_DuplicateUsername
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:300
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_DuplicateUsername (3.72s)
+--- PASS: TestAuthHandler_Register_DuplicateUsername (4.00s)
 === RUN   TestAuthHandler_Register_DuplicateEmail
-2025-10-16T20:36:49.699+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.email"}
+2025-10-18T16:31:18.433+0300	ERROR	logger/logger.go:131	Failed to create user	{"error": "UNIQUE constraint failed: users.email"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Register
@@ -373,11 +453,11 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Register_DuplicateEmail
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:341
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Register_DuplicateEmail (3.66s)
+--- PASS: TestAuthHandler_Register_DuplicateEmail (4.55s)
 === RUN   TestAuthHandler_Login_Success
---- PASS: TestAuthHandler_Login_Success (3.69s)
+--- PASS: TestAuthHandler_Login_Success (4.98s)
 === RUN   TestAuthHandler_Login_MissingUsername
-2025-10-16T20:36:55.854+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
+2025-10-18T16:31:26.846+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Username' Error:Field validation for 'Username' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -386,9 +466,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_MissingUsername
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:416
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_MissingUsername (2.46s)
+--- PASS: TestAuthHandler_Login_MissingUsername (3.43s)
 === RUN   TestAuthHandler_Login_MissingPassword
-2025-10-16T20:36:58.306+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
+2025-10-18T16:31:30.137+0300	ERROR	logger/logger.go:131	Failed to bind login request	{"error": "Key: 'UserLoginRequest.Password' Error:Field validation for 'Password' failed on the 'required' tag"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -397,9 +477,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_MissingPassword
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:444
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_MissingPassword (2.45s)
+--- PASS: TestAuthHandler_Login_MissingPassword (3.29s)
 === RUN   TestAuthHandler_Login_UserNotFound
-2025-10-16T20:37:00.786+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "nonexistentuser"}
+2025-10-18T16:31:33.427+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "nonexistentuser"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -408,9 +488,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_UserNotFound
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:473
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_UserNotFound (2.48s)
+--- PASS: TestAuthHandler_Login_UserNotFound (3.29s)
 === RUN   TestAuthHandler_Login_IncorrectPassword
-2025-10-16T20:37:04.454+0300	ERROR	logger/logger.go:131	Invalid password	{"username": "testuser"}
+2025-10-18T16:31:38.160+0300	ERROR	logger/logger.go:131	Invalid password	{"username": "testuser"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -419,9 +499,9 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_IncorrectPassword
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:512
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_IncorrectPassword (3.67s)
+--- PASS: TestAuthHandler_Login_IncorrectPassword (4.73s)
 === RUN   TestAuthHandler_Login_DeletedUser
-2025-10-16T20:37:07.511+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "deleteduser"}
+2025-10-18T16:31:41.307+0300	ERROR	logger/logger.go:131	User not found	{"error": "sql: no rows in result set", "username": "deleteduser"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*AuthHandler).Login
@@ -430,17 +510,17 @@ helixtrack.ru/core/internal/handlers.TestAuthHandler_Login_DeletedUser
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/auth_handler_test.go:551
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestAuthHandler_Login_DeletedUser (3.06s)
+--- PASS: TestAuthHandler_Login_DeletedUser (3.15s)
 === RUN   TestAuthHandler_Logout_Success
---- PASS: TestAuthHandler_Logout_Success (2.44s)
+--- PASS: TestAuthHandler_Logout_Success (2.65s)
 === RUN   TestAuthHandler_FullAuthenticationCycle
---- PASS: TestAuthHandler_FullAuthenticationCycle (3.66s)
+--- PASS: TestAuthHandler_FullAuthenticationCycle (4.44s)
 === RUN   TestInitializeUserTable
---- PASS: TestInitializeUserTable (2.44s)
+--- PASS: TestInitializeUserTable (3.47s)
 === RUN   TestAuthHandler_Register_PasswordHashing
---- PASS: TestAuthHandler_Register_PasswordHashing (4.27s)
+--- PASS: TestAuthHandler_Register_PasswordHashing (4.71s)
 === RUN   TestAuthHandler_Login_JWTTokenGeneration
---- PASS: TestAuthHandler_Login_JWTTokenGeneration (3.67s)
+--- PASS: TestAuthHandler_Login_JWTTokenGeneration (3.76s)
 === RUN   TestBoardConfigHandler_ConfigureColumns_Success
 --- PASS: TestBoardConfigHandler_ConfigureColumns_Success (0.00s)
 === RUN   TestBoardConfigHandler_ConfigureColumns_MissingBoardID
@@ -548,7 +628,7 @@ testing.tRunner
 === RUN   TestBoardConfigHandler_SetType_Unauthorized
 --- PASS: TestBoardConfigHandler_SetType_Unauthorized (0.00s)
 === RUN   TestBoardHandler_Create_Success
-2025-10-16T20:37:24.015+0300	ERROR	logger/logger.go:131	Failed to create board	{"error": "table board has no column named version"}
+2025-10-18T16:32:00.365+0300	ERROR	logger/logger.go:131	Failed to create board	{"error": "table board has no column named version"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleBoardCreate
@@ -577,7 +657,7 @@ testing.tRunner
         	Test:       	TestBoardHandler_Create_Success
 --- FAIL: TestBoardHandler_Create_Success (0.00s)
 === RUN   TestBoardHandler_Create_MinimalFields
-2025-10-16T20:37:24.016+0300	ERROR	logger/logger.go:131	Failed to create board	{"error": "table board has no column named version"}
+2025-10-18T16:32:00.366+0300	ERROR	logger/logger.go:131	Failed to create board	{"error": "table board has no column named version"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleBoardCreate
@@ -600,7 +680,7 @@ testing.tRunner
 === RUN   TestBoardHandler_Create_Unauthorized
 --- PASS: TestBoardHandler_Create_Unauthorized (0.00s)
 === RUN   TestBoardHandler_Read_Success
-2025-10-16T20:37:24.017+0300	ERROR	logger/logger.go:131	Failed to create board	{"error": "table board has no column named version"}
+2025-10-18T16:32:00.367+0300	ERROR	logger/logger.go:131	Failed to create board	{"error": "table board has no column named version"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/handlers.(*Handler).handleBoardCreate
@@ -615,29 +695,29 @@ testing.tRunner
 panic: interface conversion: interface {} is nil, not map[string]interface {} [recovered]
 	panic: interface conversion: interface {} is nil, not map[string]interface {}
 
-goroutine 341 [running]:
-testing.tRunner.func1.2({0x120d320, 0xc0004f4c60})
+goroutine 360 [running]:
+testing.tRunner.func1.2({0x12a8b20, 0xc00035b650})
 	/usr/lib/go-1.22/src/testing/testing.go:1631 +0x3f7
 testing.tRunner.func1()
 	/usr/lib/go-1.22/src/testing/testing.go:1634 +0x6b6
-panic({0x120d320?, 0xc0004f4c60?})
+panic({0x12a8b20?, 0xc00035b650?})
 	/usr/lib/go-1.22/src/runtime/panic.go:770 +0x132
-helixtrack.ru/core/internal/handlers.TestBoardHandler_Read_Success(0xc0007acd00)
+helixtrack.ru/core/internal/handlers.TestBoardHandler_Read_Success(0xc0007c0680)
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/handlers/board_handler_test.go:216 +0x1105
-testing.tRunner(0xc0007acd00, 0x1320d68)
+testing.tRunner(0xc0007c0680, 0x13c5e28)
 	/usr/lib/go-1.22/src/testing/testing.go:1689 +0x21f
 created by testing.(*T).Run in goroutine 1
 	/usr/lib/go-1.22/src/testing/testing.go:1742 +0x826
-FAIL	helixtrack.ru/core/internal/handlers	59.841s
+FAIL	helixtrack.ru/core/internal/handlers	69.387s
 === RUN   TestInitialize
 === RUN   TestInitialize/Valid_configuration
-2025-10-16T20:36:24.202+0300	INFO	logger/logger.go:121	Test log message
+2025-10-18T16:30:51.009+0300	INFO	logger/logger.go:121	Test log message
 === RUN   TestInitialize/Debug_level
-2025-10-16T20:36:24.203+0300	INFO	logger/logger.go:121	Test log message
+2025-10-18T16:30:51.010+0300	INFO	logger/logger.go:121	Test log message
 === RUN   TestInitialize/Warn_level
-2025-10-16T20:36:24.203+0300	WARN	logger/logger.go:126	Test log message
+2025-10-18T16:30:51.010+0300	WARN	logger/logger.go:126	Test log message
 === RUN   TestInitialize/Error_level
-2025-10-16T20:36:24.203+0300	ERROR	logger/logger.go:131	Test log message
+2025-10-18T16:30:51.011+0300	ERROR	logger/logger.go:131	Test log message
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/logger.TestInitialize.func1
@@ -646,7 +726,7 @@ testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 === RUN   TestInitialize/Invalid_level
 === RUN   TestInitialize/Empty_basename
-2025-10-16T20:36:24.204+0300	INFO	logger/logger.go:121	Test log message
+2025-10-18T16:30:51.011+0300	INFO	logger/logger.go:121	Test log message
 --- PASS: TestInitialize (0.00s)
     --- PASS: TestInitialize/Valid_configuration (0.00s)
     --- PASS: TestInitialize/Debug_level (0.00s)
@@ -660,13 +740,13 @@ testing.tRunner
 --- PASS: TestGetSugared (0.00s)
 === RUN   TestLoggingFunctions
 === RUN   TestLoggingFunctions/Debug
-2025-10-16T20:36:24.208+0300	DEBUG	logger/logger.go:116	debug message	{"key": "value"}
+2025-10-18T16:30:51.015+0300	DEBUG	logger/logger.go:116	debug message	{"key": "value"}
 === RUN   TestLoggingFunctions/Info
-2025-10-16T20:36:24.209+0300	INFO	logger/logger.go:121	info message	{"key": "value"}
+2025-10-18T16:30:51.016+0300	INFO	logger/logger.go:121	info message	{"key": "value"}
 === RUN   TestLoggingFunctions/Warn
-2025-10-16T20:36:24.209+0300	WARN	logger/logger.go:126	warn message	{"key": "value"}
+2025-10-18T16:30:51.016+0300	WARN	logger/logger.go:126	warn message	{"key": "value"}
 === RUN   TestLoggingFunctions/Error
-2025-10-16T20:36:24.209+0300	ERROR	logger/logger.go:131	error message	{"key": "value"}
+2025-10-18T16:30:51.016+0300	ERROR	logger/logger.go:131	error message	{"key": "value"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/logger.TestLoggingFunctions.func4.1
@@ -680,13 +760,13 @@ helixtrack.ru/core/internal/logger.TestLoggingFunctions.func4
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
 === RUN   TestLoggingFunctions/Debugf
-2025-10-16T20:36:24.209+0300	DEBUG	logger/logger.go:141	debug test 123
+2025-10-18T16:30:51.016+0300	DEBUG	logger/logger.go:141	debug test 123
 === RUN   TestLoggingFunctions/Infof
-2025-10-16T20:36:24.209+0300	INFO	logger/logger.go:146	info test 123
+2025-10-18T16:30:51.017+0300	INFO	logger/logger.go:146	info test 123
 === RUN   TestLoggingFunctions/Warnf
-2025-10-16T20:36:24.210+0300	WARN	logger/logger.go:151	warn test 123
+2025-10-18T16:30:51.017+0300	WARN	logger/logger.go:151	warn test 123
 === RUN   TestLoggingFunctions/Errorf
-2025-10-16T20:36:24.210+0300	ERROR	logger/logger.go:156	error test 123
+2025-10-18T16:30:51.017+0300	ERROR	logger/logger.go:156	error test 123
 helixtrack.ru/core/internal/logger.Errorf
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:156
 helixtrack.ru/core/internal/logger.TestLoggingFunctions.func8.1
@@ -709,16 +789,16 @@ testing.tRunner
     --- PASS: TestLoggingFunctions/Warnf (0.00s)
     --- PASS: TestLoggingFunctions/Errorf (0.00s)
 === RUN   TestSync
-2025-10-16T20:36:24.210+0300	INFO	logger/logger.go:121	test message
+2025-10-18T16:30:51.018+0300	INFO	logger/logger.go:121	test message
 --- PASS: TestSync (0.00s)
 === RUN   TestSync_Uninitialized
 --- PASS: TestSync_Uninitialized (0.00s)
 === RUN   TestInitialize_CreatesDirectory
-2025-10-16T20:36:24.211+0300	INFO	logger/logger.go:121	test message
+2025-10-18T16:30:51.018+0300	INFO	logger/logger.go:121	test message
 --- PASS: TestInitialize_CreatesDirectory (0.00s)
 PASS
 coverage: 90.7% of statements
-ok  	helixtrack.ru/core/internal/logger	1.033s	coverage: 90.7% of statements
+ok  	helixtrack.ru/core/internal/logger	1.035s	coverage: 90.7% of statements
 === RUN   TestNewMetrics
 --- PASS: TestNewMetrics (0.00s)
 === RUN   TestMetrics_RecordRequest
@@ -753,7 +833,7 @@ ok  	helixtrack.ru/core/internal/logger	1.033s	coverage: 90.7% of statements
 --- PASS: TestMetrics_ConcurrentAccess (0.00s)
 PASS
 coverage: 100.0% of statements
-ok  	helixtrack.ru/core/internal/metrics	1.258s	coverage: 100.0% of statements
+ok  	helixtrack.ru/core/internal/metrics	1.265s	coverage: 100.0% of statements
 === RUN   TestJWTMiddleware_Validate
 === RUN   TestJWTMiddleware_Validate/Missing_Authorization_header
 === RUN   TestJWTMiddleware_Validate/Invalid_Authorization_header_format
@@ -809,7 +889,7 @@ ok  	helixtrack.ru/core/internal/metrics	1.258s	coverage: 100.0% of statements
 === RUN   TestTimeoutMiddleware
 ==================
 WARNING: DATA RACE
-Write at 0x00c0004d9268 by goroutine 52:
+Write at 0x00c0004e9668 by goroutine 52:
   github.com/gin-gonic/gin.(*Context).Abort()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:200 +0x2f
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3()
@@ -827,7 +907,7 @@ Write at 0x00c0004d9268 by goroutine 52:
   testing.(*T).Run.gowrap1()
       /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
 
-Previous write at 0x00c0004d9268 by goroutine 54:
+Previous write at 0x00c0004e9668 by goroutine 54:
   github.com/gin-gonic/gin.(*Context).Next()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:183 +0x53
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
@@ -878,7 +958,7 @@ Goroutine 54 (running) created at:
 === RUN   TestRateLimiter_Cleanup
 ==================
 WARNING: DATA RACE
-Read at 0x00c0004d9218 by goroutine 54:
+Read at 0x00c0004e9618 by goroutine 54:
   github.com/gin-gonic/gin.(*responseWriter).WriteHeader()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:65 +0x4b
   github.com/gin-gonic/gin.(*Context).Status()
@@ -890,7 +970,7 @@ Read at 0x00c0004d9218 by goroutine 54:
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/middleware/performance.go:412 +0x44
 
-Previous write at 0x00c0004d9218 by goroutine 52:
+Previous write at 0x00c0004e9618 by goroutine 52:
   github.com/gin-gonic/gin.(*responseWriter).WriteHeader()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:70 +0x18c
   github.com/gin-gonic/gin.(*Context).Status()
@@ -946,7 +1026,7 @@ Goroutine 52 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Read at 0x00c0004d9210 by goroutine 54:
+Read at 0x00c0004e9610 by goroutine 54:
   github.com/gin-gonic/gin.(*responseWriter).Written()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:104 +0x75
   github.com/gin-gonic/gin.(*responseWriter).WriteHeader()
@@ -960,7 +1040,7 @@ Read at 0x00c0004d9210 by goroutine 54:
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/middleware/performance.go:412 +0x44
 
-Previous write at 0x00c0004d9210 by goroutine 52:
+Previous write at 0x00c0004e9610 by goroutine 52:
   github.com/gin-gonic/gin.(*responseWriter).WriteHeaderNow()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/response_writer.go:76 +0x5e
   github.com/gin-gonic/gin.(*responseWriter).Write()
@@ -1022,13 +1102,13 @@ Goroutine 52 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Read at 0x00c0004d9268 by goroutine 54:
+Read at 0x00c0004e9668 by goroutine 54:
   github.com/gin-gonic/gin.(*Context).Next()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:186 +0x9c
   helixtrack.ru/core/internal/middleware.TestTimeoutMiddleware.TimeoutMiddleware.func3.1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/middleware/performance.go:412 +0x44
 
-Previous write at 0x00c0004d9268 by goroutine 52:
+Previous write at 0x00c0004e9668 by goroutine 52:
   github.com/gin-gonic/gin.(*Context).Next()
       /home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:186 +0xeb4
   github.com/gin-gonic/gin.(*Engine).handleHTTPRequest()
@@ -1146,7 +1226,149 @@ Goroutine 52 (finished) created at:
     --- PASS: TestPermissionMiddleware_Integration/User_denied_permission (0.00s)
 FAIL
 coverage: 92.6% of statements
-FAIL	helixtrack.ru/core/internal/middleware	0.615s
+FAIL	helixtrack.ru/core/internal/middleware	0.622s
+=== RUN   TestUserPresence_IsValidStatus
+=== RUN   TestUserPresence_IsValidStatus/Online_status
+=== RUN   TestUserPresence_IsValidStatus/Offline_status
+=== RUN   TestUserPresence_IsValidStatus/Away_status
+=== RUN   TestUserPresence_IsValidStatus/Busy_status
+=== RUN   TestUserPresence_IsValidStatus/DND_status
+=== RUN   TestUserPresence_IsValidStatus/Invalid_status
+=== RUN   TestUserPresence_IsValidStatus/Empty_status
+--- PASS: TestUserPresence_IsValidStatus (0.00s)
+    --- PASS: TestUserPresence_IsValidStatus/Online_status (0.00s)
+    --- PASS: TestUserPresence_IsValidStatus/Offline_status (0.00s)
+    --- PASS: TestUserPresence_IsValidStatus/Away_status (0.00s)
+    --- PASS: TestUserPresence_IsValidStatus/Busy_status (0.00s)
+    --- PASS: TestUserPresence_IsValidStatus/DND_status (0.00s)
+    --- PASS: TestUserPresence_IsValidStatus/Invalid_status (0.00s)
+    --- PASS: TestUserPresence_IsValidStatus/Empty_status (0.00s)
+=== RUN   TestChatRoom_IsValidType
+=== RUN   TestChatRoom_IsValidType/Direct_room
+=== RUN   TestChatRoom_IsValidType/Group_room
+=== RUN   TestChatRoom_IsValidType/Team_room
+=== RUN   TestChatRoom_IsValidType/Project_room
+=== RUN   TestChatRoom_IsValidType/Ticket_room
+=== RUN   TestChatRoom_IsValidType/Account_room
+=== RUN   TestChatRoom_IsValidType/Organization_room
+=== RUN   TestChatRoom_IsValidType/Attachment_room
+=== RUN   TestChatRoom_IsValidType/Custom_room
+=== RUN   TestChatRoom_IsValidType/Invalid_type
+=== RUN   TestChatRoom_IsValidType/Empty_type
+--- PASS: TestChatRoom_IsValidType (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Direct_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Group_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Team_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Project_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Ticket_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Account_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Organization_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Attachment_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Custom_room (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Invalid_type (0.00s)
+    --- PASS: TestChatRoom_IsValidType/Empty_type (0.00s)
+=== RUN   TestChatRoom_PrivacyAndArchive
+--- PASS: TestChatRoom_PrivacyAndArchive (0.00s)
+=== RUN   TestChatParticipant_IsValidRole
+=== RUN   TestChatParticipant_IsValidRole/Owner_role
+=== RUN   TestChatParticipant_IsValidRole/Admin_role
+=== RUN   TestChatParticipant_IsValidRole/Moderator_role
+=== RUN   TestChatParticipant_IsValidRole/Member_role
+=== RUN   TestChatParticipant_IsValidRole/Guest_role
+=== RUN   TestChatParticipant_IsValidRole/Invalid_role
+=== RUN   TestChatParticipant_IsValidRole/Empty_role
+--- PASS: TestChatParticipant_IsValidRole (0.00s)
+    --- PASS: TestChatParticipant_IsValidRole/Owner_role (0.00s)
+    --- PASS: TestChatParticipant_IsValidRole/Admin_role (0.00s)
+    --- PASS: TestChatParticipant_IsValidRole/Moderator_role (0.00s)
+    --- PASS: TestChatParticipant_IsValidRole/Member_role (0.00s)
+    --- PASS: TestChatParticipant_IsValidRole/Guest_role (0.00s)
+    --- PASS: TestChatParticipant_IsValidRole/Invalid_role (0.00s)
+    --- PASS: TestChatParticipant_IsValidRole/Empty_role (0.00s)
+=== RUN   TestChatParticipant_MuteStatus
+--- PASS: TestChatParticipant_MuteStatus (0.00s)
+=== RUN   TestMessage_IsValidType
+=== RUN   TestMessage_IsValidType/Text_message
+=== RUN   TestMessage_IsValidType/Reply_message
+=== RUN   TestMessage_IsValidType/Quote_message
+=== RUN   TestMessage_IsValidType/System_message
+=== RUN   TestMessage_IsValidType/File_message
+=== RUN   TestMessage_IsValidType/Code_message
+=== RUN   TestMessage_IsValidType/Poll_message
+=== RUN   TestMessage_IsValidType/Invalid_type
+=== RUN   TestMessage_IsValidType/Empty_type
+--- PASS: TestMessage_IsValidType (0.00s)
+    --- PASS: TestMessage_IsValidType/Text_message (0.00s)
+    --- PASS: TestMessage_IsValidType/Reply_message (0.00s)
+    --- PASS: TestMessage_IsValidType/Quote_message (0.00s)
+    --- PASS: TestMessage_IsValidType/System_message (0.00s)
+    --- PASS: TestMessage_IsValidType/File_message (0.00s)
+    --- PASS: TestMessage_IsValidType/Code_message (0.00s)
+    --- PASS: TestMessage_IsValidType/Poll_message (0.00s)
+    --- PASS: TestMessage_IsValidType/Invalid_type (0.00s)
+    --- PASS: TestMessage_IsValidType/Empty_type (0.00s)
+=== RUN   TestMessage_IsValidContentFormat
+=== RUN   TestMessage_IsValidContentFormat/Plain_format
+=== RUN   TestMessage_IsValidContentFormat/Markdown_format
+=== RUN   TestMessage_IsValidContentFormat/HTML_format
+=== RUN   TestMessage_IsValidContentFormat/Invalid_format
+=== RUN   TestMessage_IsValidContentFormat/Empty_format
+--- PASS: TestMessage_IsValidContentFormat (0.00s)
+    --- PASS: TestMessage_IsValidContentFormat/Plain_format (0.00s)
+    --- PASS: TestMessage_IsValidContentFormat/Markdown_format (0.00s)
+    --- PASS: TestMessage_IsValidContentFormat/HTML_format (0.00s)
+    --- PASS: TestMessage_IsValidContentFormat/Invalid_format (0.00s)
+    --- PASS: TestMessage_IsValidContentFormat/Empty_format (0.00s)
+=== RUN   TestMessage_EditAndPinStatus
+--- PASS: TestMessage_EditAndPinStatus (0.00s)
+=== RUN   TestMessage_Threading
+--- PASS: TestMessage_Threading (0.00s)
+=== RUN   TestMessage_Metadata
+--- PASS: TestMessage_Metadata (0.00s)
+=== RUN   TestTypingIndicator_ExpirationLogic
+--- PASS: TestTypingIndicator_ExpirationLogic (0.00s)
+=== RUN   TestMessageReadReceipt_CreationAndRead
+--- PASS: TestMessageReadReceipt_CreationAndRead (0.00s)
+=== RUN   TestMessageAttachment_FileInfo
+--- PASS: TestMessageAttachment_FileInfo (0.00s)
+=== RUN   TestMessageReaction_EmojiHandling
+=== RUN   TestMessageReaction_EmojiHandling/Thumbs_up_unicode
+=== RUN   TestMessageReaction_EmojiHandling/Heart_emoji
+=== RUN   TestMessageReaction_EmojiHandling/Named_emoji
+=== RUN   TestMessageReaction_EmojiHandling/Multiple_emojis
+--- PASS: TestMessageReaction_EmojiHandling (0.00s)
+    --- PASS: TestMessageReaction_EmojiHandling/Thumbs_up_unicode (0.00s)
+    --- PASS: TestMessageReaction_EmojiHandling/Heart_emoji (0.00s)
+    --- PASS: TestMessageReaction_EmojiHandling/Named_emoji (0.00s)
+    --- PASS: TestMessageReaction_EmojiHandling/Multiple_emojis (0.00s)
+=== RUN   TestChatExternalIntegration_IsValidProvider
+=== RUN   TestChatExternalIntegration_IsValidProvider/Slack_provider
+=== RUN   TestChatExternalIntegration_IsValidProvider/Telegram_provider
+=== RUN   TestChatExternalIntegration_IsValidProvider/Yandex_provider
+=== RUN   TestChatExternalIntegration_IsValidProvider/Google_provider
+=== RUN   TestChatExternalIntegration_IsValidProvider/WhatsApp_provider
+=== RUN   TestChatExternalIntegration_IsValidProvider/Custom_provider
+=== RUN   TestChatExternalIntegration_IsValidProvider/Invalid_provider
+=== RUN   TestChatExternalIntegration_IsValidProvider/Empty_provider
+--- PASS: TestChatExternalIntegration_IsValidProvider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/Slack_provider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/Telegram_provider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/Yandex_provider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/Google_provider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/WhatsApp_provider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/Custom_provider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/Invalid_provider (0.00s)
+    --- PASS: TestChatExternalIntegration_IsValidProvider/Empty_provider (0.00s)
+=== RUN   TestChatExternalIntegration_Config
+--- PASS: TestChatExternalIntegration_Config (0.00s)
+=== RUN   TestPresenceStatusConstants
+--- PASS: TestPresenceStatusConstants (0.00s)
+=== RUN   TestChatRoomTypeConstants
+--- PASS: TestChatRoomTypeConstants (0.00s)
+=== RUN   TestMessageTypeConstants
+--- PASS: TestMessageTypeConstants (0.00s)
+=== RUN   TestChatProviderConstants
+--- PASS: TestChatProviderConstants (0.00s)
 === RUN   TestCustomField_IsValidFieldType
 === RUN   TestCustomField_IsValidFieldType/Text_type
 === RUN   TestCustomField_IsValidFieldType/TextArea_type
@@ -1213,6 +1435,906 @@ FAIL	helixtrack.ru/core/internal/middleware	0.615s
 --- PASS: TestCustomFieldTypes_Constants (0.00s)
 === RUN   TestCustomField_Complete
 --- PASS: TestCustomField_Complete (0.00s)
+=== RUN   TestDocumentViewHistory_Validate
+=== RUN   TestDocumentViewHistory_Validate/Valid_view_history
+=== RUN   TestDocumentViewHistory_Validate/Empty_ID
+=== RUN   TestDocumentViewHistory_Validate/Empty_DocumentID
+=== RUN   TestDocumentViewHistory_Validate/Zero_Timestamp
+=== RUN   TestDocumentViewHistory_Validate/Anonymous_user_with_IP
+=== RUN   TestDocumentViewHistory_Validate/Authenticated_user_with_session
+--- PASS: TestDocumentViewHistory_Validate (0.00s)
+    --- PASS: TestDocumentViewHistory_Validate/Valid_view_history (0.00s)
+    --- PASS: TestDocumentViewHistory_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentViewHistory_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentViewHistory_Validate/Zero_Timestamp (0.00s)
+    --- PASS: TestDocumentViewHistory_Validate/Anonymous_user_with_IP (0.00s)
+    --- PASS: TestDocumentViewHistory_Validate/Authenticated_user_with_session (0.00s)
+=== RUN   TestDocumentViewHistory_SetTimestamps
+=== RUN   TestDocumentViewHistory_SetTimestamps/Set_timestamp_when_zero
+=== RUN   TestDocumentViewHistory_SetTimestamps/Don't_override_existing_timestamp
+--- PASS: TestDocumentViewHistory_SetTimestamps (0.00s)
+    --- PASS: TestDocumentViewHistory_SetTimestamps/Set_timestamp_when_zero (0.00s)
+    --- PASS: TestDocumentViewHistory_SetTimestamps/Don't_override_existing_timestamp (0.00s)
+=== RUN   TestDocumentAnalytics_Validate
+=== RUN   TestDocumentAnalytics_Validate/Valid_analytics
+=== RUN   TestDocumentAnalytics_Validate/Empty_ID
+=== RUN   TestDocumentAnalytics_Validate/Empty_DocumentID
+=== RUN   TestDocumentAnalytics_Validate/Zero_Updated_timestamp
+--- PASS: TestDocumentAnalytics_Validate (0.00s)
+    --- PASS: TestDocumentAnalytics_Validate/Valid_analytics (0.00s)
+    --- PASS: TestDocumentAnalytics_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentAnalytics_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentAnalytics_Validate/Zero_Updated_timestamp (0.00s)
+=== RUN   TestDocumentAnalytics_CalculatePopularityScore
+=== RUN   TestDocumentAnalytics_CalculatePopularityScore/Zero_metrics
+=== RUN   TestDocumentAnalytics_CalculatePopularityScore/Only_views
+=== RUN   TestDocumentAnalytics_CalculatePopularityScore/Only_unique_viewers
+=== RUN   TestDocumentAnalytics_CalculatePopularityScore/Balanced_metrics
+--- PASS: TestDocumentAnalytics_CalculatePopularityScore (0.00s)
+    --- PASS: TestDocumentAnalytics_CalculatePopularityScore/Zero_metrics (0.00s)
+    --- PASS: TestDocumentAnalytics_CalculatePopularityScore/Only_views (0.00s)
+    --- PASS: TestDocumentAnalytics_CalculatePopularityScore/Only_unique_viewers (0.00s)
+    --- PASS: TestDocumentAnalytics_CalculatePopularityScore/Balanced_metrics (0.00s)
+=== RUN   TestDocumentAnalytics_IncrementView
+=== RUN   TestDocumentAnalytics_IncrementView/First_unique_view
+=== RUN   TestDocumentAnalytics_IncrementView/Repeat_view
+=== RUN   TestDocumentAnalytics_IncrementView/Another_unique_view
+--- PASS: TestDocumentAnalytics_IncrementView (0.00s)
+    --- PASS: TestDocumentAnalytics_IncrementView/First_unique_view (0.00s)
+    --- PASS: TestDocumentAnalytics_IncrementView/Repeat_view (0.00s)
+    --- PASS: TestDocumentAnalytics_IncrementView/Another_unique_view (0.00s)
+=== RUN   TestDocumentAnalytics_IncrementEdit
+=== RUN   TestDocumentAnalytics_IncrementEdit/First_unique_edit
+=== RUN   TestDocumentAnalytics_IncrementEdit/Repeat_edit
+=== RUN   TestDocumentAnalytics_IncrementEdit/Another_unique_edit
+--- PASS: TestDocumentAnalytics_IncrementEdit (0.00s)
+    --- PASS: TestDocumentAnalytics_IncrementEdit/First_unique_edit (0.00s)
+    --- PASS: TestDocumentAnalytics_IncrementEdit/Repeat_edit (0.00s)
+    --- PASS: TestDocumentAnalytics_IncrementEdit/Another_unique_edit (0.00s)
+=== RUN   TestDocumentAnalytics_IncrementComment
+--- PASS: TestDocumentAnalytics_IncrementComment (0.00s)
+=== RUN   TestDocumentAnalytics_IncrementReaction
+--- PASS: TestDocumentAnalytics_IncrementReaction (0.00s)
+=== RUN   TestDocumentAnalytics_IncrementWatcher
+--- PASS: TestDocumentAnalytics_IncrementWatcher (0.00s)
+=== RUN   TestDocumentAnalytics_DecrementComment
+=== RUN   TestDocumentAnalytics_DecrementComment/Normal_decrement
+=== RUN   TestDocumentAnalytics_DecrementComment/At_zero
+=== RUN   TestDocumentAnalytics_DecrementComment/At_one
+--- PASS: TestDocumentAnalytics_DecrementComment (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementComment/Normal_decrement (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementComment/At_zero (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementComment/At_one (0.00s)
+=== RUN   TestDocumentAnalytics_DecrementReaction
+=== RUN   TestDocumentAnalytics_DecrementReaction/Normal_decrement
+=== RUN   TestDocumentAnalytics_DecrementReaction/At_zero
+=== RUN   TestDocumentAnalytics_DecrementReaction/At_one
+--- PASS: TestDocumentAnalytics_DecrementReaction (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementReaction/Normal_decrement (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementReaction/At_zero (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementReaction/At_one (0.00s)
+=== RUN   TestDocumentAnalytics_DecrementWatcher
+=== RUN   TestDocumentAnalytics_DecrementWatcher/Normal_decrement
+=== RUN   TestDocumentAnalytics_DecrementWatcher/At_zero
+=== RUN   TestDocumentAnalytics_DecrementWatcher/At_one
+--- PASS: TestDocumentAnalytics_DecrementWatcher (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementWatcher/Normal_decrement (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementWatcher/At_zero (0.00s)
+    --- PASS: TestDocumentAnalytics_DecrementWatcher/At_one (0.00s)
+=== RUN   TestDocumentAnalytics_CompleteWorkflow
+--- PASS: TestDocumentAnalytics_CompleteWorkflow (0.00s)
+=== RUN   TestDocumentAttachment_Validate
+=== RUN   TestDocumentAttachment_Validate/Valid_attachment
+=== RUN   TestDocumentAttachment_Validate/Empty_ID
+=== RUN   TestDocumentAttachment_Validate/Empty_DocumentID
+=== RUN   TestDocumentAttachment_Validate/Empty_Filename
+=== RUN   TestDocumentAttachment_Validate/Empty_OriginalFilename
+=== RUN   TestDocumentAttachment_Validate/Empty_MimeType
+=== RUN   TestDocumentAttachment_Validate/Negative_SizeBytes
+=== RUN   TestDocumentAttachment_Validate/Empty_StoragePath
+=== RUN   TestDocumentAttachment_Validate/Empty_Checksum
+=== RUN   TestDocumentAttachment_Validate/Empty_UploaderID
+=== RUN   TestDocumentAttachment_Validate/Version_less_than_1
+=== RUN   TestDocumentAttachment_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentAttachment_Validate/Zero_Modified_timestamp
+--- PASS: TestDocumentAttachment_Validate (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Valid_attachment (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_Filename (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_OriginalFilename (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_MimeType (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Negative_SizeBytes (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_StoragePath (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_Checksum (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Empty_UploaderID (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Version_less_than_1 (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentAttachment_Validate/Zero_Modified_timestamp (0.00s)
+=== RUN   TestDocumentAttachment_IncrementVersion
+=== RUN   TestDocumentAttachment_IncrementVersion/From_version_1
+=== RUN   TestDocumentAttachment_IncrementVersion/From_version_5
+=== RUN   TestDocumentAttachment_IncrementVersion/From_version_100
+--- PASS: TestDocumentAttachment_IncrementVersion (0.00s)
+    --- PASS: TestDocumentAttachment_IncrementVersion/From_version_1 (0.00s)
+    --- PASS: TestDocumentAttachment_IncrementVersion/From_version_5 (0.00s)
+    --- PASS: TestDocumentAttachment_IncrementVersion/From_version_100 (0.00s)
+=== RUN   TestDocumentAttachment_IsImage
+=== RUN   TestDocumentAttachment_IsImage/JPEG_image
+=== RUN   TestDocumentAttachment_IsImage/JPG_image
+=== RUN   TestDocumentAttachment_IsImage/PNG_image
+=== RUN   TestDocumentAttachment_IsImage/GIF_image
+=== RUN   TestDocumentAttachment_IsImage/WebP_image
+=== RUN   TestDocumentAttachment_IsImage/SVG_image
+=== RUN   TestDocumentAttachment_IsImage/PDF_document
+=== RUN   TestDocumentAttachment_IsImage/Text_file
+=== RUN   TestDocumentAttachment_IsImage/Video_file
+--- PASS: TestDocumentAttachment_IsImage (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/JPEG_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/JPG_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/PNG_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/GIF_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/WebP_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/SVG_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/PDF_document (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/Text_file (0.00s)
+    --- PASS: TestDocumentAttachment_IsImage/Video_file (0.00s)
+=== RUN   TestDocumentAttachment_IsDocument
+=== RUN   TestDocumentAttachment_IsDocument/PDF
+=== RUN   TestDocumentAttachment_IsDocument/DOC
+=== RUN   TestDocumentAttachment_IsDocument/DOCX
+=== RUN   TestDocumentAttachment_IsDocument/XLS
+=== RUN   TestDocumentAttachment_IsDocument/XLSX
+=== RUN   TestDocumentAttachment_IsDocument/Plain_text
+=== RUN   TestDocumentAttachment_IsDocument/Markdown
+=== RUN   TestDocumentAttachment_IsDocument/JPEG_image
+=== RUN   TestDocumentAttachment_IsDocument/Video_file
+--- PASS: TestDocumentAttachment_IsDocument (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/PDF (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/DOC (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/DOCX (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/XLS (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/XLSX (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/Plain_text (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/Markdown (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/JPEG_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsDocument/Video_file (0.00s)
+=== RUN   TestDocumentAttachment_IsVideo
+=== RUN   TestDocumentAttachment_IsVideo/MP4_video
+=== RUN   TestDocumentAttachment_IsVideo/MPEG_video
+=== RUN   TestDocumentAttachment_IsVideo/WebM_video
+=== RUN   TestDocumentAttachment_IsVideo/QuickTime_video
+=== RUN   TestDocumentAttachment_IsVideo/JPEG_image
+=== RUN   TestDocumentAttachment_IsVideo/PDF_document
+=== RUN   TestDocumentAttachment_IsVideo/Text_file
+--- PASS: TestDocumentAttachment_IsVideo (0.00s)
+    --- PASS: TestDocumentAttachment_IsVideo/MP4_video (0.00s)
+    --- PASS: TestDocumentAttachment_IsVideo/MPEG_video (0.00s)
+    --- PASS: TestDocumentAttachment_IsVideo/WebM_video (0.00s)
+    --- PASS: TestDocumentAttachment_IsVideo/QuickTime_video (0.00s)
+    --- PASS: TestDocumentAttachment_IsVideo/JPEG_image (0.00s)
+    --- PASS: TestDocumentAttachment_IsVideo/PDF_document (0.00s)
+    --- PASS: TestDocumentAttachment_IsVideo/Text_file (0.00s)
+=== RUN   TestDocumentAttachment_GetHumanReadableSize
+=== RUN   TestDocumentAttachment_GetHumanReadableSize/100_bytes
+=== RUN   TestDocumentAttachment_GetHumanReadableSize/1_KB
+=== RUN   TestDocumentAttachment_GetHumanReadableSize/1.5_KB
+=== RUN   TestDocumentAttachment_GetHumanReadableSize/1_MB
+=== RUN   TestDocumentAttachment_GetHumanReadableSize/1.5_MB
+=== RUN   TestDocumentAttachment_GetHumanReadableSize/1_GB
+--- PASS: TestDocumentAttachment_GetHumanReadableSize (0.00s)
+    --- PASS: TestDocumentAttachment_GetHumanReadableSize/100_bytes (0.00s)
+    --- PASS: TestDocumentAttachment_GetHumanReadableSize/1_KB (0.00s)
+    --- PASS: TestDocumentAttachment_GetHumanReadableSize/1.5_KB (0.00s)
+    --- PASS: TestDocumentAttachment_GetHumanReadableSize/1_MB (0.00s)
+    --- PASS: TestDocumentAttachment_GetHumanReadableSize/1.5_MB (0.00s)
+    --- PASS: TestDocumentAttachment_GetHumanReadableSize/1_GB (0.00s)
+=== RUN   TestDocumentAttachment_Structure
+--- PASS: TestDocumentAttachment_Structure (0.00s)
+=== RUN   TestDocumentAttachment_AllImageTypes
+=== RUN   TestDocumentAttachment_AllImageTypes/image/jpeg
+=== RUN   TestDocumentAttachment_AllImageTypes/image/jpg
+=== RUN   TestDocumentAttachment_AllImageTypes/image/png
+=== RUN   TestDocumentAttachment_AllImageTypes/image/gif
+=== RUN   TestDocumentAttachment_AllImageTypes/image/webp
+=== RUN   TestDocumentAttachment_AllImageTypes/image/svg+xml
+--- PASS: TestDocumentAttachment_AllImageTypes (0.00s)
+    --- PASS: TestDocumentAttachment_AllImageTypes/image/jpeg (0.00s)
+    --- PASS: TestDocumentAttachment_AllImageTypes/image/jpg (0.00s)
+    --- PASS: TestDocumentAttachment_AllImageTypes/image/png (0.00s)
+    --- PASS: TestDocumentAttachment_AllImageTypes/image/gif (0.00s)
+    --- PASS: TestDocumentAttachment_AllImageTypes/image/webp (0.00s)
+    --- PASS: TestDocumentAttachment_AllImageTypes/image/svg+xml (0.00s)
+=== RUN   TestDocumentAttachment_AllDocumentTypes
+=== RUN   TestDocumentAttachment_AllDocumentTypes/application/pdf
+=== RUN   TestDocumentAttachment_AllDocumentTypes/application/msword
+=== RUN   TestDocumentAttachment_AllDocumentTypes/application/vnd.openxmlformats-officedocument.wordprocessingml.document
+=== RUN   TestDocumentAttachment_AllDocumentTypes/application/vnd.ms-excel
+=== RUN   TestDocumentAttachment_AllDocumentTypes/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+=== RUN   TestDocumentAttachment_AllDocumentTypes/text/plain
+=== RUN   TestDocumentAttachment_AllDocumentTypes/text/markdown
+--- PASS: TestDocumentAttachment_AllDocumentTypes (0.00s)
+    --- PASS: TestDocumentAttachment_AllDocumentTypes/application/pdf (0.00s)
+    --- PASS: TestDocumentAttachment_AllDocumentTypes/application/msword (0.00s)
+    --- PASS: TestDocumentAttachment_AllDocumentTypes/application/vnd.openxmlformats-officedocument.wordprocessingml.document (0.00s)
+    --- PASS: TestDocumentAttachment_AllDocumentTypes/application/vnd.ms-excel (0.00s)
+    --- PASS: TestDocumentAttachment_AllDocumentTypes/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet (0.00s)
+    --- PASS: TestDocumentAttachment_AllDocumentTypes/text/plain (0.00s)
+    --- PASS: TestDocumentAttachment_AllDocumentTypes/text/markdown (0.00s)
+=== RUN   TestDocumentAttachment_AllVideoTypes
+=== RUN   TestDocumentAttachment_AllVideoTypes/video/mp4
+=== RUN   TestDocumentAttachment_AllVideoTypes/video/mpeg
+=== RUN   TestDocumentAttachment_AllVideoTypes/video/webm
+=== RUN   TestDocumentAttachment_AllVideoTypes/video/quicktime
+--- PASS: TestDocumentAttachment_AllVideoTypes (0.00s)
+    --- PASS: TestDocumentAttachment_AllVideoTypes/video/mp4 (0.00s)
+    --- PASS: TestDocumentAttachment_AllVideoTypes/video/mpeg (0.00s)
+    --- PASS: TestDocumentAttachment_AllVideoTypes/video/webm (0.00s)
+    --- PASS: TestDocumentAttachment_AllVideoTypes/video/quicktime (0.00s)
+=== RUN   TestDocumentComment_Validate
+=== RUN   TestDocumentComment_Validate/Valid_comment
+=== RUN   TestDocumentComment_Validate/Empty_ID
+=== RUN   TestDocumentComment_Validate/Empty_DocumentID
+=== RUN   TestDocumentComment_Validate/Empty_UserID
+=== RUN   TestDocumentComment_Validate/Empty_Content
+=== RUN   TestDocumentComment_Validate/Version_less_than_1
+=== RUN   TestDocumentComment_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentComment_Validate/Zero_Modified_timestamp
+=== RUN   TestDocumentComment_Validate/Threaded_comment_with_parent
+=== RUN   TestDocumentComment_Validate/Resolved_comment
+--- PASS: TestDocumentComment_Validate (0.00s)
+    --- PASS: TestDocumentComment_Validate/Valid_comment (0.00s)
+    --- PASS: TestDocumentComment_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentComment_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentComment_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentComment_Validate/Empty_Content (0.00s)
+    --- PASS: TestDocumentComment_Validate/Version_less_than_1 (0.00s)
+    --- PASS: TestDocumentComment_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentComment_Validate/Zero_Modified_timestamp (0.00s)
+    --- PASS: TestDocumentComment_Validate/Threaded_comment_with_parent (0.00s)
+    --- PASS: TestDocumentComment_Validate/Resolved_comment (0.00s)
+=== RUN   TestDocumentInlineComment_Validate
+=== RUN   TestDocumentInlineComment_Validate/Valid_inline_comment
+=== RUN   TestDocumentInlineComment_Validate/Empty_ID
+=== RUN   TestDocumentInlineComment_Validate/Empty_DocumentID
+=== RUN   TestDocumentInlineComment_Validate/Empty_CommentID
+=== RUN   TestDocumentInlineComment_Validate/Negative_PositionStart
+=== RUN   TestDocumentInlineComment_Validate/PositionEnd_<_PositionStart
+=== RUN   TestDocumentInlineComment_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentInlineComment_Validate/Same_start_and_end_position
+--- PASS: TestDocumentInlineComment_Validate (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/Valid_inline_comment (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/Empty_CommentID (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/Negative_PositionStart (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/PositionEnd_<_PositionStart (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentInlineComment_Validate/Same_start_and_end_position (0.00s)
+=== RUN   TestDocumentMention_Validate
+=== RUN   TestDocumentMention_Validate/Valid_mention
+=== RUN   TestDocumentMention_Validate/Empty_ID
+=== RUN   TestDocumentMention_Validate/Empty_DocumentID
+=== RUN   TestDocumentMention_Validate/Empty_MentionedUserID
+=== RUN   TestDocumentMention_Validate/Empty_MentioningUserID
+=== RUN   TestDocumentMention_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentMention_Validate/With_context_and_position
+--- PASS: TestDocumentMention_Validate (0.00s)
+    --- PASS: TestDocumentMention_Validate/Valid_mention (0.00s)
+    --- PASS: TestDocumentMention_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentMention_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentMention_Validate/Empty_MentionedUserID (0.00s)
+    --- PASS: TestDocumentMention_Validate/Empty_MentioningUserID (0.00s)
+    --- PASS: TestDocumentMention_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentMention_Validate/With_context_and_position (0.00s)
+=== RUN   TestDocumentReaction_Validate
+=== RUN   TestDocumentReaction_Validate/Valid_reaction
+=== RUN   TestDocumentReaction_Validate/Empty_ID
+=== RUN   TestDocumentReaction_Validate/Empty_DocumentID
+=== RUN   TestDocumentReaction_Validate/Empty_UserID
+=== RUN   TestDocumentReaction_Validate/Empty_ReactionType
+=== RUN   TestDocumentReaction_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentReaction_Validate/With_emoji
+--- PASS: TestDocumentReaction_Validate (0.00s)
+    --- PASS: TestDocumentReaction_Validate/Valid_reaction (0.00s)
+    --- PASS: TestDocumentReaction_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentReaction_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentReaction_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentReaction_Validate/Empty_ReactionType (0.00s)
+    --- PASS: TestDocumentReaction_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentReaction_Validate/With_emoji (0.00s)
+=== RUN   TestDocumentWatcher_Validate
+=== RUN   TestDocumentWatcher_Validate/Valid_watcher_with_'all'_notification
+=== RUN   TestDocumentWatcher_Validate/Empty_ID
+=== RUN   TestDocumentWatcher_Validate/Empty_DocumentID
+=== RUN   TestDocumentWatcher_Validate/Empty_UserID
+=== RUN   TestDocumentWatcher_Validate/Empty_NotificationLevel
+=== RUN   TestDocumentWatcher_Validate/Invalid_NotificationLevel
+=== RUN   TestDocumentWatcher_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentWatcher_Validate/Valid_'mentions'_notification
+=== RUN   TestDocumentWatcher_Validate/Valid_'none'_notification
+--- PASS: TestDocumentWatcher_Validate (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Valid_watcher_with_'all'_notification (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Empty_NotificationLevel (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Invalid_NotificationLevel (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Valid_'mentions'_notification (0.00s)
+    --- PASS: TestDocumentWatcher_Validate/Valid_'none'_notification (0.00s)
+=== RUN   TestDocumentWatcher_AllNotificationLevels
+=== RUN   TestDocumentWatcher_AllNotificationLevels/Level:_all
+=== RUN   TestDocumentWatcher_AllNotificationLevels/Level:_mentions
+=== RUN   TestDocumentWatcher_AllNotificationLevels/Level:_none
+--- PASS: TestDocumentWatcher_AllNotificationLevels (0.00s)
+    --- PASS: TestDocumentWatcher_AllNotificationLevels/Level:_all (0.00s)
+    --- PASS: TestDocumentWatcher_AllNotificationLevels/Level:_mentions (0.00s)
+    --- PASS: TestDocumentWatcher_AllNotificationLevels/Level:_none (0.00s)
+=== RUN   TestDocumentLabel_Validate
+=== RUN   TestDocumentLabel_Validate/Valid_label
+=== RUN   TestDocumentLabel_Validate/Empty_ID
+=== RUN   TestDocumentLabel_Validate/Empty_Name
+=== RUN   TestDocumentLabel_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentLabel_Validate/With_description_and_color
+--- PASS: TestDocumentLabel_Validate (0.00s)
+    --- PASS: TestDocumentLabel_Validate/Valid_label (0.00s)
+    --- PASS: TestDocumentLabel_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentLabel_Validate/Empty_Name (0.00s)
+    --- PASS: TestDocumentLabel_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentLabel_Validate/With_description_and_color (0.00s)
+=== RUN   TestDocumentTag_Validate
+=== RUN   TestDocumentTag_Validate/Valid_tag
+=== RUN   TestDocumentTag_Validate/Empty_ID
+=== RUN   TestDocumentTag_Validate/Empty_Name
+=== RUN   TestDocumentTag_Validate/Zero_Created_timestamp
+--- PASS: TestDocumentTag_Validate (0.00s)
+    --- PASS: TestDocumentTag_Validate/Valid_tag (0.00s)
+    --- PASS: TestDocumentTag_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentTag_Validate/Empty_Name (0.00s)
+    --- PASS: TestDocumentTag_Validate/Zero_Created_timestamp (0.00s)
+=== RUN   TestCommentDocumentMapping_Validate
+=== RUN   TestCommentDocumentMapping_Validate/Valid_mapping
+=== RUN   TestCommentDocumentMapping_Validate/Empty_ID
+=== RUN   TestCommentDocumentMapping_Validate/Empty_CommentID
+=== RUN   TestCommentDocumentMapping_Validate/Empty_DocumentID
+=== RUN   TestCommentDocumentMapping_Validate/Empty_UserID
+=== RUN   TestCommentDocumentMapping_Validate/Zero_Created_timestamp
+=== RUN   TestCommentDocumentMapping_Validate/Resolved_comment_mapping
+--- PASS: TestCommentDocumentMapping_Validate (0.00s)
+    --- PASS: TestCommentDocumentMapping_Validate/Valid_mapping (0.00s)
+    --- PASS: TestCommentDocumentMapping_Validate/Empty_ID (0.00s)
+    --- PASS: TestCommentDocumentMapping_Validate/Empty_CommentID (0.00s)
+    --- PASS: TestCommentDocumentMapping_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestCommentDocumentMapping_Validate/Empty_UserID (0.00s)
+    --- PASS: TestCommentDocumentMapping_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestCommentDocumentMapping_Validate/Resolved_comment_mapping (0.00s)
+=== RUN   TestLabelDocumentMapping_Validate
+=== RUN   TestLabelDocumentMapping_Validate/Valid_mapping
+=== RUN   TestLabelDocumentMapping_Validate/Empty_ID
+=== RUN   TestLabelDocumentMapping_Validate/Empty_LabelID
+=== RUN   TestLabelDocumentMapping_Validate/Empty_DocumentID
+=== RUN   TestLabelDocumentMapping_Validate/Empty_UserID
+=== RUN   TestLabelDocumentMapping_Validate/Zero_Created_timestamp
+--- PASS: TestLabelDocumentMapping_Validate (0.00s)
+    --- PASS: TestLabelDocumentMapping_Validate/Valid_mapping (0.00s)
+    --- PASS: TestLabelDocumentMapping_Validate/Empty_ID (0.00s)
+    --- PASS: TestLabelDocumentMapping_Validate/Empty_LabelID (0.00s)
+    --- PASS: TestLabelDocumentMapping_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestLabelDocumentMapping_Validate/Empty_UserID (0.00s)
+    --- PASS: TestLabelDocumentMapping_Validate/Zero_Created_timestamp (0.00s)
+=== RUN   TestVoteMapping_Validate
+=== RUN   TestVoteMapping_Validate/Valid_upvote
+=== RUN   TestVoteMapping_Validate/Empty_ID
+=== RUN   TestVoteMapping_Validate/Empty_EntityType
+=== RUN   TestVoteMapping_Validate/Empty_EntityID
+=== RUN   TestVoteMapping_Validate/Empty_UserID
+=== RUN   TestVoteMapping_Validate/Empty_VoteType
+=== RUN   TestVoteMapping_Validate/Invalid_VoteType
+=== RUN   TestVoteMapping_Validate/Zero_Created_timestamp
+=== RUN   TestVoteMapping_Validate/Vote_with_emoji
+--- PASS: TestVoteMapping_Validate (0.00s)
+    --- PASS: TestVoteMapping_Validate/Valid_upvote (0.00s)
+    --- PASS: TestVoteMapping_Validate/Empty_ID (0.00s)
+    --- PASS: TestVoteMapping_Validate/Empty_EntityType (0.00s)
+    --- PASS: TestVoteMapping_Validate/Empty_EntityID (0.00s)
+    --- PASS: TestVoteMapping_Validate/Empty_UserID (0.00s)
+    --- PASS: TestVoteMapping_Validate/Empty_VoteType (0.00s)
+    --- PASS: TestVoteMapping_Validate/Invalid_VoteType (0.00s)
+    --- PASS: TestVoteMapping_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestVoteMapping_Validate/Vote_with_emoji (0.00s)
+=== RUN   TestVoteMapping_AllVoteTypes
+=== RUN   TestVoteMapping_AllVoteTypes/VoteType:_upvote
+=== RUN   TestVoteMapping_AllVoteTypes/VoteType:_downvote
+=== RUN   TestVoteMapping_AllVoteTypes/VoteType:_like
+=== RUN   TestVoteMapping_AllVoteTypes/VoteType:_love
+=== RUN   TestVoteMapping_AllVoteTypes/VoteType:_celebrate
+=== RUN   TestVoteMapping_AllVoteTypes/VoteType:_support
+=== RUN   TestVoteMapping_AllVoteTypes/VoteType:_insightful
+--- PASS: TestVoteMapping_AllVoteTypes (0.00s)
+    --- PASS: TestVoteMapping_AllVoteTypes/VoteType:_upvote (0.00s)
+    --- PASS: TestVoteMapping_AllVoteTypes/VoteType:_downvote (0.00s)
+    --- PASS: TestVoteMapping_AllVoteTypes/VoteType:_like (0.00s)
+    --- PASS: TestVoteMapping_AllVoteTypes/VoteType:_love (0.00s)
+    --- PASS: TestVoteMapping_AllVoteTypes/VoteType:_celebrate (0.00s)
+    --- PASS: TestVoteMapping_AllVoteTypes/VoteType:_support (0.00s)
+    --- PASS: TestVoteMapping_AllVoteTypes/VoteType:_insightful (0.00s)
+=== RUN   TestVoteMapping_IsPositive
+=== RUN   TestVoteMapping_IsPositive/Upvote
+=== RUN   TestVoteMapping_IsPositive/Like
+=== RUN   TestVoteMapping_IsPositive/Love
+=== RUN   TestVoteMapping_IsPositive/Celebrate
+=== RUN   TestVoteMapping_IsPositive/Support
+=== RUN   TestVoteMapping_IsPositive/Insightful
+=== RUN   TestVoteMapping_IsPositive/Downvote
+--- PASS: TestVoteMapping_IsPositive (0.00s)
+    --- PASS: TestVoteMapping_IsPositive/Upvote (0.00s)
+    --- PASS: TestVoteMapping_IsPositive/Like (0.00s)
+    --- PASS: TestVoteMapping_IsPositive/Love (0.00s)
+    --- PASS: TestVoteMapping_IsPositive/Celebrate (0.00s)
+    --- PASS: TestVoteMapping_IsPositive/Support (0.00s)
+    --- PASS: TestVoteMapping_IsPositive/Insightful (0.00s)
+    --- PASS: TestVoteMapping_IsPositive/Downvote (0.00s)
+=== RUN   TestVoteMapping_IsNegative
+=== RUN   TestVoteMapping_IsNegative/Downvote
+=== RUN   TestVoteMapping_IsNegative/Upvote
+=== RUN   TestVoteMapping_IsNegative/Like
+=== RUN   TestVoteMapping_IsNegative/Love
+=== RUN   TestVoteMapping_IsNegative/Celebrate
+=== RUN   TestVoteMapping_IsNegative/Support
+=== RUN   TestVoteMapping_IsNegative/Insightful
+--- PASS: TestVoteMapping_IsNegative (0.00s)
+    --- PASS: TestVoteMapping_IsNegative/Downvote (0.00s)
+    --- PASS: TestVoteMapping_IsNegative/Upvote (0.00s)
+    --- PASS: TestVoteMapping_IsNegative/Like (0.00s)
+    --- PASS: TestVoteMapping_IsNegative/Love (0.00s)
+    --- PASS: TestVoteMapping_IsNegative/Celebrate (0.00s)
+    --- PASS: TestVoteMapping_IsNegative/Support (0.00s)
+    --- PASS: TestVoteMapping_IsNegative/Insightful (0.00s)
+=== RUN   TestVoteMapping_AllEntityTypes
+=== RUN   TestVoteMapping_AllEntityTypes/EntityType:_document
+=== RUN   TestVoteMapping_AllEntityTypes/EntityType:_ticket
+=== RUN   TestVoteMapping_AllEntityTypes/EntityType:_comment
+=== RUN   TestVoteMapping_AllEntityTypes/EntityType:_epic
+=== RUN   TestVoteMapping_AllEntityTypes/EntityType:_sprint
+--- PASS: TestVoteMapping_AllEntityTypes (0.00s)
+    --- PASS: TestVoteMapping_AllEntityTypes/EntityType:_document (0.00s)
+    --- PASS: TestVoteMapping_AllEntityTypes/EntityType:_ticket (0.00s)
+    --- PASS: TestVoteMapping_AllEntityTypes/EntityType:_comment (0.00s)
+    --- PASS: TestVoteMapping_AllEntityTypes/EntityType:_epic (0.00s)
+    --- PASS: TestVoteMapping_AllEntityTypes/EntityType:_sprint (0.00s)
+=== RUN   TestVoteMapping_Structure
+--- PASS: TestVoteMapping_Structure (0.00s)
+=== RUN   TestDocumentTagMapping_Validate
+=== RUN   TestDocumentTagMapping_Validate/Valid_mapping
+=== RUN   TestDocumentTagMapping_Validate/Empty_ID
+=== RUN   TestDocumentTagMapping_Validate/Empty_DocumentID
+=== RUN   TestDocumentTagMapping_Validate/Empty_TagID
+=== RUN   TestDocumentTagMapping_Validate/Empty_UserID
+=== RUN   TestDocumentTagMapping_Validate/Zero_Created_timestamp
+--- PASS: TestDocumentTagMapping_Validate (0.00s)
+    --- PASS: TestDocumentTagMapping_Validate/Valid_mapping (0.00s)
+    --- PASS: TestDocumentTagMapping_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentTagMapping_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentTagMapping_Validate/Empty_TagID (0.00s)
+    --- PASS: TestDocumentTagMapping_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentTagMapping_Validate/Zero_Created_timestamp (0.00s)
+=== RUN   TestDocumentEntityLink_Validate
+=== RUN   TestDocumentEntityLink_Validate/Valid_entity_link
+=== RUN   TestDocumentEntityLink_Validate/Empty_ID
+=== RUN   TestDocumentEntityLink_Validate/Empty_DocumentID
+=== RUN   TestDocumentEntityLink_Validate/Empty_EntityType
+=== RUN   TestDocumentEntityLink_Validate/Empty_EntityID
+=== RUN   TestDocumentEntityLink_Validate/Empty_LinkType
+=== RUN   TestDocumentEntityLink_Validate/Empty_UserID
+=== RUN   TestDocumentEntityLink_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentEntityLink_Validate/Link_to_project
+--- PASS: TestDocumentEntityLink_Validate (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Valid_entity_link (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Empty_EntityType (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Empty_EntityID (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Empty_LinkType (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentEntityLink_Validate/Link_to_project (0.00s)
+=== RUN   TestDocumentEntityLink_AllEntityTypes
+=== RUN   TestDocumentEntityLink_AllEntityTypes/EntityType:_ticket
+=== RUN   TestDocumentEntityLink_AllEntityTypes/EntityType:_project
+=== RUN   TestDocumentEntityLink_AllEntityTypes/EntityType:_user
+=== RUN   TestDocumentEntityLink_AllEntityTypes/EntityType:_epic
+=== RUN   TestDocumentEntityLink_AllEntityTypes/EntityType:_sprint
+--- PASS: TestDocumentEntityLink_AllEntityTypes (0.00s)
+    --- PASS: TestDocumentEntityLink_AllEntityTypes/EntityType:_ticket (0.00s)
+    --- PASS: TestDocumentEntityLink_AllEntityTypes/EntityType:_project (0.00s)
+    --- PASS: TestDocumentEntityLink_AllEntityTypes/EntityType:_user (0.00s)
+    --- PASS: TestDocumentEntityLink_AllEntityTypes/EntityType:_epic (0.00s)
+    --- PASS: TestDocumentEntityLink_AllEntityTypes/EntityType:_sprint (0.00s)
+=== RUN   TestDocumentRelationship_Validate
+=== RUN   TestDocumentRelationship_Validate/Valid_relationship
+=== RUN   TestDocumentRelationship_Validate/Empty_ID
+=== RUN   TestDocumentRelationship_Validate/Empty_SourceDocumentID
+=== RUN   TestDocumentRelationship_Validate/Empty_TargetDocumentID
+=== RUN   TestDocumentRelationship_Validate/Same_source_and_target
+=== RUN   TestDocumentRelationship_Validate/Empty_RelationshipType
+=== RUN   TestDocumentRelationship_Validate/Empty_UserID
+=== RUN   TestDocumentRelationship_Validate/Zero_Created_timestamp
+--- PASS: TestDocumentRelationship_Validate (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Valid_relationship (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Empty_SourceDocumentID (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Empty_TargetDocumentID (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Same_source_and_target (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Empty_RelationshipType (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentRelationship_Validate/Zero_Created_timestamp (0.00s)
+=== RUN   TestDocumentRelationship_RelationshipTypes
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_references
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_related-to
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_blocks
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_blocked-by
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_duplicates
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_supersedes
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_child-of
+=== RUN   TestDocumentRelationship_RelationshipTypes/Type:_parent-of
+--- PASS: TestDocumentRelationship_RelationshipTypes (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_references (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_related-to (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_blocks (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_blocked-by (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_duplicates (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_supersedes (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_child-of (0.00s)
+    --- PASS: TestDocumentRelationship_RelationshipTypes/Type:_parent-of (0.00s)
+=== RUN   TestDocumentSpace_Validate
+=== RUN   TestDocumentSpace_Validate/Valid_space
+=== RUN   TestDocumentSpace_Validate/Empty_ID
+=== RUN   TestDocumentSpace_Validate/Empty_Key
+=== RUN   TestDocumentSpace_Validate/Empty_Name
+=== RUN   TestDocumentSpace_Validate/Empty_OwnerID
+=== RUN   TestDocumentSpace_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentSpace_Validate/Zero_Modified_timestamp
+=== RUN   TestDocumentSpace_Validate/Public_space
+=== RUN   TestDocumentSpace_Validate/Private_space
+--- PASS: TestDocumentSpace_Validate (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Valid_space (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Empty_Key (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Empty_Name (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Empty_OwnerID (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Zero_Modified_timestamp (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Public_space (0.00s)
+    --- PASS: TestDocumentSpace_Validate/Private_space (0.00s)
+=== RUN   TestDocumentSpace_SetTimestamps
+=== RUN   TestDocumentSpace_SetTimestamps/Set_both_timestamps_when_zero
+=== RUN   TestDocumentSpace_SetTimestamps/Only_update_modified_when_created_exists
+--- PASS: TestDocumentSpace_SetTimestamps (0.00s)
+    --- PASS: TestDocumentSpace_SetTimestamps/Set_both_timestamps_when_zero (0.00s)
+    --- PASS: TestDocumentSpace_SetTimestamps/Only_update_modified_when_created_exists (0.00s)
+=== RUN   TestDocumentSpace_Structure
+--- PASS: TestDocumentSpace_Structure (0.00s)
+=== RUN   TestDocumentSpace_Keys
+=== RUN   TestDocumentSpace_Keys/Key:_DOCS
+=== RUN   TestDocumentSpace_Keys/Key:_TECH
+=== RUN   TestDocumentSpace_Keys/Key:_HR
+=== RUN   TestDocumentSpace_Keys/Key:_SALES
+=== RUN   TestDocumentSpace_Keys/Key:_ENG
+--- PASS: TestDocumentSpace_Keys (0.00s)
+    --- PASS: TestDocumentSpace_Keys/Key:_DOCS (0.00s)
+    --- PASS: TestDocumentSpace_Keys/Key:_TECH (0.00s)
+    --- PASS: TestDocumentSpace_Keys/Key:_HR (0.00s)
+    --- PASS: TestDocumentSpace_Keys/Key:_SALES (0.00s)
+    --- PASS: TestDocumentSpace_Keys/Key:_ENG (0.00s)
+=== RUN   TestDocumentType_Validate
+=== RUN   TestDocumentType_Validate/Valid_document_type
+=== RUN   TestDocumentType_Validate/Empty_ID
+=== RUN   TestDocumentType_Validate/Empty_Key
+=== RUN   TestDocumentType_Validate/Empty_Name
+=== RUN   TestDocumentType_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentType_Validate/Zero_Modified_timestamp
+--- PASS: TestDocumentType_Validate (0.00s)
+    --- PASS: TestDocumentType_Validate/Valid_document_type (0.00s)
+    --- PASS: TestDocumentType_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentType_Validate/Empty_Key (0.00s)
+    --- PASS: TestDocumentType_Validate/Empty_Name (0.00s)
+    --- PASS: TestDocumentType_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentType_Validate/Zero_Modified_timestamp (0.00s)
+=== RUN   TestDocumentType_SetTimestamps
+=== RUN   TestDocumentType_SetTimestamps/Set_both_timestamps_when_zero
+=== RUN   TestDocumentType_SetTimestamps/Only_update_modified_when_created_exists
+--- PASS: TestDocumentType_SetTimestamps (0.00s)
+    --- PASS: TestDocumentType_SetTimestamps/Set_both_timestamps_when_zero (0.00s)
+    --- PASS: TestDocumentType_SetTimestamps/Only_update_modified_when_created_exists (0.00s)
+=== RUN   TestDocumentType_Structure
+--- PASS: TestDocumentType_Structure (0.00s)
+=== RUN   TestDocumentType_StandardTypes
+=== RUN   TestDocumentType_StandardTypes/Type:_page
+=== RUN   TestDocumentType_StandardTypes/Type:_blog
+=== RUN   TestDocumentType_StandardTypes/Type:_template
+=== RUN   TestDocumentType_StandardTypes/Type:_whiteboard
+--- PASS: TestDocumentType_StandardTypes (0.00s)
+    --- PASS: TestDocumentType_StandardTypes/Type:_page (0.00s)
+    --- PASS: TestDocumentType_StandardTypes/Type:_blog (0.00s)
+    --- PASS: TestDocumentType_StandardTypes/Type:_template (0.00s)
+    --- PASS: TestDocumentType_StandardTypes/Type:_whiteboard (0.00s)
+=== RUN   TestDocumentTemplate_Validate
+=== RUN   TestDocumentTemplate_Validate/Valid_template
+=== RUN   TestDocumentTemplate_Validate/Empty_ID
+=== RUN   TestDocumentTemplate_Validate/Empty_Name
+=== RUN   TestDocumentTemplate_Validate/Empty_TypeID
+=== RUN   TestDocumentTemplate_Validate/Empty_ContentTemplate
+=== RUN   TestDocumentTemplate_Validate/Empty_CreatorID
+=== RUN   TestDocumentTemplate_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentTemplate_Validate/Zero_Modified_timestamp
+=== RUN   TestDocumentTemplate_Validate/Template_with_all_optional_fields
+--- PASS: TestDocumentTemplate_Validate (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Valid_template (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Empty_Name (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Empty_TypeID (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Empty_ContentTemplate (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Empty_CreatorID (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Zero_Modified_timestamp (0.00s)
+    --- PASS: TestDocumentTemplate_Validate/Template_with_all_optional_fields (0.00s)
+=== RUN   TestDocumentTemplate_SetTimestamps
+=== RUN   TestDocumentTemplate_SetTimestamps/Set_both_timestamps_when_zero
+=== RUN   TestDocumentTemplate_SetTimestamps/Only_update_modified_when_created_exists
+--- PASS: TestDocumentTemplate_SetTimestamps (0.00s)
+    --- PASS: TestDocumentTemplate_SetTimestamps/Set_both_timestamps_when_zero (0.00s)
+    --- PASS: TestDocumentTemplate_SetTimestamps/Only_update_modified_when_created_exists (0.00s)
+=== RUN   TestDocumentTemplate_IncrementUseCount
+=== RUN   TestDocumentTemplate_IncrementUseCount/From_zero
+=== RUN   TestDocumentTemplate_IncrementUseCount/From_one
+=== RUN   TestDocumentTemplate_IncrementUseCount/Multiple_increments
+=== RUN   TestDocumentTemplate_IncrementUseCount/From_high_count
+--- PASS: TestDocumentTemplate_IncrementUseCount (0.00s)
+    --- PASS: TestDocumentTemplate_IncrementUseCount/From_zero (0.00s)
+    --- PASS: TestDocumentTemplate_IncrementUseCount/From_one (0.00s)
+    --- PASS: TestDocumentTemplate_IncrementUseCount/Multiple_increments (0.00s)
+    --- PASS: TestDocumentTemplate_IncrementUseCount/From_high_count (0.00s)
+=== RUN   TestDocumentTemplate_Structure
+--- PASS: TestDocumentTemplate_Structure (0.00s)
+=== RUN   TestDocumentBlueprint_Validate
+=== RUN   TestDocumentBlueprint_Validate/Valid_blueprint
+=== RUN   TestDocumentBlueprint_Validate/Empty_ID
+=== RUN   TestDocumentBlueprint_Validate/Empty_Name
+=== RUN   TestDocumentBlueprint_Validate/Empty_TemplateID
+=== RUN   TestDocumentBlueprint_Validate/Empty_CreatorID
+=== RUN   TestDocumentBlueprint_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentBlueprint_Validate/Zero_Modified_timestamp
+=== RUN   TestDocumentBlueprint_Validate/Blueprint_with_all_optional_fields
+--- PASS: TestDocumentBlueprint_Validate (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Valid_blueprint (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Empty_Name (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Empty_TemplateID (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Empty_CreatorID (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Zero_Modified_timestamp (0.00s)
+    --- PASS: TestDocumentBlueprint_Validate/Blueprint_with_all_optional_fields (0.00s)
+=== RUN   TestDocumentBlueprint_SetTimestamps
+=== RUN   TestDocumentBlueprint_SetTimestamps/Set_both_timestamps_when_zero
+=== RUN   TestDocumentBlueprint_SetTimestamps/Only_update_modified_when_created_exists
+--- PASS: TestDocumentBlueprint_SetTimestamps (0.00s)
+    --- PASS: TestDocumentBlueprint_SetTimestamps/Set_both_timestamps_when_zero (0.00s)
+    --- PASS: TestDocumentBlueprint_SetTimestamps/Only_update_modified_when_created_exists (0.00s)
+=== RUN   TestDocumentBlueprint_Structure
+--- PASS: TestDocumentBlueprint_Structure (0.00s)
+=== RUN   TestDocument_Validate
+=== RUN   TestDocument_Validate/Valid_document
+=== RUN   TestDocument_Validate/Empty_ID
+=== RUN   TestDocument_Validate/Empty_Title
+=== RUN   TestDocument_Validate/Empty_SpaceID
+=== RUN   TestDocument_Validate/Empty_TypeID
+=== RUN   TestDocument_Validate/Empty_CreatorID
+=== RUN   TestDocument_Validate/Version_less_than_1
+=== RUN   TestDocument_Validate/Zero_Created_timestamp
+=== RUN   TestDocument_Validate/Zero_Modified_timestamp
+=== RUN   TestDocument_Validate/Valid_with_optional_fields
+--- PASS: TestDocument_Validate (0.00s)
+    --- PASS: TestDocument_Validate/Valid_document (0.00s)
+    --- PASS: TestDocument_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocument_Validate/Empty_Title (0.00s)
+    --- PASS: TestDocument_Validate/Empty_SpaceID (0.00s)
+    --- PASS: TestDocument_Validate/Empty_TypeID (0.00s)
+    --- PASS: TestDocument_Validate/Empty_CreatorID (0.00s)
+    --- PASS: TestDocument_Validate/Version_less_than_1 (0.00s)
+    --- PASS: TestDocument_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocument_Validate/Zero_Modified_timestamp (0.00s)
+    --- PASS: TestDocument_Validate/Valid_with_optional_fields (0.00s)
+=== RUN   TestDocument_SetTimestamps
+=== RUN   TestDocument_SetTimestamps/Set_both_timestamps_when_zero
+=== RUN   TestDocument_SetTimestamps/Only_update_modified_when_created_exists
+=== RUN   TestDocument_SetTimestamps/Update_modified_when_both_exist
+--- PASS: TestDocument_SetTimestamps (0.00s)
+    --- PASS: TestDocument_SetTimestamps/Set_both_timestamps_when_zero (0.00s)
+    --- PASS: TestDocument_SetTimestamps/Only_update_modified_when_created_exists (0.00s)
+    --- PASS: TestDocument_SetTimestamps/Update_modified_when_both_exist (0.00s)
+=== RUN   TestDocument_IncrementVersion
+=== RUN   TestDocument_IncrementVersion/From_version_1
+=== RUN   TestDocument_IncrementVersion/From_version_5
+=== RUN   TestDocument_IncrementVersion/From_version_100
+--- PASS: TestDocument_IncrementVersion (0.00s)
+    --- PASS: TestDocument_IncrementVersion/From_version_1 (0.00s)
+    --- PASS: TestDocument_IncrementVersion/From_version_5 (0.00s)
+    --- PASS: TestDocument_IncrementVersion/From_version_100 (0.00s)
+=== RUN   TestDocument_Structure
+--- PASS: TestDocument_Structure (0.00s)
+=== RUN   TestDocument_OptimisticLocking
+--- PASS: TestDocument_OptimisticLocking (0.00s)
+=== RUN   TestDocumentContent_Validate
+=== RUN   TestDocumentContent_Validate/Valid_content
+=== RUN   TestDocumentContent_Validate/Empty_ID
+=== RUN   TestDocumentContent_Validate/Empty_DocumentID
+=== RUN   TestDocumentContent_Validate/Version_less_than_1
+=== RUN   TestDocumentContent_Validate/Empty_ContentType
+=== RUN   TestDocumentContent_Validate/Invalid_ContentType
+=== RUN   TestDocumentContent_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentContent_Validate/Zero_Modified_timestamp
+=== RUN   TestDocumentContent_Validate/Valid_HTML_content
+=== RUN   TestDocumentContent_Validate/Valid_Markdown_content
+=== RUN   TestDocumentContent_Validate/Valid_Plain_content
+=== RUN   TestDocumentContent_Validate/Valid_Storage_format
+--- PASS: TestDocumentContent_Validate (0.00s)
+    --- PASS: TestDocumentContent_Validate/Valid_content (0.00s)
+    --- PASS: TestDocumentContent_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentContent_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentContent_Validate/Version_less_than_1 (0.00s)
+    --- PASS: TestDocumentContent_Validate/Empty_ContentType (0.00s)
+    --- PASS: TestDocumentContent_Validate/Invalid_ContentType (0.00s)
+    --- PASS: TestDocumentContent_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentContent_Validate/Zero_Modified_timestamp (0.00s)
+    --- PASS: TestDocumentContent_Validate/Valid_HTML_content (0.00s)
+    --- PASS: TestDocumentContent_Validate/Valid_Markdown_content (0.00s)
+    --- PASS: TestDocumentContent_Validate/Valid_Plain_content (0.00s)
+    --- PASS: TestDocumentContent_Validate/Valid_Storage_format (0.00s)
+=== RUN   TestDocumentContent_SetTimestamps
+=== RUN   TestDocumentContent_SetTimestamps/Set_both_timestamps_when_zero
+=== RUN   TestDocumentContent_SetTimestamps/Only_update_modified_when_created_exists
+--- PASS: TestDocumentContent_SetTimestamps (0.00s)
+    --- PASS: TestDocumentContent_SetTimestamps/Set_both_timestamps_when_zero (0.00s)
+    --- PASS: TestDocumentContent_SetTimestamps/Only_update_modified_when_created_exists (0.00s)
+=== RUN   TestDocumentContent_Structure
+--- PASS: TestDocumentContent_Structure (0.00s)
+=== RUN   TestDocumentContent_AllContentTypes
+=== RUN   TestDocumentContent_AllContentTypes/ContentType:_html
+=== RUN   TestDocumentContent_AllContentTypes/ContentType:_markdown
+=== RUN   TestDocumentContent_AllContentTypes/ContentType:_plain
+=== RUN   TestDocumentContent_AllContentTypes/ContentType:_storage
+--- PASS: TestDocumentContent_AllContentTypes (0.00s)
+    --- PASS: TestDocumentContent_AllContentTypes/ContentType:_html (0.00s)
+    --- PASS: TestDocumentContent_AllContentTypes/ContentType:_markdown (0.00s)
+    --- PASS: TestDocumentContent_AllContentTypes/ContentType:_plain (0.00s)
+    --- PASS: TestDocumentContent_AllContentTypes/ContentType:_storage (0.00s)
+=== RUN   TestDocumentVersion_Validate
+=== RUN   TestDocumentVersion_Validate/Valid_version
+=== RUN   TestDocumentVersion_Validate/Empty_ID
+=== RUN   TestDocumentVersion_Validate/Empty_DocumentID
+=== RUN   TestDocumentVersion_Validate/Version_number_less_than_1
+=== RUN   TestDocumentVersion_Validate/Empty_UserID
+=== RUN   TestDocumentVersion_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentVersion_Validate/Major_version_with_all_fields
+=== RUN   TestDocumentVersion_Validate/Minor_version
+--- PASS: TestDocumentVersion_Validate (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Valid_version (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Version_number_less_than_1 (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Major_version_with_all_fields (0.00s)
+    --- PASS: TestDocumentVersion_Validate/Minor_version (0.00s)
+=== RUN   TestDocumentVersion_SetTimestamps
+=== RUN   TestDocumentVersion_SetTimestamps/Set_created_when_zero
+=== RUN   TestDocumentVersion_SetTimestamps/Don't_override_existing_created
+--- PASS: TestDocumentVersion_SetTimestamps (0.00s)
+    --- PASS: TestDocumentVersion_SetTimestamps/Set_created_when_zero (0.00s)
+    --- PASS: TestDocumentVersion_SetTimestamps/Don't_override_existing_created (0.00s)
+=== RUN   TestDocumentVersionLabel_Validate
+=== RUN   TestDocumentVersionLabel_Validate/Valid_label
+=== RUN   TestDocumentVersionLabel_Validate/Empty_ID
+=== RUN   TestDocumentVersionLabel_Validate/Empty_VersionID
+=== RUN   TestDocumentVersionLabel_Validate/Empty_Label
+=== RUN   TestDocumentVersionLabel_Validate/Empty_UserID
+=== RUN   TestDocumentVersionLabel_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentVersionLabel_Validate/With_description
+--- PASS: TestDocumentVersionLabel_Validate (0.00s)
+    --- PASS: TestDocumentVersionLabel_Validate/Valid_label (0.00s)
+    --- PASS: TestDocumentVersionLabel_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentVersionLabel_Validate/Empty_VersionID (0.00s)
+    --- PASS: TestDocumentVersionLabel_Validate/Empty_Label (0.00s)
+    --- PASS: TestDocumentVersionLabel_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentVersionLabel_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentVersionLabel_Validate/With_description (0.00s)
+=== RUN   TestDocumentVersionTag_Validate
+=== RUN   TestDocumentVersionTag_Validate/Valid_tag
+=== RUN   TestDocumentVersionTag_Validate/Empty_ID
+=== RUN   TestDocumentVersionTag_Validate/Empty_VersionID
+=== RUN   TestDocumentVersionTag_Validate/Empty_Tag
+=== RUN   TestDocumentVersionTag_Validate/Empty_UserID
+=== RUN   TestDocumentVersionTag_Validate/Zero_Created_timestamp
+--- PASS: TestDocumentVersionTag_Validate (0.00s)
+    --- PASS: TestDocumentVersionTag_Validate/Valid_tag (0.00s)
+    --- PASS: TestDocumentVersionTag_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentVersionTag_Validate/Empty_VersionID (0.00s)
+    --- PASS: TestDocumentVersionTag_Validate/Empty_Tag (0.00s)
+    --- PASS: TestDocumentVersionTag_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentVersionTag_Validate/Zero_Created_timestamp (0.00s)
+=== RUN   TestDocumentVersionComment_Validate
+=== RUN   TestDocumentVersionComment_Validate/Valid_comment
+=== RUN   TestDocumentVersionComment_Validate/Empty_ID
+=== RUN   TestDocumentVersionComment_Validate/Empty_VersionID
+=== RUN   TestDocumentVersionComment_Validate/Empty_UserID
+=== RUN   TestDocumentVersionComment_Validate/Empty_Comment
+=== RUN   TestDocumentVersionComment_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentVersionComment_Validate/Zero_Modified_timestamp
+--- PASS: TestDocumentVersionComment_Validate (0.00s)
+    --- PASS: TestDocumentVersionComment_Validate/Valid_comment (0.00s)
+    --- PASS: TestDocumentVersionComment_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentVersionComment_Validate/Empty_VersionID (0.00s)
+    --- PASS: TestDocumentVersionComment_Validate/Empty_UserID (0.00s)
+    --- PASS: TestDocumentVersionComment_Validate/Empty_Comment (0.00s)
+    --- PASS: TestDocumentVersionComment_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentVersionComment_Validate/Zero_Modified_timestamp (0.00s)
+=== RUN   TestDocumentVersionComment_SetTimestamps
+=== RUN   TestDocumentVersionComment_SetTimestamps/Set_both_timestamps_when_zero
+=== RUN   TestDocumentVersionComment_SetTimestamps/Only_update_modified_when_created_exists
+--- PASS: TestDocumentVersionComment_SetTimestamps (0.00s)
+    --- PASS: TestDocumentVersionComment_SetTimestamps/Set_both_timestamps_when_zero (0.00s)
+    --- PASS: TestDocumentVersionComment_SetTimestamps/Only_update_modified_when_created_exists (0.00s)
+=== RUN   TestDocumentVersionMention_Validate
+=== RUN   TestDocumentVersionMention_Validate/Valid_mention
+=== RUN   TestDocumentVersionMention_Validate/Empty_ID
+=== RUN   TestDocumentVersionMention_Validate/Empty_VersionID
+=== RUN   TestDocumentVersionMention_Validate/Empty_MentionedUserID
+=== RUN   TestDocumentVersionMention_Validate/Empty_MentioningUserID
+=== RUN   TestDocumentVersionMention_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentVersionMention_Validate/With_context
+--- PASS: TestDocumentVersionMention_Validate (0.00s)
+    --- PASS: TestDocumentVersionMention_Validate/Valid_mention (0.00s)
+    --- PASS: TestDocumentVersionMention_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentVersionMention_Validate/Empty_VersionID (0.00s)
+    --- PASS: TestDocumentVersionMention_Validate/Empty_MentionedUserID (0.00s)
+    --- PASS: TestDocumentVersionMention_Validate/Empty_MentioningUserID (0.00s)
+    --- PASS: TestDocumentVersionMention_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentVersionMention_Validate/With_context (0.00s)
+=== RUN   TestDocumentVersionDiff_Validate
+=== RUN   TestDocumentVersionDiff_Validate/Valid_diff
+=== RUN   TestDocumentVersionDiff_Validate/Empty_ID
+=== RUN   TestDocumentVersionDiff_Validate/Empty_DocumentID
+=== RUN   TestDocumentVersionDiff_Validate/FromVersion_less_than_1
+=== RUN   TestDocumentVersionDiff_Validate/ToVersion_less_than_1
+=== RUN   TestDocumentVersionDiff_Validate/FromVersion_>=_ToVersion
+=== RUN   TestDocumentVersionDiff_Validate/Empty_DiffType
+=== RUN   TestDocumentVersionDiff_Validate/Invalid_DiffType
+=== RUN   TestDocumentVersionDiff_Validate/Empty_DiffContent
+=== RUN   TestDocumentVersionDiff_Validate/Zero_Created_timestamp
+=== RUN   TestDocumentVersionDiff_Validate/Split_diff_type
+=== RUN   TestDocumentVersionDiff_Validate/HTML_diff_type
+--- PASS: TestDocumentVersionDiff_Validate (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Valid_diff (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Empty_ID (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Empty_DocumentID (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/FromVersion_less_than_1 (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/ToVersion_less_than_1 (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/FromVersion_>=_ToVersion (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Empty_DiffType (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Invalid_DiffType (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Empty_DiffContent (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Zero_Created_timestamp (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/Split_diff_type (0.00s)
+    --- PASS: TestDocumentVersionDiff_Validate/HTML_diff_type (0.00s)
+=== RUN   TestDocumentVersionDiff_AllDiffTypes
+=== RUN   TestDocumentVersionDiff_AllDiffTypes/DiffType:_unified
+=== RUN   TestDocumentVersionDiff_AllDiffTypes/DiffType:_split
+=== RUN   TestDocumentVersionDiff_AllDiffTypes/DiffType:_html
+--- PASS: TestDocumentVersionDiff_AllDiffTypes (0.00s)
+    --- PASS: TestDocumentVersionDiff_AllDiffTypes/DiffType:_unified (0.00s)
+    --- PASS: TestDocumentVersionDiff_AllDiffTypes/DiffType:_split (0.00s)
+    --- PASS: TestDocumentVersionDiff_AllDiffTypes/DiffType:_html (0.00s)
 === RUN   TestErrorCodeConstants
 --- PASS: TestErrorCodeConstants (0.00s)
 === RUN   TestGetErrorMessage
@@ -1846,8 +2968,8 @@ FAIL	helixtrack.ru/core/internal/middleware	0.615s
 === RUN   TestWebSocketConfig_PingPeriodLessThanPongWait
 --- PASS: TestWebSocketConfig_PingPeriodLessThanPongWait (0.00s)
 PASS
-coverage: 51.2% of statements
-ok  	helixtrack.ru/core/internal/models	1.081s	coverage: 51.2% of statements
+coverage: 74.1% of statements
+ok  	helixtrack.ru/core/internal/models	1.136s	coverage: 74.1% of statements
 === RUN   TestLogSecurityEvent
 --- PASS: TestLogSecurityEvent (0.00s)
 === RUN   TestDetermineSeverity
@@ -1904,7 +3026,7 @@ ok  	helixtrack.ru/core/internal/models	1.081s	coverage: 51.2% of statements
 === RUN   TestRegisterCallback
 ==================
 WARNING: DATA RACE
-Read at 0x00c0000d00ef by goroutine 48:
+Read at 0x00c0001cc06f by goroutine 48:
   helixtrack.ru/core/internal/security.TestRegisterCallback()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:181 +0x19a
   testing.tRunner()
@@ -1912,7 +3034,7 @@ Read at 0x00c0000d00ef by goroutine 48:
   testing.(*T).Run.gowrap1()
       /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
 
-Previous write at 0x00c0000d00ef by goroutine 49:
+Previous write at 0x00c0001cc06f by goroutine 49:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:171 +0x37
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
@@ -1944,7 +3066,7 @@ Goroutine 49 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Read at 0x00c0001a4018 by goroutine 48:
+Read at 0x00c000528018 by goroutine 48:
   helixtrack.ru/core/internal/security.TestRegisterCallback()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:182 +0x1cb
   testing.tRunner()
@@ -1952,7 +3074,7 @@ Read at 0x00c0001a4018 by goroutine 48:
   testing.(*T).Run.gowrap1()
       /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
 
-Previous write at 0x00c0001a4018 by goroutine 49:
+Previous write at 0x00c000528018 by goroutine 49:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:172 +0x4e
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
@@ -1984,7 +3106,7 @@ Goroutine 49 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Read at 0x00c0001a4028 by goroutine 48:
+Read at 0x00c000528028 by goroutine 48:
   helixtrack.ru/core/internal/security.TestRegisterCallback()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:183 +0x21c
   testing.tRunner()
@@ -1992,7 +3114,7 @@ Read at 0x00c0001a4028 by goroutine 48:
   testing.(*T).Run.gowrap1()
       /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
 
-Previous write at 0x00c0001a4028 by goroutine 49:
+Previous write at 0x00c000528028 by goroutine 49:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:172 +0x4e
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
@@ -2027,13 +3149,13 @@ Goroutine 49 (finished) created at:
 === RUN   TestMaxEventsLimit
 ==================
 WARNING: DATA RACE
-Write at 0x00c0001a4000 by goroutine 52:
+Write at 0x00c000528000 by goroutine 52:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:172 +0x4e
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log.go:59 +0xb4
 
-Previous write at 0x00c0001a4000 by goroutine 49:
+Previous write at 0x00c000528000 by goroutine 49:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:172 +0x4e
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
@@ -2061,13 +3183,13 @@ Goroutine 49 (finished) created at:
 ==================
 ==================
 WARNING: DATA RACE
-Write at 0x00c0000d00ef by goroutine 53:
+Write at 0x00c0001cc06f by goroutine 53:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:171 +0x37
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log.go:59 +0xb4
 
-Previous write at 0x00c0000d00ef by goroutine 52:
+Previous write at 0x00c0001cc06f by goroutine 52:
   helixtrack.ru/core/internal/security.TestRegisterCallback.func1()
       /home/milosvasic/Projects/HelixTrack/Core/Application/internal/security/audit_log_test.go:171 +0x37
   helixtrack.ru/core/internal/security.LogSecurityEvent.gowrap2()
@@ -2368,15 +3490,15 @@ Goroutine 52 (finished) created at:
 --- PASS: TestCSPReportHandler (0.00s)
 === RUN   TestNewServiceSigner
 === RUN   TestNewServiceSigner/Successful_creation
---- PASS: TestNewServiceSigner (0.18s)
-    --- PASS: TestNewServiceSigner/Successful_creation (0.18s)
+--- PASS: TestNewServiceSigner (0.43s)
+    --- PASS: TestNewServiceSigner/Successful_creation (0.43s)
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Sign_service_registration
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Verify_valid_signature
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Reject_tampered_service
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Reject_invalid_public_key_format
 === RUN   TestServiceSigner_SignAndVerifyServiceRegistration/Reject_invalid_signature_format
---- PASS: TestServiceSigner_SignAndVerifyServiceRegistration (0.09s)
+--- PASS: TestServiceSigner_SignAndVerifyServiceRegistration (0.21s)
     --- PASS: TestServiceSigner_SignAndVerifyServiceRegistration/Sign_service_registration (0.01s)
     --- PASS: TestServiceSigner_SignAndVerifyServiceRegistration/Verify_valid_signature (0.00s)
     --- PASS: TestServiceSigner_SignAndVerifyServiceRegistration/Reject_tampered_service (0.00s)
@@ -2391,7 +3513,7 @@ Goroutine 52 (finished) created at:
 === RUN   TestServiceSigner_VerifyServiceRotation/Reject_rotation_with_mismatched_service_types
 === RUN   TestServiceSigner_VerifyServiceRotation/Reject_rotation_when_new_service_is_not_healthy
 === RUN   TestServiceSigner_VerifyServiceRotation/Reject_rotation_when_service_registered_too_recently
---- PASS: TestServiceSigner_VerifyServiceRotation (0.40s)
+--- PASS: TestServiceSigner_VerifyServiceRotation (0.15s)
     --- PASS: TestServiceSigner_VerifyServiceRotation/Successful_rotation_with_valid_admin_token (0.00s)
     --- PASS: TestServiceSigner_VerifyServiceRotation/Reject_rotation_with_short_admin_token (0.00s)
     --- PASS: TestServiceSigner_VerifyServiceRotation/Reject_rotation_when_old_service_is_rotating (0.00s)
@@ -2413,13 +3535,13 @@ Goroutine 52 (finished) created at:
 === RUN   TestServiceSigner_GetKeys
 === RUN   TestServiceSigner_GetKeys/Get_public_key_PEM
 === RUN   TestServiceSigner_GetKeys/Get_private_key_PEM
---- PASS: TestServiceSigner_GetKeys (0.26s)
+--- PASS: TestServiceSigner_GetKeys (0.21s)
     --- PASS: TestServiceSigner_GetKeys/Get_public_key_PEM (0.00s)
     --- PASS: TestServiceSigner_GetKeys/Get_private_key_PEM (0.00s)
 === RUN   TestServiceSigner_MultipleSigners
 === RUN   TestServiceSigner_MultipleSigners/Service_with_swapped_public_key_fails_verification
---- PASS: TestServiceSigner_MultipleSigners (0.42s)
-    --- PASS: TestServiceSigner_MultipleSigners/Service_with_swapped_public_key_fails_verification (0.42s)
+--- PASS: TestServiceSigner_MultipleSigners (0.53s)
+    --- PASS: TestServiceSigner_MultipleSigners/Service_with_swapped_public_key_fails_verification (0.53s)
 === RUN   TestGenerateAdminToken
 === RUN   TestGenerateAdminToken/Generate_admin_token
 === RUN   TestGenerateAdminToken/Different_users_generate_different_tokens
@@ -2431,7 +3553,7 @@ Goroutine 52 (finished) created at:
 === RUN   TestServiceSigner_EdgeCases
 === RUN   TestServiceSigner_EdgeCases/Sign_service_with_empty_fields
 === RUN   TestServiceSigner_EdgeCases/Sign_service_with_special_characters
---- PASS: TestServiceSigner_EdgeCases (0.16s)
+--- PASS: TestServiceSigner_EdgeCases (0.24s)
     --- PASS: TestServiceSigner_EdgeCases/Sign_service_with_empty_fields (0.01s)
     --- PASS: TestServiceSigner_EdgeCases/Sign_service_with_special_characters (0.01s)
 === RUN   TestDefaultTLSConfig
@@ -2490,24 +3612,24 @@ Goroutine 52 (finished) created at:
 --- PASS: TestTLSAuditMiddleware (0.00s)
 FAIL
 coverage: 78.0% of statements
-FAIL	helixtrack.ru/core/internal/security	3.226s
+FAIL	helixtrack.ru/core/internal/security	3.485s
 === RUN   TestNewServer
-2025-10-16T20:36:27.498+0300	ERROR	logger/logger.go:131	Failed to query services for health check	{"error": "sql: database is closed"}
+2025-10-18T16:30:54.420+0300	ERROR	logger/logger.go:131	Failed to query services for health check	{"error": "sql: database is closed"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/services.(*HealthChecker).checkAllServices
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:122
 helixtrack.ru/core/internal/services.(*HealthChecker).checkLoop
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:97
---- PASS: TestNewServer (3.27s)
+--- PASS: TestNewServer (3.39s)
 === RUN   TestServer_HealthEndpoint
---- PASS: TestServer_HealthEndpoint (3.30s)
+--- PASS: TestServer_HealthEndpoint (3.37s)
 === RUN   TestServer_DoEndpoint_Version
---- PASS: TestServer_DoEndpoint_Version (3.54s)
+--- PASS: TestServer_DoEndpoint_Version (3.57s)
 === RUN   TestServer_DoEndpoint_MissingJWT
---- PASS: TestServer_DoEndpoint_MissingJWT (3.75s)
+--- PASS: TestServer_DoEndpoint_MissingJWT (3.54s)
 === RUN   TestServer_DoEndpoint_InvalidJSON
-2025-10-16T20:36:41.411+0300	ERROR	logger/logger.go:131	Failed to bind JSON request	{"error": "invalid character 'i' looking for beginning of object key string", "error_details": "invalid character 'i' looking for beginning of object key string", "body": "{invalid json}"}
+2025-10-18T16:31:08.411+0300	ERROR	logger/logger.go:131	Failed to bind JSON request	{"error": "invalid character 'i' looking for beginning of object key string", "error_details": "invalid character 'i' looking for beginning of object key string", "body": "{invalid json}"}
 helixtrack.ru/core/internal/logger.Error
 	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131
 helixtrack.ru/core/internal/server.(*Server).setupRouter.func1
@@ -2531,19 +3653,197 @@ github.com/gin-gonic/gin.(*Engine).handleHTTPRequest
 github.com/gin-gonic/gin.(*Engine).ServeHTTP
 	/home/milosvasic/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:589
 helixtrack.ru/core/internal/server.TestServer_DoEndpoint_InvalidJSON
-	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:226
+	/home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:227
 testing.tRunner
 	/usr/lib/go-1.22/src/testing/testing.go:1689
---- PASS: TestServer_DoEndpoint_InvalidJSON (3.33s)
+--- PASS: TestServer_DoEndpoint_InvalidJSON (3.50s)
 === RUN   TestServer_CORSMiddleware
---- PASS: TestServer_CORSMiddleware (3.23s)
+--- PASS: TestServer_CORSMiddleware (3.44s)
 === RUN   TestServer_Shutdown
---- PASS: TestServer_Shutdown (3.40s)
+--- PASS: TestServer_Shutdown (3.79s)
 === RUN   TestServer_GetRouter
---- PASS: TestServer_GetRouter (3.46s)
-PASS
-coverage: 67.5% of statements
-ok  	helixtrack.ru/core/internal/server	28.323s	coverage: 67.5% of statements
+--- PASS: TestServer_GetRouter (4.51s)
+=== RUN   TestServer_PortFallback_Success
+    server_test.go:360: Server start error: failed to start server on 127.0.0.1:8080: http: Server closed
+--- PASS: TestServer_PortFallback_Success (4.18s)
+=== RUN   TestServer_PortFallback_MultiplePorts
+    server_test.go:415: First server start error: failed to start server on 127.0.0.1:8080: http: Server closed
+==================
+WARNING: DATA RACE
+Read at 0x00c000194090 by goroutine 62:
+  helixtrack.ru/core/internal/server.(*Server).Shutdown()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:536 +0x544
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:481 +0xdde
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.(*T).Run.gowrap1()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
+
+Previous write at 0x00c000194090 by goroutine 71:
+  helixtrack.ru/core/internal/server.(*Server).startWithPortFallback()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:360 +0x589
+  helixtrack.ru/core/internal/server.(*Server).Start()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:325 +0x329
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts.func2()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:447 +0x37
+
+Goroutine 62 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x825
+  testing.runTests.func1()
+      /usr/lib/go-1.22/src/testing/testing.go:2161 +0x85
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.runTests()
+      /usr/lib/go-1.22/src/testing/testing.go:2159 +0x8be
+  testing.(*M).Run()
+      /usr/lib/go-1.22/src/testing/testing.go:2027 +0xf17
+  main.main()
+      _testmain.go:105 +0x2e4
+
+Goroutine 71 (running) created at:
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:446 +0xa75
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.(*T).Run.gowrap1()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c0006ee350 by goroutine 62:
+  sync/atomic.StoreInt32()
+      /usr/lib/go-1.22/src/runtime/race_amd64.s:231 +0xb
+  sync/atomic.StoreUint32()
+      <autogenerated>:1 +0x14
+  net/http.(*Server).Shutdown()
+      /usr/lib/go-1.22/src/net/http/server.go:2991 +0x6b
+  helixtrack.ru/core/internal/server.(*Server).Shutdown()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:537 +0x592
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:481 +0xdde
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.(*T).Run.gowrap1()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
+
+Previous write at 0x00c0006ee350 by goroutine 71:
+  helixtrack.ru/core/internal/server.(*Server).startWithPortFallback()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:360 +0x3d6
+  helixtrack.ru/core/internal/server.(*Server).Start()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:325 +0x329
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts.func2()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:447 +0x37
+
+Goroutine 62 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x825
+  testing.runTests.func1()
+      /usr/lib/go-1.22/src/testing/testing.go:2161 +0x85
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.runTests()
+      /usr/lib/go-1.22/src/testing/testing.go:2159 +0x8be
+  testing.(*M).Run()
+      /usr/lib/go-1.22/src/testing/testing.go:2027 +0xf17
+  main.main()
+      _testmain.go:105 +0x2e4
+
+Goroutine 71 (running) created at:
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:446 +0xa75
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.(*T).Run.gowrap1()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
+==================
+==================
+WARNING: DATA RACE
+Write at 0x00c0006ee378 by goroutine 62:
+  sync/atomic.CompareAndSwapInt32()
+      /usr/lib/go-1.22/src/runtime/race_amd64.s:310 +0xb
+  sync/atomic.CompareAndSwapInt32()
+      <autogenerated>:1 +0x18
+  net/http.(*Server).Shutdown()
+      /usr/lib/go-1.22/src/net/http/server.go:2993 +0x8a
+  helixtrack.ru/core/internal/server.(*Server).Shutdown()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:537 +0x592
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:481 +0xdde
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.(*T).Run.gowrap1()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
+
+Previous write at 0x00c0006ee378 by goroutine 71:
+  helixtrack.ru/core/internal/server.(*Server).startWithPortFallback()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:360 +0x3d6
+  helixtrack.ru/core/internal/server.(*Server).Start()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server.go:325 +0x329
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts.func2()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:447 +0x37
+
+Goroutine 62 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x825
+  testing.runTests.func1()
+      /usr/lib/go-1.22/src/testing/testing.go:2161 +0x85
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.runTests()
+      /usr/lib/go-1.22/src/testing/testing.go:2159 +0x8be
+  testing.(*M).Run()
+      /usr/lib/go-1.22/src/testing/testing.go:2027 +0xf17
+  main.main()
+      _testmain.go:105 +0x2e4
+
+Goroutine 71 (running) created at:
+  helixtrack.ru/core/internal/server.TestServer_PortFallback_MultiplePorts()
+      /home/milosvasic/Projects/HelixTrack/Core/Application/internal/server/server_test.go:446 +0xa75
+  testing.tRunner()
+      /usr/lib/go-1.22/src/testing/testing.go:1689 +0x21e
+  testing.(*T).Run.gowrap1()
+      /usr/lib/go-1.22/src/testing/testing.go:1742 +0x44
+==================
+    server_test.go:449: Second server start error: failed to start server on 127.0.0.1:8082: http: Server closed
+    testing.go:1398: race detected during execution of test
+--- FAIL: TestServer_PortFallback_MultiplePorts (5.23s)
+=== RUN   TestServer_BroadcastAvailability
+--- PASS: TestServer_BroadcastAvailability (4.60s)
+=== RUN   TestServer_ExtractPortFromAddress
+=== RUN   TestServer_ExtractPortFromAddress/address_127.0.0.1:8080
+=== RUN   TestServer_ExtractPortFromAddress/address_localhost:3000
+=== RUN   TestServer_ExtractPortFromAddress/address_0.0.0.0:9090
+=== RUN   TestServer_ExtractPortFromAddress/address_192.168.1.1:8081
+=== RUN   TestServer_ExtractPortFromAddress/address_
+=== RUN   TestServer_ExtractPortFromAddress/address_invalid
+=== RUN   TestServer_ExtractPortFromAddress/address_127.0.0.1:
+--- PASS: TestServer_ExtractPortFromAddress (4.07s)
+    --- PASS: TestServer_ExtractPortFromAddress/address_127.0.0.1:8080 (0.00s)
+    --- PASS: TestServer_ExtractPortFromAddress/address_localhost:3000 (0.00s)
+    --- PASS: TestServer_ExtractPortFromAddress/address_0.0.0.0:9090 (0.00s)
+    --- PASS: TestServer_ExtractPortFromAddress/address_192.168.1.1:8081 (0.00s)
+    --- PASS: TestServer_ExtractPortFromAddress/address_ (0.00s)
+    --- PASS: TestServer_ExtractPortFromAddress/address_invalid (0.00s)
+    --- PASS: TestServer_ExtractPortFromAddress/address_127.0.0.1: (0.00s)
+=== RUN   TestServer_IsPortInUseError
+=== RUN   TestServer_IsPortInUseError/error_0_nil_error
+=== RUN   TestServer_IsPortInUseError/error_1_bind:_address_already_in_use
+=== RUN   TestServer_IsPortInUseError/error_2_listen_tcp_127.0.0.1:8080:_bind:_address_already_in_use
+=== RUN   TestServer_IsPortInUseError/error_3_address_already_in_use
+=== RUN   TestServer_IsPortInUseError/error_4_some_other_error
+=== RUN   TestServer_IsPortInUseError/error_5_connection_refused
+--- PASS: TestServer_IsPortInUseError (3.34s)
+    --- PASS: TestServer_IsPortInUseError/error_0_nil_error (0.00s)
+    --- PASS: TestServer_IsPortInUseError/error_1_bind:_address_already_in_use (0.00s)
+    --- PASS: TestServer_IsPortInUseError/error_2_listen_tcp_127.0.0.1:8080:_bind:_address_already_in_use (0.00s)
+    --- PASS: TestServer_IsPortInUseError/error_3_address_already_in_use (0.00s)
+    --- PASS: TestServer_IsPortInUseError/error_4_some_other_error (0.00s)
+    --- PASS: TestServer_IsPortInUseError/error_5_connection_refused (0.00s)
+FAIL
+coverage: 80.4% of statements
+FAIL	helixtrack.ru/core/internal/server	50.580s
 === RUN   TestNewAuthService
 --- PASS: TestNewAuthService (0.00s)
 === RUN   TestAuthService_IsEnabled
@@ -2605,11 +3905,11 @@ ok  	helixtrack.ru/core/internal/server	28.323s	coverage: 67.5% of statements
     --- PASS: TestNewHealthChecker/Create_health_checker_with_valid_parameters (0.00s)
 === RUN   TestHealthChecker_StartStop
 === RUN   TestHealthChecker_StartStop/Start_health_checker
-{"level":"info","ts":1760636186.2166977,"caller":"logger/logger.go:121","msg":"Starting service health checker","interval":0.1}
+{"level":"info","ts":1760794253.0227726,"caller":"logger/logger.go:121","msg":"Starting service health checker","interval":0.1}
 === RUN   TestHealthChecker_StartStop/Cannot_start_already_running_checker
-{"level":"error","ts":1760636186.2168422,"caller":"logger/logger.go:131","msg":"Failed to query services for health check","error":"Query() not mockable - use real database for integration tests","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkAllServices\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:122\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkLoop\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:97"}
+{"level":"error","ts":1760794253.0229633,"caller":"logger/logger.go:131","msg":"Failed to query services for health check","error":"Query() not mockable - use real database for integration tests","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkAllServices\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:122\nhelixtrack.ru/core/internal/services.(*HealthChecker).checkLoop\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/services/health_checker.go:97"}
 === RUN   TestHealthChecker_StartStop/Stop_health_checker
-{"level":"info","ts":1760636186.2169676,"caller":"logger/logger.go:121","msg":"Service health checker stopped"}
+{"level":"info","ts":1760794253.0231428,"caller":"logger/logger.go:121","msg":"Service health checker stopped"}
 === RUN   TestHealthChecker_StartStop/Stop_non-running_checker_is_safe
 --- PASS: TestHealthChecker_StartStop (0.00s)
     --- PASS: TestHealthChecker_StartStop/Start_health_checker (0.00s)
@@ -2658,19 +3958,23 @@ ok  	helixtrack.ru/core/internal/server	28.323s	coverage: 67.5% of statements
 === RUN   TestNewNetworkDiscoveryService
 --- PASS: TestNewNetworkDiscoveryService (0.00s)
 === RUN   TestNetworkDiscoveryService_StartStop
-{"level":"info","ts":1760636186.218594,"caller":"logger/logger.go:121","msg":"Starting network discovery service","host":"localhost","port":8080}
-{"level":"info","ts":1760636186.2186909,"caller":"logger/logger.go:121","msg":"Network discovery service started successfully"}
-{"level":"info","ts":1760636186.2187304,"caller":"logger/logger.go:121","msg":"Stopping network discovery service"}
-{"level":"info","ts":1760636186.2187557,"caller":"logger/logger.go:121","msg":"Network discovery service stopped"}
+{"level":"info","ts":1760794253.0248709,"caller":"logger/logger.go:121","msg":"Starting network discovery service","host":"localhost","port":8080}
+{"level":"info","ts":1760794253.0249913,"caller":"logger/logger.go:121","msg":"Network discovery service started successfully"}
+{"level":"info","ts":1760794253.025037,"caller":"logger/logger.go:121","msg":"Stopping network discovery service"}
+{"level":"info","ts":1760794253.0250797,"caller":"logger/logger.go:121","msg":"Network discovery service stopped"}
 --- PASS: TestNetworkDiscoveryService_StartStop (0.00s)
 === RUN   TestNetworkDiscoveryService_DiscoverServices
-{"level":"info","ts":1760636186.2188563,"caller":"logger/logger.go:121","msg":"Starting network discovery service","host":"localhost","port":8080}
-{"level":"info","ts":1760636186.2189105,"caller":"logger/logger.go:121","msg":"Network discovery service started successfully"}
-{"level":"info","ts":1760636187.3204663,"caller":"logger/logger.go:121","msg":"Stopping network discovery service"}
-{"level":"info","ts":1760636187.3205485,"caller":"logger/logger.go:121","msg":"Network discovery service stopped"}
+{"level":"info","ts":1760794253.0252016,"caller":"logger/logger.go:121","msg":"Starting network discovery service","host":"localhost","port":8080}
+{"level":"info","ts":1760794253.0252697,"caller":"logger/logger.go:121","msg":"Network discovery service started successfully"}
+{"level":"info","ts":1760794254.126543,"caller":"logger/logger.go:121","msg":"Stopping network discovery service"}
+{"level":"info","ts":1760794254.1266103,"caller":"logger/logger.go:121","msg":"Network discovery service stopped"}
 --- PASS: TestNetworkDiscoveryService_DiscoverServices (1.10s)
 === RUN   TestNetworkDiscoveryService_Getters
 --- PASS: TestNetworkDiscoveryService_Getters (0.00s)
+=== RUN   TestNetworkDiscoveryService_UpdatePort
+{"level":"info","ts":1760794254.1268442,"caller":"logger/logger.go:121","msg":"Network discovery service port updated","port":9090,"host":"localhost"}
+{"level":"info","ts":1760794254.1269128,"caller":"logger/logger.go:121","msg":"Network discovery service port updated","port":10000,"host":"localhost"}
+--- PASS: TestNetworkDiscoveryService_UpdatePort (0.00s)
 === RUN   TestNewPermissionService
 --- PASS: TestNewPermissionService (0.00s)
 === RUN   TestNewLocalPermissionService
@@ -2802,15 +4106,15 @@ ok  	helixtrack.ru/core/internal/server	28.323s	coverage: 67.5% of statements
 === RUN   TestMockAuthService
 --- PASS: TestMockAuthService (0.00s)
 PASS
-coverage: 46.8% of statements
-ok  	helixtrack.ru/core/internal/services	6.163s	coverage: 46.8% of statements
+coverage: 47.5% of statements
+ok  	helixtrack.ru/core/internal/services	6.166s	coverage: 47.5% of statements
 === RUN   TestWebSocketConnection_Integration
-{"level":"info","ts":1760636184.226818,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760636184.2281964,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"bee81ac7-b022-4ee2-bdad-595ca86a05b4","username":"testuser","activeClients":1}
-{"level":"info","ts":1760636184.3293989,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"bee81ac7-b022-4ee2-bdad-595ca86a05b4","username":"testuser","activeClients":0}
-{"level":"info","ts":1760636184.3294835,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760636184.329563,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
---- PASS: TestWebSocketConnection_Integration (0.10s)
+{"level":"info","ts":1760794251.0310524,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760794251.0349572,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"00ee2a8b-e844-4abf-a5b0-6f87fb56fce8","username":"testuser","activeClients":1}
+{"level":"info","ts":1760794251.1356792,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"00ee2a8b-e844-4abf-a5b0-6f87fb56fce8","username":"testuser","activeClients":0}
+{"level":"info","ts":1760794251.135807,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760794251.1358976,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+--- PASS: TestWebSocketConnection_Integration (0.11s)
 === RUN   TestWebSocketSubscription_Integration
     manager_integration_test.go:121: Integration test with timing/race conditions - requires improved test infrastructure
 --- SKIP: TestWebSocketSubscription_Integration (0.00s)
@@ -2830,29 +4134,29 @@ ok  	helixtrack.ru/core/internal/services	6.163s	coverage: 46.8% of statements
     manager_integration_test.go:151: Integration test with timing/race conditions - requires improved test infrastructure
 --- SKIP: TestWebSocketConcurrentEventDelivery_Integration (0.00s)
 === RUN   TestWebSocketDisconnect_Integration
-{"level":"info","ts":1760636184.3302903,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760636184.3309314,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"701d5671-2f1d-4498-983e-9b73df639805","username":"testuser","activeClients":1}
-{"level":"info","ts":1760636184.4315705,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"701d5671-2f1d-4498-983e-9b73df639805","username":"testuser","activeClients":0}
-{"level":"info","ts":1760636184.6319835,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760636184.6320827,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+{"level":"info","ts":1760794251.1367629,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760794251.1373584,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"34e5f119-a76a-48f7-b296-c075116ab09e","username":"testuser","activeClients":1}
+{"level":"info","ts":1760794251.237974,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"34e5f119-a76a-48f7-b296-c075116ab09e","username":"testuser","activeClients":0}
+{"level":"info","ts":1760794251.4383996,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760794251.4385018,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
 --- PASS: TestWebSocketDisconnect_Integration (0.30s)
 === RUN   TestWebSocketProjectContextFiltering_Integration
     manager_integration_test.go:195: Project context filtering not yet implemented in manager
 --- SKIP: TestWebSocketProjectContextFiltering_Integration (0.00s)
 === RUN   TestWebSocketPingPong_Integration
-{"level":"info","ts":1760636184.632518,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760636184.6331778,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"e1490254-5f6a-4d8d-8d83-88452db6e231","username":"testuser","activeClients":1}
-{"level":"info","ts":1760636184.833895,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"e1490254-5f6a-4d8d-8d83-88452db6e231","username":"testuser","activeClients":0}
-{"level":"info","ts":1760636184.8339593,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760636184.8340116,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+{"level":"info","ts":1760794251.4388845,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760794251.4395516,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"52293656-cde1-4b07-a4cc-6522256e5e15","username":"testuser","activeClients":1}
+{"level":"info","ts":1760794251.6403944,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"52293656-cde1-4b07-a4cc-6522256e5e15","username":"testuser","activeClients":0}
+{"level":"info","ts":1760794251.640487,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760794251.6405327,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
 --- PASS: TestWebSocketPingPong_Integration (0.20s)
 === RUN   TestWebSocketInvalidMessage_Integration
-{"level":"info","ts":1760636184.8341758,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
-{"level":"info","ts":1760636184.8348188,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"f6bf3e83-5521-43cd-a505-9683d12abd3b","username":"testuser","activeClients":1}
-{"level":"error","ts":1760636184.8351223,"caller":"logger/logger.go:131","msg":"Failed to unmarshal WebSocket message","error":"invalid character 'i' looking for beginning of object key string","clientId":"f6bf3e83-5521-43cd-a505-9683d12abd3b","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/websocket.(*Manager).readPump\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/websocket/manager.go:413"}
-{"level":"info","ts":1760636184.9356015,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"f6bf3e83-5521-43cd-a505-9683d12abd3b","username":"testuser","activeClients":0}
-{"level":"info","ts":1760636184.9356751,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
-{"level":"info","ts":1760636184.9357376,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
+{"level":"info","ts":1760794251.6407406,"caller":"logger/logger.go:121","msg":"Starting WebSocket manager","maxClients":100,"path":"/ws"}
+{"level":"info","ts":1760794251.641439,"caller":"logger/logger.go:121","msg":"Client registered","clientId":"e5f9a542-0f31-4e16-ac9f-40e7c240e625","username":"testuser","activeClients":1}
+{"level":"error","ts":1760794251.641667,"caller":"logger/logger.go:131","msg":"Failed to unmarshal WebSocket message","error":"invalid character 'i' looking for beginning of object key string","clientId":"e5f9a542-0f31-4e16-ac9f-40e7c240e625","stacktrace":"helixtrack.ru/core/internal/logger.Error\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/logger/logger.go:131\nhelixtrack.ru/core/internal/websocket.(*Manager).readPump\n\t/home/milosvasic/Projects/HelixTrack/Core/Application/internal/websocket/manager.go:425"}
+{"level":"info","ts":1760794251.7421522,"caller":"logger/logger.go:121","msg":"Client unregistered","clientId":"e5f9a542-0f31-4e16-ac9f-40e7c240e625","username":"testuser","activeClients":0}
+{"level":"info","ts":1760794251.7422245,"caller":"logger/logger.go:121","msg":"Stopping WebSocket manager"}
+{"level":"info","ts":1760794251.7422683,"caller":"logger/logger.go:121","msg":"WebSocket manager stopped"}
 --- PASS: TestWebSocketInvalidMessage_Integration (0.10s)
 === RUN   TestNewPublisher
 --- PASS: TestNewPublisher (0.00s)
@@ -2895,5 +4199,5 @@ ok  	helixtrack.ru/core/internal/services	6.163s	coverage: 46.8% of statements
 === RUN   TestPublisher_ConcurrentPublishing
 --- PASS: TestPublisher_ConcurrentPublishing (0.01s)
 PASS
-coverage: 50.9% of statements
-ok  	helixtrack.ru/core/internal/websocket	1.772s	coverage: 50.9% of statements
+coverage: 51.2% of statements
+ok  	helixtrack.ru/core/internal/websocket	1.773s	coverage: 51.2% of statements

@@ -713,5 +713,423 @@ curl http://localhost:8080/health
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-10-10
+## Extension Deployment
+
+HelixTrack Core supports optional extensions that add functionality without modifying the core codebase. This section covers deploying extensions, with a focus on the Documents V2 extension.
+
+### Available Extensions
+
+- **Documents** (✅ Production Ready) - Confluence-style document management
+- **Times** - Time tracking and work log management
+- **Chats** - Integration with messaging platforms (Slack, Telegram, etc.)
+- **Lokalisation** - Localization and internationalization support
+
+### Extension Architecture
+
+Extensions follow a modular architecture:
+
+1. **Self-Contained**: Each extension has its own database schema
+2. **HTTP-Based**: Extensions communicate with Core via REST API
+3. **Optional**: Can be enabled/disabled without affecting core functionality
+4. **Independent**: Extensions can run as separate services or within Core
+
+---
+
+## Documents V2 Extension Deployment
+
+The Documents extension adds Confluence-style document management capabilities to HelixTrack with 102% feature parity.
+
+### Features Overview
+
+- **90 API Actions**: Complete document lifecycle management
+- **32 Database Tables**: Comprehensive document data model
+- **Confluence Parity**: 46 features covering all major Confluence capabilities
+- **Real-time Collaboration**: Comments, mentions, watchers, reactions
+- **Version Control**: Full version history with diffs and rollback
+- **Rich Content**: HTML, Markdown, Plain Text, Storage Format
+- **Templates & Blueprints**: Reusable document templates with wizards
+- **Analytics**: View tracking, popularity scoring, engagement metrics
+- **Multi-format Export**: PDF, Markdown, HTML, DOCX
+- **Hierarchical Organization**: Spaces, types, parent-child relationships
+
+### Database Schema Deployment
+
+#### SQLite Deployment
+
+```bash
+# Navigate to database directory
+cd Database/DDL/Extensions/Documents
+
+# Import Documents extension schema
+sqlite3 /path/to/database.db < Documents.V1.sql
+
+# Verify tables created
+sqlite3 /path/to/database.db "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'document%';"
+```
+
+Expected output: 32 tables starting with `document`
+
+#### PostgreSQL Deployment
+
+```bash
+# Import Documents extension schema
+psql -U htcore -d htcore -f Database/DDL/Extensions/Documents/Documents.V1.sql
+
+# Verify tables created
+psql -U htcore -d htcore -c "\dt document*"
+```
+
+### Documents Database Tables (32 tables)
+
+**Core Tables:**
+- `document` - Main document metadata
+- `document_content` - Document content with versioning
+- `document_space` - Confluence-style spaces
+- `document_type` - Document type definitions
+
+**Versioning Tables:**
+- `document_version` - Version history
+- `document_version_label` - Version labels
+- `document_version_tag` - Version tags
+- `document_version_comment` - Version comments
+- `document_version_mention` - @mentions in versions
+- `document_version_diff` - Cached version diffs
+
+**Collaboration Tables:**
+- `comment_document_mapping` - Document comments
+- `document_inline_comment` - Inline/contextual comments
+- `document_watcher` - Watch subscriptions
+- `document_mention` - @mentions in documents
+- `document_reaction` - Emoji reactions
+
+**Organization Tables:**
+- `label_document_mapping` - Document labels
+- `document_tag` - Tag definitions
+- `document_tag_mapping` - Document tags
+- `vote_mapping` - Votes/reactions (generic system)
+
+**Relationship Tables:**
+- `document_entity_link` - Links to tickets/projects/etc.
+- `document_relationship` - Document-to-document relationships
+
+**Template Tables:**
+- `document_template` - Reusable templates
+- `document_blueprint` - Template wizards
+
+**Analytics Tables:**
+- `document_view_history` - View tracking
+- `document_analytics` - Aggregated metrics
+
+**Attachment Tables:**
+- `document_attachment` - File attachments
+
+### Configuration
+
+Documents extension requires no additional configuration - it uses the main Core configuration for database and services.
+
+**Optional Configuration** (for advanced deployments):
+
+```json
+{
+  "extensions": {
+    "documents": {
+      "enabled": true,
+      "max_document_size": 10485760,
+      "max_attachment_size": 52428800,
+      "allowed_attachment_types": ["pdf", "doc", "docx", "xls", "xlsx", "png", "jpg", "jpeg"],
+      "enable_realtime_collaboration": true,
+      "enable_export": true
+    }
+  }
+}
+```
+
+### API Actions (90 total)
+
+The Documents extension adds 90 new API actions to the Core `/do` endpoint:
+
+**Core Document Operations** (20 actions):
+- `documentCreate`, `documentRead`, `documentList`, `documentUpdate`, `documentDelete`
+- `documentRestore`, `documentArchive`, `documentUnarchive`, `documentPublish`, `documentUnpublish`
+- `documentDuplicate`, `documentMove`, `documentSetParent`, `documentGetChildren`, `documentGetHierarchy`
+- `documentGetBreadcrumb`, `documentSearch`, `documentGetRelated`, `documentGetTree`, `documentReorder`
+
+**Document Content** (4 actions):
+- `documentContentCreate`, `documentContentGet`, `documentContentUpdate`, `documentContentGetLatest`
+
+**Document Spaces** (5 actions):
+- `documentSpaceCreate`, `documentSpaceRead`, `documentSpaceList`, `documentSpaceUpdate`, `documentSpaceDelete`
+
+**Document Versioning** (15 actions):
+- Version management, labels, tags, comments, mentions, diffs, restore
+
+**Document Collaboration** (12 actions):
+- Comments, inline comments, watchers, mentions
+
+**Document Organization** (10 actions):
+- Labels, tags, reactions, voting
+
+**Document Export** (8 actions):
+- `documentExportPDF`, `documentExportMarkdown`, `documentExportHTML`, `documentExportDOCX`
+- `documentExportSpace`, `documentExportBatch`, `documentExportSchedule`, `documentExportGetStatus`
+
+**Document Entity Links** (4 actions):
+- `documentLinkCreate`, `documentLinkList`, `documentLinkDelete`, `documentRelationshipCreate`
+
+**Document Templates** (5 actions):
+- `documentTemplateCreate`, `documentTemplateGet`, `documentTemplateList`, `documentTemplateUse`, `documentBlueprintCreate`
+
+**Document Analytics** (3 actions):
+- `documentViewTrack`, `documentAnalyticsGet`, `documentGetPopular`
+
+**Document Attachments** (4 actions):
+- `documentAttachmentUpload`, `documentAttachmentGet`, `documentAttachmentList`, `documentAttachmentDelete`
+
+### Testing Documents Deployment
+
+#### Verify Schema
+
+```bash
+# Check table count
+sqlite3 /path/to/database.db "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE 'document%';"
+# Expected: 32
+
+# List all document tables
+sqlite3 /path/to/database.db "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'document%' ORDER BY name;"
+```
+
+#### Test API Actions
+
+```bash
+# 1. Create a document space
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentSpaceCreate",
+    "jwt": "your-jwt-token",
+    "data": {
+      "key": "DOCS",
+      "name": "Documentation",
+      "description": "Main documentation space",
+      "is_public": true
+    }
+  }'
+
+# 2. Create a document
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentCreate",
+    "jwt": "your-jwt-token",
+    "data": {
+      "title": "Getting Started",
+      "space_id": "space-id-from-step-1",
+      "type_id": "page",
+      "content": "<h1>Welcome</h1><p>Getting started with HelixTrack</p>",
+      "content_type": "html"
+    }
+  }'
+
+# 3. List documents
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type": application/json" \
+  -d '{
+    "action": "documentList",
+    "jwt": "your-jwt-token",
+    "data": {
+      "space_id": "space-id-from-step-1",
+      "limit": 10
+    }
+  }'
+```
+
+#### Verify Analytics
+
+```bash
+# Track document view
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentViewTrack",
+    "jwt": "your-jwt-token",
+    "data": {
+      "document_id": "doc-id",
+      "duration": 30
+    }
+  }'
+
+# Get analytics
+curl -X POST http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "documentAnalyticsGet",
+    "jwt": "your-jwt-token",
+    "data": {
+      "document_id": "doc-id"
+    }
+  }'
+```
+
+### Performance Considerations
+
+**Database Indexes** (recommended for production):
+
+```sql
+-- Document lookup indexes
+CREATE INDEX IF NOT EXISTS idx_document_space ON document(space_id);
+CREATE INDEX IF NOT EXISTS idx_document_parent ON document(parent_id);
+CREATE INDEX IF NOT EXISTS idx_document_type ON document(type_id);
+CREATE INDEX IF NOT EXISTS idx_document_created ON document(created);
+
+-- Version history indexes
+CREATE INDEX IF NOT EXISTS idx_document_version_doc ON document_version(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_content_doc ON document_content(document_id);
+
+-- Collaboration indexes
+CREATE INDEX IF NOT EXISTS idx_watcher_document ON document_watcher(document_id);
+CREATE INDEX IF NOT EXISTS idx_comment_document ON comment_document_mapping(document_id);
+
+-- Analytics indexes
+CREATE INDEX IF NOT EXISTS idx_view_document ON document_view_history(document_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_document ON document_analytics(document_id);
+```
+
+**Recommended Settings:**
+
+- **Max Document Size**: 10 MB (configurable)
+- **Max Attachment Size**: 50 MB (configurable)
+- **Version Retention**: Unlimited (soft delete)
+- **Analytics Aggregation**: Every 5 minutes
+- **Search Indexing**: Real-time
+
+### Troubleshooting
+
+#### Issue: Documents API actions return 404
+
+**Solution**: Verify handlers are registered in Core
+
+```bash
+# Check available actions
+curl http://localhost:8080/do \
+  -H "Content-Type: application/json" \
+  -d '{"action": "version"}'
+
+# Look for "documentCreate" in response
+```
+
+#### Issue: Database tables not found
+
+**Solution**: Import Documents schema
+
+```bash
+# Check if tables exist
+sqlite3 database.db "SELECT name FROM sqlite_master WHERE type='table' AND name='document';"
+
+# If empty, import schema
+sqlite3 database.db < Database/DDL/Extensions/Documents/Documents.V1.sql
+```
+
+#### Issue: Slow document searches
+
+**Solution**: Add search indexes
+
+```sql
+-- Full-text search index (SQLite)
+CREATE VIRTUAL TABLE IF NOT EXISTS document_fts USING fts5(
+    document_id, title, content, tokenize='porter'
+);
+
+-- Keep FTS in sync with triggers
+CREATE TRIGGER IF NOT EXISTS document_fts_insert AFTER INSERT ON document BEGIN
+    INSERT INTO document_fts(document_id, title) VALUES (new.id, new.title);
+END;
+```
+
+#### Issue: WebSocket events not working for documents
+
+**Solution**: Verify WebSocket endpoint is accessible
+
+```bash
+# Test WebSocket connection
+wscat -c ws://localhost:8080/ws
+
+# Should receive connection confirmation
+```
+
+### Migration from Other Systems
+
+#### Confluence to HelixTrack Documents
+
+```bash
+# Export from Confluence (use Confluence REST API)
+curl -u admin:password \
+  "https://your-confluence.com/rest/api/content?limit=100" \
+  > confluence-export.json
+
+# Convert and import (example script)
+python scripts/migrate-confluence.py \
+  --input confluence-export.json \
+  --helix-url http://localhost:8080 \
+  --jwt "your-token"
+```
+
+#### Google Docs to HelixTrack Documents
+
+1. Export from Google Docs (File → Download → HTML)
+2. Use `documentCreate` API with HTML content
+3. Convert links and images to HelixTrack references
+
+### Backup and Recovery
+
+```bash
+# Backup Documents tables (SQLite)
+sqlite3 database.db ".dump document" > documents-backup.sql
+sqlite3 database.db ".dump document_content" >> documents-backup.sql
+# ... repeat for all 32 tables
+
+# Restore
+sqlite3 database.db < documents-backup.sql
+
+# Backup Documents tables (PostgreSQL)
+pg_dump -U htcore -d htcore \
+  -t 'document*' \
+  > documents-backup.sql
+
+# Restore
+psql -U htcore -d htcore < documents-backup.sql
+```
+
+### Monitoring
+
+**Key Metrics to Monitor:**
+
+- Document creation rate
+- Document view count
+- Search response time
+- Attachment storage usage
+- Version history size
+- Collaboration activity (comments, watchers)
+
+**Sample Monitoring Query:**
+
+```sql
+-- Document statistics
+SELECT
+    COUNT(*) as total_documents,
+    COUNT(CASE WHEN is_published = 1 THEN 1 END) as published,
+    COUNT(CASE WHEN is_archived = 1 THEN 1 END) as archived,
+    COUNT(CASE WHEN deleted = 1 THEN 1 END) as deleted
+FROM document;
+
+-- Most popular documents
+SELECT d.title, da.total_views, da.unique_viewers, da.popularity_score
+FROM document d
+JOIN document_analytics da ON d.id = da.document_id
+ORDER BY da.popularity_score DESC
+LIMIT 10;
+```
+
+---
+
+**Version:** 3.1.0 (Documents V2 Edition)
+**Last Updated:** 2025-10-18

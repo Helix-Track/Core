@@ -757,6 +757,230 @@ func (h *Handler) DoAction(c *gin.Context) {
 	case models.ActionCommentParseMentions:
 		h.handleCommentParseMentions(c, req)
 
+	// ================================================================
+	// DOCUMENT ACTIONS (90 actions - Documents V2 with Confluence parity)
+	// ================================================================
+
+	// Core document operations (20 actions)
+	case models.ActionDocumentCreate:
+		h.handleDocumentCreate(c, req)
+	case models.ActionDocumentRead:
+		h.handleDocumentRead(c, req)
+	case models.ActionDocumentList:
+		h.handleDocumentList(c, req)
+	case models.ActionDocumentUpdate:
+		h.handleDocumentUpdate(c, req)
+	case models.ActionDocumentDelete:
+		h.handleDocumentDelete(c, req)
+	case models.ActionDocumentRestore:
+		h.handleDocumentRestore(c, req)
+	case models.ActionDocumentArchive:
+		h.handleDocumentArchive(c, req)
+	case models.ActionDocumentUnarchive:
+		h.handleDocumentUnarchive(c, req)
+	case models.ActionDocumentDuplicate:
+		h.handleDocumentDuplicate(c, req)
+	case models.ActionDocumentMove:
+		h.handleDocumentMove(c, req)
+	case models.ActionDocumentPublish:
+		h.handleDocumentPublish(c, req)
+	case models.ActionDocumentUnpublish:
+		h.handleDocumentUnpublish(c, req)
+	case models.ActionDocumentSearch:
+		h.handleDocumentSearch(c, req)
+	case models.ActionDocumentGetHierarchy:
+		h.handleDocumentGetHierarchy(c, req)
+	case models.ActionDocumentGetBreadcrumb:
+		h.handleDocumentGetBreadcrumb(c, req)
+	case models.ActionDocumentGetRelated:
+		h.handleDocumentGetRelated(c, req)
+	case models.ActionDocumentSetParent:
+		h.handleDocumentSetParent(c, req)
+	case models.ActionDocumentGetChildren:
+		h.handleDocumentGetChildren(c, req)
+	case models.ActionDocumentExportPDF:
+		h.handleDocumentExportPDF(c, req)
+	case models.ActionDocumentExportWord:
+		h.handleDocumentExportWord(c, req)
+
+	// Document content operations (4 actions)
+	case models.ActionDocumentContentGet:
+		h.handleDocumentContentGet(c, req)
+	case models.ActionDocumentContentUpdate:
+		h.handleDocumentContentUpdate(c, req)
+	case models.ActionDocumentContentGetVersion:
+		h.handleDocumentContentGetVersion(c, req)
+	case models.ActionDocumentContentGetLatest:
+		h.handleDocumentContentGetLatest(c, req)
+
+	// Document space operations (5 actions)
+	case models.ActionDocumentSpaceCreate:
+		h.handleDocumentSpaceCreate(c, req)
+	case models.ActionDocumentSpaceRead:
+		h.handleDocumentSpaceRead(c, req)
+	case models.ActionDocumentSpaceList:
+		h.handleDocumentSpaceList(c, req)
+	case models.ActionDocumentSpaceUpdate:
+		h.handleDocumentSpaceUpdate(c, req)
+	case models.ActionDocumentSpaceDelete:
+		h.handleDocumentSpaceDelete(c, req)
+
+	// Document version operations (15 actions)
+	case models.ActionDocumentVersionCreate:
+		h.handleDocumentVersionCreate(c, req)
+	case models.ActionDocumentVersionGet:
+		h.handleDocumentVersionGet(c, req)
+	case models.ActionDocumentVersionList:
+		h.handleDocumentVersionList(c, req)
+	case models.ActionDocumentVersionCompare:
+		h.handleDocumentVersionCompare(c, req)
+	case models.ActionDocumentVersionRestore:
+		h.handleDocumentVersionRestore(c, req)
+	case models.ActionDocumentVersionLabelCreate:
+		h.handleDocumentVersionLabelCreate(c, req)
+	case models.ActionDocumentVersionLabelList:
+		h.handleDocumentVersionLabelList(c, req)
+	case models.ActionDocumentVersionTagCreate:
+		h.handleDocumentVersionTagCreate(c, req)
+	case models.ActionDocumentVersionTagList:
+		h.handleDocumentVersionTagList(c, req)
+	case models.ActionDocumentVersionCommentCreate:
+		h.handleDocumentVersionCommentCreate(c, req)
+	case models.ActionDocumentVersionCommentList:
+		h.handleDocumentVersionCommentList(c, req)
+	case models.ActionDocumentVersionMentionCreate:
+		h.handleDocumentVersionMentionCreate(c, req)
+	case models.ActionDocumentVersionMentionList:
+		h.handleDocumentVersionMentionList(c, req)
+	case models.ActionDocumentVersionDiffGet:
+		h.handleDocumentVersionDiffGet(c, req)
+	case models.ActionDocumentVersionDiffCreate:
+		h.handleDocumentVersionDiffCreate(c, req)
+
+	// Document collaboration operations (12 actions)
+	case models.ActionDocumentCommentAdd:
+		h.handleDocumentCommentAdd(c, req)
+	case models.ActionDocumentCommentList:
+		h.handleDocumentCommentList(c, req)
+	case models.ActionDocumentCommentRemove:
+		h.handleDocumentCommentRemove(c, req)
+	case models.ActionDocumentInlineCommentCreate:
+		h.handleDocumentInlineCommentCreate(c, req)
+	case models.ActionDocumentInlineCommentList:
+		h.handleDocumentInlineCommentList(c, req)
+	case models.ActionDocumentInlineCommentResolve:
+		h.handleDocumentInlineCommentResolve(c, req)
+	case models.ActionDocumentWatcherAdd:
+		h.handleDocumentWatcherAdd(c, req)
+	case models.ActionDocumentWatcherRemove:
+		h.handleDocumentWatcherRemove(c, req)
+	case models.ActionDocumentWatcherList:
+		h.handleDocumentWatcherList(c, req)
+	case models.ActionDocumentVoteAdd:
+		h.handleDocumentVoteAdd(c, req)
+	case models.ActionDocumentVoteRemove:
+		h.handleDocumentVoteRemove(c, req)
+	case models.ActionDocumentVoteCount:
+		h.handleDocumentVoteCount(c, req)
+
+	// Document organization operations (10 actions)
+	case models.ActionDocumentLabelAdd:
+		h.handleDocumentLabelAdd(c, req)
+	case models.ActionDocumentLabelRemove:
+		h.handleDocumentLabelRemove(c, req)
+	case models.ActionDocumentLabelList:
+		h.handleDocumentLabelList(c, req)
+	case models.ActionDocumentTagCreate:
+		h.handleDocumentTagCreate(c, req)
+	case models.ActionDocumentTagGet:
+		h.handleDocumentTagGet(c, req)
+	case models.ActionDocumentTagAdd:
+		h.handleDocumentTagAdd(c, req)
+	case models.ActionDocumentTagRemove:
+		h.handleDocumentTagRemove(c, req)
+	case models.ActionDocumentTagList:
+		h.handleDocumentTagList(c, req)
+	case models.ActionDocumentCategoryAssign:
+		h.handleDocumentCategoryAssign(c, req)
+	case models.ActionDocumentCategoryList:
+		h.handleDocumentCategoryList(c, req)
+
+	// Document export operations (8 actions)
+	case models.ActionDocumentExportHTML:
+		h.handleDocumentExportHTML(c, req)
+	case models.ActionDocumentExportXML:
+		h.handleDocumentExportXML(c, req)
+	case models.ActionDocumentExportMarkdown:
+		h.handleDocumentExportMarkdown(c, req)
+	case models.ActionDocumentExportText:
+		h.handleDocumentExportText(c, req)
+	case models.ActionDocumentExportStatus:
+		h.handleDocumentExportStatus(c, req)
+	case models.ActionDocumentExportDownload:
+		h.handleDocumentExportDownload(c, req)
+	case models.ActionDocumentExportCancel:
+		h.handleDocumentExportCancel(c, req)
+	case models.ActionDocumentExportList:
+		h.handleDocumentExportList(c, req)
+
+	// Document entity connection operations (8 actions)
+	case models.ActionDocumentEntityLinkCreate:
+		h.handleDocumentEntityLinkCreate(c, req)
+	case models.ActionDocumentEntityLinkList:
+		h.handleDocumentEntityLinkList(c, req)
+	case models.ActionDocumentEntityLinkRemove:
+		h.handleDocumentEntityLinkRemove(c, req)
+	case models.ActionDocumentRelationshipCreate:
+		h.handleDocumentRelationshipCreate(c, req)
+	case models.ActionDocumentRelationshipList:
+		h.handleDocumentRelationshipList(c, req)
+	case models.ActionDocumentRelationshipRemove:
+		h.handleDocumentRelationshipRemove(c, req)
+	case models.ActionDocumentEntityDocumentsList:
+		h.handleDocumentEntityDocumentsList(c, req)
+	case models.ActionDocumentProjectWikiGet:
+		h.handleDocumentProjectWikiGet(c, req)
+
+	// Document template operations (7 actions)
+	case models.ActionDocumentTemplateCreate:
+		h.handleDocumentTemplateCreate(c, req)
+	case models.ActionDocumentTemplateGet:
+		h.handleDocumentTemplateGet(c, req)
+	case models.ActionDocumentTemplateList:
+		h.handleDocumentTemplateList(c, req)
+	case models.ActionDocumentTemplateUpdate:
+		h.handleDocumentTemplateUpdate(c, req)
+	case models.ActionDocumentTemplateDelete:
+		h.handleDocumentTemplateDelete(c, req)
+	case models.ActionDocumentBlueprintCreate:
+		h.handleDocumentBlueprintCreate(c, req)
+	case models.ActionDocumentBlueprintList:
+		h.handleDocumentBlueprintList(c, req)
+
+	// Document analytics operations (5 actions)
+	case models.ActionDocumentAnalyticsGet:
+		h.handleDocumentAnalyticsGet(c, req)
+	case models.ActionDocumentAnalyticsUpdate:
+		h.handleDocumentAnalyticsUpdate(c, req)
+	case models.ActionDocumentViewHistoryGet:
+		h.handleDocumentViewHistoryGet(c, req)
+	case models.ActionDocumentPopularGet:
+		h.handleDocumentPopularGet(c, req)
+	case models.ActionDocumentViewRecord:
+		h.handleDocumentViewRecord(c, req)
+
+	// Document attachment operations (5 actions)
+	case models.ActionDocumentAttachmentUpload:
+		h.handleDocumentAttachmentUpload(c, req)
+	case models.ActionDocumentAttachmentGet:
+		h.handleDocumentAttachmentGet(c, req)
+	case models.ActionDocumentAttachmentList:
+		h.handleDocumentAttachmentList(c, req)
+	case models.ActionDocumentAttachmentUpdate:
+		h.handleDocumentAttachmentUpdate(c, req)
+	case models.ActionDocumentAttachmentDelete:
+		h.handleDocumentAttachmentDelete(c, req)
+
 	default:
 		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
 			models.ErrorCodeInvalidAction,
