@@ -1,0 +1,144 @@
+<mxfile host="app.diagrams.net" modified="2025-10-18T00:00:00.000Z" agent="Claude Code" version="24.0.0">
+  <diagram name="Authentication-Permissions" id="auth-perm">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Authentication &amp; Authorization Flow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="350" y="20" width="700" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Authentication Flow -->
+        <mxCell id="auth-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="620" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-title" value="AUTHENTICATION FLOW (JWT)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1B5E20;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step1" value="1. Login Request&#xa;POST /do&#xa;{&#xa;  &quot;action&quot;: &quot;authenticate&quot;,&#xa;  &quot;data&quot;: {&#xa;    &quot;username&quot;: &quot;admin&quot;,&#xa;    &quot;password&quot;: &quot;****&quot;&#xa;  }&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#1B5E20;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="140" width="240" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step2" value="2. Core → Auth Service&#xa;&#xa;If external auth enabled:&#xa;  authService.Authenticate()&#xa;&#xa;Else local auth:&#xa;  Query users table&#xa;  bcrypt.Compare(hash, pass)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="360" y="140" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-auth1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#2E7D32;" edge="1" parent="1" source="step1" target="step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="step3" value="3. Generate JWT Token&#xa;&#xa;JWT Payload:&#xa;{&#xa;  &quot;sub&quot;: &quot;authentication&quot;,&#xa;  &quot;username&quot;: &quot;admin&quot;,&#xa;  &quot;name&quot;: &quot;Admin User&quot;,&#xa;  &quot;role&quot;: &quot;admin&quot;,&#xa;  &quot;permissions&quot;: &quot;ALL&quot;,&#xa;  &quot;exp&quot;: 1697366400&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="280" width="240" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-auth2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#2E7D32;" edge="1" parent="1" source="step2" target="step3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="260" />
+              <mxPoint x="200" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="step4" value="4. Return Token to Client&#xa;&#xa;Response:&#xa;{&#xa;  &quot;errorCode&quot;: -1,&#xa;  &quot;data&quot;: {&#xa;    &quot;token&quot;: &quot;eyJhbGc...&quot;,&#xa;    &quot;username&quot;: &quot;admin&quot;,&#xa;    &quot;role&quot;: &quot;admin&quot;&#xa;  }&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66BB6A;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="360" y="280" width="260" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-auth3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#2E7D32;" edge="1" parent="1" source="step3" target="step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Permissions Flow -->
+        <mxCell id="perm-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="620" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="perm-title" value="AUTHORIZATION FLOW (RBAC)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="60" y="530" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="perm1" value="1. Request with JWT&#xa;POST /do&#xa;{&#xa;  &quot;action&quot;: &quot;priorityCreate&quot;,&#xa;  &quot;jwt&quot;: &quot;eyJhbGc...&quot;,&#xa;  &quot;object&quot;: &quot;priority&quot;,&#xa;  &quot;data&quot;: {...}&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="580" width="220" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="perm2" value="2. JWT Validation&#xa;&#xa;• Parse JWT&#xa;• Verify signature&#xa;• Check expiration&#xa;• Extract claims:&#xa;  - username&#xa;  - role&#xa;  - permissions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="580" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-perm1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#E65100;" edge="1" parent="1" source="perm1" target="perm2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="perm3" value="3. Permission Check&#xa;&#xa;permService.CheckPermission(&#xa;  username: &quot;admin&quot;,&#xa;  object: &quot;priority&quot;,&#xa;  action: CREATE&#xa;)&#xa;&#xa;Checks:&#xa;• User role permissions&#xa;• Context-based access&#xa;• Hierarchical permissions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFB74D;strokeColor=#E65100;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="720" width="260" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-perm2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#E65100;" edge="1" parent="1" source="perm2" target="perm3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="700" />
+              <mxPoint x="210" y="700" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="perm4-allow" value="4a. ALLOWED ✓&#xa;&#xa;Proceed to handler:&#xa;• Execute business logic&#xa;• Access database&#xa;• Return success response" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66BB6A;strokeColor=#1B5E20;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="380" y="720" width="220" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="perm4-deny" value="4b. DENIED ✗&#xa;&#xa;Return error:&#xa;{&#xa;  &quot;errorCode&quot;: 1009,&#xa;  &quot;errorMessage&quot;:&#xa;    &quot;Insufficient permission&quot;&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="380" y="830" width="220" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow-perm3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#2E7D32;" edge="1" parent="1" source="perm3" target="perm4-allow">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-perm4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#C62828;" edge="1" parent="1" source="perm3" target="perm4-deny">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Permission Engine Details -->
+        <mxCell id="engine-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#6A1B9A;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="720" y="80" width="640" height="860" as="geometry" />
+        </mxCell>
+        <mxCell id="engine-title" value="PERMISSIONS ENGINE INTERNALS" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#6A1B9A;" vertex="1" parent="1">
+          <mxGeometry x="740" y="90" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="roles" value="ROLES&#xa;&#xa;admin:  ALL permissions&#xa;user:   READ, CREATE, UPDATE&#xa;viewer: READ only&#xa;guest:  Limited READ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="140" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="permissions-enum" value="PERMISSION VALUES&#xa;&#xa;READ = 1&#xa;CREATE = 2&#xa;UPDATE = 3&#xa;DELETE/ALL = 5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#6A1B9A;fontSize=11;align=left;spacingLeft=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1060" y="140" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="context-hierarchy" value="PERMISSION CONTEXTS&#xa;(Hierarchical)&#xa;&#xa;node&#xa; └─ account&#xa;     └─ organization&#xa;         ├─ team&#xa;         └─ project&#xa;&#xa;Access granted if:&#xa;• User has permission in context&#xa;• OR parent context with ≥ level" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BA68C8;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="760" y="270" width="260" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="security-levels" value="SECURITY LEVELS&#xa;(Project-level)&#xa;&#xa;• Confidential (Level 5)&#xa;• Internal (Level 3)&#xa;• Public (Level 1)&#xa;&#xa;Access via:&#xa;• Direct user grant&#xa;• Team membership&#xa;• Project role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#AB47BC;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="270" width="260" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="project-roles" value="PROJECT ROLES&#xa;&#xa;• Administrator&#xa;• Developer&#xa;• Reporter&#xa;• Viewer&#xa;&#xa;Each role has specific&#xa;permission set per project" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9C27B0;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="480" width="260" height="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="permission-check-algo" value="PERMISSION CHECK ALGORITHM&#xa;&#xa;1. Get user role from JWT&#xa;2. Check global permissions&#xa;3. Check context permissions&#xa;4. Check project roles&#xa;5. Check security level access&#xa;6. Evaluate hierarchically:&#xa;   • Direct match?&#xa;   • Parent context match?&#xa;   • Permission level ≥ required?&#xa;7. Return: allowed/denied" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7B1FA2;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1060" y="460" width="260" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="caching" value="PERFORMANCE OPTIMIZATIONS&#xa;&#xa;• Permission cache (TTL: 5min)&#xa;• Role-based pre-calculation&#xa;• Context hierarchy cache&#xa;• JWT signature verification cache&#xa;• Database connection pooling&#xa;&#xa;Result: &lt;1ms permission checks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6A1B9A;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="760" y="650" width="560" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rbac-example" value="EXAMPLE: priorityCreate Permission Check&#xa;&#xa;User: admin (role=admin, permissions=ALL)&#xa;Action: priorityCreate&#xa;Object: priority&#xa;Required Permission: CREATE (level 2)&#xa;&#xa;Evaluation:&#xa;1. User role 'admin' has ALL permissions ✓&#xa;2. ALL (5) ≥ CREATE (2) ✓&#xa;3. Result: ALLOWED ✓" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4A148C;strokeColor=#311B92;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="760" y="800" width="560" height="120" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

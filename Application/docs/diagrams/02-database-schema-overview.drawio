@@ -1,0 +1,307 @@
+<mxfile host="app.diagrams.net" modified="2025-10-18T00:00:00.000Z" agent="Claude Code" version="24.0.0">
+  <diagram name="Database Schema Overview" id="db-schema">
+    <mxGraphModel dx="2400" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="HelixTrack Core - Database Schema (V3.0) - 89 Tables" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="700" y="20" width="1000" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="subtitle" value="Complete Entity-Relationship Diagram across V1 (61 tables), Phase 1 (+11 tables), Phase 2 (+15 tables), Phase 3 (+2 tables)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=0;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="700" y="70" width="1000" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Core Domain (V1) -->
+        <mxCell id="core-domain-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="580" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="core-domain-title" value="CORE DOMAIN (V1 - 61 Tables)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="130" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Core Tables -->
+        <mxCell id="project-table" value="PROJECT&#xa;id, title, key, description,&#xa;lead_user_id,&#xa;default_assignee_id,&#xa;project_category_id,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="180" width="180" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ticket-table" value="TICKET&#xa;id, title, description,&#xa;project_id, ticket_type_id,&#xa;ticket_status_id,&#xa;priority_id, resolution_id,&#xa;assignee_id, reporter_id,&#xa;is_epic, epic_id, epic_color,&#xa;is_subtask, parent_ticket_id,&#xa;security_level_id,&#xa;vote_count, due_date,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="300" y="180" width="200" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comment-table" value="COMMENT&#xa;id, content, user_id,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="290" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="workflow-table" value="WORKFLOW&#xa;id, title, description,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="380" width="170" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ticket-status-table" value="TICKET_STATUS&#xa;id, title, category,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="270" y="380" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ticket-type-table" value="TICKET_TYPE&#xa;id, title, icon,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="450" y="380" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="board-table" value="BOARD&#xa;id, title, description,&#xa;filter_id, board_type,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="470" width="180" height="85" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cycle-table" value="CYCLE&#xa;id, title, start_date,&#xa;end_date, cycle_type,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="280" y="470" width="170" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 1 Domain -->
+        <mxCell id="phase1-domain-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#F57C00;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="660" y="120" width="540" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="phase1-domain-title" value="PHASE 1 - JIRA PARITY (+11 Tables)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="680" y="130" width="450" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 1 Tables -->
+        <mxCell id="priority-table" value="PRIORITY&#xa;id, title, description,&#xa;level (1-5), icon, color,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="700" y="180" width="180" height="85" as="geometry" />
+        </mxCell>
+
+        <mxCell id="resolution-table" value="RESOLUTION&#xa;id, title, description,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="920" y="180" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="version-table" value="VERSION&#xa;id, title, description,&#xa;project_id, start_date,&#xa;release_date, released,&#xa;archived,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="700" y="285" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="filter-table" value="FILTER&#xa;id, title, description,&#xa;owner_id, query (JSON),&#xa;is_public, is_favorite,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="920" y="270" width="180" height="95" as="geometry" />
+        </mxCell>
+
+        <mxCell id="custom-field-table" value="CUSTOM_FIELD&#xa;id, field_name, field_type,&#xa;description, project_id,&#xa;is_required, default_value,&#xa;configuration (JSON),&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="700" y="405" width="200" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="custom-field-option-table" value="CUSTOM_FIELD_OPTION&#xa;id, custom_field_id,&#xa;value, display_value,&#xa;position, is_default,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="930" y="405" width="200" height="95" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ticket-watcher-table" value="TICKET_WATCHER_MAPPING&#xa;id, ticket_id, user_id,&#xa;created, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="700" y="525" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 2 Domain -->
+        <mxCell id="phase2-domain-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="120" width="560" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="phase2-domain-title" value="PHASE 2 - AGILE ENHANCEMENTS (+15 Tables)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#6A1B9A;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="130" width="500" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 2 Tables -->
+        <mxCell id="work-log-table" value="WORK_LOG&#xa;id, ticket_id, user_id,&#xa;time_spent, work_date,&#xa;description,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1280" y="180" width="180" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="project-role-table" value="PROJECT_ROLE&#xa;id, title, description,&#xa;project_id (NULL=global),&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1500" y="180" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="security-level-table" value="SECURITY_LEVEL&#xa;id, title, description,&#xa;project_id, level,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1280" y="290" width="180" height="85" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dashboard-table" value="DASHBOARD&#xa;id, title, description,&#xa;owner_id, is_public,&#xa;is_favorite, layout (JSON),&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1500" y="280" width="190" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="dashboard-widget-table" value="DASHBOARD_WIDGET&#xa;id, dashboard_id,&#xa;widget_type, title,&#xa;position_x, position_y,&#xa;width, height,&#xa;configuration (JSON),&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="395" width="190" height="115" as="geometry" />
+        </mxCell>
+
+        <mxCell id="board-column-table" value="BOARD_COLUMN&#xa;id, board_id, title,&#xa;status_id, position,&#xa;max_items (WIP limit),&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="400" width="190" height="95" as="geometry" />
+        </mxCell>
+
+        <mxCell id="board-swimlane-table" value="BOARD_SWIMLANE&#xa;id, board_id, title,&#xa;query, position,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="530" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="notification-scheme-table" value="NOTIFICATION_SCHEME&#xa;id, title, description,&#xa;project_id,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="520" width="200" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 3 Domain -->
+        <mxCell id="phase3-domain-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="1840" y="120" width="520" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="phase3-domain-title" value="PHASE 3 - COLLABORATION (+2 Tables)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1B5E20;" vertex="1" parent="1">
+          <mxGeometry x="1860" y="130" width="450" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 3 Tables -->
+        <mxCell id="project-category-table" value="PROJECT_CATEGORY&#xa;id, title, description,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#1B5E20;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1880" y="180" width="190" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ticket-vote-table" value="TICKET_VOTE_MAPPING&#xa;id, ticket_id, user_id,&#xa;created, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#1B5E20;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="2110" y="180" width="190" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comment-mention-table" value="COMMENT_MENTION_MAPPING&#xa;id, comment_id,&#xa;mentioned_user_id,&#xa;created, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#1B5E20;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="270" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Multi-tenancy Domain -->
+        <mxCell id="multi-tenancy-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#880E4F;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="40" y="660" width="580" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="multi-tenancy-title" value="MULTI-TENANCY &amp; ORGANIZATION (V1)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#880E4F;" vertex="1" parent="1">
+          <mxGeometry x="60" y="670" width="450" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="account-table" value="ACCOUNT&#xa;id, title, description,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#880E4F;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="720" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="organization-table" value="ORGANIZATION&#xa;id, title, description,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#880E4F;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="270" y="720" width="170" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="team-table" value="TEAM&#xa;id, title, description,&#xa;team_lead_id,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#880E4F;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="80" y="820" width="160" height="75" as="geometry" />
+        </mxCell>
+
+        <mxCell id="permission-table" value="PERMISSION&#xa;id, title, description,&#xa;permission_value,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#880E4F;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="270" y="820" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="permission-context-table" value="PERMISSION_CONTEXT&#xa;id, title, parent_context_id,&#xa;context_type,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#880E4F;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="915" width="200" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- Supporting Systems -->
+        <mxCell id="supporting-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="660" y="660" width="540" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="supporting-title" value="SUPPORTING SYSTEMS (V1)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#F57F17;" vertex="1" parent="1">
+          <mxGeometry x="680" y="670" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="component-table" value="COMPONENT&#xa;id, title, description,&#xa;project_id,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="700" y="720" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="label-table" value="LABEL&#xa;id, title, color,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="920" y="720" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="asset-table" value="ASSET&#xa;id, title, file_path,&#xa;file_size, mime_type,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="700" y="820" width="170" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="repository-table" value="REPOSITORY&#xa;id, title, url,&#xa;repository_type_id,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="910" y="820" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="audit-table" value="AUDIT&#xa;id, user_id, action,&#xa;entity_type, entity_id,&#xa;is_public, activity_type,&#xa;created, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="700" y="920" width="170" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="report-table" value="REPORT&#xa;id, title, description,&#xa;query, report_type,&#xa;created, modified, deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="910" y="920" width="180" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Mapping Tables -->
+        <mxCell id="mapping-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#424242;strokeWidth=3;dashed=1;dashPattern=8 8;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="660" width="1120" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="mapping-title" value="MAPPING TABLES - Many-to-Many Relationships (V1, V2, V3)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#212121;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="670" width="680" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mapping-list" value="MAPPING TABLES (40+ tables):&#xa;• ticket_project_mapping • ticket_board_mapping • ticket_cycle_mapping&#xa;• ticket_type_project_mapping • ticket_relationship • component_ticket_mapping&#xa;• label_ticket_mapping • asset_ticket_mapping • repository_commit_ticket_mapping&#xa;• user_organization_mapping • user_team_mapping • team_organization_mapping&#xa;• team_project_mapping • cycle_project_mapping • permission_user_mapping&#xa;• permission_team_mapping • board_meta_data • ticket_meta_data&#xa;• ticket_affected_version_mapping • ticket_fix_version_mapping&#xa;• filter_share_mapping • ticket_custom_field_value&#xa;• project_role_user_mapping • security_level_permission_mapping&#xa;• dashboard_share_mapping • notification_rule • notification_event&#xa;• board_quick_filter • and more..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEEEEE;strokeColor=#424242;align=left;verticalAlign=top;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="720" width="1050" height="260" as="geometry" />
+        </mxCell>
+
+        <!-- Relationships -->
+        <mxCell id="rel1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1976D2;endArrow=classic;endFill=1;" edge="1" parent="1" source="project-table" target="ticket-table">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel1-label" value="1:N" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=9;fontStyle=1;fontColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="270" y="210" width="30" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rel2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#E65100;endArrow=classic;endFill=1;" edge="1" parent="1" source="priority-table" target="ticket-table">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel2-label" value="1:N" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=9;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="530" y="210" width="30" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#616161;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="2320" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="LEGEND &amp; KEY INFORMATION" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="60" y="1050" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Color coding -->
+        <mxCell id="legend-v1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1090" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-v1-text" value="V1 Core Tables (61)" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="120" y="1085" width="160" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-phase1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1090" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-phase1-text" value="Phase 1 (+11)" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="340" y="1085" width="120" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-phase2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1090" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-phase2-text" value="Phase 2 (+15)" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="520" y="1085" width="120" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-phase3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#1B5E20;" vertex="1" parent="1">
+          <mxGeometry x="660" y="1090" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-phase3-text" value="Phase 3 (+2)" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1085" width="120" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-multi" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#880E4F;" vertex="1" parent="1">
+          <mxGeometry x="840" y="1090" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-multi-text" value="Multi-tenancy" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="880" y="1085" width="120" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-support" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="1090" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-support-text" value="Supporting Systems" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="1085" width="150" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Summary -->
+        <mxCell id="summary" value="DATABASE SUMMARY&#xa;Total Tables: 89 (V1: 61, Phase 1: +11, Phase 2: +15, Phase 3: +2)&#xa;Relationships: 100+ foreign key relationships via mapping tables&#xa;Features: Multi-tenancy, Soft deletes, Full audit trail, UUID identifiers&#xa;Scalability: Designed for PostgreSQL (production) and SQLite (development/embedded)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;align=left;spacingLeft=15;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1125" width="900" height="25" as="geometry" />
+        </mxCell>
+
+        <mxCell id="patterns" value="DESIGN PATTERNS&#xa;• UUID for all IDs (globally unique) • Soft deletes (deleted column) • Audit timestamps (created, modified)&#xa;• Mapping tables for M:N relationships • Meta-data tables for extensibility • JSON for flexible configuration&#xa;• Hierarchical permissions (context-based) • Denormalized vote_count for performance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;fontSize=9;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="1125" width="1320" height="25" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

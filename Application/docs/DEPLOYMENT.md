@@ -10,6 +10,34 @@
 6. [Production Checklist](#production-checklist)
 7. [Monitoring and Maintenance](#monitoring-and-maintenance)
 
+## Visual Documentation
+
+Before deploying, review the architecture diagrams to understand the system structure:
+
+**Quick Access:** [Documentation Portal](index.html) | [All Diagrams](diagrams/README.md) | [Architecture Docs](ARCHITECTURE.md)
+
+### Key Diagrams for Deployment
+
+1. **[System Architecture](diagrams/01-system-architecture.drawio)** - Complete overview of all system layers, components, and how they interact. Essential for understanding deployment topology.
+
+2. **[Microservices Interaction](diagrams/05-microservices-interaction.drawio)** - Shows Core service, Authentication service, Permissions engine, and optional extensions. Includes 3 deployment scenarios:
+   - Development (single machine)
+   - Production (distributed services)
+   - High Availability (multiple replicas)
+
+3. **[Database Schema Overview](diagrams/02-database-schema-overview.drawio)** - All 89 tables for database setup and migration planning.
+
+These diagrams include:
+- Service topology and communication patterns
+- Port configurations (Core: 8080, Auth: 8081, Permissions: 8082)
+- HTTP/JSON communication details
+- Deployment architecture examples
+- Docker Compose and Kubernetes configurations
+
+**Additional Resources:**
+- [Architecture Documentation](ARCHITECTURE.md) - Section 8: Deployment Architecture
+- [User Manual](USER_MANUAL.md) - API reference and service configuration
+
 ## Prerequisites
 
 ### System Requirements

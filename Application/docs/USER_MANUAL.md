@@ -36,6 +36,31 @@ HelixTrack Core is a production-ready, modern REST API service built with Go and
 - SQLite 3 or PostgreSQL 12+ (for database)
 - Linux, macOS, or Windows
 
+## Visual Documentation
+
+Comprehensive architecture diagrams are available to help understand the system:
+
+**Quick Access:** [View All Diagrams](diagrams/README.md) | [Documentation Portal](index.html)
+
+### Available Architecture Diagrams
+
+1. **[System Architecture](diagrams/01-system-architecture.drawio)** - Complete multi-layer architecture overview showing client applications, API layer, middleware stack, handlers, database, and monitoring systems.
+
+2. **[Database Schema Overview](diagrams/02-database-schema-overview.drawio)** - All 89 tables organized by domain and color-coded by version (V1, Phase 1-3) with relationships and mapping tables.
+
+3. **[API Request Flow](diagrams/03-api-request-flow.drawio)** - Complete request/response lifecycle through the unified `/do` endpoint with 9-step flow and error handling.
+
+4. **[Authentication & Permissions Flow](diagrams/04-auth-permissions-flow.drawio)** - JWT-based authentication and RBAC authorization flows with permissions engine internals.
+
+5. **[Microservices Interaction](diagrams/05-microservices-interaction.drawio)** - Complete service topology, HTTP communication patterns, and deployment scenarios.
+
+**Additional Resources:**
+- [Architecture Documentation](ARCHITECTURE.md) - Comprehensive technical documentation
+- [Diagram Index](diagrams/README.md) - Detailed diagram descriptions and usage
+- [Documentation Portal](index.html) - Interactive web-based documentation
+
+All diagrams are available in both editable DrawIO format (.drawio) and high-resolution PNG. See [Export Instructions](diagrams/EXPORT_INSTRUCTIONS.md) for generating PNG files.
+
 ## Installation
 
 ### From Source

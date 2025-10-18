@@ -1,0 +1,195 @@
+<mxfile host="app.diagrams.net" modified="2025-10-18T00:00:00.000Z" agent="Claude Code" version="24.0.0">
+  <diagram name="API Request Flow" id="api-flow">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="API Request/Response Flow - Unified /do Endpoint" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Client Request -->
+        <mxCell id="client-request" value="CLIENT REQUEST&#xa;POST /do&#xa;{&#xa;  &quot;action&quot;: &quot;priorityCreate&quot;,&#xa;  &quot;jwt&quot;: &quot;eyJhbGc...&quot;,&#xa;  &quot;data&quot;: {&#xa;    &quot;title&quot;: &quot;Critical&quot;,&#xa;    &quot;level&quot;: 5&#xa;  }&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="300" height="160" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#0066CC;" edge="1" parent="1" source="client-request" target="gin-router">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Gin Router -->
+        <mxCell id="gin-router" value="GIN ROUTER&#xa;Route: POST /do&#xa;- Parse JSON request&#xa;- Validate format&#xa;- Extract action" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;fontSize=12;fontColor=#FFFFFF;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="320" width="300" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#0066CC;" edge="1" parent="1" source="gin-router" target="middleware-stack">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Middleware Stack -->
+        <mxCell id="middleware-stack" value="MIDDLEWARE STACK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEB3B;strokeColor=#F57F17;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="480" width="300" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- JWT Validation -->
+        <mxCell id="jwt-validation" value="1. JWT VALIDATION&#xa;- Check if action requires auth&#xa;- Parse JWT token&#xa;- Validate signature&#xa;- Extract claims (username, role)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="560" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9C27B0;dashed=1;" edge="1" parent="1" source="jwt-validation" target="auth-service-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="auth-service-box" value="Authentication Service&#xa;(if enabled)&#xa;&#xa;Validates JWT token&#xa;Returns user claims" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9C27B0;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="500" y="560" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- CORS & Logging -->
+        <mxCell id="cors-logging" value="2. CORS &amp; LOGGING&#xa;- Set CORS headers&#xa;- Log incoming request&#xa;- Track request metrics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F57F17;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="670" width="300" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#0066CC;" edge="1" parent="1" source="cors-logging" target="handler-router">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Handler Router -->
+        <mxCell id="handler-router" value="HANDLER ROUTER&#xa;DoAction(request)&#xa;&#xa;Switch on action:&#xa;• ActionPriorityCreate&#xa;• ActionTicketModify&#xa;• ActionBoardList&#xa;• ... (282 total actions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;fontSize=11;align=left;spacingLeft=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="800" width="300" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#0066CC;" edge="1" parent="1" source="handler-router" target="permission-check">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Permission Check -->
+        <mxCell id="permission-check" value="PERMISSION CHECK&#xa;&#xa;- Extract username from JWT&#xa;- Check permission for object&#xa;- Verify access level&#xa;  (READ/CREATE/UPDATE/DELETE)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00695C;fontSize=10;align=left;spacingLeft=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="980" width="300" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9C27B0;dashed=1;" edge="1" parent="1" source="permission-check" target="perm-service-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="perm-service-box" value="Permissions Engine&#xa;(if enabled)&#xa;&#xa;Checks user permissions&#xa;Returns: allowed/denied" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9C27B0;strokeColor=#4A148C;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="500" y="980" width="180" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Business Logic -->
+        <mxCell id="business-logic" value="BUSINESS LOGIC&#xa;Execute action handler:&#xa;&#xa;handlePriorityCreate()&#xa;- Validate input data&#xa;- Generate UUID&#xa;- Set timestamps&#xa;- Prepare SQL query" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4DB6AC;strokeColor=#00695C;fontSize=11;align=left;spacingLeft=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="800" y="100" width="300" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#00695C;" edge="1" parent="1" source="permission-check" target="business-logic">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="1030" />
+              <mxPoint x="700" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow7-label" value="IF ALLOWED" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=1;fontColor=#00695C;" vertex="1" parent="1">
+          <mxGeometry x="620" y="900" width="100" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#00695C;" edge="1" parent="1" source="business-logic" target="database-layer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Database Layer -->
+        <mxCell id="database-layer" value="DATABASE LAYER&#xa;&#xa;INSERT INTO priority (...)&#xa;VALUES (...)&#xa;&#xa;Execute via:&#xa;db.Exec() or db.QueryRow()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#26A69A;strokeColor=#00695C;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="800" y="280" width="300" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-icon" value="SQLite /&#xa;PostgreSQL" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#00695C;strokeColor=#004D40;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="900" y="440" width="100" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#00695C;" edge="1" parent="1" source="database-layer" target="db-icon">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Response Builder -->
+        <mxCell id="response-builder" value="RESPONSE BUILDER&#xa;&#xa;Build success response:&#xa;{&#xa;  &quot;errorCode&quot;: -1,&#xa;  &quot;errorMessage&quot;: &quot;&quot;,&#xa;  &quot;data&quot;: {&#xa;    &quot;id&quot;: &quot;priority-uuid-123&quot;,&#xa;    &quot;title&quot;: &quot;Critical&quot;,&#xa;    &quot;level&quot;: 5&#xa;  }&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="800" y="580" width="300" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#00695C;" edge="1" parent="1" source="db-icon" target="response-builder">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="950" y="550" />
+              <mxPoint x="950" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=4;strokeColor=#4CAF50;" edge="1" parent="1" source="response-builder" target="client-response">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Client Response -->
+        <mxCell id="client-response" value="CLIENT RESPONSE&#xa;HTTP 200 OK&#xa;{&#xa;  &quot;errorCode&quot;: -1,&#xa;  &quot;errorMessage&quot;: &quot;&quot;,&#xa;  &quot;errorMessageLocalised&quot;: &quot;&quot;,&#xa;  &quot;data&quot;: {&#xa;    &quot;id&quot;: &quot;priority-uuid-123&quot;,&#xa;    &quot;title&quot;: &quot;Critical&quot;,&#xa;    &quot;level&quot;: 5,&#xa;    &quot;created&quot;: 1697280000,&#xa;    &quot;modified&quot;: 1697280000&#xa;  }&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="800" y="820" width="300" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- Error Path -->
+        <mxCell id="error-path-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#C62828;dashed=1;dashPattern=8 8;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="100" width="320" height="920" as="geometry" />
+        </mxCell>
+        <mxCell id="error-path-title" value="ERROR HANDLING PATH" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#C62828;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="110" width="280" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error1" value="Invalid Request&#xa;errorCode: 1000&#xa;&quot;Invalid request format&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="160" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error2" value="Missing JWT&#xa;errorCode: 1002&#xa;&quot;JWT required for this action&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="240" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error3" value="Invalid JWT&#xa;errorCode: 1003&#xa;&quot;JWT validation failed&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="320" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error4" value="Permission Denied&#xa;errorCode: 1009&#xa;&quot;Insufficient permission&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="400" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error5" value="Database Error&#xa;errorCode: 2001&#xa;&quot;Database operation failed&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="480" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error6" value="Entity Not Found&#xa;errorCode: 3000&#xa;&quot;Requested entity not found&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="560" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error7" value="Validation Failed&#xa;errorCode: 3002&#xa;&quot;Input validation failed&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="640" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="error-response" value="ERROR RESPONSE&#xa;HTTP 400/401/403/500&#xa;{&#xa;  &quot;errorCode&quot;: XXXX,&#xa;  &quot;errorMessage&quot;: &quot;...&quot;,&#xa;  &quot;errorMessageLocalised&quot;: &quot;...&quot;,&#xa;  &quot;data&quot;: null&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF5350;strokeColor=#B71C1C;fontColor=#FFFFFF;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="1240" y="740" width="240" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from errors to error response -->
+        <mxCell id="arrow-err1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C62828;" edge="1" parent="1" source="error1" target="error-response">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Performance Metrics -->
+        <mxCell id="perf-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="920" width="320" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="perf-title" value="PERFORMANCE METRICS" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="930" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="perf-data" value="• 50,000+ requests/second&#xa;• Avg response time: &lt;5ms&#xa;• 282 API actions supported&#xa;• JWT validation: &lt;1ms" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="955" width="270" height="60" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -8,6 +8,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Current Status**: V1, V2, V3 Production Ready - 100% Implementation Complete
 
+## 📊 Visual Documentation
+
+**NEW:** Comprehensive architecture diagrams are available to help understand the system:
+
+**Quick Access:** [View All Diagrams](Application/docs/diagrams/README.md)
+
+### Available Diagrams
+
+1. **[System Architecture](Application/docs/diagrams/01-system-architecture.drawio)** - Complete multi-layer architecture overview
+2. **[Database Schema](Application/docs/diagrams/02-database-schema-overview.drawio)** - All 89 tables with relationships (V1/V2/V3)
+3. **[API Request Flow](Application/docs/diagrams/03-api-request-flow.drawio)** - Complete `/do` endpoint lifecycle
+4. **[Auth & Permissions](Application/docs/diagrams/04-auth-permissions-flow.drawio)** - JWT and RBAC flows
+5. **[Microservices](Application/docs/diagrams/05-microservices-interaction.drawio)** - Service interaction and deployment
+
+**Format:** DrawIO (.drawio) with PNG exports
+**Location:** `Application/docs/diagrams/`
+**Documentation:** See [diagrams/README.md](Application/docs/diagrams/README.md) for detailed descriptions
+
 ## Development Setup
 
 ### Prerequisites

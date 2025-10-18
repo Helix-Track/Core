@@ -1,0 +1,265 @@
+version: '3.8'
+
+# HelixTrack Core - Diagram Export Docker Compose Configuration
+# This file provides reusable Docker Compose services for exporting DrawIO diagrams to PNG
+#
+# Usage:
+#   Export all diagrams:     docker-compose -f docker-compose.export.yml up
+#   Export specific diagram: docker-compose -f docker-compose.export.yml up export-system-architecture
+#   Cleanup after export:    docker-compose -f docker-compose.export.yml down
+#
+# Requirements:
+#   - Docker and Docker Compose installed
+#   - DrawIO (.drawio) source files in the same directory
+#
+# Output:
+#   - High-resolution PNG files (300 DPI equivalent, scale 3x)
+#   - Transparent backgrounds
+#   - 10px border
+#   - Files created in the same directory as source .drawio files
+
+services:
+  # ============================================================================
+  # DIAGRAM 1: System Architecture
+  # ============================================================================
+  export-system-architecture:
+    image: rlespinasse/drawio-export:latest
+    container_name: helixtrack-export-system-architecture
+    volumes:
+      - ./:/data
+    command:
+      - --format
+      - png
+      - --scale
+      - "3"
+      - --transparent
+      - --border
+      - "10"
+      - --output
+      - /data/01-system-architecture.png
+      - /data/01-system-architecture.drawio
+    restart: "no"
+
+  # ============================================================================
+  # DIAGRAM 2: Database Schema Overview
+  # ============================================================================
+  export-database-schema:
+    image: rlespinasse/drawio-export:latest
+    container_name: helixtrack-export-database-schema
+    volumes:
+      - ./:/data
+    command:
+      - --format
+      - png
+      - --scale
+      - "3"
+      - --transparent
+      - --border
+      - "10"
+      - --output
+      - /data/02-database-schema-overview.png
+      - /data/02-database-schema-overview.drawio
+    restart: "no"
+
+  # ============================================================================
+  # DIAGRAM 3: API Request Flow
+  # ============================================================================
+  export-api-flow:
+    image: rlespinasse/drawio-export:latest
+    container_name: helixtrack-export-api-flow
+    volumes:
+      - ./:/data
+    command:
+      - --format
+      - png
+      - --scale
+      - "3"
+      - --transparent
+      - --border
+      - "10"
+      - --output
+      - /data/03-api-request-flow.png
+      - /data/03-api-request-flow.drawio
+    restart: "no"
+
+  # ============================================================================
+  # DIAGRAM 4: Authentication & Permissions Flow
+  # ============================================================================
+  export-auth-permissions:
+    image: rlespinasse/drawio-export:latest
+    container_name: helixtrack-export-auth-permissions
+    volumes:
+      - ./:/data
+    command:
+      - --format
+      - png
+      - --scale
+      - "3"
+      - --transparent
+      - --border
+      - "10"
+      - --output
+      - /data/04-auth-permissions-flow.png
+      - /data/04-auth-permissions-flow.drawio
+    restart: "no"
+
+  # ============================================================================
+  # DIAGRAM 5: Microservices Interaction
+  # ============================================================================
+  export-microservices:
+    image: rlespinasse/drawio-export:latest
+    container_name: helixtrack-export-microservices
+    volumes:
+      - ./:/data
+    command:
+      - --format
+      - png
+      - --scale
+      - "3"
+      - --transparent
+      - --border
+      - "10"
+      - --output
+      - /data/05-microservices-interaction.png
+      - /data/05-microservices-interaction.drawio
+    restart: "no"
+
+  # ============================================================================
+  # CLEANUP SERVICE: Reorganize exported files
+  # ============================================================================
+  # The DrawIO export tool creates subdirectories with page names.
+  # This service copies the PNGs to the correct location and removes the directories.
+  cleanup-exports:
+    image: alpine:latest
+    container_name: helixtrack-cleanup-exports
+    volumes:
+      - ./:/data
+    command: >
+      sh -c "
+        cd /data &&
+        echo 'Reorganizing exported PNG files...' &&
+        find . -maxdepth 2 -name '*.png' -type f -exec cp {} /data/ \; &&
+        echo 'Removing export directories...' &&
+        rm -rf *.png/ &&
+        echo 'Fixing file permissions...' &&
+        chown -R 1000:1000 /data/*.png &&
+        echo '' &&
+        echo 'Export cleanup complete!' &&
+        echo '' &&
+        ls -lh /data/*.png | grep -v 'total'
+      "
+    restart: "no"
+    depends_on:
+      - export-system-architecture
+      - export-database-schema
+      - export-api-flow
+      - export-auth-permissions
+      - export-microservices
+
+# ==============================================================================
+# USAGE EXAMPLES
+# ==============================================================================
+#
+# 1. Export all diagrams at once:
+#    docker-compose -f docker-compose.export.yml up
+#
+# 2. Export specific diagram:
+#    docker-compose -f docker-compose.export.yml up export-system-architecture
+#    docker-compose -f docker-compose.export.yml up export-database-schema
+#
+# 3. Export multiple specific diagrams:
+#    docker-compose -f docker-compose.export.yml up export-system-architecture export-api-flow
+#
+# 4. Cleanup after export:
+#    docker-compose -f docker-compose.export.yml down
+#
+# 5. Force rebuild (re-pull image):
+#    docker-compose -f docker-compose.export.yml pull
+#    docker-compose -f docker-compose.export.yml up
+#
+# 6. View logs:
+#    docker-compose -f docker-compose.export.yml logs
+#
+# 7. Remove all containers and cleanup:
+#    docker-compose -f docker-compose.export.yml down --remove-orphans
+#
+# ==============================================================================
+# EXPORT SETTINGS REFERENCE
+# ==============================================================================
+#
+# --format png          Output format (png, pdf, svg, jpg supported)
+# --scale 3             Scale factor (3 = 300%, high resolution ~300 DPI)
+# --transparent         Transparent background (no white background)
+# --border 10           Border width in pixels around the diagram
+# --output /path/file   Output file path
+# input.drawio          Input DrawIO source file
+#
+# Modify these settings in each service's command section above.
+#
+# ==============================================================================
+# FILE SIZES (Typical)
+# ==============================================================================
+#
+# 01-system-architecture.png:       ~700KB
+# 02-database-schema-overview.png:  ~1.4MB (largest, most complex)
+# 03-api-request-flow.png:           ~780KB
+# 04-auth-permissions-flow.png:      ~860KB
+# 05-microservices-interaction.png:  ~740KB
+#
+# Total: ~4.5MB for all 5 diagrams
+#
+# ==============================================================================
+# TROUBLESHOOTING
+# ==============================================================================
+#
+# Issue: "Permission denied" errors
+# Solution: The cleanup service fixes permissions automatically.
+#          If still having issues, run manually:
+#          docker run --rm -v $(pwd):/data alpine:latest chown -R 1000:1000 /data/*.png
+#
+# Issue: PNG files in subdirectories
+# Solution: Run the cleanup service:
+#          docker-compose -f docker-compose.export.yml up cleanup-exports
+#
+# Issue: "Image not found"
+# Solution: Pull the image manually:
+#          docker pull rlespinasse/drawio-export:latest
+#
+# Issue: Export fails with XML error
+# Solution: Check .drawio file for XML syntax errors.
+#          Common issue: Unescaped & characters in diagram names.
+#          Fix: Replace & with &amp; or use - instead.
+#
+# ==============================================================================
+# CUSTOMIZATION
+# ==============================================================================
+#
+# To export with different settings, modify the command section.
+# Examples:
+#
+# Higher resolution (500%):
+#   --scale "5"
+#
+# PDF instead of PNG:
+#   --format pdf
+#   --output /data/diagram.pdf
+#
+# JPG format (smaller files):
+#   --format jpg
+#   --quality "95"
+#   --output /data/diagram.jpg
+#
+# No transparency (white background):
+#   Remove --transparent flag
+#
+# Larger border:
+#   --border "20"
+#
+# ==============================================================================
+
+# Notes:
+# - This file is designed to be version-controlled (commit to git)
+# - All diagrams export in parallel for faster processing
+# - The cleanup service ensures proper file organization
+# - Total export time: ~1-2 minutes for all 5 diagrams (first run)
+# - Subsequent exports are faster (Docker image cached)

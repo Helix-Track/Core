@@ -83,6 +83,32 @@
 
 ---
 
+## 📊 Visual Documentation
+
+Comprehensive architecture diagrams and interactive documentation portal available:
+
+**🌐 [Documentation Portal](Application/docs/index.html)** - Interactive web-based documentation with all diagrams and resources
+
+### Architecture Diagrams
+
+Professional-grade DrawIO diagrams covering all aspects of the system:
+
+1. **[System Architecture](Application/docs/diagrams/01-system-architecture.drawio)** - Complete multi-layer architecture (Client → API → Database → Monitoring)
+2. **[Database Schema Overview](Application/docs/diagrams/02-database-schema-overview.drawio)** - All 89 tables with relationships (V1/V2/V3)
+3. **[API Request Flow](Application/docs/diagrams/03-api-request-flow.drawio)** - Complete `/do` endpoint lifecycle with middleware and handlers
+4. **[Auth & Permissions Flow](Application/docs/diagrams/04-auth-permissions-flow.drawio)** - JWT authentication and RBAC authorization
+5. **[Microservices Interaction](Application/docs/diagrams/05-microservices-interaction.drawio)** - Service topology and deployment scenarios
+
+**Additional Documentation:**
+- [Architecture Documentation](Application/docs/ARCHITECTURE.md) - Comprehensive technical documentation (50KB+)
+- [Diagram Index](Application/docs/diagrams/README.md) - Detailed diagram descriptions
+- [User Manual](Application/docs/USER_MANUAL.md) - Complete API reference
+- [Deployment Guide](Application/docs/DEPLOYMENT.md) - Production deployment instructions
+
+All diagrams available in editable DrawIO format (.drawio) and high-resolution PNG exports.
+
+---
+
 ## Technology Stack
 
 - **Language**: Go 1.22+
