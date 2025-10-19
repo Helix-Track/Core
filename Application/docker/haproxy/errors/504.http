@@ -1,0 +1,16 @@
+HTTP/1.1 504 Gateway Timeout
+Content-Type: application/json
+Cache-Control: no-cache
+Connection: close
+
+{
+  "errorCode": 2005,
+  "errorMessage": "Gateway timeout",
+  "errorMessageLocalised": "Gateway timeout",
+  "data": {
+    "status": "504",
+    "service": "HelixTrack Core",
+    "message": "The server did not receive a timely response from the backend. Please try again.",
+    "timestamp": "2024-01-01T00:00:00Z"
+  }
+}

@@ -1,0 +1,614 @@
+package engine
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+// TestNewRoleEvaluator tests role evaluator creation
+func TestNewRoleEvaluator(t *testing.T) {
+	mockDB := new(MockDatabase)
+	evaluator := NewRoleEvaluator(mockDB)
+
+	assert.NotNil(t, evaluator)
+	assert.NotNil(t, evaluator.db)
+}
+
+// TestRolePermissionLevel tests role to permission level mapping
+func TestRolePermissionLevel(t *testing.T) {
+	mockDB := new(MockDatabase)
+	evaluator := NewRoleEvaluator(mockDB)
+
+	tests := []struct {
+		name      string
+		roleTitle string
+		expected  int
+	}{
+		{"Viewer role", "Viewer", 1},
+		{"Contributor role", "Contributor", 2},
+		{"Developer role", "Developer", 3},
+		{"Project Lead role", "Project Lead", 4},
+		{"Project Administrator role", "Project Administrator", 5},
+		{"Unknown role", "Unknown", 0},
+		{"Empty role", "", 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := evaluator.rolePermissionLevel(tt.roleTitle)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+// TestCheckProjectAccess_NoRoles tests project access with no roles
+func TestCheckProjectAccess_NoRoles(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock no roles
+	mockRows := &MockRows{rows: [][]interface{}{}}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	hasAccess, err := evaluator.CheckProjectAccess(ctx, "testuser", "project-1", ActionCreate)
+
+	assert.NoError(t, err)
+	assert.False(t, hasAccess)
+}
+
+// TestCheckProjectAccess_WithDeveloperRole tests developer role access
+func TestCheckProjectAccess_WithDeveloperRole(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock developer role
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"Developer"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	// Developer can UPDATE (permission level 3)
+	hasAccess, err := evaluator.CheckProjectAccess(ctx, "testuser", "project-1", ActionUpdate)
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// TestCheckProjectAccess_WithAdminRole tests admin role access
+func TestCheckProjectAccess_WithAdminRole(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock admin role
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"Project Administrator"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	// Admin can DELETE (permission level 5)
+	hasAccess, err := evaluator.CheckProjectAccess(ctx, "testuser", "project-1", ActionDelete)
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// TestCheckProjectAccess_InsufficientPermission tests insufficient permissions
+func TestCheckProjectAccess_InsufficientPermission(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock viewer role (only READ permission)
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"Viewer"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	// Viewer cannot CREATE (requires permission level 2)
+	hasAccess, err := evaluator.CheckProjectAccess(ctx, "testuser", "project-1", ActionCreate)
+
+	assert.NoError(t, err)
+	assert.False(t, hasAccess)
+}
+
+// TestGetUserRoles_NoRoles tests getting user roles when none exist
+func TestGetUserRoles_NoRoles(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock no roles
+	mockRows := &MockRows{rows: [][]interface{}{}}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	roles, err := evaluator.GetUserRoles(ctx, "testuser", "project-1")
+
+	assert.NoError(t, err)
+	assert.Empty(t, roles)
+}
+
+// TestGetUserRoles_WithRoles tests getting user roles
+func TestGetUserRoles_WithRoles(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock multiple roles
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"role-1", "Developer"},
+			{"role-2", "Contributor"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	roles, err := evaluator.GetUserRoles(ctx, "testuser", "project-1")
+
+	assert.NoError(t, err)
+	assert.Len(t, roles, 2)
+	assert.Equal(t, "role-1", roles[0].ID)
+	assert.Equal(t, "Developer", roles[0].Title)
+	assert.Equal(t, "role-2", roles[1].ID)
+	assert.Equal(t, "Contributor", roles[1].Title)
+}
+
+// TestGetUserGlobalRoles tests getting global roles
+func TestGetUserGlobalRoles(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock global roles (no project context)
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"role-admin", "System Administrator"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	roles, err := evaluator.GetUserGlobalRoles(ctx, "testuser")
+
+	assert.NoError(t, err)
+	assert.Len(t, roles, 1)
+	assert.Equal(t, "role-admin", roles[0].ID)
+	assert.Equal(t, "System Administrator", roles[0].Title)
+}
+
+// TestRoleHierarchy tests role hierarchy and permission inheritance
+func TestRoleHierarchy(t *testing.T) {
+	mockDB := new(MockDatabase)
+	evaluator := NewRoleEvaluator(mockDB)
+
+	tests := []struct {
+		name      string
+		roleTitle string
+		testCases []struct {
+			action     Action
+			shouldPass bool
+		}
+	}{
+		{
+			name:      "Project Administrator has all permissions",
+			roleTitle: "Project Administrator",
+			testCases: []struct {
+				action     Action
+				shouldPass bool
+			}{
+				{ActionRead, true},
+				{ActionList, true},
+				{ActionCreate, true},
+				{ActionUpdate, true},
+				{ActionExecute, true},
+				{ActionDelete, true},
+			},
+		},
+		{
+			name:      "Developer has up to UPDATE",
+			roleTitle: "Developer",
+			testCases: []struct {
+				action     Action
+				shouldPass bool
+			}{
+				{ActionRead, true},
+				{ActionList, true},
+				{ActionCreate, true},
+				{ActionUpdate, true},
+				{ActionExecute, true},
+				{ActionDelete, false},
+			},
+		},
+		{
+			name:      "Contributor has up to CREATE",
+			roleTitle: "Contributor",
+			testCases: []struct {
+				action     Action
+				shouldPass bool
+			}{
+				{ActionRead, true},
+				{ActionList, true},
+				{ActionCreate, true},
+				{ActionUpdate, false},
+				{ActionExecute, false},
+				{ActionDelete, false},
+			},
+		},
+		{
+			name:      "Viewer has only READ",
+			roleTitle: "Viewer",
+			testCases: []struct {
+				action     Action
+				shouldPass bool
+			}{
+				{ActionRead, true},
+				{ActionList, true},
+				{ActionCreate, false},
+				{ActionUpdate, false},
+				{ActionExecute, false},
+				{ActionDelete, false},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			roleLevel := evaluator.rolePermissionLevel(tt.roleTitle)
+
+			for _, tc := range tt.testCases {
+				// Map action to required permission
+				var requiredPermission int
+				switch tc.action {
+				case ActionRead, ActionList:
+					requiredPermission = 1
+				case ActionCreate:
+					requiredPermission = 2
+				case ActionUpdate, ActionExecute:
+					requiredPermission = 3
+				case ActionDelete:
+					requiredPermission = 5
+				}
+
+				hasPermission := roleLevel >= requiredPermission
+				assert.Equal(t, tc.shouldPass, hasPermission,
+					"Role %s with action %s (level %d, required %d)",
+					tt.roleTitle, tc.action, roleLevel, requiredPermission)
+			}
+		})
+	}
+}
+
+// TestCheckProjectAccess_MultipleRoles tests user with multiple roles
+func TestCheckProjectAccess_MultipleRoles(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock multiple roles - highest permission wins
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"Viewer"},           // Permission level 1
+			{"Developer"},        // Permission level 3
+			{"Contributor"},      // Permission level 2
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	// Should have highest permission (Developer = 3)
+	hasUpdateAccess, err := evaluator.CheckProjectAccess(ctx, "testuser", "project-1", ActionUpdate)
+	assert.NoError(t, err)
+	assert.True(t, hasUpdateAccess)
+
+	// Should NOT have DELETE access (requires level 5)
+	hasDeleteAccess, err := evaluator.CheckProjectAccess(ctx, "testuser", "project-1", ActionDelete)
+	assert.NoError(t, err)
+	assert.False(t, hasDeleteAccess)
+}
+
+// TestGetHighestRolePermission tests getting highest permission level
+func TestGetHighestRolePermission(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock multiple roles
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"Viewer"},
+			{"Developer"},
+			{"Contributor"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	highestLevel, err := evaluator.GetHighestRolePermission(ctx, "testuser", "project-1")
+
+	assert.NoError(t, err)
+	assert.Equal(t, 3, highestLevel) // Developer level
+}
+
+// TestIsProjectAdmin tests checking if user is project admin
+func TestIsProjectAdmin(t *testing.T) {
+	tests := []struct {
+		name     string
+		roles    [][]interface{}
+		expected bool
+	}{
+		{
+			name: "User is admin",
+			roles: [][]interface{}{
+				{"Project Administrator"},
+			},
+			expected: true,
+		},
+		{
+			name: "User has admin among other roles",
+			roles: [][]interface{}{
+				{"Developer"},
+				{"Project Administrator"},
+			},
+			expected: true,
+		},
+		{
+			name: "User is not admin",
+			roles: [][]interface{}{
+				{"Developer"},
+				{"Contributor"},
+			},
+			expected: false,
+		},
+		{
+			name:     "User has no roles",
+			roles:    [][]interface{}{},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+			mockRows := &MockRows{rows: tt.roles}
+			mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+			evaluator := NewRoleEvaluator(mockDB)
+			ctx := context.Background()
+
+			isAdmin, err := evaluator.IsProjectAdmin(ctx, "testuser", "project-1")
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expected, isAdmin)
+		})
+	}
+}
+
+// TestCheckGlobalAccess tests global role access
+func TestCheckGlobalAccess(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock global admin role
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"System Administrator"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	// Global admin should have full access
+	hasAccess, err := evaluator.CheckGlobalAccess(ctx, "testuser", ActionDelete)
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// TestRoleCache tests role caching
+func TestRoleCache(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock roles
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"role-1", "Developer"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	// First call - should query database
+	roles1, err := evaluator.GetUserRoles(ctx, "testuser", "project-1")
+	assert.NoError(t, err)
+	assert.Len(t, roles1, 1)
+
+	// Second call - should use cache (no additional DB call)
+	roles2, err := evaluator.GetUserRoles(ctx, "testuser", "project-1")
+	assert.NoError(t, err)
+	assert.Len(t, roles2, 1)
+	assert.Equal(t, roles1[0].ID, roles2[0].ID)
+}
+
+// TestInvalidateRoleCache tests cache invalidation
+func TestInvalidateRoleCache(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Initial roles
+	mockRows1 := &MockRows{
+		rows: [][]interface{}{
+			{"role-1", "Developer"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows1, nil).Once()
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	// Get roles - should cache
+	roles, err := evaluator.GetUserRoles(ctx, "testuser", "project-1")
+	assert.NoError(t, err)
+	assert.Len(t, roles, 1)
+
+	// Invalidate cache
+	evaluator.InvalidateCache("testuser")
+
+	// Updated roles after cache invalidation
+	mockRows2 := &MockRows{
+		rows: [][]interface{}{
+			{"role-1", "Developer"},
+			{"role-2", "Project Administrator"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows2, nil).Once()
+
+	// Get roles again - should query database
+	rolesAfter, err := evaluator.GetUserRoles(ctx, "testuser", "project-1")
+	assert.NoError(t, err)
+	assert.Len(t, rolesAfter, 2)
+}
+
+// TestProjectRoleAssignment tests role assignment validation
+func TestProjectRoleAssignment(t *testing.T) {
+	mockDB := new(MockDatabase)
+	evaluator := NewRoleEvaluator(mockDB)
+
+	tests := []struct {
+		name      string
+		roleTitle string
+		isValid   bool
+	}{
+		{"Valid role - Viewer", "Viewer", true},
+		{"Valid role - Contributor", "Contributor", true},
+		{"Valid role - Developer", "Developer", true},
+		{"Valid role - Project Lead", "Project Lead", true},
+		{"Valid role - Project Administrator", "Project Administrator", true},
+		{"Invalid role - Unknown", "Unknown", false},
+		{"Invalid role - Empty", "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			isValid := evaluator.IsValidRole(tt.roleTitle)
+			assert.Equal(t, tt.isValid, isValid)
+		})
+	}
+}
+
+// TestCompareRoles tests role comparison
+func TestCompareRoles(t *testing.T) {
+	mockDB := new(MockDatabase)
+	evaluator := NewRoleEvaluator(mockDB)
+
+	tests := []struct {
+		name           string
+		role1          string
+		role2          string
+		role1IsHigher  bool
+	}{
+		{"Admin > Developer", "Project Administrator", "Developer", true},
+		{"Developer > Contributor", "Developer", "Contributor", true},
+		{"Contributor > Viewer", "Contributor", "Viewer", true},
+		{"Developer = Developer", "Developer", "Developer", false},
+		{"Viewer < Developer", "Viewer", "Developer", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			level1 := evaluator.rolePermissionLevel(tt.role1)
+			level2 := evaluator.rolePermissionLevel(tt.role2)
+
+			isHigher := level1 > level2
+			assert.Equal(t, tt.role1IsHigher, isHigher)
+		})
+	}
+}
+
+// TestActionRequiresRole tests minimum role requirement for actions
+func TestActionRequiresRole(t *testing.T) {
+	mockDB := new(MockDatabase)
+	evaluator := NewRoleEvaluator(mockDB)
+
+	tests := []struct {
+		name            string
+		action          Action
+		minimumRole     string
+		minimumLevel    int
+	}{
+		{"READ requires Viewer", ActionRead, "Viewer", 1},
+		{"LIST requires Viewer", ActionList, "Viewer", 1},
+		{"CREATE requires Contributor", ActionCreate, "Contributor", 2},
+		{"UPDATE requires Developer", ActionUpdate, "Developer", 3},
+		{"EXECUTE requires Developer", ActionExecute, "Developer", 3},
+		{"DELETE requires Admin", ActionDelete, "Project Administrator", 5},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			minimumLevel := evaluator.rolePermissionLevel(tt.minimumRole)
+			assert.Equal(t, tt.minimumLevel, minimumLevel)
+
+			// Verify action maps to correct permission level
+			var actionLevel int
+			switch tt.action {
+			case ActionRead, ActionList:
+				actionLevel = 1
+			case ActionCreate:
+				actionLevel = 2
+			case ActionUpdate, ActionExecute:
+				actionLevel = 3
+			case ActionDelete:
+				actionLevel = 5
+			}
+			assert.Equal(t, minimumLevel, actionLevel)
+		})
+	}
+}
+
+// Benchmark tests
+func BenchmarkRolePermissionLevel(b *testing.B) {
+	mockDB := new(MockDatabase)
+	evaluator := NewRoleEvaluator(mockDB)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		evaluator.rolePermissionLevel("Developer")
+	}
+}
+
+func BenchmarkCheckProjectAccess(b *testing.B) {
+	mockDB := new(MockDatabase)
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"Developer"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	evaluator := NewRoleEvaluator(mockDB)
+	ctx := context.Background()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = evaluator.CheckProjectAccess(ctx, "testuser", "project-1", ActionUpdate)
+	}
+}

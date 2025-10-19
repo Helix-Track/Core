@@ -1,0 +1,47 @@
+{
+  "service": {
+    "id": "helixtrack-documents-default",
+    "name": "helixtrack-documents",
+    "tags": [
+      "documents",
+      "extension",
+      "confluence-alternative",
+      "v2.0.0"
+    ],
+    "address": "documents-service",
+    "port": 8083,
+    "meta": {
+      "version": "2.0.0",
+      "environment": "production",
+      "service_type": "documents_extension",
+      "supports_rotation": "true",
+      "auto_port_selection": "true",
+      "extension": "true"
+    },
+    "checks": [
+      {
+        "id": "helixtrack-documents-health",
+        "name": "HelixTrack Documents Health Check",
+        "http": "http://documents-service:8083/health",
+        "method": "GET",
+        "interval": "30s",
+        "timeout": "10s",
+        "deregister_critical_service_after": "90s",
+        "success_before_passing": 2,
+        "failures_before_critical": 3
+      },
+      {
+        "id": "helixtrack-documents-tcp",
+        "name": "HelixTrack Documents TCP Check",
+        "tcp": "documents-service:8083",
+        "interval": "30s",
+        "timeout": "5s"
+      }
+    ],
+    "enable_tag_override": false,
+    "weights": {
+      "passing": 10,
+      "warning": 1
+    }
+  }
+}

@@ -18,22 +18,29 @@ import (
 
 // Handler manages all HTTP handlers
 type Handler struct {
-	db          database.Database
-	authService services.AuthService
-	permService services.PermissionService
-	version     string
-	publisher   websocket.EventPublisher
+	db             database.Database
+	authService    services.AuthService
+	permService    services.PermissionService
+	securityEngine interface{} // engine.Engine - Security Engine for authorization
+	version        string
+	publisher      websocket.EventPublisher
 }
 
 // NewHandler creates a new handler instance
 func NewHandler(db database.Database, authService services.AuthService, permService services.PermissionService, version string) *Handler {
 	return &Handler{
-		db:          db,
-		authService: authService,
-		permService: permService,
-		version:     version,
-		publisher:   websocket.NewNoOpPublisher(), // Default to no-op publisher
+		db:             db,
+		authService:    authService,
+		permService:    permService,
+		securityEngine: nil, // Will be set via SetSecurityEngine
+		version:        version,
+		publisher:      websocket.NewNoOpPublisher(), // Default to no-op publisher
 	}
+}
+
+// SetSecurityEngine sets the security engine for the handler
+func (h *Handler) SetSecurityEngine(engine interface{}) {
+	h.securityEngine = engine
 }
 
 // SetEventPublisher sets the event publisher for the handler

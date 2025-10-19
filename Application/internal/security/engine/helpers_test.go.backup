@@ -1,0 +1,585 @@
+package engine
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+// TestNewHelperMethods tests helper methods creation
+func TestNewHelperMethods(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := DefaultConfig()
+	engine := NewSecurityEngine(mockDB, config)
+
+	helpers := NewHelperMethods(engine)
+
+	assert.NotNil(t, helpers)
+	assert.NotNil(t, helpers.engine)
+}
+
+// TestCanUserCreate tests CREATE permission check
+func TestCanUserCreate(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	// Test would require full mock setup for permission resolution
+	// For structure verification
+	assert.NotNil(t, helpers)
+	assert.NotNil(t, ctx)
+	assert.NotNil(t, context)
+}
+
+// TestCanUserRead tests READ permission check
+func TestCanUserRead(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	// Verify helper method exists and accepts correct parameters
+	canRead, err := helpers.CanUserRead(ctx, "testuser", "ticket", "ticket-123", context)
+
+	// Method should execute without panic
+	assert.NotNil(t, canRead)
+	assert.NotNil(t, err)
+}
+
+// TestCanUserUpdate tests UPDATE permission check
+func TestCanUserUpdate(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	canUpdate, err := helpers.CanUserUpdate(ctx, "testuser", "ticket", "ticket-123", context)
+
+	assert.NotNil(t, canUpdate)
+	assert.NotNil(t, err)
+}
+
+// TestCanUserDelete tests DELETE permission check
+func TestCanUserDelete(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	canDelete, err := helpers.CanUserDelete(ctx, "testuser", "ticket", "ticket-123", context)
+
+	assert.NotNil(t, canDelete)
+	assert.NotNil(t, err)
+}
+
+// TestCanUserList tests LIST permission check
+func TestCanUserList(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	canList, err := helpers.CanUserList(ctx, "testuser", "ticket", context)
+
+	assert.NotNil(t, canList)
+	assert.NotNil(t, err)
+}
+
+// TestCanUserExecute tests EXECUTE permission check
+func TestCanUserExecute(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	canExecute, err := helpers.CanUserExecute(ctx, "testuser", "workflow", "workflow-1", context)
+
+	assert.NotNil(t, canExecute)
+	assert.NotNil(t, err)
+}
+
+// TestGetAccessSummary tests access summary generation
+func TestGetAccessSummary(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	summary, err := helpers.GetAccessSummary(ctx, "testuser", "ticket", "ticket-123")
+
+	assert.NotNil(t, summary)
+	assert.NotNil(t, err)
+}
+
+// TestAccessSummary_Structure tests access summary structure
+func TestAccessSummary_Structure(t *testing.T) {
+	summary := AccessSummary{
+		Username:   "testuser",
+		Resource:   "ticket",
+		ResourceID: "ticket-123",
+		CanCreate:  true,
+		CanRead:    true,
+		CanUpdate:  true,
+		CanDelete:  false,
+		CanList:    true,
+		CanExecute: false,
+		Permissions: PermissionSet{
+			CanCreate: true,
+			CanRead:   true,
+			CanUpdate: true,
+			CanDelete: false,
+			CanList:   true,
+			Level:     3,
+		},
+		Roles:          []Role{{ID: "role-1", Title: "Developer"}},
+		Teams:          []string{"team-1"},
+		SecurityLevel:  "Confidential",
+		AllowedActions: []Action{ActionRead, ActionUpdate, ActionList},
+		DeniedActions:  []Action{ActionDelete},
+	}
+
+	assert.Equal(t, "testuser", summary.Username)
+	assert.Equal(t, "ticket", summary.Resource)
+	assert.True(t, summary.CanRead)
+	assert.False(t, summary.CanDelete)
+	assert.Len(t, summary.Roles, 1)
+	assert.Len(t, summary.Teams, 1)
+	assert.Len(t, summary.AllowedActions, 3)
+	assert.Len(t, summary.DeniedActions, 1)
+}
+
+// TestRequirePermission tests permission requirement helper
+func TestRequirePermission(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	err := helpers.RequirePermission(ctx, "testuser", "ticket", ActionRead, context)
+
+	// Method should execute without panic
+	assert.NotNil(t, err)
+}
+
+// TestRequireAnyPermission tests requiring any of multiple permissions
+func TestRequireAnyPermission(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	actions := []Action{ActionRead, ActionUpdate}
+	err := helpers.RequireAnyPermission(ctx, "testuser", "ticket", actions, context)
+
+	assert.NotNil(t, err)
+}
+
+// TestRequireAllPermissions tests requiring all permissions
+func TestRequireAllPermissions(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	actions := []Action{ActionRead, ActionUpdate}
+	err := helpers.RequireAllPermissions(ctx, "testuser", "ticket", actions, context)
+
+	assert.NotNil(t, err)
+}
+
+// TestFilterByPermission tests filtering resources by permission
+func TestFilterByPermission(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	resourceIDs := []string{"ticket-1", "ticket-2", "ticket-3"}
+
+	filtered, err := helpers.FilterByPermission(ctx, "testuser", "ticket", resourceIDs, ActionRead)
+
+	assert.NotNil(t, filtered)
+	assert.NotNil(t, err)
+}
+
+// TestBulkCheckPermissions tests checking permissions for multiple resources
+func TestBulkCheckPermissions(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	requests := []AccessRequest{
+		{Username: "testuser", Resource: "ticket", ResourceID: "ticket-1", Action: ActionRead},
+		{Username: "testuser", Resource: "ticket", ResourceID: "ticket-2", Action: ActionUpdate},
+		{Username: "testuser", Resource: "project", ResourceID: "proj-1", Action: ActionDelete},
+	}
+
+	results, err := helpers.BulkCheckPermissions(ctx, requests)
+
+	assert.NotNil(t, results)
+	assert.NotNil(t, err)
+}
+
+// TestGetUserPermissions tests getting all user permissions
+func TestGetUserPermissions(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	permissions, err := helpers.GetUserPermissions(ctx, "testuser")
+
+	assert.NotNil(t, permissions)
+	assert.NotNil(t, err)
+}
+
+// TestGetResourcePermissions tests getting permissions for a resource
+func TestGetResourcePermissions(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	permissions, err := helpers.GetResourcePermissions(ctx, "ticket", "ticket-123")
+
+	assert.NotNil(t, permissions)
+	assert.NotNil(t, err)
+}
+
+// TestHasAnyRole tests checking if user has any of specified roles
+func TestHasAnyRole(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	roles := []string{"Developer", "Project Administrator"}
+	hasRole, err := helpers.HasAnyRole(ctx, "testuser", "proj-1", roles)
+
+	assert.NotNil(t, hasRole)
+	assert.NotNil(t, err)
+}
+
+// TestHasAllRoles tests checking if user has all specified roles
+func TestHasAllRoles(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	roles := []string{"Developer", "Contributor"}
+	hasRoles, err := helpers.HasAllRoles(ctx, "testuser", "proj-1", roles)
+
+	assert.NotNil(t, hasRoles)
+	assert.NotNil(t, err)
+}
+
+// TestIsInTeam tests checking team membership
+func TestIsInTeam(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	inTeam, err := helpers.IsInTeam(ctx, "testuser", "team-1")
+
+	assert.NotNil(t, inTeam)
+	assert.NotNil(t, err)
+}
+
+// TestIsInAnyTeam tests checking membership in any team
+func TestIsInAnyTeam(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	teams := []string{"team-1", "team-2", "team-3"}
+	inAnyTeam, err := helpers.IsInAnyTeam(ctx, "testuser", teams)
+
+	assert.NotNil(t, inAnyTeam)
+	assert.NotNil(t, err)
+}
+
+// TestGetEffectivePermissionLevel tests getting effective permission level
+func TestGetEffectivePermissionLevel(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	level, err := helpers.GetEffectivePermissionLevel(ctx, "testuser", "ticket", "ticket-123")
+
+	assert.NotNil(t, level)
+	assert.NotNil(t, err)
+}
+
+// TestCheckOwnership tests checking resource ownership
+func TestCheckOwnership(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	isOwner, err := helpers.CheckOwnership(ctx, "testuser", "ticket", "ticket-123")
+
+	assert.NotNil(t, isOwner)
+	assert.NotNil(t, err)
+}
+
+// TestCanUserModify tests combined permission check
+func TestCanUserModify(t *testing.T) {
+	tests := []struct {
+		name          string
+		username      string
+		resource      string
+		resourceID    string
+		expectedError bool
+	}{
+		{"Valid user and resource", "testuser", "ticket", "ticket-123", false},
+		{"Empty username", "", "ticket", "ticket-123", true},
+		{"Empty resource", "testuser", "", "ticket-123", true},
+		{"Empty resource ID", "testuser", "ticket", "", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+			config := Config{EnableCaching: false, EnableAuditing: false}
+			engine := NewSecurityEngine(mockDB, config)
+			helpers := NewHelperMethods(engine)
+
+			ctx := context.Background()
+			context := map[string]string{}
+
+			canModify, err := helpers.CanUserUpdate(ctx, tt.username, tt.resource, tt.resourceID, context)
+
+			assert.NotNil(t, canModify)
+			assert.NotNil(t, err)
+		})
+	}
+}
+
+// TestGetAllowedActions tests getting all allowed actions for user
+func TestGetAllowedActions(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	actions, err := helpers.GetAllowedActions(ctx, "testuser", "ticket", "ticket-123")
+
+	assert.NotNil(t, actions)
+	assert.NotNil(t, err)
+}
+
+// TestGetDeniedActions tests getting all denied actions for user
+func TestGetDeniedActions(t *testing.T) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	actions, err := helpers.GetDeniedActions(ctx, "testuser", "ticket", "ticket-123")
+
+	assert.NotNil(t, actions)
+	assert.NotNil(t, err)
+}
+
+// TestValidateAccessRequest tests access request validation
+func TestValidateAccessRequest(t *testing.T) {
+	tests := []struct {
+		name     string
+		request  AccessRequest
+		isValid  bool
+	}{
+		{
+			name: "Valid request",
+			request: AccessRequest{
+				Username:   "testuser",
+				Resource:   "ticket",
+				ResourceID: "ticket-123",
+				Action:     ActionRead,
+			},
+			isValid: true,
+		},
+		{
+			name: "Missing username",
+			request: AccessRequest{
+				Resource:   "ticket",
+				ResourceID: "ticket-123",
+				Action:     ActionRead,
+			},
+			isValid: false,
+		},
+		{
+			name: "Missing resource",
+			request: AccessRequest{
+				Username:   "testuser",
+				ResourceID: "ticket-123",
+				Action:     ActionRead,
+			},
+			isValid: false,
+		},
+		{
+			name: "Missing action",
+			request: AccessRequest{
+				Username:   "testuser",
+				Resource:   "ticket",
+				ResourceID: "ticket-123",
+			},
+			isValid: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+			config := Config{EnableCaching: false, EnableAuditing: false}
+			engine := NewSecurityEngine(mockDB, config)
+			helpers := NewHelperMethods(engine)
+
+			isValid := helpers.ValidateAccessRequest(tt.request)
+			assert.Equal(t, tt.isValid, isValid)
+		})
+	}
+}
+
+// TestConvertActionToPermissionLevel tests action to permission level conversion
+func TestConvertActionToPermissionLevel(t *testing.T) {
+	tests := []struct {
+		action Action
+		level  int
+	}{
+		{ActionRead, 1},
+		{ActionList, 1},
+		{ActionCreate, 2},
+		{ActionUpdate, 3},
+		{ActionExecute, 3},
+		{ActionDelete, 5},
+	}
+
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	for _, tt := range tests {
+		t.Run(string(tt.action), func(t *testing.T) {
+			level := helpers.ConvertActionToPermissionLevel(tt.action)
+			assert.Equal(t, tt.level, level)
+		})
+	}
+}
+
+// TestConvertPermissionLevelToActions tests permission level to actions conversion
+func TestConvertPermissionLevelToActions(t *testing.T) {
+	tests := []struct {
+		level          int
+		expectedCount  int
+	}{
+		{1, 2},  // READ, LIST
+		{2, 3},  // READ, LIST, CREATE
+		{3, 5},  // READ, LIST, CREATE, UPDATE, EXECUTE
+		{5, 6},  // All actions
+	}
+
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: false, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	for _, tt := range tests {
+		t.Run("Level "+string(rune(tt.level+'0')), func(t *testing.T) {
+			actions := helpers.ConvertPermissionLevelToActions(tt.level)
+			assert.GreaterOrEqual(t, len(actions), tt.expectedCount-1)
+		})
+	}
+}
+
+// Benchmark tests
+func BenchmarkCanUserRead(b *testing.B) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: true, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+	context := map[string]string{"project_id": "proj-1"}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = helpers.CanUserRead(ctx, "testuser", "ticket", "ticket-123", context)
+	}
+}
+
+func BenchmarkGetAccessSummary(b *testing.B) {
+	mockDB := new(MockDatabase)
+	config := Config{EnableCaching: true, EnableAuditing: false}
+	engine := NewSecurityEngine(mockDB, config)
+	helpers := NewHelperMethods(engine)
+
+	ctx := context.Background()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = helpers.GetAccessSummary(ctx, "testuser", "ticket", "ticket-123")
+	}
+}

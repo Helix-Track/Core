@@ -1,0 +1,74 @@
+{
+  "datacenter": "helixtrack-dc1",
+  "node_name": "helixtrack-consul-server",
+  "server": true,
+  "bootstrap_expect": 1,
+  "ui_config": {
+    "enabled": true
+  },
+  "client_addr": "0.0.0.0",
+  "bind_addr": "0.0.0.0",
+  "data_dir": "/consul/data",
+  "log_level": "INFO",
+  "enable_syslog": false,
+  "enable_script_checks": true,
+  "disable_update_check": true,
+  "ports": {
+    "http": 8500,
+    "https": 8501,
+    "grpc": 8502,
+    "dns": 8600,
+    "serf_lan": 8301,
+    "serf_wan": 8302,
+    "server": 8300
+  },
+  "connect": {
+    "enabled": true
+  },
+  "telemetry": {
+    "prometheus_retention_time": "60s",
+    "disable_hostname": false
+  },
+  "performance": {
+    "raft_multiplier": 1
+  },
+  "limits": {
+    "http_max_conns_per_client": 200
+  },
+  "acl": {
+    "enabled": false,
+    "default_policy": "allow",
+    "enable_token_persistence": true
+  },
+  "encrypt": "",
+  "verify_incoming": false,
+  "verify_outgoing": false,
+  "verify_server_hostname": false,
+  "ca_file": "",
+  "cert_file": "",
+  "key_file": "",
+  "auto_encrypt": {
+    "allow_tls": false
+  },
+  "addresses": {
+    "http": "0.0.0.0",
+    "https": "0.0.0.0",
+    "grpc": "0.0.0.0",
+    "dns": "0.0.0.0"
+  },
+  "leave_on_terminate": false,
+  "skip_leave_on_interrupt": true,
+  "rejoin_after_leave": true,
+  "enable_central_service_config": true,
+  "service": {
+    "name": "consul",
+    "tags": ["service-discovery", "health-check", "kv-store"],
+    "port": 8500,
+    "check": {
+      "http": "http://localhost:8500/v1/status/leader",
+      "interval": "10s",
+      "timeout": "5s"
+    }
+  },
+  "services": []
+}

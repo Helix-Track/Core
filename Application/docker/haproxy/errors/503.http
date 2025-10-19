@@ -1,0 +1,16 @@
+HTTP/1.1 503 Service Unavailable
+Content-Type: application/json
+Cache-Control: no-cache
+Connection: close
+
+{
+  "errorCode": 2003,
+  "errorMessage": "Service temporarily unavailable",
+  "errorMessageLocalised": "Service temporarily unavailable",
+  "data": {
+    "status": "503",
+    "service": "HelixTrack Core",
+    "message": "All backend servers are currently unavailable. Please try again later.",
+    "timestamp": "2024-01-01T00:00:00Z"
+  }
+}

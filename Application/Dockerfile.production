@@ -1,0 +1,122 @@
+# ===================================================================
+# HelixTrack Core - Production Dockerfile
+# Multi-stage build for optimized production deployment
+#
+# Features:
+# - Multi-stage build for minimal image size
+# - PostgreSQL support with encryption
+# - Service discovery integration
+# - Automatic port selection
+# - Health checks
+# - Non-root user for security
+# ===================================================================
+
+# ===================================================================
+# STAGE 1: Builder
+# ===================================================================
+FROM golang:1.22-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    postgresql-dev \
+    git \
+    ca-certificates \
+    tzdata
+
+WORKDIR /build
+
+# Copy go mod files first (better caching)
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download && go mod verify
+
+# Copy source code
+COPY . .
+
+# Build arguments
+ARG BUILD_VERSION=1.0.0
+ARG BUILD_DATE
+ARG BUILD_COMMIT=unknown
+
+# Build the application with optimizations
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-w -s \
+    -X 'main.version=${BUILD_VERSION}' \
+    -X 'main.buildDate=${BUILD_DATE}' \
+    -X 'main.commit=${BUILD_COMMIT}'" \
+    -a -installsuffix cgo \
+    -o /build/htCore \
+    main.go
+
+# Verify the binary
+RUN /build/htCore --version || echo "Binary built successfully"
+
+# ===================================================================
+# STAGE 2: Production Runtime
+# ===================================================================
+FROM alpine:3.18
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    postgresql-client \
+    tzdata \
+    wget \
+    curl \
+    && update-ca-certificates
+
+# Create non-root user for security
+RUN addgroup -g 1000 helixtrack && \
+    adduser -D -u 1000 -G helixtrack helixtrack && \
+    mkdir -p /app /app/logs /app/Database /app/uploads && \
+    chown -R helixtrack:helixtrack /app
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder --chown=helixtrack:helixtrack /build/htCore .
+
+# Copy configuration files
+COPY --chown=helixtrack:helixtrack Configurations/ ./Configurations/
+
+# Copy database migration scripts
+COPY --chown=helixtrack:helixtrack Database/DDL/ ./Database/DDL/
+
+# Create startup script
+COPY --chown=helixtrack:helixtrack docker/scripts/entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
+
+# Switch to non-root user
+USER helixtrack
+
+# Expose ports
+# Note: Actual port is determined at runtime with auto-selection
+EXPOSE 8080-8089
+EXPOSE 9090
+
+# Environment variables
+ENV APP_ENV=production \
+    LOG_LEVEL=info \
+    AUTO_PORT_SELECTION=true \
+    SERVICE_DISCOVERY_ENABLED=true
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${SERVER_PORT:-8080}/health || exit 1
+
+# Labels
+LABEL maintainer="HelixTrack Team" \
+      version="${BUILD_VERSION}" \
+      description="HelixTrack Core Service - Production" \
+      org.opencontainers.image.source="https://github.com/Helix-Track/Core" \
+      org.opencontainers.image.version="${BUILD_VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}"
+
+# Entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default command
+CMD ["./htCore"]

@@ -16,6 +16,7 @@ import (
 	"helixtrack.ru/core/internal/logger"
 	"helixtrack.ru/core/internal/middleware"
 	"helixtrack.ru/core/internal/models"
+	"helixtrack.ru/core/internal/security/engine"
 	"helixtrack.ru/core/internal/services"
 	"helixtrack.ru/core/internal/websocket"
 )
@@ -28,6 +29,7 @@ type Server struct {
 	db                      database.Database
 	authService             services.AuthService
 	permService             services.PermissionService
+	securityEngine          engine.Engine
 	serviceDiscoveryHandler *handlers.ServiceDiscoveryHandler
 	networkDiscoveryService *services.NetworkDiscoveryService
 	wsManager               *websocket.Manager
@@ -54,6 +56,15 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		cfg.Services.Permissions.URL,
 		cfg.Services.Permissions.Timeout,
 		cfg.Services.Permissions.Enabled,
+	)
+
+	// Initialize Security Engine
+	securityConfig := engine.DefaultConfig()
+	securityEngine := engine.NewSecurityEngine(db, securityConfig)
+
+	logger.Info("Security Engine initialized",
+		zap.Bool("caching_enabled", securityConfig.EnableCaching),
+		zap.Bool("auditing_enabled", securityConfig.EnableAuditing),
 	)
 
 	// Initialize service discovery handler
@@ -97,6 +108,7 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		db:                      db,
 		authService:             authService,
 		permService:             permService,
+		securityEngine:          securityEngine,
 		serviceDiscoveryHandler: serviceDiscoveryHandler,
 		networkDiscoveryService: networkDiscoveryService,
 		wsManager:               wsManager,
@@ -146,6 +158,7 @@ func (s *Server) setupRouter() {
 	// Create handlers
 	handler := handlers.NewHandler(s.db, s.authService, s.permService, s.config.Version)
 	handler.SetEventPublisher(s.wsPublisher) // Set event publisher for WebSocket events
+	handler.SetSecurityEngine(s.securityEngine) // Set Security Engine for RBAC
 	authHandler := handlers.NewAuthHandler(s.db)
 
 	// WebSocket routes (if enabled)

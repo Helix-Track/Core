@@ -1,0 +1,637 @@
+package engine
+
+import (
+	"context"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+// TestNewSecurityLevelChecker tests security level checker creation
+func TestNewSecurityLevelChecker(t *testing.T) {
+	mockDB := new(MockDatabase)
+	checker := NewSecurityLevelChecker(mockDB)
+
+	assert.NotNil(t, checker)
+	assert.NotNil(t, checker.db)
+}
+
+// TestCheckAccess_NoSecurityLevel tests entities without security levels
+func TestCheckAccess_NoSecurityLevel(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock no security level
+	mockRow := &MockRow{data: nil}
+	mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	// Entity with no security level should be accessible
+	hasAccess, err := checker.CheckAccess(ctx, "testuser", "ticket-1", "ticket")
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// TestCheckAccess_DirectGrant tests direct user security grants
+func TestCheckAccess_DirectGrant(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock entity has security level
+	mockRow1 := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT security_level_id FROM ticket WHERE id = ?"
+	}), mock.Anything).Return(mockRow1)
+
+	// Mock direct grant exists
+	mockRow2 := &MockRow{data: map[string]interface{}{"count": 1}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND username = ?"
+	}), mock.Anything).Return(mockRow2)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	hasAccess, err := checker.CheckAccess(ctx, "testuser", "ticket-1", "ticket")
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// TestCheckAccess_TeamGrant tests team-based security access
+func TestCheckAccess_TeamGrant(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock entity has security level
+	mockRow1 := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT security_level_id FROM ticket WHERE id = ?"
+	}), mock.Anything).Return(mockRow1)
+
+	// Mock no direct grant
+	mockRow2 := &MockRow{data: map[string]interface{}{"count": 0}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND username = ?"
+	}), mock.Anything).Return(mockRow2)
+
+	// Mock user teams
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"team-1"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT team_id FROM team_membership WHERE username = ?"
+	}), mock.Anything).Return(mockRows, nil)
+
+	// Mock team has grant
+	mockRow3 := &MockRow{data: map[string]interface{}{"count": 1}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND team_id = ?"
+	}), mock.Anything).Return(mockRow3)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	hasAccess, err := checker.CheckAccess(ctx, "testuser", "ticket-1", "ticket")
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// TestCheckAccess_RoleGrant tests role-based security access
+func TestCheckAccess_RoleGrant(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock entity has security level
+	mockRow1 := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT security_level_id FROM ticket WHERE id = ?"
+	}), mock.Anything).Return(mockRow1)
+
+	// Mock no direct grant
+	mockRow2 := &MockRow{data: map[string]interface{}{"count": 0}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND username = ?"
+	}), mock.Anything).Return(mockRow2)
+
+	// Mock no teams
+	mockRows1 := &MockRows{rows: [][]interface{}{}}
+	mockDB.On("Query", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT team_id FROM team_membership WHERE username = ?"
+	}), mock.Anything).Return(mockRows1, nil)
+
+	// Mock user roles
+	mockRows2 := &MockRows{
+		rows: [][]interface{}{
+			{"role-1"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT role_id FROM user_role WHERE username = ?"
+	}), mock.Anything).Return(mockRows2, nil)
+
+	// Mock role has grant
+	mockRow3 := &MockRow{data: map[string]interface{}{"count": 1}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND role_id = ?"
+	}), mock.Anything).Return(mockRow3)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	hasAccess, err := checker.CheckAccess(ctx, "testuser", "ticket-1", "ticket")
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// TestCheckAccess_Denied tests access denial
+func TestCheckAccess_Denied(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Mock entity has security level
+	mockRow1 := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT security_level_id FROM ticket WHERE id = ?"
+	}), mock.Anything).Return(mockRow1)
+
+	// Mock no direct grant
+	mockRow2 := &MockRow{data: map[string]interface{}{"count": 0}}
+	mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow2)
+
+	// Mock no teams
+	mockRows1 := &MockRows{rows: [][]interface{}{}}
+	mockDB.On("Query", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT team_id FROM team_membership WHERE username = ?"
+	}), mock.Anything).Return(mockRows1, nil)
+
+	// Mock no roles
+	mockRows2 := &MockRows{rows: [][]interface{}{}}
+	mockDB.On("Query", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT role_id FROM user_role WHERE username = ?"
+	}), mock.Anything).Return(mockRows2, nil)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	hasAccess, err := checker.CheckAccess(ctx, "testuser", "ticket-1", "ticket")
+
+	assert.NoError(t, err)
+	assert.False(t, hasAccess)
+}
+
+// TestGetEntitySecurityLevel tests retrieving entity security level
+func TestGetEntitySecurityLevel(t *testing.T) {
+	tests := []struct {
+		name       string
+		entityType string
+		query      string
+	}{
+		{"Ticket entity", "ticket", "SELECT security_level_id FROM ticket WHERE id = ?"},
+		{"Project entity", "project", "SELECT security_level_id FROM project WHERE id = ?"},
+		{"Epic entity", "epic", "SELECT security_level_id FROM epic WHERE id = ?"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+
+			mockRow := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+			mockDB.On("QueryRow", mock.Anything, tt.query, mock.Anything).Return(mockRow)
+
+			checker := NewSecurityLevelChecker(mockDB)
+			ctx := context.Background()
+
+			levelID, err := checker.getEntitySecurityLevel(ctx, "entity-1", tt.entityType)
+
+			assert.NoError(t, err)
+			assert.Equal(t, "level-1", levelID)
+		})
+	}
+}
+
+// TestCheckDirectSecurityAccess tests direct grant verification
+func TestCheckDirectSecurityAccess(t *testing.T) {
+	tests := []struct {
+		name      string
+		count     int
+		hasAccess bool
+	}{
+		{"Grant exists", 1, true},
+		{"No grant", 0, false},
+		{"Multiple grants", 3, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+
+			mockRow := &MockRow{data: map[string]interface{}{"count": tt.count}}
+			mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+			checker := NewSecurityLevelChecker(mockDB)
+			ctx := context.Background()
+
+			hasAccess, err := checker.checkDirectSecurityAccess(ctx, "testuser", "level-1")
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.hasAccess, hasAccess)
+		})
+	}
+}
+
+// TestCheckTeamSecurityAccess tests team-based access
+func TestCheckTeamSecurityAccess(t *testing.T) {
+	tests := []struct {
+		name      string
+		teams     [][]interface{}
+		hasGrant  bool
+		hasAccess bool
+	}{
+		{
+			name:      "No teams",
+			teams:     [][]interface{}{},
+			hasGrant:  false,
+			hasAccess: false,
+		},
+		{
+			name: "Team with grant",
+			teams: [][]interface{}{
+				{"team-1"},
+			},
+			hasGrant:  true,
+			hasAccess: true,
+		},
+		{
+			name: "Team without grant",
+			teams: [][]interface{}{
+				{"team-1"},
+			},
+			hasGrant:  false,
+			hasAccess: false,
+		},
+		{
+			name: "Multiple teams, one with grant",
+			teams: [][]interface{}{
+				{"team-1"},
+				{"team-2"},
+			},
+			hasGrant:  true,
+			hasAccess: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+
+			mockRows := &MockRows{rows: tt.teams}
+			mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+			grantCount := 0
+			if tt.hasGrant {
+				grantCount = 1
+			}
+			mockRow := &MockRow{data: map[string]interface{}{"count": grantCount}}
+			mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+			checker := NewSecurityLevelChecker(mockDB)
+			ctx := context.Background()
+
+			hasAccess, err := checker.checkTeamSecurityAccess(ctx, "testuser", "level-1")
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.hasAccess, hasAccess)
+		})
+	}
+}
+
+// TestCheckRoleSecurityAccess tests role-based access
+func TestCheckRoleSecurityAccess(t *testing.T) {
+	tests := []struct {
+		name      string
+		roles     [][]interface{}
+		hasGrant  bool
+		hasAccess bool
+	}{
+		{
+			name:      "No roles",
+			roles:     [][]interface{}{},
+			hasGrant:  false,
+			hasAccess: false,
+		},
+		{
+			name: "Role with grant",
+			roles: [][]interface{}{
+				{"role-1"},
+			},
+			hasGrant:  true,
+			hasAccess: true,
+		},
+		{
+			name: "Role without grant",
+			roles: [][]interface{}{
+				{"role-1"},
+			},
+			hasGrant:  false,
+			hasAccess: false,
+		},
+		{
+			name: "Multiple roles, one with grant",
+			roles: [][]interface{}{
+				{"role-1"},
+				{"role-2"},
+			},
+			hasGrant:  true,
+			hasAccess: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+
+			mockRows := &MockRows{rows: tt.roles}
+			mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+			grantCount := 0
+			if tt.hasGrant {
+				grantCount = 1
+			}
+			mockRow := &MockRow{data: map[string]interface{}{"count": grantCount}}
+			mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+			checker := NewSecurityLevelChecker(mockDB)
+			ctx := context.Background()
+
+			hasAccess, err := checker.checkRoleSecurityAccess(ctx, "testuser", "level-1")
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.hasAccess, hasAccess)
+		})
+	}
+}
+
+// TestSecurityLevelHierarchy tests security level hierarchy
+func TestSecurityLevelHierarchy(t *testing.T) {
+	mockDB := new(MockDatabase)
+	checker := NewSecurityLevelChecker(mockDB)
+
+	tests := []struct {
+		name          string
+		levelID       int
+		requiredLevel int
+		hasAccess     bool
+	}{
+		{"Level 0 vs Level 0", 0, 0, true},
+		{"Level 1 vs Level 0", 1, 0, true},
+		{"Level 2 vs Level 1", 2, 1, true},
+		{"Level 3 vs Level 2", 3, 2, true},
+		{"Level 5 vs Level 3", 5, 3, true},
+		{"Level 0 vs Level 1", 0, 1, false},
+		{"Level 1 vs Level 3", 1, 3, false},
+		{"Level 3 vs Level 5", 3, 5, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hasAccess := checker.checkLevelHierarchy(tt.levelID, tt.requiredLevel)
+			assert.Equal(t, tt.hasAccess, hasAccess)
+		})
+	}
+}
+
+// TestGetSecurityLevelInfo tests retrieving security level information
+func TestGetSecurityLevelInfo(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	mockRow := &MockRow{
+		data: map[string]interface{}{
+			"id":          "level-1",
+			"title":       "Confidential",
+			"level":       3,
+			"description": "Confidential information",
+		},
+	}
+	mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	info, err := checker.GetSecurityLevelInfo(ctx, "level-1")
+
+	assert.NoError(t, err)
+	assert.Equal(t, "level-1", info.ID)
+	assert.Equal(t, "Confidential", info.Title)
+	assert.Equal(t, 3, info.Level)
+	assert.Equal(t, "Confidential information", info.Description)
+}
+
+// TestGrantSecurityAccess tests granting security access
+func TestGrantSecurityAccess(t *testing.T) {
+	tests := []struct {
+		name       string
+		grantType  string
+		granteeID  string
+		shouldPass bool
+	}{
+		{"Grant to user", "user", "testuser", true},
+		{"Grant to team", "team", "team-1", true},
+		{"Grant to role", "role", "role-1", true},
+		{"Invalid grant type", "invalid", "invalid-1", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+
+			if tt.shouldPass {
+				mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
+			}
+
+			checker := NewSecurityLevelChecker(mockDB)
+			ctx := context.Background()
+
+			err := checker.GrantAccess(ctx, "level-1", tt.grantType, tt.granteeID)
+
+			if tt.shouldPass {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
+}
+
+// TestRevokeSecurityAccess tests revoking security access
+func TestRevokeSecurityAccess(t *testing.T) {
+	mockDB := new(MockDatabase)
+	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	err := checker.RevokeAccess(ctx, "level-1", "user", "testuser")
+
+	assert.NoError(t, err)
+}
+
+// TestGetAllGrants tests retrieving all security grants
+func TestGetAllGrants(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	mockRows := &MockRows{
+		rows: [][]interface{}{
+			{"grant-1", "level-1", "user", "testuser"},
+			{"grant-2", "level-1", "team", "team-1"},
+			{"grant-3", "level-1", "role", "role-1"},
+		},
+	}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	grants, err := checker.GetAllGrants(ctx, "level-1")
+
+	assert.NoError(t, err)
+	assert.Len(t, grants, 3)
+	assert.Equal(t, "grant-1", grants[0].ID)
+	assert.Equal(t, "user", grants[0].GranteeType)
+	assert.Equal(t, "testuser", grants[0].GranteeID)
+}
+
+// TestMultipleEntityTypes tests security checks across different entity types
+func TestMultipleEntityTypes(t *testing.T) {
+	entityTypes := []string{"ticket", "project", "epic", "subtask", "work_log"}
+
+	for _, entityType := range entityTypes {
+		t.Run("Entity type: "+entityType, func(t *testing.T) {
+			mockDB := new(MockDatabase)
+
+			mockRow := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+			mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+			// Mock direct grant
+			mockRow2 := &MockRow{data: map[string]interface{}{"count": 1}}
+			mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow2)
+
+			checker := NewSecurityLevelChecker(mockDB)
+			ctx := context.Background()
+
+			hasAccess, err := checker.CheckAccess(ctx, "testuser", "entity-1", entityType)
+
+			assert.NoError(t, err)
+			assert.True(t, hasAccess)
+		})
+	}
+}
+
+// TestCascadingAccess tests cascading access through user → team → role
+func TestCascadingAccess(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	// Entity has security level
+	mockRow1 := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT security_level_id FROM ticket WHERE id = ?"
+	}), mock.Anything).Return(mockRow1)
+
+	// No direct grant
+	mockRow2 := &MockRow{data: map[string]interface{}{"count": 0}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND username = ?"
+	}), mock.Anything).Return(mockRow2)
+
+	// No team grants
+	mockRows1 := &MockRows{rows: [][]interface{}{{"team-1"}}}
+	mockDB.On("Query", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT team_id FROM team_membership WHERE username = ?"
+	}), mock.Anything).Return(mockRows1, nil)
+
+	mockRow3 := &MockRow{data: map[string]interface{}{"count": 0}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND team_id = ?"
+	}), mock.Anything).Return(mockRow3)
+
+	// Role has grant (cascading fallback)
+	mockRows2 := &MockRows{rows: [][]interface{}{{"role-1"}}}
+	mockDB.On("Query", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT role_id FROM user_role WHERE username = ?"
+	}), mock.Anything).Return(mockRows2, nil)
+
+	mockRow4 := &MockRow{data: map[string]interface{}{"count": 1}}
+	mockDB.On("QueryRow", mock.Anything, mock.MatchedBy(func(query string) bool {
+		return query == "SELECT COUNT(*) FROM security_level_grant WHERE security_level_id = ? AND role_id = ?"
+	}), mock.Anything).Return(mockRow4)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	hasAccess, err := checker.CheckAccess(ctx, "testuser", "ticket-1", "ticket")
+
+	assert.NoError(t, err)
+	assert.True(t, hasAccess)
+}
+
+// Benchmark tests
+func BenchmarkSecurityLevelCheckAccess(b *testing.B) {
+	mockDB := new(MockDatabase)
+
+	mockRow := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+	mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+	mockRow2 := &MockRow{data: map[string]interface{}{"count": 1}}
+	mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow2)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = checker.CheckAccess(ctx, "testuser", "ticket-1", "ticket")
+	}
+}
+
+func BenchmarkGetEntitySecurityLevel(b *testing.B) {
+	mockDB := new(MockDatabase)
+
+	mockRow := &MockRow{data: map[string]interface{}{"security_level_id": "level-1"}}
+	mockDB.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+
+	checker := NewSecurityLevelChecker(mockDB)
+	ctx := context.Background()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = checker.getEntitySecurityLevel(ctx, "ticket-1", "ticket")
+	}
+}
+
+// MockRow for single row results
+type MockRow struct {
+	data map[string]interface{}
+}
+
+func (m *MockRow) Scan(dest ...interface{}) error {
+	if m.data == nil {
+		return sql.ErrNoRows
+	}
+
+	// Simple scan implementation for tests
+	if securityLevelID, ok := m.data["security_level_id"]; ok {
+		if ptr, ok := dest[0].(*string); ok {
+			*ptr = securityLevelID.(string)
+		}
+	}
+	if count, ok := m.data["count"]; ok {
+		if ptr, ok := dest[0].(*int); ok {
+			*ptr = count.(int)
+		}
+	}
+
+	return nil
+}

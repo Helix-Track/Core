@@ -1,0 +1,73 @@
+#==============================================================================
+# HelixTrack Core - HAProxy Dynamic Configuration Template
+# This template is used by consul-template to dynamically update HAProxy
+# configuration based on Consul service discovery
+#==============================================================================
+
+global
+    log stdout format raw local0
+    maxconn 4096
+    tune.ssl.default-dh-param 2048
+    stats socket /var/run/haproxy.sock mode 660 level admin expose-fd listeners
+    stats timeout 30s
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    option  http-server-close
+    option  forwardfor except 127.0.0.0/8
+    option  redispatch
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+#==============================================================================
+# Statistics dashboard
+#==============================================================================
+frontend stats
+    bind *:8404
+    stats enable
+    stats uri /stats
+    stats refresh 5s
+    stats admin if TRUE
+
+#==============================================================================
+# Frontend
+#==============================================================================
+frontend http_front
+    bind *:80
+    mode http
+    default_backend core_services
+
+#==============================================================================
+# Backend - Dynamically populated from Consul
+#==============================================================================
+backend core_services
+    mode http
+    balance roundrobin
+    option httpchk GET /health
+    {{- range service "helixtrack-core" }}
+    server {{.Node}}-{{.Port}} {{.Address}}:{{.Port}} check inter 10s fall 3 rise 2{{end}}
+
+backend auth_services
+    mode http
+    balance roundrobin
+    option httpchk GET /health
+    {{- range service "helixtrack-auth" }}
+    server {{.Node}}-{{.Port}} {{.Address}}:{{.Port}} check inter 10s fall 3 rise 2{{end}}
+
+backend perm_services
+    mode http
+    balance roundrobin
+    option httpchk GET /health
+    {{- range service "helixtrack-perm" }}
+    server {{.Node}}-{{.Port}} {{.Address}}:{{.Port}} check inter 10s fall 3 rise 2{{end}}
+
+backend documents_services
+    mode http
+    balance roundrobin
+    option httpchk GET /health
+    {{- range service "helixtrack-documents" }}
+    server {{.Node}}-{{.Port}} {{.Address}}:{{.Port}} check inter 10s fall 3 rise 2{{end}}
