@@ -6,7 +6,7 @@
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="HelixTrack Core - System Architecture (V3.0)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
+        <mxCell id="title" value="HelixTrack Core - System Architecture (V4.0 with Documents V2 Extension)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
           <mxGeometry x="660" y="20" width="600" height="40" as="geometry" />
         </mxCell>
 
@@ -176,7 +176,7 @@
         </mxCell>
 
         <!-- Database Details -->
-        <mxCell id="db-details" value="V3 Schema&#xa;89 Tables&#xa;282 API Actions&#xa;100% JIRA Parity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00695C;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+        <mxCell id="db-details" value="V3 Schema&#xa;89 Tables&#xa;372 API Actions (282 core + 90 Documents V2)&#xa;100% JIRA Parity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00695C;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
           <mxGeometry x="800" y="650" width="140" height="120" as="geometry" />
         </mxCell>
 
@@ -262,7 +262,7 @@
         </mxCell>
 
         <!-- Key Metrics -->
-        <mxCell id="metrics-box" value="KEY METRICS (V3.0)&#xa;• 282 API Actions (100% JIRA Parity)&#xa;• 89 Database Tables (V1: 61, Phase 1: +11, Phase 2: +15, Phase 3: +2)&#xa;• 1,375 Tests (98.8% pass rate, 71.9% coverage)&#xa;• 50,000+ requests/second performance&#xa;• Multi-database: SQLite &amp; PostgreSQL&#xa;• Multi-platform: Web, Desktop, Android, iOS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
+        <mxCell id="metrics-box" value="KEY METRICS (V4.0 with Documents V2 Extension)&#xa;• 372 API Actions (282 core + 90 Documents V2) (100% JIRA Parity)&#xa;• 121 Database Tables (89 core + 32 Documents V2) (V1: 61, Phase 1: +11, Phase 2: +15, Phase 3: +2)&#xa;• 1,769 Tests (1,375 core + 394 Documents) (98.8% pass rate, 71.9% coverage)&#xa;• 50,000+ requests/second performance&#xa;• Multi-database: SQLite &amp; PostgreSQL&#xa;• Multi-platform: Web, Desktop, Android, iOS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;align=left;spacingLeft=10;fontFamily=Courier New;" vertex="1" parent="1">
           <mxGeometry x="200" y="1060" width="720" height="50" as="geometry" />
         </mxCell>
 

@@ -17,7 +17,7 @@
           <mxGeometry x="670" y="410" width="460" height="30" as="geometry" />
         </mxCell>
 
-        <mxCell id="core-details" value="Technology: Go 1.22+ / Gin Gonic&#xa;Port: 8080 (configurable)&#xa;Protocol: HTTP/HTTPS&#xa;Database: SQLite / PostgreSQL&#xa;Features: 282 API Actions&#xa;Schema: V3 (89 tables)&#xa;Performance: 50K+ req/s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=15;fontStyle=1" vertex="1" parent="1">
+        <mxCell id="core-details" value="Technology: Go 1.22+ / Gin Gonic&#xa;Port: 8080 (configurable)&#xa;Protocol: HTTP/HTTPS&#xa;Database: SQLite / PostgreSQL&#xa;Features: 372 API Actions (282 core + 90 Documents V2)&#xa;Schema: V3 (121 tables (89 core V3 + 32 Documents V2))&#xa;Performance: 50K+ req/s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;fontColor=#FFFFFF;fontSize=11;align=left;spacingLeft=15;fontStyle=1" vertex="1" parent="1">
           <mxGeometry x="700" y="460" width="400" height="120" as="geometry" />
         </mxCell>
 
