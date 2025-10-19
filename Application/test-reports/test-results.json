@@ -1,8 +1,8 @@
 {
-  "timestamp": "2025-10-19T09:00:27Z",
+  "timestamp": "2025-10-19T16:57:58Z",
   "status": "FAILED",
   "go_version": "1.22.2",
-  "duration_seconds": 602,
+  "duration_seconds": 601,
   "statistics": {
     "total_packages": 16,
     "total_tests": 1710,

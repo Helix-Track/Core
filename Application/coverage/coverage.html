@@ -534,7 +534,7 @@ func (c *inMemoryCache) evictOldest() <span class="cov1" title="1">{
         var oldestTime time.Time
 
         for key, entry := range c.entries </span><span class="cov3" title="3">{
-                if oldestTime.IsZero() || entry.expiration.Before(oldestTime) </span><span class="cov1" title="1">{
+                if oldestTime.IsZero() || entry.expiration.Before(oldestTime) </span><span class="cov2" title="2">{
                         oldestKey = key
                         oldestTime = entry.expiration
                 }</span>
@@ -4827,10 +4827,10 @@ func (m *Metrics) RecordRequest(duration time.Duration, statusCode int, path, me
         // Update min time
         for </span><span class="cov10" title="225">{
                 oldMin := atomic.LoadInt64(&amp;m.minRequestTime)
-                if durationNs &gt;= oldMin </span><span class="cov9" title="210">{
+                if durationNs &gt;= oldMin </span><span class="cov9" title="211">{
                         break</span>
                 }
-                <span class="cov5" title="15">if atomic.CompareAndSwapInt64(&amp;m.minRequestTime, oldMin, durationNs) </span><span class="cov5" title="15">{
+                <span class="cov5" title="14">if atomic.CompareAndSwapInt64(&amp;m.minRequestTime, oldMin, durationNs) </span><span class="cov5" title="14">{
                         break</span>
                 }
         }
@@ -4885,10 +4885,10 @@ func (m *Metrics) recordEndpointMetrics(path, method string, durationNs int64, s
         // Update endpoint min time
         for </span><span class="cov10" title="225">{
                 oldMin := atomic.LoadInt64(&amp;endpoint.MinTime)
-                if durationNs &gt;= oldMin </span><span class="cov9" title="200">{
+                if durationNs &gt;= oldMin </span><span class="cov9" title="201">{
                         break</span>
                 }
-                <span class="cov6" title="25">if atomic.CompareAndSwapInt64(&amp;endpoint.MinTime, oldMin, durationNs) </span><span class="cov6" title="25">{
+                <span class="cov6" title="24">if atomic.CompareAndSwapInt64(&amp;endpoint.MinTime, oldMin, durationNs) </span><span class="cov6" title="24">{
                         break</span>
                 }
         }
