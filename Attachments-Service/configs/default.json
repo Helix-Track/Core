@@ -1,0 +1,110 @@
+{
+  "service": {
+    "name": "attachments-service",
+    "port": 8090,
+    "port_range": [8090, 8100],
+    "environment": "development",
+    "read_timeout": 60,
+    "write_timeout": 300,
+    "max_header_bytes": 8192,
+    "discovery": {
+      "enabled": false,
+      "provider": "consul",
+      "consul_address": "localhost:8500"
+    }
+  },
+  "database": {
+    "driver": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "database": "helixtrack_attachments",
+    "user": "helixtrack",
+    "password": "helixtrack_dev_password",
+    "ssl_mode": "disable",
+    "max_connections": 50,
+    "idle_connections": 10,
+    "connection_timeout": 30,
+    "connection_lifetime": 3600
+  },
+  "storage": {
+    "endpoints": [
+      {
+        "id": "local-primary",
+        "type": "local",
+        "role": "primary",
+        "priority": 1,
+        "enabled": true,
+        "max_size_gb": 1000,
+        "adapter_config": {
+          "path": "/var/helixtrack/attachments"
+        }
+      }
+    ],
+    "replication_mode": "hybrid",
+    "cleanup": {
+      "orphan_retention_days": 30,
+      "job_schedule": "0 2 * * *"
+    }
+  },
+  "security": {
+    "jwt_secret": "your-secret-key-change-this-in-production",
+    "jwt_issuer": "helixtrack-auth",
+    "allowed_mime_types": [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "application/pdf",
+      "text/plain",
+      "text/markdown",
+      "text/csv",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/zip",
+      "application/x-tar",
+      "application/gzip",
+      "video/mp4",
+      "video/webm",
+      "video/quicktime"
+    ],
+    "max_file_size_mb": 100,
+    "virus_scanning": {
+      "enabled": false,
+      "clamd_socket": "/var/run/clamav/clamd.sock",
+      "clamd_host": "",
+      "clamd_port": 0,
+      "max_scan_size_mb": 100,
+      "timeout_seconds": 60
+    },
+    "rate_limiting": {
+      "per_ip_requests_per_minute": 100,
+      "per_user_requests_per_minute": 1000,
+      "per_ip_uploads_per_minute": 10,
+      "per_user_uploads_per_minute": 100,
+      "global_requests_per_minute": 10000,
+      "max_connections_per_ip": 100,
+      "max_connections_global": 1000
+    },
+    "image_validation": {
+      "max_width_pixels": 10000,
+      "max_height_pixels": 10000,
+      "auto_compress": false,
+      "compression_quality": 85
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "output": "stdout"
+  },
+  "metrics": {
+    "enabled": true,
+    "prometheus_port": 9090,
+    "path": "/metrics"
+  }
+}
