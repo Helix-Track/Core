@@ -18,23 +18,25 @@ import (
 
 // Handler manages all HTTP handlers
 type Handler struct {
-	db             database.Database
-	authService    services.AuthService
-	permService    services.PermissionService
-	securityEngine interface{} // engine.Engine - Security Engine for authorization
-	version        string
-	publisher      websocket.EventPublisher
+	db                  database.Database
+	authService         services.AuthService
+	permService         services.PermissionService
+	localizationService *services.LocalizationService
+	securityEngine      interface{} // engine.Engine - Security Engine for authorization
+	version             string
+	publisher           websocket.EventPublisher
 }
 
 // NewHandler creates a new handler instance
 func NewHandler(db database.Database, authService services.AuthService, permService services.PermissionService, version string) *Handler {
 	return &Handler{
-		db:             db,
-		authService:    authService,
-		permService:    permService,
-		securityEngine: nil, // Will be set via SetSecurityEngine
-		version:        version,
-		publisher:      websocket.NewNoOpPublisher(), // Default to no-op publisher
+		db:                  db,
+		authService:         authService,
+		permService:         permService,
+		localizationService: nil, // Will be set via SetLocalizationService
+		securityEngine:      nil, // Will be set via SetSecurityEngine
+		version:             version,
+		publisher:           websocket.NewNoOpPublisher(), // Default to no-op publisher
 	}
 }
 
@@ -43,9 +45,66 @@ func (h *Handler) SetSecurityEngine(engine interface{}) {
 	h.securityEngine = engine
 }
 
+// SetLocalizationService sets the localization service for the handler
+func (h *Handler) SetLocalizationService(service *services.LocalizationService) {
+	h.localizationService = service
+}
+
 // SetEventPublisher sets the event publisher for the handler
 func (h *Handler) SetEventPublisher(publisher websocket.EventPublisher) {
 	h.publisher = publisher
+}
+
+// getLocale extracts the locale from the request (from req.Locale or Accept-Language header)
+func (h *Handler) getLocale(c *gin.Context, req *models.Request) string {
+	// First, check if locale is specified in the request
+	if req.Locale != "" {
+		return req.Locale
+	}
+
+	// Fall back to Accept-Language header
+	acceptLanguage := c.GetHeader("Accept-Language")
+	if acceptLanguage != "" {
+		// Parse Accept-Language (e.g., "en-US,en;q=0.9,de;q=0.8" -> "en")
+		if len(acceptLanguage) >= 2 {
+			return acceptLanguage[:2]
+		}
+	}
+
+	// Default to English
+	return "en"
+}
+
+// getLocalizedMessage retrieves a localized message for a given key and error code
+func (h *Handler) getLocalizedMessage(ctx context.Context, errorCode int, locale string) string {
+	// Get the localization key for this error code
+	key := models.GetLocalizationKey(errorCode)
+
+	// If localization service is not available, return the English message as fallback
+	if h.localizationService == nil {
+		return models.GetErrorMessage(errorCode)
+	}
+
+	// Fetch localized message
+	message, err := h.localizationService.Localize(ctx, key, locale)
+	if err != nil {
+		logger.Warn("Failed to fetch localized message, using fallback",
+			zap.String("key", key),
+			zap.String("locale", locale),
+			zap.Error(err),
+		)
+		return models.GetErrorMessage(errorCode)
+	}
+
+	return message
+}
+
+// newLocalizedErrorResponse creates an error response with localized message
+func (h *Handler) newLocalizedErrorResponse(c *gin.Context, req *models.Request, code int, englishMessage string) *models.Response {
+	locale := h.getLocale(c, req)
+	localizedMessage := h.getLocalizedMessage(c.Request.Context(), code, locale)
+
+	return models.NewErrorResponse(code, englishMessage, localizedMessage)
 }
 
 // DoAction handles the unified /do endpoint with action-based routing
@@ -54,10 +113,13 @@ func (h *Handler) DoAction(c *gin.Context) {
 	reqInterface, exists := c.Get("request")
 	if !exists {
 		logger.Error("Request not found in context")
-		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+		// Create a minimal request for localization
+		minimalReq := &models.Request{Locale: "en"}
+		c.JSON(http.StatusBadRequest, h.newLocalizedErrorResponse(
+			c,
+			minimalReq,
 			models.ErrorCodeInvalidRequest,
 			"Invalid request format",
-			"",
 		))
 		return
 	}
@@ -65,10 +127,13 @@ func (h *Handler) DoAction(c *gin.Context) {
 	req, ok := reqInterface.(*models.Request)
 	if !ok {
 		logger.Error("Invalid request type in context")
-		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+		// Create a minimal request for localization
+		minimalReq := &models.Request{Locale: "en"}
+		c.JSON(http.StatusBadRequest, h.newLocalizedErrorResponse(
+			c,
+			minimalReq,
 			models.ErrorCodeInvalidRequest,
 			"Invalid request format",
-			"",
 		))
 		return
 	}
@@ -989,10 +1054,11 @@ func (h *Handler) DoAction(c *gin.Context) {
 		h.handleDocumentAttachmentDelete(c, req)
 
 	default:
-		c.JSON(http.StatusBadRequest, models.NewErrorResponse(
+		c.JSON(http.StatusBadRequest, h.newLocalizedErrorResponse(
+			c,
+			req,
 			models.ErrorCodeInvalidAction,
 			"Unknown action: "+req.Action,
-			"",
 		))
 	}
 }

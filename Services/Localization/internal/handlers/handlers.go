@@ -11,22 +11,25 @@ import (
 	"github.com/helixtrack/localization-service/internal/database"
 	"github.com/helixtrack/localization-service/internal/middleware"
 	"github.com/helixtrack/localization-service/internal/models"
+	"github.com/helixtrack/localization-service/internal/websocket"
 	"go.uber.org/zap"
 )
 
 // Handler dependencies
 type Handler struct {
-	db     database.Database
-	cache  cache.Cache
-	logger *zap.Logger
+	db        database.Database
+	cache     cache.Cache
+	logger    *zap.Logger
+	wsManager *websocket.Manager
 }
 
 // NewHandler creates a new handler instance
-func NewHandler(db database.Database, cache cache.Cache, logger *zap.Logger) *Handler {
+func NewHandler(db database.Database, cache cache.Cache, logger *zap.Logger, wsManager *websocket.Manager) *Handler {
 	return &Handler{
-		db:     db,
-		cache:  cache,
-		logger: logger,
+		db:        db,
+		cache:     cache,
+		logger:    logger,
+		wsManager: wsManager,
 	}
 }
 
@@ -51,6 +54,12 @@ func (h *Handler) RegisterRoutes(router *gin.Engine, jwtSecret string, adminRole
 		// Language routes
 		v1.GET("/languages", h.ListLanguages)
 
+		// Version routes (public)
+		v1.GET("/version/current", h.GetCurrentVersion)
+		v1.GET("/version/history", h.GetVersionHistory)
+		v1.GET("/version/:version", h.GetVersionByNumber)
+		v1.GET("/version/:version/catalog/:language", h.GetCatalogByVersion)
+
 		// Admin routes
 		admin := v1.Group("/admin")
 		admin.Use(middleware.AdminOnly(adminRoles))
@@ -65,6 +74,15 @@ func (h *Handler) RegisterRoutes(router *gin.Engine, jwtSecret string, adminRole
 			admin.PUT("/localizations/:id", h.UpdateLocalization)
 			admin.DELETE("/localizations/:id", h.DeleteLocalization)
 			admin.POST("/localizations/:id/approve", h.ApproveLocalization)
+			admin.POST("/localizations/batch", h.HandleBatchLocalizations)
+
+			// Import/Export
+			admin.POST("/import", h.HandleImport)
+			admin.GET("/export", h.HandleExport)
+
+			// Version admin
+			admin.POST("/version/create", h.CreateVersion)
+			admin.DELETE("/version/:version", h.DeleteVersion)
 
 			// Cache admin
 			admin.POST("/cache/invalidate", h.InvalidateCache)
@@ -279,7 +297,7 @@ func (h *Handler) GetLocalization(c *gin.Context) {
 
 // BatchLocalize retrieves multiple localizations at once
 func (h *Handler) BatchLocalize(c *gin.Context) {
-	var req models.BatchLocalizationRequest
+	var req models.GetBatchLocalizationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(
 			models.ErrCodeValidationFailed,
@@ -328,7 +346,7 @@ func (h *Handler) BatchLocalize(c *gin.Context) {
 		}
 	}
 
-	response := models.BatchLocalizationResponse{
+	response := models.GetBatchLocalizationResponse{
 		Language:      req.Language,
 		Localizations: localizations,
 	}

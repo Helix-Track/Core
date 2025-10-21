@@ -28,7 +28,11 @@
       "url": "http://localhost:8082",
       "timeout": 30
     },
-    "lokalisation": null,
+    "lokalisation": {
+      "enabled": true,
+      "url": "https://localhost:8085",
+      "timeout": 30
+    },
     "extensions": {}
   }
 }

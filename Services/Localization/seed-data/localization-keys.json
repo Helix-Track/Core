@@ -1,0 +1,548 @@
+[
+  {
+    "key": "error.success",
+    "category": "error",
+    "description": "Success message",
+    "context": "api_response",
+    "variables": []
+  },
+  {
+    "key": "error.invalid_request",
+    "category": "error",
+    "description": "Invalid request error",
+    "context": "api_validation",
+    "variables": []
+  },
+  {
+    "key": "error.invalid_action",
+    "category": "error",
+    "description": "Invalid action error",
+    "context": "api_validation",
+    "variables": []
+  },
+  {
+    "key": "error.missing_jwt",
+    "category": "error",
+    "description": "Missing JWT token error",
+    "context": "authentication",
+    "variables": []
+  },
+  {
+    "key": "error.invalid_jwt",
+    "category": "error",
+    "description": "Invalid JWT token error",
+    "context": "authentication",
+    "variables": []
+  },
+  {
+    "key": "error.missing_object",
+    "category": "error",
+    "description": "Missing object type error",
+    "context": "api_validation",
+    "variables": []
+  },
+  {
+    "key": "error.invalid_object",
+    "category": "error",
+    "description": "Invalid object type error",
+    "context": "api_validation",
+    "variables": []
+  },
+  {
+    "key": "error.missing_data",
+    "category": "error",
+    "description": "Missing required data error",
+    "context": "api_validation",
+    "variables": []
+  },
+  {
+    "key": "error.invalid_data",
+    "category": "error",
+    "description": "Invalid data format error",
+    "context": "api_validation",
+    "variables": []
+  },
+  {
+    "key": "error.unauthorized",
+    "category": "error",
+    "description": "Unauthorized access error",
+    "context": "authentication",
+    "variables": []
+  },
+  {
+    "key": "error.forbidden",
+    "category": "error",
+    "description": "Forbidden - insufficient permissions error",
+    "context": "authorization",
+    "variables": []
+  },
+  {
+    "key": "error.internal_error",
+    "category": "error",
+    "description": "Internal server error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "error.database_error",
+    "category": "error",
+    "description": "Database error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "error.service_unavailable",
+    "category": "error",
+    "description": "Service unavailable error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "error.configuration_error",
+    "category": "error",
+    "description": "Configuration error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "error.auth_service_error",
+    "category": "error",
+    "description": "Authentication service error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "error.permission_service_error",
+    "category": "error",
+    "description": "Permission service error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "error.extension_service_error",
+    "category": "error",
+    "description": "Extension service error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "error.entity_not_found",
+    "category": "error",
+    "description": "Entity not found error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.entity_already_exists",
+    "category": "error",
+    "description": "Entity already exists error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.entity_validation_failed",
+    "category": "error",
+    "description": "Entity validation failed error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.entity_delete_failed",
+    "category": "error",
+    "description": "Failed to delete entity error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.entity_update_failed",
+    "category": "error",
+    "description": "Failed to update entity error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.entity_create_failed",
+    "category": "error",
+    "description": "Failed to create entity error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.version_conflict",
+    "category": "error",
+    "description": "Version conflict error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.network_error",
+    "category": "error",
+    "description": "Network error",
+    "context": "client",
+    "variables": []
+  },
+  {
+    "key": "error.server_error",
+    "category": "error",
+    "description": "Server error",
+    "context": "client",
+    "variables": []
+  },
+  {
+    "key": "error.authentication_required",
+    "category": "error",
+    "description": "Authentication required error",
+    "context": "authentication",
+    "variables": []
+  },
+  {
+    "key": "error.access_denied",
+    "category": "error",
+    "description": "Access denied error",
+    "context": "authorization",
+    "variables": []
+  },
+  {
+    "key": "error.resource_not_found",
+    "category": "error",
+    "description": "Resource not found error",
+    "context": "crud",
+    "variables": []
+  },
+  {
+    "key": "error.validation_error",
+    "category": "error",
+    "description": "Validation error",
+    "context": "validation",
+    "variables": []
+  },
+  {
+    "key": "error.unknown_error",
+    "category": "error",
+    "description": "Unknown error",
+    "context": "system",
+    "variables": []
+  },
+  {
+    "key": "common.ok",
+    "category": "common",
+    "description": "OK button text",
+    "context": "ui_controls",
+    "variables": []
+  },
+  {
+    "key": "common.cancel",
+    "category": "common",
+    "description": "Cancel button text",
+    "context": "ui_controls",
+    "variables": []
+  },
+  {
+    "key": "common.save",
+    "category": "common",
+    "description": "Save button text",
+    "context": "ui_controls",
+    "variables": []
+  },
+  {
+    "key": "common.delete",
+    "category": "common",
+    "description": "Delete button text",
+    "context": "ui_controls",
+    "variables": []
+  },
+  {
+    "key": "common.edit",
+    "category": "common",
+    "description": "Edit button text",
+    "context": "ui_controls",
+    "variables": []
+  },
+  {
+    "key": "common.create",
+    "category": "common",
+    "description": "Create button text",
+    "context": "ui_controls",
+    "variables": []
+  },
+  {
+    "key": "common.loading",
+    "category": "common",
+    "description": "Loading message",
+    "context": "ui_state",
+    "variables": []
+  },
+  {
+    "key": "common.error",
+    "category": "common",
+    "description": "Error label",
+    "context": "ui_state",
+    "variables": []
+  },
+  {
+    "key": "common.retry",
+    "category": "common",
+    "description": "Retry button text",
+    "context": "ui_controls",
+    "variables": []
+  },
+  {
+    "key": "common.no_data",
+    "category": "common",
+    "description": "No data available message",
+    "context": "ui_state",
+    "variables": []
+  },
+  {
+    "key": "nav.dashboard",
+    "category": "navigation",
+    "description": "Dashboard navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "nav.projects",
+    "category": "navigation",
+    "description": "Projects navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "nav.tickets",
+    "category": "navigation",
+    "description": "Tickets navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "nav.boards",
+    "category": "navigation",
+    "description": "Boards navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "nav.users",
+    "category": "navigation",
+    "description": "Users navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "nav.teams",
+    "category": "navigation",
+    "description": "Teams navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "nav.reports",
+    "category": "navigation",
+    "description": "Reports navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "nav.settings",
+    "category": "navigation",
+    "description": "Settings navigation item",
+    "context": "main_menu",
+    "variables": []
+  },
+  {
+    "key": "auth.login",
+    "category": "authentication",
+    "description": "Login button text",
+    "context": "login_form",
+    "variables": []
+  },
+  {
+    "key": "auth.logout",
+    "category": "authentication",
+    "description": "Logout button text",
+    "context": "user_menu",
+    "variables": []
+  },
+  {
+    "key": "auth.username",
+    "category": "authentication",
+    "description": "Username field label",
+    "context": "login_form",
+    "variables": []
+  },
+  {
+    "key": "auth.password",
+    "category": "authentication",
+    "description": "Password field label",
+    "context": "login_form",
+    "variables": []
+  },
+  {
+    "key": "auth.login_failed",
+    "category": "authentication",
+    "description": "Login failed error message",
+    "context": "login_form",
+    "variables": []
+  },
+  {
+    "key": "auth.invalid_credentials",
+    "category": "authentication",
+    "description": "Invalid credentials error message",
+    "context": "login_form",
+    "variables": []
+  },
+  {
+    "key": "dashboard.welcome",
+    "category": "dashboard",
+    "description": "Welcome message",
+    "context": "dashboard_page",
+    "variables": []
+  },
+  {
+    "key": "dashboard.recent_activity",
+    "category": "dashboard",
+    "description": "Recent activity section title",
+    "context": "dashboard_page",
+    "variables": []
+  },
+  {
+    "key": "dashboard.my_tickets",
+    "category": "dashboard",
+    "description": "My tickets section title",
+    "context": "dashboard_page",
+    "variables": []
+  },
+  {
+    "key": "dashboard.project_overview",
+    "category": "dashboard",
+    "description": "Project overview section title",
+    "context": "dashboard_page",
+    "variables": []
+  },
+  {
+    "key": "project.name",
+    "category": "project",
+    "description": "Project name field label",
+    "context": "project_form",
+    "variables": []
+  },
+  {
+    "key": "project.description",
+    "category": "project",
+    "description": "Project description field label",
+    "context": "project_form",
+    "variables": []
+  },
+  {
+    "key": "project.create",
+    "category": "project",
+    "description": "Create project button text",
+    "context": "project_form",
+    "variables": []
+  },
+  {
+    "key": "project.edit",
+    "category": "project",
+    "description": "Edit project button text",
+    "context": "project_form",
+    "variables": []
+  },
+  {
+    "key": "ticket.title",
+    "category": "ticket",
+    "description": "Ticket title field label",
+    "context": "ticket_form",
+    "variables": []
+  },
+  {
+    "key": "ticket.description",
+    "category": "ticket",
+    "description": "Ticket description field label",
+    "context": "ticket_form",
+    "variables": []
+  },
+  {
+    "key": "ticket.priority",
+    "category": "ticket",
+    "description": "Ticket priority field label",
+    "context": "ticket_form",
+    "variables": []
+  },
+  {
+    "key": "ticket.status",
+    "category": "ticket",
+    "description": "Ticket status field label",
+    "context": "ticket_form",
+    "variables": []
+  },
+  {
+    "key": "ticket.type",
+    "category": "ticket",
+    "description": "Ticket type field label",
+    "context": "ticket_form",
+    "variables": []
+  },
+  {
+    "key": "ticket.create",
+    "category": "ticket",
+    "description": "Create ticket button text",
+    "context": "ticket_form",
+    "variables": []
+  },
+  {
+    "key": "ticket.edit",
+    "category": "ticket",
+    "description": "Edit ticket button text",
+    "context": "ticket_form",
+    "variables": []
+  },
+  {
+    "key": "settings.backend_url",
+    "category": "settings",
+    "description": "Backend URL setting label",
+    "context": "settings_page",
+    "variables": []
+  },
+  {
+    "key": "settings.theme",
+    "category": "settings",
+    "description": "Theme setting label",
+    "context": "settings_page",
+    "variables": []
+  },
+  {
+    "key": "settings.theme_light",
+    "category": "settings",
+    "description": "Light theme option",
+    "context": "settings_page",
+    "variables": []
+  },
+  {
+    "key": "settings.theme_dark",
+    "category": "settings",
+    "description": "Dark theme option",
+    "context": "settings_page",
+    "variables": []
+  },
+  {
+    "key": "settings.theme_system",
+    "category": "settings",
+    "description": "System theme option",
+    "context": "settings_page",
+    "variables": []
+  },
+  {
+    "key": "app.name",
+    "category": "application",
+    "description": "Application name",
+    "context": "global",
+    "variables": []
+  },
+  {
+    "key": "app.welcome_user",
+    "category": "application",
+    "description": "Welcome message with user name",
+    "context": "dashboard",
+    "variables": ["name"]
+  }
+]

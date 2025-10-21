@@ -1,0 +1,82 @@
+[
+  {
+    "code": "en",
+    "name": "English",
+    "native_name": "English",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": true
+  },
+  {
+    "code": "de",
+    "name": "German",
+    "native_name": "Deutsch",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "fr",
+    "name": "French",
+    "native_name": "Français",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "es",
+    "name": "Spanish",
+    "native_name": "Español",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "pt",
+    "name": "Portuguese",
+    "native_name": "Português",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "ru",
+    "name": "Russian",
+    "native_name": "Русский",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "zh",
+    "name": "Chinese",
+    "native_name": "中文",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "ja",
+    "name": "Japanese",
+    "native_name": "日本語",
+    "is_rtl": false,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "ar",
+    "name": "Arabic",
+    "native_name": "العربية",
+    "is_rtl": true,
+    "is_active": true,
+    "is_default": false
+  },
+  {
+    "code": "he",
+    "name": "Hebrew",
+    "native_name": "עברית",
+    "is_rtl": true,
+    "is_active": true,
+    "is_default": false
+  }
+]

@@ -240,6 +240,85 @@ if __name__ == \"__main__\":
           cpus: '0.25'
           memory: 256M
 
+  # PostgreSQL database for Localization service
+  localization-db:
+    image: postgres:15-alpine
+    container_name: helixtrack-localization-db
+    hostname: localization-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${LOCALIZATION_DB_NAME:-helixtrack_localization}
+      - POSTGRES_USER=${LOCALIZATION_DB_USER:-localization_user}
+      - POSTGRES_PASSWORD=${LOCALIZATION_DB_PASSWORD:-localization_secure_password_change_me}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --lc-collate=C --lc-ctype=C
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - localization-db-data:/var/lib/postgresql/data
+      - ../../Database/DDL/Services/Localization/Definition.V1.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ../../Database/DDL/Services/Localization/Migration.V1.2.sql:/docker-entrypoint-initdb.d/02-migration.sql:ro
+    ports:
+      - "${LOCALIZATION_DB_PORT:-5434}:5432"
+    networks:
+      - helixtrack-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LOCALIZATION_DB_USER:-localization_user} -d ${LOCALIZATION_DB_NAME:-helixtrack_localization}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # Localization microservice
+  localization-service:
+    build:
+      context: ../Services/Localization
+      dockerfile: Dockerfile
+    container_name: helixtrack-localization-service
+    hostname: localization-service
+    restart: unless-stopped
+    depends_on:
+      localization-db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=localization-db
+      - DB_PORT=5432
+      - DB_NAME=${LOCALIZATION_DB_NAME:-helixtrack_localization}
+      - DB_USER=${LOCALIZATION_DB_USER:-localization_user}
+      - DB_PASSWORD=${LOCALIZATION_DB_PASSWORD:-localization_secure_password_change_me}
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-key-change-in-production}
+      - SEED_DATA_PATH=seed-data
+      - LOG_LEVEL=info
+    ports:
+      - "${LOCALIZATION_PORT:-8085}:8085"
+    volumes:
+      - ../Services/Localization/configs:/app/configs:ro
+      - ../Services/Localization/certs:/app/certs:ro
+      - ../Services/Localization/backups:/app/backups
+      - localization-logs:/app/logs
+    networks:
+      - helixtrack-network
+    healthcheck:
+      test: ["CMD", "curl", "--insecure", "--fail", "https://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
   # Chat microservice
   chat-service:
     build:
@@ -291,3 +370,7 @@ volumes:
     name: helixtrack-chat-db-data
   chat-logs:
     name: helixtrack-chat-logs
+  localization-db-data:
+    name: helixtrack-localization-db-data
+  localization-logs:
+    name: helixtrack-localization-logs

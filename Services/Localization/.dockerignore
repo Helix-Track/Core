@@ -1,0 +1,61 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+docs/
+ARCHITECTURE.md
+USER_MANUAL.md
+CLIENT_INTEGRATIONS.md
+
+# Test files
+*_test.go
+test-reports/
+coverage.out
+coverage.html
+
+# Build artifacts
+htLocalization
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Logs
+logs/
+*.log
+
+# Backups
+backups/
+seed-data-export/
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies (will be downloaded)
+vendor/

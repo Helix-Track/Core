@@ -1,7 +1,6 @@
 package services
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -14,11 +13,15 @@ import (
 
 // LocalizationService client for the Localization service
 type LocalizationService struct {
-	baseURL    string
-	jwtToken   string
-	httpClient *http.Client
-	cache      *LocalizationCache
-	logger     *zap.Logger
+	baseURL      string
+	jwtToken     string
+	httpClient   *http.Client
+	cache        *LocalizationCache
+	logger       *zap.Logger
+	wsClient     *LocalizationWebSocketClient
+	wsEnabled    bool
+	wsCtx        context.Context
+	wsCancel     context.CancelFunc
 }
 
 // LocalizationCache implements in-memory caching for localizations
@@ -220,4 +223,70 @@ func (lc *LocalizationCache) Clear() {
 	defer lc.mu.Unlock()
 
 	lc.catalogs = make(map[string]*CachedCatalog)
+}
+
+// EnableWebSocket enables WebSocket support for real-time updates
+func (ls *LocalizationService) EnableWebSocket() {
+	ls.wsEnabled = true
+	ls.logger.Info("websocket support enabled for localization service")
+}
+
+// StartWebSocket starts the WebSocket client connection
+func (ls *LocalizationService) StartWebSocket() error {
+	if !ls.wsEnabled {
+		ls.logger.Warn("websocket not enabled, skipping start")
+		return nil
+	}
+
+	if ls.wsClient != nil {
+		ls.logger.Warn("websocket client already started")
+		return nil
+	}
+
+	// Create WebSocket client
+	ls.wsClient = NewLocalizationWebSocketClient(ls.baseURL, ls, ls.logger)
+
+	// Create context for WebSocket lifecycle
+	ls.wsCtx, ls.wsCancel = context.WithCancel(context.Background())
+
+	// Start the WebSocket client in a goroutine
+	go func() {
+		if err := ls.wsClient.Start(ls.wsCtx); err != nil {
+			ls.logger.Error("websocket client error", zap.Error(err))
+		}
+	}()
+
+	ls.logger.Info("websocket client started")
+	return nil
+}
+
+// StopWebSocket stops the WebSocket client connection
+func (ls *LocalizationService) StopWebSocket() {
+	if ls.wsClient == nil {
+		return
+	}
+
+	ls.logger.Info("stopping websocket client")
+
+	// Cancel the context to signal shutdown
+	if ls.wsCancel != nil {
+		ls.wsCancel()
+	}
+
+	// Stop the client
+	ls.wsClient.Stop()
+
+	ls.wsClient = nil
+	ls.wsCtx = nil
+	ls.wsCancel = nil
+
+	ls.logger.Info("websocket client stopped")
+}
+
+// IsWebSocketConnected returns whether the WebSocket is connected
+func (ls *LocalizationService) IsWebSocketConnected() bool {
+	if ls.wsClient == nil {
+		return false
+	}
+	return ls.wsClient.IsConnected()
 }

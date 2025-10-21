@@ -42,8 +42,8 @@ type LocalizationResponse struct {
 	Approved bool              `json:"approved"`
 }
 
-// BatchLocalizationResponse represents a batch localization response
-type BatchLocalizationResponse struct {
+// GetBatchLocalizationResponse represents a batch localization fetch response
+type GetBatchLocalizationResponse struct {
 	Language      string            `json:"language"`
 	Localizations map[string]string `json:"localizations"`
 }

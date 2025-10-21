@@ -13,8 +13,8 @@ type CreateLocalizationRequest struct {
 	Approved    bool                   `json:"approved"`
 }
 
-// BatchLocalizationRequest represents a batch request for multiple keys
-type BatchLocalizationRequest struct {
+// GetBatchLocalizationRequest represents a batch request for fetching multiple keys
+type GetBatchLocalizationRequest struct {
 	Keys     []string `json:"keys" binding:"required"`
 	Language string   `json:"language" binding:"required"`
 	Fallback bool     `json:"fallback"`

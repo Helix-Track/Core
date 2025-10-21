@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/helixtrack/localization-service/internal/middleware"
 	"github.com/helixtrack/localization-service/internal/models"
+	"github.com/helixtrack/localization-service/internal/websocket"
 	"go.uber.org/zap"
 )
 
@@ -47,6 +48,22 @@ func (h *Handler) CreateLanguage(c *gin.Context) {
 	// Audit log
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "CREATE", "LANGUAGE", lang.ID, claims.Username, lang, c.ClientIP(), c.Request.UserAgent())
+
+	// Broadcast WebSocket event
+	h.wsManager.BroadcastEvent(
+		websocket.EventLanguageAdded,
+		&websocket.LanguageEventData{
+			ID:         lang.ID,
+			Code:       lang.Code,
+			Name:       lang.Name,
+			NativeName: lang.NativeName,
+			IsRTL:      lang.IsRTL,
+			IsActive:   lang.IsActive,
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
 
 	c.JSON(http.StatusCreated, models.SuccessResponse(lang))
 }
@@ -98,6 +115,22 @@ func (h *Handler) UpdateLanguage(c *gin.Context) {
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "UPDATE", "LANGUAGE", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
 
+	// Broadcast WebSocket event
+	h.wsManager.BroadcastEvent(
+		websocket.EventLanguageUpdated,
+		&websocket.LanguageEventData{
+			ID:         existing.ID,
+			Code:       existing.Code,
+			Name:       existing.Name,
+			NativeName: existing.NativeName,
+			IsRTL:      existing.IsRTL,
+			IsActive:   existing.IsActive,
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
+
 	c.JSON(http.StatusOK, models.SuccessResponse(existing))
 }
 
@@ -107,6 +140,16 @@ func (h *Handler) DeleteLanguage(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	// Get language before deleting for WebSocket event
+	lang, err := h.db.GetLanguageByID(ctx, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse(
+			models.ErrCodeNotFound,
+			"language not found",
+		))
+		return
+	}
 
 	if err := h.db.DeleteLanguage(ctx, id); err != nil {
 		h.logger.Error("failed to delete language", zap.Error(err))
@@ -120,6 +163,22 @@ func (h *Handler) DeleteLanguage(c *gin.Context) {
 	// Audit log
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "DELETE", "LANGUAGE", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
+
+	// Broadcast WebSocket event
+	h.wsManager.BroadcastEvent(
+		websocket.EventLanguageDeleted,
+		&websocket.LanguageEventData{
+			ID:         lang.ID,
+			Code:       lang.Code,
+			Name:       lang.Name,
+			NativeName: lang.NativeName,
+			IsRTL:      lang.IsRTL,
+			IsActive:   lang.IsActive,
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "language deleted successfully",
@@ -204,6 +263,23 @@ func (h *Handler) CreateLocalization(c *gin.Context) {
 		claims := middleware.GetClaims(c)
 		h.db.CreateAuditLog(ctx, "UPDATE", "LOCALIZATION", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
 
+		// Broadcast WebSocket event
+		h.wsManager.BroadcastEvent(
+			websocket.EventLocalizationUpdated,
+			&websocket.LocalizationEventData{
+				ID:         existing.ID,
+				KeyID:      existing.KeyID,
+				Key:        locKey.Key,
+				LanguageID: existing.LanguageID,
+				LanguageCode: lang.Code,
+				Value:      existing.Value,
+				IsApproved: existing.Approved,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+
 		c.JSON(http.StatusOK, models.SuccessResponse(existing))
 		return
 	}
@@ -233,6 +309,23 @@ func (h *Handler) CreateLocalization(c *gin.Context) {
 	// Audit log
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "CREATE", "LOCALIZATION", loc.ID, claims.Username, loc, c.ClientIP(), c.Request.UserAgent())
+
+	// Broadcast WebSocket event
+	h.wsManager.BroadcastEvent(
+		websocket.EventLocalizationAdded,
+		&websocket.LocalizationEventData{
+			ID:         loc.ID,
+			KeyID:      loc.KeyID,
+			Key:        locKey.Key,
+			LanguageID: loc.LanguageID,
+			LanguageCode: lang.Code,
+			Value:      loc.Value,
+			IsApproved: loc.Approved,
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
 
 	c.JSON(http.StatusCreated, models.SuccessResponse(loc))
 }
@@ -291,9 +384,37 @@ func (h *Handler) UpdateLocalization(c *gin.Context) {
 		h.invalidateCacheForLanguage(ctx, lang.Code)
 	}
 
+	// Get key for WebSocket event
+	locKey, _ := h.db.GetLocalizationKeyByID(ctx, existing.KeyID)
+
 	// Audit log
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "UPDATE", "LOCALIZATION", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
+
+	// Broadcast WebSocket event
+	keyName := ""
+	langCode := ""
+	if locKey != nil {
+		keyName = locKey.Key
+	}
+	if lang != nil {
+		langCode = lang.Code
+	}
+	h.wsManager.BroadcastEvent(
+		websocket.EventLocalizationUpdated,
+		&websocket.LocalizationEventData{
+			ID:         existing.ID,
+			KeyID:      existing.KeyID,
+			Key:        keyName,
+			LanguageID: existing.LanguageID,
+			LanguageCode: langCode,
+			Value:      existing.Value,
+			IsApproved: existing.Approved,
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
 
 	c.JSON(http.StatusOK, models.SuccessResponse(existing))
 }
@@ -305,13 +426,23 @@ func (h *Handler) DeleteLocalization(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Get localization to find language for cache invalidation
+	// Get localization before deleting for WebSocket event
 	loc, err := h.db.GetLocalizationByID(ctx, id)
-	if err == nil {
-		lang, _ := h.db.GetLanguageByID(ctx, loc.LanguageID)
-		if lang != nil {
-			h.invalidateCacheForLanguage(ctx, lang.Code)
-		}
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse(
+			models.ErrCodeNotFound,
+			"localization not found",
+		))
+		return
+	}
+
+	// Get related data for event
+	lang, _ := h.db.GetLanguageByID(ctx, loc.LanguageID)
+	locKey, _ := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
+
+	// Invalidate cache
+	if lang != nil {
+		h.invalidateCacheForLanguage(ctx, lang.Code)
 	}
 
 	if err := h.db.DeleteLocalization(ctx, id); err != nil {
@@ -327,6 +458,31 @@ func (h *Handler) DeleteLocalization(c *gin.Context) {
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "DELETE", "LOCALIZATION", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
 
+	// Broadcast WebSocket event
+	keyName := ""
+	langCode := ""
+	if locKey != nil {
+		keyName = locKey.Key
+	}
+	if lang != nil {
+		langCode = lang.Code
+	}
+	h.wsManager.BroadcastEvent(
+		websocket.EventLocalizationDeleted,
+		&websocket.LocalizationEventData{
+			ID:         loc.ID,
+			KeyID:      loc.KeyID,
+			Key:        keyName,
+			LanguageID: loc.LanguageID,
+			LanguageCode: langCode,
+			Value:      loc.Value,
+			IsApproved: loc.Approved,
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
+
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "localization deleted successfully",
 	}))
@@ -339,6 +495,16 @@ func (h *Handler) ApproveLocalization(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// Get localization before approving for WebSocket event
+	loc, err := h.db.GetLocalizationByID(ctx, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse(
+			models.ErrCodeNotFound,
+			"localization not found",
+		))
+		return
+	}
+
 	claims := middleware.GetClaims(c)
 	if err := h.db.ApproveLocalization(ctx, id, claims.Username); err != nil {
 		h.logger.Error("failed to approve localization", zap.Error(err))
@@ -349,8 +515,37 @@ func (h *Handler) ApproveLocalization(c *gin.Context) {
 		return
 	}
 
+	// Get related data for event
+	lang, _ := h.db.GetLanguageByID(ctx, loc.LanguageID)
+	locKey, _ := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
+
 	// Audit log
 	h.db.CreateAuditLog(ctx, "APPROVE", "LOCALIZATION", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
+
+	// Broadcast WebSocket event
+	keyName := ""
+	langCode := ""
+	if locKey != nil {
+		keyName = locKey.Key
+	}
+	if lang != nil {
+		langCode = lang.Code
+	}
+	h.wsManager.BroadcastEvent(
+		websocket.EventLocalizationApproved,
+		&websocket.LocalizationEventData{
+			ID:         loc.ID,
+			KeyID:      loc.KeyID,
+			Key:        keyName,
+			LanguageID: loc.LanguageID,
+			LanguageCode: langCode,
+			Value:      loc.Value,
+			IsApproved: true,
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "localization approved successfully",
@@ -374,6 +569,24 @@ func (h *Handler) InvalidateCache(c *gin.Context) {
 		// Invalidate all
 		h.cache.DeletePattern(ctx, "l10n:*")
 	}
+
+	// Get JWT claims for audit and WebSocket event
+	claims := middleware.GetClaims(c)
+
+	// Create audit log
+	h.db.CreateAuditLog(ctx, "INVALIDATE", "CACHE", "", claims.Username, req, c.ClientIP(), c.Request.UserAgent())
+
+	// Broadcast WebSocket event
+	h.wsManager.BroadcastEvent(
+		websocket.EventCacheInvalidated,
+		&websocket.CacheInvalidatedEventData{
+			Language: req.Language,
+			Reason:   "manual invalidation",
+		},
+		&websocket.EventMetadata{
+			Username: claims.Username,
+		},
+	)
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "cache invalidated successfully",

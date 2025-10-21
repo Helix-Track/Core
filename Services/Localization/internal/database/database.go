@@ -53,6 +53,16 @@ type Database interface {
 	DeleteCatalog(ctx context.Context, id string) error
 	BuildCatalog(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error)
 
+	// Version operations
+	CreateVersion(ctx context.Context, version *models.LocalizationVersion) error
+	GetVersionByNumber(ctx context.Context, versionNumber string) (*models.LocalizationVersion, error)
+	GetVersionByID(ctx context.Context, id string) (*models.LocalizationVersion, error)
+	GetCurrentVersion(ctx context.Context) (*models.LocalizationVersion, error)
+	ListVersions(ctx context.Context, limit, offset int) ([]*models.LocalizationVersion, error)
+	CountVersions(ctx context.Context) (int, error)
+	DeleteVersion(ctx context.Context, id string) error
+	GetCatalogByVersion(ctx context.Context, versionNumber, languageCode string) (*models.LocalizationCatalog, error)
+
 	// Audit operations
 	CreateAuditLog(ctx context.Context, action, entityType, entityID, username string, changes interface{}, ipAddress, userAgent string) error
 

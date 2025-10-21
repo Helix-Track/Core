@@ -29,6 +29,7 @@ type Server struct {
 	db                      database.Database
 	authService             services.AuthService
 	permService             services.PermissionService
+	localizationService     *services.LocalizationService
 	securityEngine          engine.Engine
 	serviceDiscoveryHandler *handlers.ServiceDiscoveryHandler
 	networkDiscoveryService *services.NetworkDiscoveryService
@@ -57,6 +58,20 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		cfg.Services.Permissions.Timeout,
 		cfg.Services.Permissions.Enabled,
 	)
+
+	// Initialize Localization Service
+	var localizationService *services.LocalizationService
+	if cfg.Services.Lokalisation != nil && cfg.Services.Lokalisation.Enabled {
+		localizationService = services.NewLocalizationService(
+			cfg.Services.Lokalisation.URL,
+			logger.Get(),
+		)
+		logger.Info("Localization service enabled",
+			zap.String("url", cfg.Services.Lokalisation.URL),
+		)
+	} else {
+		logger.Info("Localization service disabled")
+	}
 
 	// Initialize Security Engine
 	securityConfig := engine.DefaultConfig()
@@ -108,6 +123,7 @@ func NewServer(cfg *config.Config) (*Server, error) {
 		db:                      db,
 		authService:             authService,
 		permService:             permService,
+		localizationService:     localizationService,
 		securityEngine:          securityEngine,
 		serviceDiscoveryHandler: serviceDiscoveryHandler,
 		networkDiscoveryService: networkDiscoveryService,
@@ -157,8 +173,9 @@ func (s *Server) setupRouter() {
 
 	// Create handlers
 	handler := handlers.NewHandler(s.db, s.authService, s.permService, s.config.Version)
-	handler.SetEventPublisher(s.wsPublisher) // Set event publisher for WebSocket events
-	handler.SetSecurityEngine(s.securityEngine) // Set Security Engine for RBAC
+	handler.SetEventPublisher(s.wsPublisher)          // Set event publisher for WebSocket events
+	handler.SetSecurityEngine(s.securityEngine)       // Set Security Engine for RBAC
+	handler.SetLocalizationService(s.localizationService) // Set localization service
 	authHandler := handlers.NewAuthHandler(s.db)
 
 	// WebSocket routes (if enabled)

@@ -72,3 +72,50 @@ func GetErrorMessage(code int) string {
 	}
 	return "Unknown error"
 }
+
+// ErrorCodeToLocalizationKey maps error codes to localization keys
+var ErrorCodeToLocalizationKey = map[int]string{
+	ErrorCodeNoError:                "error.success",
+	ErrorCodeInvalidRequest:         "error.invalid_request",
+	ErrorCodeInvalidAction:          "error.invalid_action",
+	ErrorCodeMissingJWT:             "error.missing_jwt",
+	ErrorCodeInvalidJWT:             "error.invalid_jwt",
+	ErrorCodeMissingObject:          "error.missing_object",
+	ErrorCodeInvalidObject:          "error.invalid_object",
+	ErrorCodeMissingData:            "error.missing_data",
+	ErrorCodeInvalidData:            "error.invalid_data",
+	ErrorCodeUnauthorized:           "error.unauthorized",
+	ErrorCodeForbidden:              "error.forbidden",
+	ErrorCodeInternalError:          "error.internal_error",
+	ErrorCodeDatabaseError:          "error.database_error",
+	ErrorCodeServiceUnavailable:     "error.service_unavailable",
+	ErrorCodeConfigurationError:     "error.configuration_error",
+	ErrorCodeAuthServiceError:       "error.auth_service_error",
+	ErrorCodePermissionServiceError: "error.permission_service_error",
+	ErrorCodeExtensionServiceError:  "error.extension_service_error",
+	ErrorCodeEntityNotFound:         "error.not_found",
+	ErrorCodeEntityAlreadyExists:    "error.already_exists",
+	ErrorCodeEntityValidationFailed: "error.validation_failed",
+	ErrorCodeEntityDeleteFailed:     "error.delete_failed",
+	ErrorCodeEntityUpdateFailed:     "error.update_failed",
+	ErrorCodeEntityCreateFailed:     "error.create_failed",
+	ErrorCodeVersionConflict:        "error.version_conflict",
+}
+
+// GetLocalizationKey returns the localization key for a given error code
+func GetLocalizationKey(code int) string {
+	if key, ok := ErrorCodeToLocalizationKey[code]; ok {
+		return key
+	}
+	return "error.unknown"
+}
+
+// ErrorCodeFromKey returns the error code for a given localization key (fallback helper)
+func ErrorCodeFromKey(key string) int {
+	for code, k := range ErrorCodeToLocalizationKey {
+		if k == key {
+			return code
+		}
+	}
+	return ErrorCodeInternalError
+}

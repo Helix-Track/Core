@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
 	"fmt"
@@ -16,7 +17,9 @@ import (
 	"github.com/helixtrack/localization-service/internal/database"
 	"github.com/helixtrack/localization-service/internal/handlers"
 	"github.com/helixtrack/localization-service/internal/middleware"
+	"github.com/helixtrack/localization-service/internal/seeder"
 	"github.com/helixtrack/localization-service/internal/utils"
+	"github.com/helixtrack/localization-service/internal/websocket"
 	"github.com/quic-go/quic-go/http3"
 	"go.uber.org/zap"
 )
@@ -78,6 +81,35 @@ func main() {
 		zap.String("host", cfg.Database.Host),
 	)
 
+	// Check if database needs seeding
+	seedDataPath := os.Getenv("SEED_DATA_PATH")
+	if seedDataPath == "" {
+		seedDataPath = "seed-data"
+	}
+
+	seeder := seeder.New(db, logger, seedDataPath)
+	ctx := context.Background()
+
+	shouldSeed, err := seeder.ShouldSeed(ctx)
+	if err != nil {
+		logger.Warn("Failed to check if database needs seeding",
+			zap.Error(err),
+		)
+	} else if shouldSeed {
+		logger.Info("Database is empty, starting seed population...")
+
+		if err := seeder.Seed(ctx); err != nil {
+			logger.Error("Failed to seed database",
+				zap.Error(err),
+			)
+			// Don't exit - service can still run with empty database
+		} else {
+			logger.Info("Database seeded successfully")
+		}
+	} else {
+		logger.Info("Database already populated, skipping seed")
+	}
+
 	// Initialize cache
 	var cacheInstance cache.Cache
 
@@ -121,6 +153,17 @@ func main() {
 	}
 	defer cacheInstance.Close()
 
+	// Initialize WebSocket manager
+	wsManager := websocket.NewManager(logger)
+	logger.Info("WebSocket manager initialized")
+
+	// Create context for WebSocket manager
+	wsCtx, wsCancel := context.WithCancel(context.Background())
+	defer wsCancel()
+
+	// Start WebSocket manager in goroutine
+	go wsManager.Start(wsCtx)
+
 	// Initialize HTTP server with Gin
 	if cfg.Service.Environment == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -142,8 +185,13 @@ func main() {
 	router.Use(rateLimiter.RateLimit())
 
 	// Initialize handlers
-	handler := handlers.NewHandler(db, cacheInstance, logger)
+	handler := handlers.NewHandler(db, cacheInstance, logger, wsManager)
 	handler.RegisterRoutes(router, cfg.Security.JWTSecret, cfg.Security.AdminRoles)
+
+	// Add WebSocket endpoint
+	router.GET("/ws", func(c *gin.Context) {
+		wsManager.HandleConnection(c.Writer, c.Request)
+	})
 
 	// Create TLS configuration for HTTP/3 QUIC
 	tlsConfig := &tls.Config{
@@ -218,6 +266,10 @@ func main() {
 	<-quit
 
 	logger.Info("Shutting down server...")
+
+	// Shutdown WebSocket manager
+	wsCancel()
+	logger.Info("WebSocket manager shut down")
 
 	// Deregister from service discovery
 	if serviceRegistry != nil {

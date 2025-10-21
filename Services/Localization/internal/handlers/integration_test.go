@@ -447,7 +447,7 @@ func TestIntegration_GetLocalization_MissingLanguage(t *testing.T) {
 func TestIntegration_BatchLocalize_Success(t *testing.T) {
 	router, _, jwtSecret := setupTestServer()
 
-	batchReq := models.BatchLocalizationRequest{
+	batchReq := models.GetBatchLocalizationRequest{
 		Language: "en",
 		Keys:     []string{"app.welcome", "app.error"},
 		Fallback: true,
