@@ -1,0 +1,65 @@
+{
+  "service": {
+    "name": "localization-service",
+    "port": 8085,
+    "port_range": [8085, 8095],
+    "environment": "development",
+    "read_timeout": 30,
+    "write_timeout": 30,
+    "max_header_bytes": 8192,
+    "tls_cert_file": "certs/server.crt",
+    "tls_key_file": "certs/server.key",
+    "discovery": {
+      "enabled": false,
+      "provider": "consul",
+      "consul_address": "localhost:8500",
+      "etcd_endpoints": []
+    }
+  },
+  "database": {
+    "driver": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "database": "helixtrack_localization",
+    "user": "helixtrack",
+    "password": "helixtrack",
+    "ssl_mode": "disable",
+    "max_connections": 50,
+    "idle_connections": 10,
+    "connection_timeout": 30,
+    "connection_lifetime": 3600,
+    "encryption_key": "your-32-byte-encryption-key-here!"
+  },
+  "cache": {
+    "in_memory": {
+      "enabled": true,
+      "max_size_mb": 1024,
+      "default_ttl": 3600,
+      "cleanup_interval": 300
+    },
+    "redis": {
+      "enabled": false,
+      "addresses": ["localhost:6379"],
+      "password": "",
+      "database": 0,
+      "max_retries": 3,
+      "pool_size": 10,
+      "default_ttl": 14400
+    }
+  },
+  "security": {
+    "jwt_secret": "your-jwt-secret-key-change-in-production",
+    "jwt_issuer": "helixtrack-auth",
+    "rate_limiting": {
+      "per_ip_requests_per_minute": 1000,
+      "per_user_requests_per_minute": 5000,
+      "global_requests_per_minute": 100000
+    },
+    "admin_roles": ["admin", "superadmin"]
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "output": "stdout"
+  }
+}
