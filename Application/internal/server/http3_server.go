@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +41,7 @@ func NewHTTP3Server(router *gin.Engine, certFile, keyFile string, logger *zap.Lo
 	server := &http3.Server{
 		Handler:   router,
 		TLSConfig: tlsConfig,
-		QuicConfig: &quic.Config{
+		QUICConfig: &quic.Config{
 			MaxIdleTimeout:             30 * time.Second,
 			MaxIncomingStreams:         1000,
 			MaxIncomingUniStreams:      1000,
@@ -92,5 +91,5 @@ func (s *HTTP3Server) GetAddress() string {
 
 // SetQUICConfig allows customizing QUIC configuration
 func (s *HTTP3Server) SetQUICConfig(config *quic.Config) {
-	s.server.QuicConfig = config
+	s.server.QUICConfig = config
 }

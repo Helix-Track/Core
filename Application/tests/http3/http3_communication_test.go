@@ -28,7 +28,7 @@ func TestHTTP3Connectivity(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 	defer cancel()
 
-	resp, err := client.Get(ctx, testServerURL+"/health")
+	resp, err := doGet(client, ctx, testServerURL+"/health")
 	require.NoError(t, err, "HTTP/3 GET request should succeed")
 	defer resp.Body.Close()
 
@@ -49,7 +49,7 @@ func TestQUICProtocolNegotiation(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 	defer cancel()
 
-	resp, err := client.Get(ctx, testServerURL+"/do")
+	resp, err := doGet(client, ctx, testServerURL+"/do")
 	require.NoError(t, err, "HTTP/3 GET request should succeed")
 	defer resp.Body.Close()
 
@@ -67,7 +67,7 @@ func TestTLS13Verification(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 	defer cancel()
 
-	resp, err := client.Get(ctx, testServerURL+"/health")
+	resp, err := doGet(client, ctx, testServerURL+"/health")
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
@@ -98,7 +98,7 @@ func TestConnectionMultiplexing(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 			defer cancel()
 
-			resp, err := client.Get(ctx, testServerURL+"/health")
+			resp, err := doGet(client, ctx, testServerURL+"/health")
 			if err != nil {
 				results <- err
 				return
@@ -140,7 +140,7 @@ func TestLatencyMeasurement(t *testing.T) {
 	defer cancel()
 
 	// Warm-up request
-	resp, _ := client.Get(ctx, testServerURL+"/health")
+	resp, _ := doGet(client, ctx, testServerURL+"/health")
 	if resp != nil {
 		resp.Body.Close()
 	}
@@ -152,7 +152,7 @@ func TestLatencyMeasurement(t *testing.T) {
 	for i := 0; i < numRequests; i++ {
 		start := time.Now()
 
-		resp, err := client.Get(ctx, testServerURL+"/health")
+		resp, err := doGet(client, ctx, testServerURL+"/health")
 		latency := time.Since(start)
 
 		require.NoError(t, err, "Request %d should succeed", i)
@@ -209,7 +209,7 @@ func TestThroughput(t *testing.T) {
 		go func() {
 			defer wg.Done()
 
-			resp, err := client.Get(ctx, testServerURL+"/health")
+			resp, err := doGet(client, ctx, testServerURL+"/health")
 			if err != nil {
 				errors <- err
 				return
@@ -264,7 +264,7 @@ func TestErrorHandling(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 			defer cancel()
 
-			resp, err := client.Get(ctx, tc.url)
+			resp, err := doGet(client, ctx, tc.url)
 			require.NoError(t, err, "Request should complete even if endpoint is invalid")
 			defer resp.Body.Close()
 
@@ -320,7 +320,7 @@ func TestConnectionReuse(t *testing.T) {
 
 	// Make multiple requests
 	for i := 0; i < 5; i++ {
-		resp, err := client.Get(ctx, testServerURL+"/health")
+		resp, err := doGet(client, ctx, testServerURL+"/health")
 		require.NoError(t, err)
 		resp.Body.Close()
 	}
@@ -338,7 +338,7 @@ func createHTTP3TestClient(t *testing.T) *http.Client {
 		MaxVersion:         tls.VersionTLS13,
 	}
 
-	roundTripper := &http3.RoundTripper{
+	roundTripper := &http3.Transport{
 		TLSClientConfig: tlsConfig,
 	}
 
@@ -350,9 +350,18 @@ func createHTTP3TestClient(t *testing.T) *http.Client {
 
 // Helper function to close HTTP/3 client
 func closeClient(client *http.Client) {
-	if transport, ok := client.Transport.(*http3.RoundTripper); ok {
+	if transport, ok := client.Transport.(*http3.Transport); ok {
 		transport.Close()
 	}
+}
+
+// Helper function to do GET request with context
+func doGet(client *http.Client, ctx context.Context, url string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	return client.Do(req)
 }
 
 // BenchmarkHTTP3Latency benchmarks HTTP/3 request latency
@@ -365,7 +374,7 @@ func BenchmarkHTTP3Latency(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		resp, err := client.Get(ctx, url)
+		resp, err := doGet(client, ctx, url)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -386,7 +395,7 @@ func BenchmarkHTTP3Throughput(b *testing.B) {
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			resp, err := client.Get(ctx, url)
+			resp, err := doGet(client, ctx, url)
 			if err != nil {
 				b.Fatal(err)
 			}

@@ -53,9 +53,9 @@ func NewHTTP3Client(logger *zap.Logger, config *HTTP3ClientConfig) *HTTP3Client 
 		NextProtos:         []string{"h3"}, // HTTP/3
 	}
 
-	roundTripper := &http3.RoundTripper{
+	roundTripper := &http3.Transport{
 		TLSClientConfig: tlsConfig,
-		QuicConfig: &quic.Config{
+		QUICConfig: &quic.Config{
 			MaxIdleTimeout:  config.MaxIdleTimeout,
 			EnableDatagrams: config.EnableDatagrams,
 			KeepAlivePeriod: 10 * time.Second,
@@ -182,7 +182,7 @@ func (c *HTTP3Client) Do(req *http.Request) (*http.Response, error) {
 
 // Close closes the HTTP/3 client and releases resources
 func (c *HTTP3Client) Close() error {
-	if transport, ok := c.client.Transport.(*http3.RoundTripper); ok {
+	if transport, ok := c.client.Transport.(*http3.Transport); ok {
 		transport.Close()
 	}
 	c.logger.Debug("HTTP/3 client closed")

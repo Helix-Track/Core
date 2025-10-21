@@ -307,6 +307,34 @@ func (m *MockDatabase) GetStats(ctx context.Context) (map[string]interface{}, er
 	}, nil
 }
 
+// CountVersions returns the total number of versions (mock implementation)
+func (m *MockDatabase) CountVersions(ctx context.Context) (int, error) {
+	// Mock implementation - return a fixed count for testing
+	return 5, nil
+}
+
+// CreateVersion creates a new version (mock implementation)
+func (m *MockDatabase) CreateVersion(ctx context.Context, version *models.LocalizationVersion) error {
+	// Mock implementation - just return success for testing
+	return nil
+}
+
+// DeleteVersion deletes a version (mock implementation)
+func (m *MockDatabase) DeleteVersion(ctx context.Context, id string) error {
+	// Mock implementation - just return success for testing
+	return nil
+}
+
+// GetCatalogByVersion gets a catalog by version number and language code (mock implementation)
+func (m *MockDatabase) GetCatalogByVersion(ctx context.Context, versionNumber, languageCode string) (*models.LocalizationCatalog, error) {
+	// Mock implementation - return a sample catalog
+	return &models.LocalizationCatalog{
+		ID:         "test-catalog-1",
+		LanguageID: "en",
+		Category:   "general",
+	}, nil
+}
+
 var _ database.Database = (*MockDatabase)(nil)
 
 // Helper function to create a test JWT token
@@ -329,7 +357,8 @@ func setupTestServer() (*gin.Engine, *Handler, string) {
 	db := NewMockDatabase()
 	memCache := cache.NewMemoryCache(10, 1*time.Hour, 5*time.Minute, logger)
 
-	handler := NewHandler(db, memCache, logger)
+	// WebSocket manager not needed for integration tests
+	handler := NewHandler(db, memCache, logger, nil)
 
 	router := gin.New()
 	jwtSecret := "test-secret"
