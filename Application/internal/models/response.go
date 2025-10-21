@@ -29,3 +29,26 @@ func NewErrorResponse(code int, message string, localisedMessage string) *Respon
 func (r *Response) IsSuccess() bool {
 	return r.ErrorCode == ErrorCodeNoError
 }
+
+// NewLocalizedErrorResponse creates an error response with localized message
+// It uses the error code to look up both the default message and localization key
+func NewLocalizedErrorResponse(code int, locale string, localizedMessage string) *Response {
+	defaultMessage := GetErrorMessage(code)
+
+	return &Response{
+		ErrorCode:             code,
+		ErrorMessage:          defaultMessage,
+		ErrorMessageLocalised: localizedMessage,
+	}
+}
+
+// NewErrorResponseFromCode creates an error response from just an error code
+// This uses the default English message from the ErrorMessages map
+func NewErrorResponseFromCode(code int) *Response {
+	message := GetErrorMessage(code)
+
+	return &Response{
+		ErrorCode:    code,
+		ErrorMessage: message,
+	}
+}
