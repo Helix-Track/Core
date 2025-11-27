@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
+	"os/exec"
 	"sync"
 	"time"
 
@@ -14,13 +17,14 @@ import (
 
 // Orchestrator manages and coordinates QA test execution
 type Orchestrator struct {
-	Config      config.QAConfig
-	TestCases   []testcases.TestCase
-	Agents      []*agents.QAAgent
-	Results     map[string]agents.TestResult
-	mu          sync.Mutex
-	StartTime   time.Time
-	EndTime     time.Time
+	Config        config.QAConfig
+	TestCases     []testcases.TestCase
+	Agents        []*agents.QAAgent
+	Results       map[string]agents.TestResult
+	mu            sync.Mutex
+	StartTime     time.Time
+	EndTime       time.Time
+	serverProcess *os.Process
 }
 
 // NewOrchestrator creates a new test orchestrator
@@ -52,9 +56,27 @@ func (o *Orchestrator) Initialize() error {
 	// Login all agents and share JWT tokens
 	o.loginAllAgents()
 
-	// TODO: Reset database if configured
-	// TODO: Start server if configured
-	// TODO: Wait for server to be ready
+	// Reset database if configured
+	if o.Config.ResetBeforeRun && o.Config.DatabasePath != "" {
+		err := o.resetDatabase()
+		if err != nil {
+			return fmt.Errorf("failed to reset database: %w", err)
+		}
+	}
+
+	// Start server if configured
+	if o.Config.ServerStartCmd != "" {
+		err := o.startServer()
+		if err != nil {
+			return fmt.Errorf("failed to start server: %w", err)
+		}
+
+		// Wait for server to be ready
+		err = o.waitForServerReady()
+		if err != nil {
+			return fmt.Errorf("server failed to become ready: %w", err)
+		}
+	}
 
 	log.Printf("Initialized with %d test cases and %d agents", len(o.TestCases), len(o.Agents))
 
@@ -297,4 +319,95 @@ func (o *Orchestrator) GetSuccessRate() float64 {
 	}
 
 	return float64(passed) / float64(len(o.Results)) * 100
+}
+
+// resetDatabase resets the database if configured
+func (o *Orchestrator) resetDatabase() error {
+	if o.Config.DatabasePath == "" {
+		return nil
+	}
+
+	log.Printf("Resetting database: %s", o.Config.DatabasePath)
+	
+	// For SQLite databases, we can delete and recreate the file
+	// For other databases, we would need to execute reset scripts
+	if o.Config.DatabaseType == "sqlite" {
+		// Remove existing database file
+		if err := os.Remove(o.Config.DatabasePath); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("failed to remove database file: %w", err)
+		}
+		
+		// Recreate empty database file
+		file, err := os.Create(o.Config.DatabasePath)
+		if err != nil {
+			return fmt.Errorf("failed to create database file: %w", err)
+		}
+		file.Close()
+		
+		log.Printf("Database reset completed")
+	} else {
+		log.Printf("Database reset not implemented for type: %s", o.Config.DatabaseType)
+	}
+	
+	return nil
+}
+
+// startServer starts the server if configured
+func (o *Orchestrator) startServer() error {
+	if o.Config.ServerStartCmd == "" {
+		return nil
+	}
+
+	log.Printf("Starting server with command: %s", o.Config.ServerStartCmd)
+	
+	// Execute the server start command
+	cmd := exec.Command("sh", "-c", o.Config.ServerStartCmd)
+	cmd.Dir = o.Config.ServerWorkingDir
+	
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start server: %w", err)
+	}
+	
+	// Store the process for later cleanup
+	o.serverProcess = cmd.Process
+	log.Printf("Server started with PID: %d", cmd.Process.Pid)
+	
+	return nil
+}
+
+// waitForServerReady waits for the server to become ready
+func (o *Orchestrator) waitForServerReady() error {
+	if o.Config.ServerURL == "" {
+		return nil
+	}
+
+	log.Printf("Waiting for server to be ready at: %s", o.Config.ServerURL)
+	
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+	
+	deadline := time.Now().Add(o.Config.StartupTimeout)
+	
+	for time.Now().Before(deadline) {
+		resp, err := client.Get(o.Config.ServerURL + "/do")
+		if err == nil && resp.StatusCode == http.StatusOK {
+			log.Printf("Server is ready")
+			return nil
+		}
+		
+		time.Sleep(2 * time.Second)
+	}
+	
+	return fmt.Errorf("server did not become ready within %v", o.Config.StartupTimeout)
+}
+
+// Cleanup stops the server if it was started by the orchestrator
+func (o *Orchestrator) Cleanup() {
+	if o.serverProcess != nil {
+		log.Printf("Stopping server with PID: %d", o.serverProcess.Pid)
+		if err := o.serverProcess.Kill(); err != nil {
+			log.Printf("Failed to stop server: %v", err)
+		}
+	}
 }

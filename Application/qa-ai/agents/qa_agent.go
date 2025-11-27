@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -300,8 +301,19 @@ func (agent *QAAgent) verifyExpectedResult(expected testcases.ExpectedResult, re
 		}
 	}
 
-	// TODO: Implement JSONPath verification
-	// TODO: Implement response time check
+	// JSONPath verification
+	if len(expected.JSONPath) > 0 {
+		if !agent.verifyJSONPath(respBody, expected.JSONPath) {
+			return false
+		}
+	}
+
+	// Response time check
+	if expected.ResponseTime > 0 {
+		if duration > expected.ResponseTime {
+			return false
+		}
+	}
 
 	return true
 }
@@ -395,6 +407,51 @@ func (agent *QAAgent) GetTestSummary() TestSummary {
 	summary.SuccessRate = float64(summary.Passed) / float64(summary.TotalTests) * 100
 
 	return summary
+}
+
+// verifyJSONPath verifies JSONPath expressions against response body
+func (agent *QAAgent) verifyJSONPath(respBody []byte, jsonPathChecks map[string]interface{}) bool {
+	if len(jsonPathChecks) == 0 {
+		return true
+	}
+
+	// Parse response body as JSON
+	var data interface{}
+	if err := json.Unmarshal(respBody, &data); err != nil {
+		log.Printf("Failed to parse response body as JSON: %v", err)
+		return false
+	}
+
+	// For now, implement basic JSON path verification
+	// In a full implementation, we would use a JSONPath library
+	for path, expectedValue := range jsonPathChecks {
+		actualValue := agent.extractJSONValue(data, path)
+		if actualValue != expectedValue {
+			log.Printf("JSONPath verification failed for path %s: expected %v, got %v", 
+				path, expectedValue, actualValue)
+			return false
+		}
+	}
+
+	return true
+}
+
+// extractJSONValue extracts a value from JSON data using a simple path syntax
+func (agent *QAAgent) extractJSONValue(data interface{}, path string) interface{} {
+	// Simple implementation for basic paths like "data.user.name"
+	// For production, use a proper JSONPath library
+	parts := strings.Split(path, ".")
+	
+	current := data
+	for _, part := range parts {
+		if m, ok := current.(map[string]interface{}); ok {
+			current = m[part]
+		} else {
+			return nil
+		}
+	}
+	
+	return current
 }
 
 // TestSummary provides a summary of test results
