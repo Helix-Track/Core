@@ -243,6 +243,19 @@ func createTestTables(t *testing.T, db database.Database) {
 		)
 	`)
 	require.NoError(t, err)
+
+	// Create comment table with version column
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS comment (
+			id TEXT NOT NULL PRIMARY KEY UNIQUE,
+			comment TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted BOOLEAN NOT NULL DEFAULT 0,
+			version INTEGER NOT NULL DEFAULT 1
+		)
+	`)
+	require.NoError(t, err)
 }
 
 func setupTestHandler(t *testing.T) *Handler {

@@ -150,7 +150,14 @@ CREATE INDEX IF NOT EXISTS idx_org_acc_mapping_acc_id ON organization_account_ma
 CREATE INDEX IF NOT EXISTS idx_org_acc_mapping_created ON organization_account_mapping(created);
 
 -- ==================================================
--- STEP 6: Create team tables for team management
+-- STEP 6: Add missing columns to existing tables
+-- ==================================================
+
+-- Add version column to comment table
+ALTER TABLE comment ADD COLUMN version INTEGER NOT NULL DEFAULT 1;
+
+-- ==================================================
+-- STEP 7: Create team tables for team management
 -- ==================================================
 
 CREATE TABLE IF NOT EXISTS team (
