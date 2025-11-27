@@ -109,6 +109,31 @@ func (m *MockRows) Close() error {
 	return nil
 }
 
+func (m *MockRows) Columns() ([]string, error) {
+	// Return the column names that match the audit table structure
+	return []string{
+		"id",
+		"timestamp", 
+		"username",
+		"resource",
+		"resource_id",
+		"action",
+		"allowed",
+		"reason",
+		"ip_address",
+		"user_agent",
+		"context_data",
+	}, nil
+}
+
+func (m *MockRows) Err() error {
+	return nil
+}
+
+func (m *MockRows) NextResultSet() bool {
+	return false
+}
+
 // TestNewAuditLogger tests audit logger creation
 func TestNewAuditLogger(t *testing.T) {
 	mockDB := new(MockDatabase)

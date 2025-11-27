@@ -138,12 +138,122 @@ func (m *MockEventPublisher) GetEventCount() int {
 	return len(m.PublishedEvents)
 }
 
+// createTestTables creates the necessary tables for handler tests
+func createTestTables(t *testing.T, db database.Database) {
+	// Create account table
+	_, err := db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS account (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create organization table
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS organization (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create team table
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS team (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create organization_account_mapping table
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS organization_account_mapping (
+			id TEXT PRIMARY KEY,
+			organization_id TEXT NOT NULL,
+			account_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create team_organization_mapping table
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS team_organization_mapping (
+			id TEXT PRIMARY KEY,
+			team_id TEXT NOT NULL,
+			organization_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create team_project_mapping table
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS team_project_mapping (
+			id TEXT PRIMARY KEY,
+			team_id TEXT NOT NULL,
+			project_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create user_organization_mapping table
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS user_organization_mapping (
+			id TEXT PRIMARY KEY,
+			user_id TEXT NOT NULL,
+			organization_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+
+	// Create user_team_mapping table
+	_, err = db.Exec(context.Background(), `
+		CREATE TABLE IF NOT EXISTS user_team_mapping (
+			id TEXT PRIMARY KEY,
+			user_id TEXT NOT NULL,
+			team_id TEXT NOT NULL,
+			created INTEGER NOT NULL,
+			modified INTEGER NOT NULL,
+			deleted INTEGER NOT NULL DEFAULT 0
+		)
+	`)
+	require.NoError(t, err)
+}
+
 func setupTestHandler(t *testing.T) *Handler {
 	db, err := database.NewDatabase(config.DatabaseConfig{
 		Type:       "sqlite",
 		SQLitePath: ":memory:",
 	})
 	require.NoError(t, err)
+
+	// Create necessary tables for tests
+	createTestTables(t, db)
 
 	mockAuth := &services.MockAuthService{
 		IsEnabledFunc: func() bool { return true },

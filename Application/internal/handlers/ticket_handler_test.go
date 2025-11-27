@@ -92,6 +92,7 @@ func setupTicketTestHandler(t *testing.T) (*Handler, string) {
 			story_points     INTEGER NOT NULL,
 			creator          TEXT    NOT NULL,
 			deleted          BOOLEAN NOT NULL,
+			version          INTEGER NOT NULL DEFAULT 1,
 			UNIQUE (ticket_number, project_id)
 		)
 	`)
@@ -1423,6 +1424,7 @@ func setupTicketTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPubl
 			story_points     INTEGER NOT NULL,
 			creator          TEXT    NOT NULL,
 			deleted          BOOLEAN NOT NULL,
+			version          INTEGER NOT NULL DEFAULT 1,
 			UNIQUE (ticket_number, project_id)
 		)
 	`)

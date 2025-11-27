@@ -897,10 +897,14 @@ func TestCommentHandler_Create_PublishesEvent(t *testing.T) {
 	_, err = handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS comment (
 			id TEXT PRIMARY KEY,
-			comment TEXT,
+			title TEXT,
+			description TEXT,
+			user_id TEXT,
+			parent_id TEXT,
 			created INTEGER,
 			modified INTEGER,
-			deleted INTEGER
+			deleted INTEGER,
+			version INTEGER DEFAULT 1
 		)
 	`)
 	require.NoError(t, err)
@@ -1005,10 +1009,14 @@ func TestCommentHandler_Modify_PublishesEvent(t *testing.T) {
 	_, err = handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS comment (
 			id TEXT PRIMARY KEY,
-			comment TEXT,
+			title TEXT,
+			description TEXT,
+			user_id TEXT,
+			parent_id TEXT,
 			created INTEGER,
 			modified INTEGER,
-			deleted INTEGER
+			deleted INTEGER,
+			version INTEGER DEFAULT 1
 		)
 	`)
 	require.NoError(t, err)
@@ -1126,10 +1134,14 @@ func TestCommentHandler_Remove_PublishesEvent(t *testing.T) {
 	_, err = handler.db.Exec(context.Background(), `
 		CREATE TABLE IF NOT EXISTS comment (
 			id TEXT PRIMARY KEY,
-			comment TEXT,
+			title TEXT,
+			description TEXT,
+			user_id TEXT,
+			parent_id TEXT,
 			created INTEGER,
 			modified INTEGER,
-			deleted INTEGER
+			deleted INTEGER,
+			version INTEGER DEFAULT 1
 		)
 	`)
 	require.NoError(t, err)

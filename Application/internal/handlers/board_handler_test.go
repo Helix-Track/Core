@@ -29,7 +29,8 @@ func setupBoardTestHandler(t *testing.T) *Handler {
 			description TEXT,
 			created     INTEGER NOT NULL,
 			modified    INTEGER NOT NULL,
-			deleted     BOOLEAN NOT NULL
+			deleted     BOOLEAN NOT NULL,
+			version     INTEGER NOT NULL DEFAULT 1
 		)
 	`)
 	require.NoError(t, err)

@@ -92,13 +92,155 @@ VALUES (
 );
 
 -- ==================================================
+-- STEP 3: Create account table for account management
+-- ==================================================
+
+CREATE TABLE IF NOT EXISTS account (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0
+);
+
+-- Indexes for account table
+CREATE INDEX IF NOT EXISTS idx_account_title ON account(title);
+CREATE INDEX IF NOT EXISTS idx_account_created ON account(created);
+CREATE INDEX IF NOT EXISTS idx_account_modified ON account(modified);
+CREATE INDEX IF NOT EXISTS idx_account_deleted ON account(deleted);
+
+-- ==================================================
+-- STEP 4: Create organization table for organization management
+-- ==================================================
+
+CREATE TABLE IF NOT EXISTS organization (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0
+);
+
+-- Indexes for organization table
+CREATE INDEX IF NOT EXISTS idx_organization_title ON organization(title);
+CREATE INDEX IF NOT EXISTS idx_organization_created ON organization(created);
+CREATE INDEX IF NOT EXISTS idx_organization_modified ON organization(modified);
+CREATE INDEX IF NOT EXISTS idx_organization_deleted ON organization(deleted);
+
+-- ==================================================
+-- STEP 5: Create organization_account_mapping table for multi-tenancy
+-- ==================================================
+
+CREATE TABLE IF NOT EXISTS organization_account_mapping (
+    id TEXT PRIMARY KEY,
+    organization_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (organization_id) REFERENCES organization(id),
+    FOREIGN KEY (account_id) REFERENCES account(id)
+);
+
+-- Indexes for organization_account_mapping table
+CREATE INDEX IF NOT EXISTS idx_org_acc_mapping_org_id ON organization_account_mapping(organization_id);
+CREATE INDEX IF NOT EXISTS idx_org_acc_mapping_acc_id ON organization_account_mapping(account_id);
+CREATE INDEX IF NOT EXISTS idx_org_acc_mapping_created ON organization_account_mapping(created);
+
+-- ==================================================
+-- STEP 6: Create team tables for team management
+-- ==================================================
+
+CREATE TABLE IF NOT EXISTS team (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0
+);
+
+-- Indexes for team table
+CREATE INDEX IF NOT EXISTS idx_team_title ON team(title);
+CREATE INDEX IF NOT EXISTS idx_team_created ON team(created);
+CREATE INDEX IF NOT EXISTS idx_team_modified ON team(modified);
+CREATE INDEX IF NOT EXISTS idx_team_deleted ON team(deleted);
+
+-- Team-Organization mapping
+CREATE TABLE IF NOT EXISTS team_organization_mapping (
+    id TEXT PRIMARY KEY,
+    team_id TEXT NOT NULL,
+    organization_id TEXT NOT NULL,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (team_id) REFERENCES team(id),
+    FOREIGN KEY (organization_id) REFERENCES organization(id)
+);
+
+-- Indexes for team_organization_mapping table
+CREATE INDEX IF NOT EXISTS idx_team_org_mapping_team_id ON team_organization_mapping(team_id);
+CREATE INDEX IF NOT EXISTS idx_team_org_mapping_org_id ON team_organization_mapping(organization_id);
+
+-- Team-Project mapping
+CREATE TABLE IF NOT EXISTS team_project_mapping (
+    id TEXT PRIMARY KEY,
+    team_id TEXT NOT NULL,
+    project_id TEXT NOT NULL,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (team_id) REFERENCES team(id),
+    FOREIGN KEY (project_id) REFERENCES project(id)
+);
+
+-- Indexes for team_project_mapping table
+CREATE INDEX IF NOT EXISTS idx_team_project_mapping_team_id ON team_project_mapping(team_id);
+CREATE INDEX IF NOT EXISTS idx_team_project_mapping_project_id ON team_project_mapping(project_id);
+
+-- User-Organization mapping
+CREATE TABLE IF NOT EXISTS user_organization_mapping (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    organization_id TEXT NOT NULL,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (organization_id) REFERENCES organization(id)
+);
+
+-- Indexes for user_organization_mapping table
+CREATE INDEX IF NOT EXISTS idx_user_org_mapping_user_id ON user_organization_mapping(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_org_mapping_org_id ON user_organization_mapping(organization_id);
+
+-- User-Team mapping
+CREATE TABLE IF NOT EXISTS user_team_mapping (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    team_id TEXT NOT NULL,
+    created INTEGER NOT NULL,
+    modified INTEGER NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (team_id) REFERENCES team(id)
+);
+
+-- Indexes for user_team_mapping table
+CREATE INDEX IF NOT EXISTS idx_user_team_mapping_user_id ON user_team_mapping(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_team_mapping_team_id ON user_team_mapping(team_id);
+
+-- ==================================================
 -- Migration V5.6 Complete
 -- ==================================================
 -- Tables created/modified:
 -- - audit (enhanced with 4 new columns + 10 indexes)
 -- - security_audit (new table with 7 indexes)
 -- - permission_cache (new table with 3 indexes)
+-- - account (new table with 4 indexes)
 --
--- Total new indexes: 20
+-- Total new indexes: 24
 -- Schema version: V5.6
 -- ==================================================

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -45,8 +46,30 @@ func (h *Handler) AccountCreate(c *gin.Context, req *models.Request) {
 	account.Modified = account.Created
 	account.Deleted = false
 
-	// TODO: Store account in database
-	// This will be implemented when database layer is updated
+	// Store account in database
+	query := `
+		INSERT INTO account (id, title, description, created, modified, deleted)
+		VALUES (?, ?, ?, ?, ?, ?)
+	`
+
+	_, err = h.db.Exec(
+		context.Background(),
+		query,
+		account.ID,
+		account.Title,
+		account.Description,
+		account.Created,
+		account.Modified,
+		0, // deleted as integer (false)
+	)
+
+	if err != nil {
+		logger.Error("Failed to create account", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInternalError, "Failed to create account", "")
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
 	logger.Info("Account created", zap.String("id", account.ID), zap.String("title", account.Title))
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -65,23 +88,84 @@ func (h *Handler) AccountRead(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// TODO: Retrieve account from database
-	// This will be implemented when database layer is updated
-	logger.Info("Account read requested", zap.String("id", accountID))
+	// Retrieve account from database
+	query := `
+		SELECT id, title, description, created, modified, deleted
+		FROM account
+		WHERE id = ? AND deleted = 0
+	`
 
-	// For now, return a placeholder response
-	response := models.NewErrorResponse(models.ErrorCodeInternalError, "Account read not yet implemented", "")
-	c.JSON(http.StatusNotImplemented, response)
+	var account models.Account
+	err := h.db.QueryRow(context.Background(), query, accountID).Scan(
+		&account.ID,
+		&account.Title,
+		&account.Description,
+		&account.Created,
+		&account.Modified,
+		&account.Deleted,
+	)
+
+	if err != nil {
+		logger.Error("Failed to read account", zap.Error(err), zap.String("id", accountID))
+		response := models.NewErrorResponse(models.ErrorCodeEntityNotFound, "Account not found", "")
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
+	logger.Info("Account read", zap.String("id", account.ID), zap.String("title", account.Title))
+
+	response := models.NewSuccessResponse(map[string]interface{}{
+		"account": account,
+	})
+	c.JSON(http.StatusOK, response)
 }
 
 // AccountList handles listing all accounts
 func (h *Handler) AccountList(c *gin.Context, req *models.Request) {
-	// TODO: Retrieve accounts from database with pagination
-	// This will be implemented when database layer is updated
-	logger.Info("Account list requested")
+	// Retrieve accounts from database with pagination
+	query := `
+		SELECT id, title, description, created, modified, deleted
+		FROM account
+		WHERE deleted = 0
+		ORDER BY created DESC
+	`
 
-	// For now, return empty list
-	accounts := []models.Account{}
+	rows, err := h.db.Query(context.Background(), query)
+	if err != nil {
+		logger.Error("Failed to list accounts", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInternalError, "Failed to list accounts", "")
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	defer rows.Close()
+
+	var accounts []models.Account
+	for rows.Next() {
+		var account models.Account
+		err := rows.Scan(
+			&account.ID,
+			&account.Title,
+			&account.Description,
+			&account.Created,
+			&account.Modified,
+			&account.Deleted,
+		)
+		if err != nil {
+			logger.Error("Failed to scan account row", zap.Error(err))
+			continue
+		}
+		accounts = append(accounts, account)
+	}
+
+	if err = rows.Err(); err != nil {
+		logger.Error("Error iterating account rows", zap.Error(err))
+		response := models.NewErrorResponse(models.ErrorCodeInternalError, "Failed to list accounts", "")
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	logger.Info("Account list retrieved", zap.Int("count", len(accounts)))
+
 	response := models.NewSuccessResponse(map[string]interface{}{
 		"accounts": accounts,
 		"count":    len(accounts),
@@ -118,8 +202,36 @@ func (h *Handler) AccountModify(c *gin.Context, req *models.Request) {
 	// Update timestamp
 	account.Modified = time.Now().Unix()
 
-	// TODO: Update account in database
-	// This will be implemented when database layer is updated
+	// Update account in database
+	query := `
+		UPDATE account
+		SET title = ?, description = ?, modified = ?
+		WHERE id = ? AND deleted = 0
+	`
+
+	result, err := h.db.Exec(
+		context.Background(),
+		query,
+		account.Title,
+		account.Description,
+		account.Modified,
+		account.ID,
+	)
+
+	if err != nil {
+		logger.Error("Failed to modify account", zap.Error(err), zap.String("id", account.ID))
+		response := models.NewErrorResponse(models.ErrorCodeInternalError, "Failed to modify account", "")
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		response := models.NewErrorResponse(models.ErrorCodeEntityNotFound, "Account not found", "")
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
 	logger.Info("Account modified", zap.String("id", account.ID))
 
 	response := models.NewSuccessResponse(map[string]interface{}{
@@ -138,8 +250,34 @@ func (h *Handler) AccountRemove(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	// TODO: Soft-delete account in database (set deleted=true)
-	// This will be implemented when database layer is updated
+	// Soft-delete account in database (set deleted=true)
+	query := `
+		UPDATE account
+		SET deleted = 1, modified = ?
+		WHERE id = ? AND deleted = 0
+	`
+
+	result, err := h.db.Exec(
+		context.Background(),
+		query,
+		time.Now().Unix(),
+		accountID,
+	)
+
+	if err != nil {
+		logger.Error("Failed to remove account", zap.Error(err), zap.String("id", accountID))
+		response := models.NewErrorResponse(models.ErrorCodeInternalError, "Failed to remove account", "")
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		response := models.NewErrorResponse(models.ErrorCodeEntityNotFound, "Account not found", "")
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
 	logger.Info("Account removed", zap.String("id", accountID))
 
 	response := models.NewSuccessResponse(map[string]interface{}{

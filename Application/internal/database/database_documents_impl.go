@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"helixtrack.ru/core/internal/models"
 )
 
@@ -402,11 +403,9 @@ func (d *db) GetDocumentChildren(id string) ([]*models.Document, error) {
 	return d.ListDocuments(filters, 0, 0)
 }
 
-// Placeholder for UUID generation
+// generateUUID generates a proper UUID for document operations
 func generateUUID() string {
-	// TODO: Implement proper UUID generation
-	// For now, return a placeholder
-	return fmt.Sprintf("doc-%d", time.Now().UnixNano())
+	return uuid.New().String()
 }
 
 // ========================================================================
