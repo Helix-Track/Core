@@ -193,6 +193,90 @@ func main() {
 		wsManager.HandleConnection(c.Writer, c.Request)
 	})
 
+	// Check if TLS certs are configured
+	isTestMode := cfg.Service.Environment == "test" || 
+		cfg.Service.TLSCertFile == "" || cfg.Service.TLSKeyFile == ""
+
+	var serviceRegistry *utils.ServiceRegistry
+	
+	// Service discovery registration (if enabled)
+	if cfg.Service.Discovery.Enabled {
+		serviceRegistry, err = utils.NewServiceRegistry(
+			cfg.Service.Discovery.Provider,
+			cfg.Service.Discovery.ConsulAddress,
+			serviceName,
+			port,
+			logger,
+		)
+		if err != nil {
+			logger.Warn("Failed to initialize service registry",
+				zap.Error(err),
+			)
+		} else {
+			if err := serviceRegistry.Register(); err != nil {
+				logger.Warn("Failed to register service",
+					zap.Error(err),
+				)
+			} else {
+				logger.Info("Service registered successfully",
+					zap.String("provider", cfg.Service.Discovery.Provider),
+				)
+			}
+		}
+	}
+
+	if isTestMode {
+		// Run regular HTTP server for testing
+		logger.Info("Starting HTTP server for testing",
+			zap.Int("port", port),
+			zap.String("environment", cfg.Service.Environment),
+			zap.String("protocol", "HTTP/1.1"),
+		)
+
+		srv := &http.Server{
+			Addr:    fmt.Sprintf(":%d", port),
+			Handler: router,
+		}
+
+		// Start HTTP server in goroutine
+		go func() {
+			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				logger.Fatal("Failed to start HTTP server", zap.Error(err))
+			}
+		}()
+
+		// Wait for interrupt signal for graceful shutdown
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+		<-quit
+
+		logger.Info("Shutting down server...")
+
+		// Shutdown WebSocket manager
+		wsCancel()
+		logger.Info("WebSocket manager shut down")
+
+		// Deregister from service discovery
+		if serviceRegistry != nil {
+			if err := serviceRegistry.Deregister(); err != nil {
+				logger.Error("Failed to deregister service", zap.Error(err))
+			} else {
+				logger.Info("Service deregistered successfully")
+			}
+		}
+
+		// Graceful shutdown
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
+			logger.Error("HTTP server forced to shutdown", zap.Error(err))
+		}
+
+		logger.Info("HTTP server exited successfully")
+		return
+	}
+
+	// Production mode with HTTP/3 QUIC
 	// Create TLS configuration for HTTP/3 QUIC
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
@@ -219,32 +303,7 @@ func main() {
 		)
 	}
 
-	// Service discovery registration (if enabled)
-	var serviceRegistry *utils.ServiceRegistry
-	if cfg.Service.Discovery.Enabled {
-		serviceRegistry, err = utils.NewServiceRegistry(
-			cfg.Service.Discovery.Provider,
-			cfg.Service.Discovery.ConsulAddress,
-			serviceName,
-			port,
-			logger,
-		)
-		if err != nil {
-			logger.Warn("Failed to initialize service registry",
-				zap.Error(err),
-			)
-		} else {
-			if err := serviceRegistry.Register(); err != nil {
-				logger.Warn("Failed to register service",
-					zap.Error(err),
-				)
-			} else {
-				logger.Info("Service registered successfully",
-					zap.String("provider", cfg.Service.Discovery.Provider),
-				)
-			}
-		}
-	}
+	// Service discovery registration was handled above
 
 	// Start HTTP/3 QUIC server in goroutine
 	go func() {

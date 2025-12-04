@@ -1,0 +1,2222 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>handlers: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/helixtrack/localization-service/internal/handlers/admin_handlers.go (7.7%)</option>
+				
+				<option value="file1">github.com/helixtrack/localization-service/internal/handlers/handlers.go (79.6%)</option>
+				
+				<option value="file2">github.com/helixtrack/localization-service/internal/handlers/import_export_handlers.go (0.0%)</option>
+				
+				<option value="file3">github.com/helixtrack/localization-service/internal/handlers/version_handlers.go (32.3%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handlers
+
+import (
+        "context"
+        "encoding/json"
+        "net/http"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/helixtrack/localization-service/internal/middleware"
+        "github.com/helixtrack/localization-service/internal/models"
+        "github.com/helixtrack/localization-service/internal/websocket"
+        "go.uber.org/zap"
+)
+
+// CreateLanguage creates a new language (admin only)
+func (h *Handler) CreateLanguage(c *gin.Context) <span class="cov8" title="1">{
+        var req models.CreateLanguageRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov8" title="1">{
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeValidationFailed,
+                        "invalid request body",
+                ))
+                return
+        }</span>
+
+        <span class="cov8" title="1">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        lang := &amp;models.Language{
+                Code:       req.Code,
+                Name:       req.Name,
+                NativeName: req.NativeName,
+                IsRTL:      req.IsRTL,
+                IsActive:   req.IsActive,
+                IsDefault:  req.IsDefault,
+        }
+
+        if err := h.db.CreateLanguage(ctx, lang); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to create language", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeDatabaseError,
+                        "failed to create language",
+                ))
+                return
+        }</span>
+
+        // Audit log
+        <span class="cov8" title="1">claims := middleware.GetClaims(c)
+        h.db.CreateAuditLog(ctx, "CREATE", "LANGUAGE", lang.ID, claims.Username, lang, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventLanguageAdded,
+                        &amp;websocket.LanguageEventData{
+                                ID:         lang.ID,
+                                Code:       lang.Code,
+                                Name:       lang.Name,
+                                NativeName: lang.NativeName,
+                                IsRTL:      lang.IsRTL,
+                                IsActive:   lang.IsActive,
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(http.StatusCreated, models.SuccessResponse(lang))</span>
+}
+
+// UpdateLanguage updates an existing language (admin only)
+func (h *Handler) UpdateLanguage(c *gin.Context) <span class="cov0" title="0">{
+        id := c.Param("id")
+
+        var req models.CreateLanguageRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeValidationFailed,
+                        "invalid request body",
+                ))
+                return
+        }</span>
+
+        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Get existing language
+        existing, err := h.db.GetLanguageByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "language not found",
+                ))
+                return
+        }</span>
+
+        // Update fields
+        <span class="cov0" title="0">existing.Code = req.Code
+        existing.Name = req.Name
+        existing.NativeName = req.NativeName
+        existing.IsRTL = req.IsRTL
+        existing.IsActive = req.IsActive
+        existing.IsDefault = req.IsDefault
+
+        if err := h.db.UpdateLanguage(ctx, existing); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to update language", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeDatabaseError,
+                        "failed to update language",
+                ))
+                return
+        }</span>
+
+        // Audit log
+        <span class="cov0" title="0">claims := middleware.GetClaims(c)
+        h.db.CreateAuditLog(ctx, "UPDATE", "LANGUAGE", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventLanguageUpdated,
+                        &amp;websocket.LanguageEventData{
+                                ID:         existing.ID,
+                                Code:       existing.Code,
+                                Name:       existing.Name,
+                                NativeName: existing.NativeName,
+                                IsRTL:      existing.IsRTL,
+                                IsActive:   existing.IsActive,
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(existing))</span>
+}
+
+// DeleteLanguage deletes a language (admin only)
+func (h *Handler) DeleteLanguage(c *gin.Context) <span class="cov0" title="0">{
+        id := c.Param("id")
+
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Get language before deleting for WebSocket event
+        lang, err := h.db.GetLanguageByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "language not found",
+                ))
+                return
+        }</span>
+
+        <span class="cov0" title="0">if err := h.db.DeleteLanguage(ctx, id); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to delete language", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeDatabaseError,
+                        "failed to delete language",
+                ))
+                return
+        }</span>
+
+        // Audit log
+        <span class="cov0" title="0">claims := middleware.GetClaims(c)
+        h.db.CreateAuditLog(ctx, "DELETE", "LANGUAGE", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventLanguageDeleted,
+                        &amp;websocket.LanguageEventData{
+                                ID:         lang.ID,
+                                Code:       lang.Code,
+                                Name:       lang.Name,
+                                NativeName: lang.NativeName,
+                                IsRTL:      lang.IsRTL,
+                                IsActive:   lang.IsActive,
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
+                "message": "language deleted successfully",
+        }))</span>
+}
+
+// CreateLocalization creates or updates a localization (admin only)
+func (h *Handler) CreateLocalization(c *gin.Context) <span class="cov0" title="0">{
+        var req models.CreateLocalizationRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeValidationFailed,
+                        "invalid request body",
+                ))
+                return
+        }</span>
+
+        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Get or create localization key
+        locKey, err := h.db.GetLocalizationKeyByKey(ctx, req.Key)
+        if err != nil </span><span class="cov0" title="0">{
+                // Create new key
+                locKey = &amp;models.LocalizationKey{
+                        Key:         req.Key,
+                        Category:    req.Category,
+                        Description: req.Description,
+                        Context:     req.Context,
+                }
+                if err := h.db.CreateLocalizationKey(ctx, locKey); err != nil </span><span class="cov0" title="0">{
+                        h.logger.Error("failed to create localization key", zap.Error(err))
+                        c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                                models.ErrCodeDatabaseError,
+                                "failed to create localization key",
+                        ))
+                        return
+                }</span>
+        }
+
+        // Get language
+        <span class="cov0" title="0">lang, err := h.db.GetLanguageByCode(ctx, req.Language)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "language not found",
+                ))
+                return
+        }</span>
+
+        // Prepare JSON fields
+        <span class="cov0" title="0">var pluralFormsJSON, variablesJSON json.RawMessage
+        if req.PluralForms != nil </span><span class="cov0" title="0">{
+                pluralFormsJSON, _ = json.Marshal(req.PluralForms)
+        }</span>
+        <span class="cov0" title="0">if req.Variables != nil </span><span class="cov0" title="0">{
+                variablesJSON, _ = json.Marshal(req.Variables)
+        }</span>
+
+        // Check if localization already exists
+        <span class="cov0" title="0">existing, err := h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, lang.ID)
+        if err == nil </span><span class="cov0" title="0">{
+                // Update existing
+                existing.Value = req.Value
+                existing.PluralForms = pluralFormsJSON
+                existing.Variables = variablesJSON
+                existing.Approved = req.Approved
+
+                if err := h.db.UpdateLocalization(ctx, existing); err != nil </span><span class="cov0" title="0">{
+                        h.logger.Error("failed to update localization", zap.Error(err))
+                        c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                                models.ErrCodeDatabaseError,
+                                "failed to update localization",
+                        ))
+                        return
+                }</span>
+
+                // Invalidate cache
+                <span class="cov0" title="0">h.invalidateCacheForLanguage(ctx, lang.Code)
+
+                // Audit log
+                claims := middleware.GetClaims(c)
+                h.db.CreateAuditLog(ctx, "UPDATE", "LOCALIZATION", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
+
+                // Broadcast WebSocket event (if WebSocket is enabled)
+                if h.wsManager != nil </span><span class="cov0" title="0">{
+                        h.wsManager.BroadcastEvent(
+                                websocket.EventLocalizationUpdated,
+                                &amp;websocket.LocalizationEventData{
+                                        ID:           existing.ID,
+                                        KeyID:        existing.KeyID,
+                                        Key:          locKey.Key,
+                                        LanguageID:   existing.LanguageID,
+                                        LanguageCode: lang.Code,
+                                        Value:        existing.Value,
+                                        IsApproved:   existing.Approved,
+                                },
+                                &amp;websocket.EventMetadata{
+                                        Username: claims.Username,
+                                },
+                        )
+                }</span>
+
+                <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(existing))
+                return</span>
+        }
+
+        // Create new localization
+        <span class="cov0" title="0">loc := &amp;models.Localization{
+                KeyID:       locKey.ID,
+                LanguageID:  lang.ID,
+                Value:       req.Value,
+                PluralForms: pluralFormsJSON,
+                Variables:   variablesJSON,
+                Approved:    req.Approved,
+        }
+
+        if err := h.db.CreateLocalization(ctx, loc); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to create localization", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeDatabaseError,
+                        "failed to create localization",
+                ))
+                return
+        }</span>
+
+        // Invalidate cache
+        <span class="cov0" title="0">h.invalidateCacheForLanguage(ctx, lang.Code)
+
+        // Audit log
+        claims := middleware.GetClaims(c)
+        h.db.CreateAuditLog(ctx, "CREATE", "LOCALIZATION", loc.ID, claims.Username, loc, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventLocalizationAdded,
+                        &amp;websocket.LocalizationEventData{
+                                ID:           loc.ID,
+                                KeyID:        loc.KeyID,
+                                Key:          locKey.Key,
+                                LanguageID:   loc.LanguageID,
+                                LanguageCode: lang.Code,
+                                Value:        loc.Value,
+                                IsApproved:   loc.Approved,
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusCreated, models.SuccessResponse(loc))</span>
+}
+
+// UpdateLocalization updates an existing localization (admin only)
+func (h *Handler) UpdateLocalization(c *gin.Context) <span class="cov0" title="0">{
+        id := c.Param("id")
+
+        var req models.CreateLocalizationRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeValidationFailed,
+                        "invalid request body",
+                ))
+                return
+        }</span>
+
+        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Get existing localization
+        existing, err := h.db.GetLocalizationByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "localization not found",
+                ))
+                return
+        }</span>
+
+        // Update fields
+        <span class="cov0" title="0">existing.Value = req.Value
+
+        var pluralFormsJSON, variablesJSON json.RawMessage
+        if req.PluralForms != nil </span><span class="cov0" title="0">{
+                pluralFormsJSON, _ = json.Marshal(req.PluralForms)
+                existing.PluralForms = pluralFormsJSON
+        }</span>
+        <span class="cov0" title="0">if req.Variables != nil </span><span class="cov0" title="0">{
+                variablesJSON, _ = json.Marshal(req.Variables)
+                existing.Variables = variablesJSON
+        }</span>
+
+        <span class="cov0" title="0">if err := h.db.UpdateLocalization(ctx, existing); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to update localization", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeDatabaseError,
+                        "failed to update localization",
+                ))
+                return
+        }</span>
+
+        // Invalidate cache
+        <span class="cov0" title="0">lang, _ := h.db.GetLanguageByID(ctx, existing.LanguageID)
+        if lang != nil </span><span class="cov0" title="0">{
+                h.invalidateCacheForLanguage(ctx, lang.Code)
+        }</span>
+
+        // Get key for WebSocket event
+        <span class="cov0" title="0">locKey, _ := h.db.GetLocalizationKeyByID(ctx, existing.KeyID)
+
+        // Audit log
+        claims := middleware.GetClaims(c)
+        h.db.CreateAuditLog(ctx, "UPDATE", "LOCALIZATION", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event
+        keyName := ""
+        langCode := ""
+        if locKey != nil </span><span class="cov0" title="0">{
+                keyName = locKey.Key
+        }</span>
+        <span class="cov0" title="0">if lang != nil </span><span class="cov0" title="0">{
+                langCode = lang.Code
+        }</span>
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        <span class="cov0" title="0">if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventLocalizationUpdated,
+                        &amp;websocket.LocalizationEventData{
+                                ID:           existing.ID,
+                                KeyID:        existing.KeyID,
+                                Key:          keyName,
+                                LanguageID:   existing.LanguageID,
+                                LanguageCode: langCode,
+                                Value:        existing.Value,
+                                IsApproved:   existing.Approved,
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(existing))</span>
+}
+
+// DeleteLocalization deletes a localization (admin only)
+func (h *Handler) DeleteLocalization(c *gin.Context) <span class="cov0" title="0">{
+        id := c.Param("id")
+
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Get localization before deleting for WebSocket event
+        loc, err := h.db.GetLocalizationByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "localization not found",
+                ))
+                return
+        }</span>
+
+        // Get related data for event
+        <span class="cov0" title="0">lang, _ := h.db.GetLanguageByID(ctx, loc.LanguageID)
+        locKey, _ := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
+
+        // Invalidate cache
+        if lang != nil </span><span class="cov0" title="0">{
+                h.invalidateCacheForLanguage(ctx, lang.Code)
+        }</span>
+
+        <span class="cov0" title="0">if err := h.db.DeleteLocalization(ctx, id); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to delete localization", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeDatabaseError,
+                        "failed to delete localization",
+                ))
+                return
+        }</span>
+
+        // Audit log
+        <span class="cov0" title="0">claims := middleware.GetClaims(c)
+        h.db.CreateAuditLog(ctx, "DELETE", "LOCALIZATION", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event
+        keyName := ""
+        langCode := ""
+        if locKey != nil </span><span class="cov0" title="0">{
+                keyName = locKey.Key
+        }</span>
+        <span class="cov0" title="0">if lang != nil </span><span class="cov0" title="0">{
+                langCode = lang.Code
+        }</span>
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        <span class="cov0" title="0">if h.wsManager != nil </span><span class="cov0" title="0">{
+                // Broadcast WebSocket event (if WebSocket is enabled)
+                if h.wsManager != nil </span><span class="cov0" title="0">{
+                        h.wsManager.BroadcastEvent(
+                                websocket.EventLocalizationApproved,
+                                &amp;websocket.LocalizationEventData{
+                                        ID:           loc.ID,
+                                        KeyID:        loc.KeyID,
+                                        Key:          keyName,
+                                        LanguageID:   loc.LanguageID,
+                                        LanguageCode: langCode,
+                                        Value:        loc.Value,
+                                        IsApproved:   loc.Approved,
+                                },
+                                &amp;websocket.EventMetadata{
+                                        Username: claims.Username,
+                                },
+                        )
+                }</span>
+        }
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
+                "message": "localization deleted successfully",
+        }))</span>
+}
+
+// ApproveLocalization approves a localization (admin only)
+func (h *Handler) ApproveLocalization(c *gin.Context) <span class="cov0" title="0">{
+        id := c.Param("id")
+
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Get localization before approving for WebSocket event
+        loc, err := h.db.GetLocalizationByID(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "localization not found",
+                ))
+                return
+        }</span>
+
+        <span class="cov0" title="0">claims := middleware.GetClaims(c)
+        if err := h.db.ApproveLocalization(ctx, id, claims.Username); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to approve localization", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeDatabaseError,
+                        "failed to approve localization",
+                ))
+                return
+        }</span>
+
+        // Get related data for event
+        <span class="cov0" title="0">lang, _ := h.db.GetLanguageByID(ctx, loc.LanguageID)
+        locKey, _ := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
+
+        // Audit log
+        h.db.CreateAuditLog(ctx, "APPROVE", "LOCALIZATION", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event
+        keyName := ""
+        langCode := ""
+        if locKey != nil </span><span class="cov0" title="0">{
+                keyName = locKey.Key
+        }</span>
+        <span class="cov0" title="0">if lang != nil </span><span class="cov0" title="0">{
+                langCode = lang.Code
+        }</span>
+        <span class="cov0" title="0">h.wsManager.BroadcastEvent(
+                websocket.EventLocalizationApproved,
+                &amp;websocket.LocalizationEventData{
+                        ID:           loc.ID,
+                        KeyID:        loc.KeyID,
+                        Key:          keyName,
+                        LanguageID:   loc.LanguageID,
+                        LanguageCode: langCode,
+                        Value:        loc.Value,
+                        IsApproved:   true,
+                },
+                &amp;websocket.EventMetadata{
+                        Username: claims.Username,
+                },
+        )
+
+        c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
+                "message": "localization approved successfully",
+        }))</span>
+}
+
+// InvalidateCache invalidates cache (admin only)
+func (h *Handler) InvalidateCache(c *gin.Context) <span class="cov0" title="0">{
+        var req models.CacheInvalidationRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                // If no body, invalidate all
+                req = models.CacheInvalidationRequest{}
+        }</span>
+
+        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        if req.Language != "" </span><span class="cov0" title="0">{
+                h.invalidateCacheForLanguage(ctx, req.Language)
+        }</span> else<span class="cov0" title="0"> {
+                // Invalidate all
+                h.cache.DeletePattern(ctx, "l10n:*")
+        }</span>
+
+        // Get JWT claims for audit and WebSocket event
+        <span class="cov0" title="0">claims := middleware.GetClaims(c)
+
+        // Create audit log
+        h.db.CreateAuditLog(ctx, "INVALIDATE", "CACHE", "", claims.Username, req, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventCacheInvalidated,
+                        &amp;websocket.CacheInvalidatedEventData{
+                                Language: req.Language,
+                                Reason:   "manual invalidation",
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
+                "message": "cache invalidated successfully",
+        }))</span>
+}
+
+// GetStats retrieves database statistics (admin only)
+func (h *Handler) GetStats(c *gin.Context) <span class="cov8" title="1">{
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        stats, err := h.db.GetStats(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to get stats", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "failed to retrieve statistics",
+                ))
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(stats))</span>
+}
+
+// invalidateCacheForLanguage invalidates all cache entries for a language
+func (h *Handler) invalidateCacheForLanguage(ctx context.Context, languageCode string) <span class="cov0" title="0">{
+        pattern := "l10n:catalog:" + languageCode + ":*"
+        h.cache.DeletePattern(ctx, pattern)
+        h.logger.Info("cache invalidated", zap.String("language", languageCode))
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handlers
+
+import (
+        "context"
+        "encoding/json"
+        "net/http"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/helixtrack/localization-service/internal/cache"
+        "github.com/helixtrack/localization-service/internal/database"
+        "github.com/helixtrack/localization-service/internal/middleware"
+        "github.com/helixtrack/localization-service/internal/models"
+        "github.com/helixtrack/localization-service/internal/websocket"
+        "go.uber.org/zap"
+)
+
+// Handler dependencies
+type Handler struct {
+        db        database.Database
+        cache     cache.Cache
+        logger    *zap.Logger
+        wsManager *websocket.Manager
+}
+
+// NewHandler creates a new handler instance
+func NewHandler(db database.Database, cache cache.Cache, logger *zap.Logger, wsManager *websocket.Manager) *Handler <span class="cov8" title="1">{
+        return &amp;Handler{
+                db:        db,
+                cache:     cache,
+                logger:    logger,
+                wsManager: wsManager,
+        }
+}</span>
+
+// RegisterRoutes registers all API routes
+func (h *Handler) RegisterRoutes(router *gin.Engine, jwtSecret string, adminRoles []string) <span class="cov8" title="1">{
+        // Public routes
+        router.GET("/health", h.HealthCheck)
+
+        // API v1 routes
+        v1 := router.Group("/v1")
+        </span><span class="cov8" title="1">{
+                // Authentication required
+                v1.Use(middleware.JWTAuth(jwtSecret, h.logger))
+
+                // Catalog routes
+                v1.GET("/catalog/:language", h.GetCatalog)
+
+                // Localization routes
+                v1.GET("/localize/:key", h.GetLocalization)
+                v1.POST("/localize/batch", h.BatchLocalize)
+
+                // Language routes
+                v1.GET("/languages", h.ListLanguages)
+
+                // Version routes (public)
+                v1.GET("/version/current", h.GetCurrentVersion)
+                v1.GET("/version/history", h.GetVersionHistory)
+                v1.GET("/version/:version", h.GetVersionByNumber)
+                v1.GET("/version/:version/catalog/:language", h.GetCatalogByVersion)
+
+                // Admin routes
+                admin := v1.Group("/admin")
+                admin.Use(middleware.AdminOnly(adminRoles))
+                </span><span class="cov8" title="1">{
+                        // Language admin
+                        admin.POST("/languages", h.CreateLanguage)
+                        admin.PUT("/languages/:id", h.UpdateLanguage)
+                        admin.DELETE("/languages/:id", h.DeleteLanguage)
+
+                        // Localization admin
+                        admin.POST("/localizations", h.CreateLocalization)
+                        admin.PUT("/localizations/:id", h.UpdateLocalization)
+                        admin.DELETE("/localizations/:id", h.DeleteLocalization)
+                        admin.POST("/localizations/:id/approve", h.ApproveLocalization)
+                        admin.POST("/localizations/batch", h.HandleBatchLocalizations)
+
+                        // Import/Export
+                        admin.POST("/import", h.HandleImport)
+                        admin.GET("/export", h.HandleExport)
+
+                        // Version admin
+                        admin.POST("/version/create", h.CreateVersion)
+                        admin.DELETE("/version/:version", h.DeleteVersion)
+
+                        // Cache admin
+                        admin.POST("/cache/invalidate", h.InvalidateCache)
+
+                        // Stats
+                        admin.GET("/stats", h.GetStats)
+                }</span>
+        }
+}
+
+// HealthCheck handles health check requests
+func (h *Handler) HealthCheck(c *gin.Context) <span class="cov8" title="1">{
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        checks := make(map[string]interface{})
+
+        // Check database
+        dbStart := time.Now()
+        if err := h.db.Ping(); err != nil </span><span class="cov0" title="0">{
+                checks["database"] = map[string]interface{}{
+                        "status": "unhealthy",
+                        "error":  err.Error(),
+                }
+                c.JSON(http.StatusServiceUnavailable, models.HealthResponse{
+                        Status:  "unhealthy",
+                        Version: "1.0.0",
+                        Checks:  checks,
+                })
+                return
+        }</span>
+
+        <span class="cov8" title="1">checks["database"] = map[string]interface{}{
+                "status":     "healthy",
+                "latency_ms": time.Since(dbStart).Milliseconds(),
+        }
+
+        // Check cache
+        if _, err := h.cache.Exists(ctx, "health_check"); err != nil </span><span class="cov0" title="0">{
+                checks["cache"] = map[string]interface{}{
+                        "status": "degraded",
+                        "error":  err.Error(),
+                }
+        }</span> else<span class="cov8" title="1"> {
+                checks["cache"] = map[string]interface{}{
+                        "status": "healthy",
+                }
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(http.StatusOK, models.HealthResponse{
+                Status:  "healthy",
+                Version: "1.0.0",
+                Checks:  checks,
+        })</span>
+}
+
+// GetCatalog retrieves a complete localization catalog
+func (h *Handler) GetCatalog(c *gin.Context) <span class="cov8" title="1">{
+        languageCode := c.Param("language")
+        category := c.Query("category")
+
+        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer cancel()
+
+        // Generate cache key
+        cacheKey := cache.CacheKey("catalog", languageCode, category)
+
+        // Try cache first
+        if cached, err := h.cache.Get(ctx, cacheKey); err == nil </span><span class="cov8" title="1">{
+                var response models.CatalogResponse
+                if err := json.Unmarshal([]byte(cached), &amp;response); err == nil </span><span class="cov8" title="1">{
+                        h.logger.Debug("catalog cache hit", zap.String("language", languageCode))
+                        c.JSON(http.StatusOK, models.SuccessResponse(response))
+                        return
+                }</span>
+        }
+
+        // Get language
+        <span class="cov8" title="1">lang, err := h.db.GetLanguageByCode(ctx, languageCode)
+        if err != nil </span><span class="cov8" title="1">{
+                h.logger.Error("failed to get language", zap.Error(err))
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "language not found",
+                ))
+                return
+        }</span>
+
+        // Get or build catalog
+        <span class="cov8" title="1">catalog, err := h.db.GetLatestCatalog(ctx, lang.ID, category)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to get catalog", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "failed to retrieve catalog",
+                ))
+                return
+        }</span>
+
+        // Parse catalog data
+        <span class="cov8" title="1">catalogMap, err := catalog.GetCatalogMap()
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to parse catalog", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "failed to parse catalog",
+                ))
+                return
+        }</span>
+
+        <span class="cov8" title="1">response := models.CatalogResponse{
+                Language: languageCode,
+                Version:  catalog.Version,
+                Checksum: catalog.Checksum,
+                Catalog:  catalogMap,
+        }
+
+        // Cache the response
+        if responseJSON, err := json.Marshal(response); err == nil </span><span class="cov8" title="1">{
+                h.cache.Set(ctx, cacheKey, string(responseJSON), 1*time.Hour)
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
+}
+
+// GetLocalization retrieves a single localization
+func (h *Handler) GetLocalization(c *gin.Context) <span class="cov8" title="1">{
+        key := c.Param("key")
+        languageCode := c.Query("language")
+        fallback := c.DefaultQuery("fallback", "true") == "true"
+
+        if languageCode == "" </span><span class="cov8" title="1">{
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeValidationFailed,
+                        "language parameter is required",
+                ))
+                return
+        }</span>
+
+        <span class="cov8" title="1">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        // Get language
+        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
+        if err != nil </span><span class="cov8" title="1">{
+                if fallback </span><span class="cov0" title="0">{
+                        // Try default language
+                        defaultLang, err := h.db.GetDefaultLanguage(ctx)
+                        if err != nil </span><span class="cov0" title="0">{
+                                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                                        models.ErrCodeNotFound,
+                                        "language not found",
+                                ))
+                                return
+                        }</span>
+                        <span class="cov0" title="0">lang = defaultLang</span>
+                } else<span class="cov8" title="1"> {
+                        c.JSON(http.StatusNotFound, models.ErrorResponse(
+                                models.ErrCodeNotFound,
+                                "language not found",
+                        ))
+                        return
+                }</span>
+        }
+
+        // Get localization key
+        <span class="cov8" title="1">locKey, err := h.db.GetLocalizationKeyByKey(ctx, key)
+        if err != nil </span><span class="cov8" title="1">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "localization key not found",
+                ))
+                return
+        }</span>
+
+        // Get localization
+        <span class="cov8" title="1">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, lang.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                if fallback </span><span class="cov0" title="0">{
+                        // Try default language
+                        defaultLang, err := h.db.GetDefaultLanguage(ctx)
+                        if err == nil </span><span class="cov0" title="0">{
+                                loc, err = h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, defaultLang.ID)
+                        }</span>
+                }
+
+                <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                        c.JSON(http.StatusNotFound, models.ErrorResponse(
+                                models.ErrCodeNotFound,
+                                "localization not found",
+                        ))
+                        return
+                }</span>
+        }
+
+        // Parse variables
+        <span class="cov8" title="1">var variables []string
+        if loc.Variables != nil </span><span class="cov0" title="0">{
+                json.Unmarshal(loc.Variables, &amp;variables)
+        }</span>
+
+        <span class="cov8" title="1">response := models.LocalizationResponse{
+                Key:      key,
+                Language: lang.Code,
+                Value:    loc.Value,
+                Variables: variables,
+                Approved: loc.Approved,
+        }
+
+        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
+}
+
+// BatchLocalize retrieves multiple localizations at once
+func (h *Handler) BatchLocalize(c *gin.Context) <span class="cov8" title="1">{
+        var req models.GetBatchLocalizationRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov8" title="1">{
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeValidationFailed,
+                        "invalid request body",
+                ))
+                return
+        }</span>
+
+        <span class="cov8" title="1">ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer cancel()
+
+        // Get language
+        lang, err := h.db.GetLanguageByCode(ctx, req.Language)
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "language not found",
+                ))
+                return
+        }</span>
+
+        // Get default language for fallback
+        <span class="cov8" title="1">var defaultLang *models.Language
+        if req.Fallback </span><span class="cov8" title="1">{
+                defaultLang, _ = h.db.GetDefaultLanguage(ctx)
+        }</span>
+
+        // Retrieve each localization
+        <span class="cov8" title="1">localizations := make(map[string]string)
+        for _, key := range req.Keys </span><span class="cov8" title="1">{
+                // Get localization key
+                locKey, err := h.db.GetLocalizationKeyByKey(ctx, key)
+                if err != nil </span><span class="cov0" title="0">{
+                        continue</span> // Skip missing keys
+                }
+
+                // Get localization
+                <span class="cov8" title="1">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, lang.ID)
+                if err != nil &amp;&amp; req.Fallback &amp;&amp; defaultLang != nil </span><span class="cov0" title="0">{
+                        // Try fallback
+                        loc, err = h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, defaultLang.ID)
+                }</span>
+
+                <span class="cov8" title="1">if err == nil </span><span class="cov8" title="1">{
+                        localizations[key] = loc.Value
+                }</span>
+        }
+
+        <span class="cov8" title="1">response := models.GetBatchLocalizationResponse{
+                Language:      req.Language,
+                Localizations: localizations,
+        }
+
+        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
+}
+
+// ListLanguages retrieves all active languages
+func (h *Handler) ListLanguages(c *gin.Context) <span class="cov8" title="1">{
+        activeOnly := c.DefaultQuery("active_only", "true") == "true"
+
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        languages, err := h.db.GetLanguages(ctx, activeOnly)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("failed to get languages", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "failed to retrieve languages",
+                ))
+                return
+        }</span>
+
+        // Convert to response format
+        <span class="cov8" title="1">var langList []models.Language
+        for _, lang := range languages </span><span class="cov8" title="1">{
+                langList = append(langList, *lang)
+        }</span>
+
+        <span class="cov8" title="1">response := models.LanguageListResponse{
+                Languages: langList,
+        }
+
+        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package handlers
+
+import (
+        "context"
+        "encoding/csv"
+        "fmt"
+        "net/http"
+        "strings"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "github.com/helixtrack/localization-service/internal/middleware"
+        "github.com/helixtrack/localization-service/internal/models"
+        "github.com/helixtrack/localization-service/internal/websocket"
+        "go.uber.org/zap"
+)
+
+// HandleImport handles bulk import of localization data
+// POST /v1/admin/import
+func (h *Handler) HandleImport(c *gin.Context) <span class="cov0" title="0">{
+        ctx := context.Background()
+        startTime := time.Now()
+
+        // Parse request
+        var req models.ImportRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to parse import request", zap.Error(err))
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "success": false,
+                        "error":   "Invalid request format: " + err.Error(),
+                })
+                return
+        }</span>
+
+        // Validate request
+        <span class="cov0" title="0">if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Import request validation failed", zap.Error(err))
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "success": false,
+                        "error":   err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">h.logger.Info("Starting import",
+                zap.String("type", req.ImportType),
+                zap.Bool("overwrite", req.OverwriteExisting),
+                zap.Int("languages", len(req.Data.Languages)),
+                zap.Int("keys", len(req.Data.Keys)),
+        )
+
+        // Perform import
+        response := h.performImport(ctx, &amp;req)
+        response.Summary.DurationMs = time.Since(startTime).Milliseconds()
+
+        // Log results
+        h.logger.Info("Import completed",
+                zap.Bool("success", response.Success),
+                zap.Int("languages_imported", response.Summary.LanguagesImported),
+                zap.Int("keys_imported", response.Summary.KeysImported),
+                zap.Int("localizations_imported", response.Summary.LocalizationsImported),
+                zap.Int("errors", len(response.Errors)),
+                zap.Int64("duration_ms", response.Summary.DurationMs),
+        )
+
+        // Invalidate cache after successful import
+        if response.Success </span><span class="cov0" title="0">{
+                h.cache.DeletePattern(ctx, "l10n:*")
+        }</span>
+
+        // Get JWT claims for audit and WebSocket event
+        <span class="cov0" title="0">claims := middleware.GetClaims(c)
+
+        // Create audit log
+        h.db.CreateAuditLog(ctx, "IMPORT", "BATCH", "", claims.Username, req, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event for import completion
+        failedCount := response.Summary.LanguagesSkipped + response.Summary.KeysSkipped + response.Summary.LocalizationsSkipped
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventBatchOperationCompleted,
+                        &amp;websocket.BatchOperationEventData{
+                                Operation: "import",
+                                Processed: response.Summary.TotalProcessed,
+                                Failed:    failedCount,
+                                Duration:  fmt.Sprintf("%dms", response.Summary.DurationMs),
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">statusCode := http.StatusOK
+        if !response.Success </span><span class="cov0" title="0">{
+                statusCode = http.StatusPartialContent
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(statusCode, response)</span>
+}
+
+// performImport performs the actual import operation
+func (h *Handler) performImport(ctx context.Context, req *models.ImportRequest) *models.ImportResponse <span class="cov0" title="0">{
+        response := &amp;models.ImportResponse{
+                Success: true,
+                Summary: models.ImportSummary{},
+                Errors:  []models.ImportError{},
+        }
+
+        // Import languages
+        for _, langData := range req.Data.Languages </span><span class="cov0" title="0">{
+                err := h.importLanguage(ctx, langData, req.OverwriteExisting)
+                if err != nil </span><span class="cov0" title="0">{
+                        response.Errors = append(response.Errors, models.ImportError{
+                                Type:    "language",
+                                ID:      langData.Code,
+                                Message: err.Error(),
+                        })
+                        response.Summary.LanguagesSkipped++
+                        response.Success = false
+                }</span> else<span class="cov0" title="0"> {
+                        // Check if it was update or create
+                        existing, _ := h.db.GetLanguageByCode(ctx, langData.Code)
+                        if existing != nil &amp;&amp; req.OverwriteExisting </span><span class="cov0" title="0">{
+                                response.Summary.LanguagesUpdated++
+                        }</span> else<span class="cov0" title="0"> {
+                                response.Summary.LanguagesImported++
+                        }</span>
+                }
+        }
+
+        // Import localization keys
+        <span class="cov0" title="0">for _, keyData := range req.Data.Keys </span><span class="cov0" title="0">{
+                err := h.importLocalizationKey(ctx, keyData, req.OverwriteExisting)
+                if err != nil </span><span class="cov0" title="0">{
+                        response.Errors = append(response.Errors, models.ImportError{
+                                Type:    "key",
+                                ID:      keyData.Key,
+                                Message: err.Error(),
+                        })
+                        response.Summary.KeysSkipped++
+                        response.Success = false
+                }</span> else<span class="cov0" title="0"> {
+                        // Check if it was update or create
+                        existing, _ := h.db.GetLocalizationKeyByKey(ctx, keyData.Key)
+                        if existing != nil &amp;&amp; req.OverwriteExisting </span><span class="cov0" title="0">{
+                                response.Summary.KeysUpdated++
+                        }</span> else<span class="cov0" title="0"> {
+                                response.Summary.KeysImported++
+                        }</span>
+                }
+        }
+
+        // Import localizations
+        <span class="cov0" title="0">for languageCode, translations := range req.Data.Localizations </span><span class="cov0" title="0">{
+                for key, value := range translations </span><span class="cov0" title="0">{
+                        err := h.importLocalization(ctx, languageCode, key, value, req.OverwriteExisting)
+                        if err != nil </span><span class="cov0" title="0">{
+                                response.Errors = append(response.Errors, models.ImportError{
+                                        Type:    "localization",
+                                        ID:      fmt.Sprintf("%s:%s", languageCode, key),
+                                        Message: err.Error(),
+                                })
+                                response.Summary.LocalizationsSkipped++
+                                response.Success = false
+                        }</span> else<span class="cov0" title="0"> {
+                                response.Summary.LocalizationsImported++
+                        }</span>
+                }
+        }
+
+        <span class="cov0" title="0">response.Summary.TotalProcessed = response.Summary.LanguagesImported +
+                response.Summary.LanguagesUpdated +
+                response.Summary.KeysImported +
+                response.Summary.KeysUpdated +
+                response.Summary.LocalizationsImported +
+                response.Summary.LocalizationsUpdated
+
+        return response</span>
+}
+
+// importLanguage imports a single language
+func (h *Handler) importLanguage(ctx context.Context, data models.ImportLanguage, overwrite bool) error <span class="cov0" title="0">{
+        // Check if language exists
+        existing, _ := h.db.GetLanguageByCode(ctx, data.Code)
+
+        if existing != nil </span><span class="cov0" title="0">{
+                if !overwrite </span><span class="cov0" title="0">{
+                        return fmt.Errorf("language already exists and overwrite is disabled")
+                }</span>
+
+                // Update existing language
+                <span class="cov0" title="0">existing.Name = data.Name
+                existing.NativeName = data.NativeName
+                existing.IsRTL = data.IsRTL
+                existing.IsActive = data.IsActive
+                existing.IsDefault = data.IsDefault
+                existing.ModifiedAt = time.Now().Unix()
+
+                return h.db.UpdateLanguage(ctx, existing)</span>
+        }
+
+        // Create new language
+        <span class="cov0" title="0">lang := &amp;models.Language{
+                ID:         uuid.New().String(),
+                Code:       data.Code,
+                Name:       data.Name,
+                NativeName: data.NativeName,
+                IsRTL:      data.IsRTL,
+                IsActive:   data.IsActive,
+                IsDefault:  data.IsDefault,
+                CreatedAt:  time.Now().Unix(),
+                ModifiedAt: time.Now().Unix(),
+                Deleted:    false,
+        }
+
+        return h.db.CreateLanguage(ctx, lang)</span>
+}
+
+// importLocalizationKey imports a single localization key
+func (h *Handler) importLocalizationKey(ctx context.Context, data models.ImportLocalizationKey, overwrite bool) error <span class="cov0" title="0">{
+        // Check if key exists
+        existing, _ := h.db.GetLocalizationKeyByKey(ctx, data.Key)
+
+        if existing != nil </span><span class="cov0" title="0">{
+                if !overwrite </span><span class="cov0" title="0">{
+                        return fmt.Errorf("key already exists and overwrite is disabled")
+                }</span>
+
+                // Update existing key
+                <span class="cov0" title="0">existing.Category = data.Category
+                existing.Description = data.Description
+                existing.Context = data.Context
+                existing.ModifiedAt = time.Now().Unix()
+
+                return h.db.UpdateLocalizationKey(ctx, existing)</span>
+        }
+
+        // Create new key
+        <span class="cov0" title="0">key := &amp;models.LocalizationKey{
+                ID:          uuid.New().String(),
+                Key:         data.Key,
+                Category:    data.Category,
+                Description: data.Description,
+                Context:     data.Context,
+                CreatedAt:   time.Now().Unix(),
+                ModifiedAt:  time.Now().Unix(),
+                Deleted:     false,
+        }
+
+        return h.db.CreateLocalizationKey(ctx, key)</span>
+}
+
+// importLocalization imports a single localization
+func (h *Handler) importLocalization(ctx context.Context, languageCode, key, value string, overwrite bool) error <span class="cov0" title="0">{
+        // Get language
+        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("language not found: %s", languageCode)
+        }</span>
+
+        // Get key
+        <span class="cov0" title="0">keyObj, err := h.db.GetLocalizationKeyByKey(ctx, key)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("localization key not found: %s", key)
+        }</span>
+
+        // Check if localization exists
+        <span class="cov0" title="0">existing, _ := h.db.GetLocalizationByKeyAndLanguage(ctx, keyObj.ID, lang.ID)
+
+        if existing != nil </span><span class="cov0" title="0">{
+                if !overwrite </span><span class="cov0" title="0">{
+                        return fmt.Errorf("localization already exists and overwrite is disabled")
+                }</span>
+
+                // Update existing localization
+                <span class="cov0" title="0">existing.Value = value
+                existing.Version++
+                existing.ModifiedAt = time.Now().Unix()
+
+                return h.db.UpdateLocalization(ctx, existing)</span>
+        }
+
+        // Create new localization
+        <span class="cov0" title="0">localization := &amp;models.Localization{
+                ID:         uuid.New().String(),
+                KeyID:      keyObj.ID,
+                LanguageID: lang.ID,
+                Value:      value,
+                Version:    1,
+                Approved:   false, // New imports require approval
+                CreatedAt:  time.Now().Unix(),
+                ModifiedAt: time.Now().Unix(),
+                Deleted:    false,
+        }
+
+        return h.db.CreateLocalization(ctx, localization)</span>
+}
+
+// HandleExport handles export of localization data
+// GET /v1/admin/export
+func (h *Handler) HandleExport(c *gin.Context) <span class="cov0" title="0">{
+        ctx := context.Background()
+
+        // Parse query parameters
+        format := c.DefaultQuery("format", "json")
+        languages := c.QueryArray("languages")
+        categories := c.QueryArray("categories")
+        includeMetadata := c.DefaultQuery("include_metadata", "true") == "true"
+        onlyApproved := c.DefaultQuery("only_approved", "true") == "true"
+
+        req := models.ExportRequest{
+                Format:          format,
+                Languages:       languages,
+                Categories:      categories,
+                IncludeMetadata: includeMetadata,
+                OnlyApproved:    onlyApproved,
+                Compress:        false,
+        }
+
+        // Validate request
+        if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Export request validation failed", zap.Error(err))
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "success": false,
+                        "error":   err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">h.logger.Info("Starting export",
+                zap.String("format", format),
+                zap.Strings("languages", languages),
+                zap.Strings("categories", categories),
+        )
+
+        // Perform export
+        response, err := h.performExport(ctx, &amp;req)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Export failed", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, gin.H{
+                        "success": false,
+                        "error":   err.Error(),
+                })
+                return
+        }</span>
+
+        // Return based on format
+        <span class="cov0" title="0">switch format </span>{
+        case "json":<span class="cov0" title="0">
+                c.JSON(http.StatusOK, response)</span>
+        case "csv":<span class="cov0" title="0">
+                // Return CSV data directly
+                c.Header("Content-Type", "text/csv")
+                c.Header("Content-Disposition", "attachment; filename=localization-export.csv")
+                c.String(http.StatusOK, response.Data.(string))</span>
+        case "xliff":<span class="cov0" title="0">
+                // Return XLIFF data directly
+                c.Header("Content-Type", "application/xml")
+                c.Header("Content-Disposition", "attachment; filename=localization-export.xlf")
+                c.String(http.StatusOK, response.Data.(string))</span>
+        }
+}
+
+// performExport performs the actual export operation
+func (h *Handler) performExport(ctx context.Context, req *models.ExportRequest) (*models.ExportResponse, error) <span class="cov0" title="0">{
+        // Get all languages or filter by requested languages
+        allLanguages, err := h.db.GetLanguages(ctx, true)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get languages: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">languages := allLanguages
+        if len(req.Languages) &gt; 0 </span><span class="cov0" title="0">{
+                languages = []*models.Language{}
+                for _, code := range req.Languages </span><span class="cov0" title="0">{
+                        lang, err := h.db.GetLanguageByCode(ctx, code)
+                        if err != nil </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+                        <span class="cov0" title="0">languages = append(languages, lang)</span>
+                }
+        }
+
+        // Get all localization keys or filter by categories
+        <span class="cov0" title="0">var keys []*models.LocalizationKey
+        if len(req.Categories) &gt; 0 </span><span class="cov0" title="0">{
+                for _, category := range req.Categories </span><span class="cov0" title="0">{
+                        categoryKeys, err := h.db.GetLocalizationKeysByCategory(ctx, category)
+                        if err != nil </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+                        <span class="cov0" title="0">keys = append(keys, categoryKeys...)</span>
+                }
+        } else<span class="cov0" title="0"> {
+                // Get all keys (there's no GetAllKeys method, so we'll need to get by language)
+                // For now, we'll collect keys as we process localizations
+                keys = []*models.LocalizationKey{}
+        }</span>
+
+        // Build export data
+        <span class="cov0" title="0">exportData := models.ImportData{
+                Languages:     []models.ImportLanguage{},
+                Keys:          []models.ImportLocalizationKey{},
+                Localizations: make(map[string]map[string]string),
+        }
+
+        // Add languages
+        for _, lang := range languages </span><span class="cov0" title="0">{
+                exportData.Languages = append(exportData.Languages, models.ImportLanguage{
+                        Code:       lang.Code,
+                        Name:       lang.Name,
+                        NativeName: lang.NativeName,
+                        IsRTL:      lang.IsRTL,
+                        IsActive:   lang.IsActive,
+                        IsDefault:  lang.IsDefault,
+                })
+        }</span>
+
+        // Get localizations for each language
+        <span class="cov0" title="0">keysSeen := make(map[string]*models.LocalizationKey)
+        totalLocalizations := 0
+
+        for _, lang := range languages </span><span class="cov0" title="0">{
+                localizations, err := h.db.GetLocalizationsByLanguage(ctx, lang.ID)
+                if err != nil </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">exportData.Localizations[lang.Code] = make(map[string]string)
+
+                for _, loc := range localizations </span><span class="cov0" title="0">{
+                        if req.OnlyApproved &amp;&amp; !loc.Approved </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+
+                        // Get the key
+                        <span class="cov0" title="0">key, err := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
+                        if err != nil </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+
+                        // Add to translations
+                        <span class="cov0" title="0">exportData.Localizations[lang.Code][key.Key] = loc.Value
+                        totalLocalizations++
+
+                        // Track key
+                        if _, exists := keysSeen[key.ID]; !exists </span><span class="cov0" title="0">{
+                                keysSeen[key.ID] = key
+
+                                exportData.Keys = append(exportData.Keys, models.ImportLocalizationKey{
+                                        Key:         key.Key,
+                                        Category:    key.Category,
+                                        Description: key.Description,
+                                        Context:     key.Context,
+                                        Variables:   []string{}, // Variables not stored in current model
+                                })
+                        }</span>
+                }
+        }
+
+        // Create response based on format
+        <span class="cov0" title="0">response := &amp;models.ExportResponse{
+                Success: true,
+                Format:  req.Format,
+                Metadata: models.ExportMetadata{
+                        ExportedAt:    time.Now().Unix(),
+                        Languages:     len(languages),
+                        Keys:          len(exportData.Keys),
+                        Localizations: totalLocalizations,
+                        Format:        req.Format,
+                        Compressed:    req.Compress,
+                        Version:       "1.0.0",
+                },
+        }
+
+        switch req.Format </span>{
+        case "json":<span class="cov0" title="0">
+                response.Data = exportData</span>
+        case "csv":<span class="cov0" title="0">
+                csvData, err := h.exportToCSV(exportData)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">response.Data = csvData</span>
+        case "xliff":<span class="cov0" title="0">
+                xliffData, err := h.exportToXLIFF(exportData)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">response.Data = xliffData</span>
+        }
+
+        <span class="cov0" title="0">return response, nil</span>
+}
+
+// exportToCSV converts export data to CSV format
+func (h *Handler) exportToCSV(data models.ImportData) (string, error) <span class="cov0" title="0">{
+        var builder strings.Builder
+        writer := csv.NewWriter(&amp;builder)
+
+        // Write header
+        header := []string{"Key", "Category", "Description", "Context"}
+        for _, lang := range data.Languages </span><span class="cov0" title="0">{
+                header = append(header, lang.Code)
+        }</span>
+        <span class="cov0" title="0">writer.Write(header)
+
+        // Write rows
+        for _, key := range data.Keys </span><span class="cov0" title="0">{
+                row := []string{key.Key, key.Category, key.Description, key.Context}
+
+                for _, lang := range data.Languages </span><span class="cov0" title="0">{
+                        value := ""
+                        if translations, exists := data.Localizations[lang.Code]; exists </span><span class="cov0" title="0">{
+                                if v, ok := translations[key.Key]; ok </span><span class="cov0" title="0">{
+                                        value = v
+                                }</span>
+                        }
+                        <span class="cov0" title="0">row = append(row, value)</span>
+                }
+
+                <span class="cov0" title="0">writer.Write(row)</span>
+        }
+
+        <span class="cov0" title="0">writer.Flush()
+        return builder.String(), writer.Error()</span>
+}
+
+// exportToXLIFF converts export data to XLIFF format
+func (h *Handler) exportToXLIFF(data models.ImportData) (string, error) <span class="cov0" title="0">{
+        // Simplified XLIFF 1.2 format
+        var builder strings.Builder
+        builder.WriteString(`&lt;?xml version="1.0" encoding="UTF-8"?&gt;` + "\n")
+        builder.WriteString(`&lt;xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"&gt;` + "\n")
+
+        for _, lang := range data.Languages </span><span class="cov0" title="0">{
+                if len(data.Localizations[lang.Code]) == 0 </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">builder.WriteString(fmt.Sprintf(`  &lt;file source-language="en" target-language="%s" datatype="plaintext"&gt;`, lang.Code) + "\n")
+                builder.WriteString(`    &lt;body&gt;` + "\n")
+
+                for key, value := range data.Localizations[lang.Code] </span><span class="cov0" title="0">{
+                        builder.WriteString(fmt.Sprintf(`      &lt;trans-unit id="%s"&gt;`, key) + "\n")
+                        builder.WriteString(fmt.Sprintf(`        &lt;source&gt;%s&lt;/source&gt;`, key) + "\n")
+                        builder.WriteString(fmt.Sprintf(`        &lt;target&gt;%s&lt;/target&gt;`, value) + "\n")
+                        builder.WriteString(`      &lt;/trans-unit&gt;` + "\n")
+                }</span>
+
+                <span class="cov0" title="0">builder.WriteString(`    &lt;/body&gt;` + "\n")
+                builder.WriteString(`  &lt;/file&gt;` + "\n")</span>
+        }
+
+        <span class="cov0" title="0">builder.WriteString(`&lt;/xliff&gt;` + "\n")
+        return builder.String(), nil</span>
+}
+
+// HandleBatchLocalizations handles batch localization operations
+// POST /v1/admin/localizations/batch
+func (h *Handler) HandleBatchLocalizations(c *gin.Context) <span class="cov0" title="0">{
+        ctx := context.Background()
+        startTime := time.Now()
+
+        // Parse request
+        var req models.BatchLocalizationRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to parse batch request", zap.Error(err))
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "success": false,
+                        "error":   "Invalid request format: " + err.Error(),
+                })
+                return
+        }</span>
+
+        // Validate request
+        <span class="cov0" title="0">if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Batch request validation failed", zap.Error(err))
+                c.JSON(http.StatusBadRequest, gin.H{
+                        "success": false,
+                        "error":   err.Error(),
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">h.logger.Info("Starting batch operation",
+                zap.String("operation", req.Operation),
+                zap.Int("count", len(req.Localizations)),
+        )
+
+        // Perform batch operation
+        response := h.performBatchOperation(ctx, &amp;req)
+        response.Summary.DurationMs = time.Since(startTime).Milliseconds()
+
+        h.logger.Info("Batch operation completed",
+                zap.Bool("success", response.Success),
+                zap.Int("successful", response.Summary.Successful),
+                zap.Int("failed", response.Summary.Failed),
+                zap.Int64("duration_ms", response.Summary.DurationMs),
+        )
+
+        // Invalidate cache after successful operation
+        if response.Success </span><span class="cov0" title="0">{
+                h.cache.DeletePattern(ctx, "l10n:*")
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, response)</span>
+}
+
+// performBatchOperation performs a batch localization operation
+func (h *Handler) performBatchOperation(ctx context.Context, req *models.BatchLocalizationRequest) *models.BatchLocalizationResponse <span class="cov0" title="0">{
+        response := &amp;models.BatchLocalizationResponse{
+                Success: true,
+                Summary: models.BatchSummary{
+                        TotalRequested: len(req.Localizations),
+                },
+                Errors: []models.BatchError{},
+        }
+
+        for i, item := range req.Localizations </span><span class="cov0" title="0">{
+                var err error
+
+                switch req.Operation </span>{
+                case "create", "update":<span class="cov0" title="0">
+                        err = h.importLocalization(ctx, item.LanguageCode, item.Key, item.Value, req.Operation == "update")</span>
+                case "approve":<span class="cov0" title="0">
+                        err = h.approveLocalization(ctx, item.LanguageCode, item.Key)</span>
+                case "delete":<span class="cov0" title="0">
+                        err = h.deleteLocalization(ctx, item.LanguageCode, item.Key)</span>
+                }
+
+                <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                        response.Errors = append(response.Errors, models.BatchError{
+                                Index:   i,
+                                Key:     item.Key,
+                                Message: err.Error(),
+                        })
+                        response.Summary.Failed++
+                        response.Success = false
+                }</span> else<span class="cov0" title="0"> {
+                        response.Summary.Successful++
+                }</span>
+        }
+
+        <span class="cov0" title="0">return response</span>
+}
+
+// approveLocalization approves a localization
+func (h *Handler) approveLocalization(ctx context.Context, languageCode, key string) error <span class="cov0" title="0">{
+        // Get language
+        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("language not found: %s", languageCode)
+        }</span>
+
+        // Get key
+        <span class="cov0" title="0">keyObj, err := h.db.GetLocalizationKeyByKey(ctx, key)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("localization key not found: %s", key)
+        }</span>
+
+        // Get localization
+        <span class="cov0" title="0">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, keyObj.ID, lang.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("localization not found")
+        }</span>
+
+        // Approve
+        <span class="cov0" title="0">return h.db.ApproveLocalization(ctx, loc.ID, "admin")</span>
+}
+
+// deleteLocalization deletes a localization
+func (h *Handler) deleteLocalization(ctx context.Context, languageCode, key string) error <span class="cov0" title="0">{
+        // Get language
+        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("language not found: %s", languageCode)
+        }</span>
+
+        // Get key
+        <span class="cov0" title="0">keyObj, err := h.db.GetLocalizationKeyByKey(ctx, key)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("localization key not found: %s", key)
+        }</span>
+
+        // Get localization
+        <span class="cov0" title="0">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, keyObj.ID, lang.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("localization not found")
+        }</span>
+
+        // Delete
+        <span class="cov0" title="0">return h.db.DeleteLocalization(ctx, loc.ID)</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handlers
+
+import (
+        "context"
+        "encoding/json"
+        "net/http"
+        "strconv"
+        "strings"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/google/uuid"
+        "github.com/helixtrack/localization-service/internal/middleware"
+        "github.com/helixtrack/localization-service/internal/models"
+        "github.com/helixtrack/localization-service/internal/websocket"
+        "go.uber.org/zap"
+)
+
+// GetCurrentVersion returns the current localization version
+// GET /v1/version/current
+func (h *Handler) GetCurrentVersion(c *gin.Context) <span class="cov8" title="1">{
+        ctx := context.Background()
+
+        version, err := h.db.GetCurrentVersion(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to get current version", zap.Error(err))
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "No version found",
+                ))
+                return
+        }</span>
+
+        // Build version info response
+        <span class="cov8" title="1">versionInfo := models.VersionInfo{
+                Version:        version.VersionNumber,
+                KeysCount:      version.KeysCount,
+                LanguagesCount: version.LanguagesCount,
+                LastUpdated:    version.CreatedAt,
+        }
+
+        c.JSON(http.StatusOK, models.SuccessResponse(versionInfo))</span>
+}
+
+// GetVersionHistory returns version history with pagination
+// GET /v1/version/history
+func (h *Handler) GetVersionHistory(c *gin.Context) <span class="cov8" title="1">{
+        ctx := context.Background()
+
+        // Parse pagination parameters
+        limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+        offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+
+        if limit &gt; 100 </span><span class="cov0" title="0">{
+                limit = 100
+        }</span>
+
+        // Get versions
+        <span class="cov8" title="1">versions, err := h.db.ListVersions(ctx, limit, offset)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to list versions", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "Failed to retrieve version history",
+                ))
+                return
+        }</span>
+
+        // Get total count
+        <span class="cov8" title="1">totalCount, err := h.db.CountVersions(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to count versions", zap.Error(err))
+                totalCount = len(versions)
+        }</span>
+
+        // Get current version
+        <span class="cov8" title="1">currentVersion := ""
+        if len(versions) &gt; 0 </span><span class="cov8" title="1">{
+                currentVersion = versions[0].VersionNumber
+        }</span>
+
+        <span class="cov8" title="1">response := models.VersionHistoryResponse{
+                Versions:       make([]models.LocalizationVersion, len(versions)),
+                TotalVersions:  totalCount,
+                CurrentVersion: currentVersion,
+        }
+
+        // Convert pointers to values
+        for i, v := range versions </span><span class="cov8" title="1">{
+                response.Versions[i] = *v
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
+}
+
+// GetVersionByNumber returns a specific version by number
+// GET /v1/version/:version
+func (h *Handler) GetVersionByNumber(c *gin.Context) <span class="cov8" title="1">{
+        ctx := context.Background()
+        versionNumber := c.Param("version")
+
+        version, err := h.db.GetVersionByNumber(ctx, versionNumber)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to get version", zap.Error(err), zap.String("version", versionNumber))
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "Version not found",
+                ))
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(version))</span>
+}
+
+// GetCatalogByVersion returns a catalog for a specific version
+// GET /v1/version/:version/catalog/:language
+func (h *Handler) GetCatalogByVersion(c *gin.Context) <span class="cov8" title="1">{
+        ctx := context.Background()
+        versionNumber := c.Param("version")
+        languageCode := c.Param("language")
+
+        // Check cache first
+        cacheKey := "l10n:catalog:" + languageCode + ":version:" + versionNumber
+        if cached, err := h.cache.Get(ctx, cacheKey); err == nil &amp;&amp; cached != "" </span><span class="cov0" title="0">{
+                h.logger.Info("Cache hit for versioned catalog",
+                        zap.String("version", versionNumber),
+                        zap.String("language", languageCode),
+                )
+
+                var catalogMap map[string]string
+                if err := json.Unmarshal([]byte(cached), &amp;catalogMap); err == nil </span><span class="cov0" title="0">{
+                        // Parse version number to get int
+                        verNum := 1 // Default version
+                        if parts := strings.Split(versionNumber, "."); len(parts) &gt;= 3 </span><span class="cov0" title="0">{
+                                if major, err := strconv.Atoi(parts[0]); err == nil </span><span class="cov0" title="0">{
+                                        verNum = major
+                                }</span>
+                        }
+
+                        <span class="cov0" title="0">response := models.CatalogResponse{
+                                Language: languageCode,
+                                Version:  verNum,
+                                Catalog:  catalogMap,
+                        }
+                        c.JSON(http.StatusOK, models.SuccessResponse(response))
+                        return</span>
+                }
+        }
+
+        // Get from database
+        <span class="cov8" title="1">catalog, err := h.db.GetCatalogByVersion(ctx, versionNumber, languageCode)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to get catalog by version",
+                        zap.Error(err),
+                        zap.String("version", versionNumber),
+                        zap.String("language", languageCode),
+                )
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "Catalog not found for this version and language",
+                ))
+                return
+        }</span>
+
+        // Parse catalog data
+        <span class="cov8" title="1">catalogMap, err := catalog.GetCatalogMap()
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to parse catalog data", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "Failed to parse catalog data",
+                ))
+                return
+        }</span>
+
+        // Cache the result (versioned catalogs can be cached longer)
+        <span class="cov8" title="1">if catalogJSON, err := json.Marshal(catalogMap); err == nil </span><span class="cov8" title="1">{
+                h.cache.Set(ctx, cacheKey, string(catalogJSON), 24*time.Hour) // 24 hours for versioned catalogs
+        }</span>
+
+        // Parse version number to get int
+        <span class="cov8" title="1">verNum := 1 // Default version
+        if parts := strings.Split(versionNumber, "."); len(parts) &gt;= 3 </span><span class="cov8" title="1">{
+                if major, err := strconv.Atoi(parts[0]); err == nil </span><span class="cov8" title="1">{
+                        verNum = major
+                }</span>
+        }
+
+        <span class="cov8" title="1">response := models.CatalogResponse{
+                Language: languageCode,
+                Version:  verNum,
+                Catalog:  catalogMap,
+        }
+
+        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
+}
+
+// CreateVersion creates a new version (admin only)
+// POST /v1/admin/version/create
+func (h *Handler) CreateVersion(c *gin.Context) <span class="cov0" title="0">{
+        ctx := context.Background()
+
+        // Parse request
+        var req models.CreateVersionRequest
+        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to parse create version request", zap.Error(err))
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeInvalidRequest,
+                        "Invalid request format: "+err.Error(),
+                ))
+                return
+        }</span>
+
+        // Validate request
+        <span class="cov0" title="0">if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Create version request validation failed", zap.Error(err))
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeInvalidRequest,
+                        err.Error(),
+                ))
+                return
+        }</span>
+
+        // Get current version
+        <span class="cov0" title="0">currentVersion, err := h.db.GetCurrentVersion(ctx)
+        var newVersionNumber string
+
+        if err != nil </span><span class="cov0" title="0">{
+                // No current version, start with 1.0.0
+                newVersionNumber = "1.0.0"
+        }</span> else<span class="cov0" title="0"> {
+                // Increment based on type
+                newVersionNumber, err = models.IncrementVersion(currentVersion.VersionNumber, req.VersionType)
+                if err != nil </span><span class="cov0" title="0">{
+                        h.logger.Error("Failed to increment version", zap.Error(err))
+                        c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                                models.ErrCodeInternalError,
+                                "Failed to generate new version number",
+                        ))
+                        return
+                }</span>
+        }
+
+        // Get current counts
+        <span class="cov0" title="0">keysCount, _ := h.db.CountVersions(ctx)          // Placeholder - should count actual keys
+        languagesCount, _ := h.db.CountVersions(ctx)     // Placeholder - should count actual languages
+        totalLocalizations, _ := h.db.CountVersions(ctx) // Placeholder - should count actual localizations
+
+        // Get username from JWT claims
+        username, exists := c.Get("username")
+        if !exists </span><span class="cov0" title="0">{
+                username = "admin"
+        }</span>
+
+        // Create version
+        <span class="cov0" title="0">version := &amp;models.LocalizationVersion{
+                ID:                 uuid.New().String(),
+                VersionNumber:      newVersionNumber,
+                VersionType:        req.VersionType,
+                Description:        req.Description,
+                KeysCount:          keysCount,
+                LanguagesCount:     languagesCount,
+                TotalLocalizations: totalLocalizations,
+                CreatedBy:          username.(string),
+                CreatedAt:          time.Now().Unix(),
+        }
+
+        // Set metadata
+        if req.Metadata != nil </span><span class="cov0" title="0">{
+                if err := version.SetMetadataMap(req.Metadata); err != nil </span><span class="cov0" title="0">{
+                        h.logger.Error("Failed to set metadata", zap.Error(err))
+                }</span>
+        }
+
+        // Save to database
+        <span class="cov0" title="0">if err := h.db.CreateVersion(ctx, version); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to create version", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "Failed to create version",
+                ))
+                return
+        }</span>
+
+        <span class="cov0" title="0">h.logger.Info("Version created",
+                zap.String("version", version.VersionNumber),
+                zap.String("type", version.VersionType),
+                zap.String("created_by", version.CreatedBy),
+        )
+
+        // Get JWT claims for audit and WebSocket event
+        claims := middleware.GetClaims(c)
+
+        // Create audit log
+        h.db.CreateAuditLog(ctx, "CREATE", "VERSION", "", claims.Username, version, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventVersionCreated,
+                        &amp;websocket.VersionEventData{
+                                ID:                version.ID,
+                                Version:           version.VersionNumber,
+                                Description:       version.Description,
+                                KeysCount:         version.KeysCount,
+                                LanguagesCount:    version.LanguagesCount,
+                                TranslationsCount: version.TotalLocalizations,
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusCreated, models.SuccessResponse(version))</span>
+}
+
+// DeleteVersion deletes a version (admin only)
+// DELETE /v1/admin/version/:version
+func (h *Handler) DeleteVersion(c *gin.Context) <span class="cov0" title="0">{
+        ctx := context.Background()
+        versionNumber := c.Param("version")
+
+        // Get version first to get ID
+        version, err := h.db.GetVersionByNumber(ctx, versionNumber)
+        if err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to get version", zap.Error(err))
+                c.JSON(http.StatusNotFound, models.ErrorResponse(
+                        models.ErrCodeNotFound,
+                        "Version not found",
+                ))
+                return
+        }</span>
+
+        // Don't allow deleting the current version
+        <span class="cov0" title="0">currentVersion, err := h.db.GetCurrentVersion(ctx)
+        if err == nil &amp;&amp; currentVersion.ID == version.ID </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, models.ErrorResponse(
+                        models.ErrCodeInvalidRequest,
+                        "Cannot delete the current version",
+                ))
+                return
+        }</span>
+
+        // Delete version
+        <span class="cov0" title="0">if err := h.db.DeleteVersion(ctx, version.ID); err != nil </span><span class="cov0" title="0">{
+                h.logger.Error("Failed to delete version", zap.Error(err))
+                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+                        models.ErrCodeInternalError,
+                        "Failed to delete version",
+                ))
+                return
+        }</span>
+
+        <span class="cov0" title="0">h.logger.Info("Version deleted", zap.String("version", versionNumber))
+
+        // Get JWT claims for audit and WebSocket event
+        claims := middleware.GetClaims(c)
+
+        // Create audit log
+        h.db.CreateAuditLog(ctx, "DELETE", "VERSION", "", claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
+
+        // Broadcast WebSocket event (if WebSocket is enabled)
+        if h.wsManager != nil </span><span class="cov0" title="0">{
+                h.wsManager.BroadcastEvent(
+                        websocket.EventVersionDeleted,
+                        &amp;websocket.VersionEventData{
+                                ID:                version.ID,
+                                Version:           version.VersionNumber,
+                                Description:       version.Description,
+                                KeysCount:         version.KeysCount,
+                                LanguagesCount:    version.LanguagesCount,
+                                TranslationsCount: version.TotalLocalizations,
+                        },
+                        &amp;websocket.EventMetadata{
+                                Username: claims.Username,
+                        },
+                )
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
+                "message": "Version deleted successfully",
+                "version": versionNumber,
+        }))</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

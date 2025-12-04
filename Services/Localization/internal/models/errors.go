@@ -10,6 +10,7 @@ const (
 	ErrCodeValidationFailed  = 1001
 	ErrCodeNotFound          = 1002
 	ErrCodeAlreadyExists     = 1003
+	ErrCodeInvalidRequest    = 1004
 	ErrCodeDatabaseError     = 2001
 	ErrCodeCacheError        = 2002
 	ErrCodeUnauthorized      = 3001

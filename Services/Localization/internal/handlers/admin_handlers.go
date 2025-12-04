@@ -482,24 +482,21 @@ func (h *Handler) DeleteLocalization(c *gin.Context) {
 	}
 	// Broadcast WebSocket event (if WebSocket is enabled)
 	if h.wsManager != nil {
-		// Broadcast WebSocket event (if WebSocket is enabled)
-		if h.wsManager != nil {
-			h.wsManager.BroadcastEvent(
-				websocket.EventLocalizationApproved,
-				&websocket.LocalizationEventData{
-					ID:           loc.ID,
-					KeyID:        loc.KeyID,
-					Key:          keyName,
-					LanguageID:   loc.LanguageID,
-					LanguageCode: langCode,
-					Value:        loc.Value,
-					IsApproved:   loc.Approved,
-				},
-				&websocket.EventMetadata{
-					Username: claims.Username,
-				},
-			)
-		}
+		h.wsManager.BroadcastEvent(
+			websocket.EventLocalizationDeleted,
+			&websocket.LocalizationEventData{
+				ID:           loc.ID,
+				KeyID:        loc.KeyID,
+				Key:          keyName,
+				LanguageID:   loc.LanguageID,
+				LanguageCode: langCode,
+				Value:        loc.Value,
+				IsApproved:   loc.Approved,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
 	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
@@ -550,21 +547,25 @@ func (h *Handler) ApproveLocalization(c *gin.Context) {
 	if lang != nil {
 		langCode = lang.Code
 	}
-	h.wsManager.BroadcastEvent(
-		websocket.EventLocalizationApproved,
-		&websocket.LocalizationEventData{
-			ID:           loc.ID,
-			KeyID:        loc.KeyID,
-			Key:          keyName,
-			LanguageID:   loc.LanguageID,
-			LanguageCode: langCode,
-			Value:        loc.Value,
-			IsApproved:   true,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventLocalizationApproved,
+			&websocket.LocalizationEventData{
+				ID:           loc.ID,
+				KeyID:        loc.KeyID,
+				Key:          keyName,
+				LanguageID:   loc.LanguageID,
+				LanguageCode: langCode,
+				Value:        loc.Value,
+				IsApproved:   true,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "localization approved successfully",

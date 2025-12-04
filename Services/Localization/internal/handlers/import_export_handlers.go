@@ -26,20 +26,20 @@ func (h *Handler) HandleImport(c *gin.Context) {
 	var req models.ImportRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.logger.Error("Failed to parse import request", zap.Error(err))
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"error":   "Invalid request format: " + err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(
+			models.ErrCodeValidationFailed,
+			"Invalid request format: "+err.Error(),
+		))
 		return
 	}
 
 	// Validate request
 	if err := req.Validate(); err != nil {
 		h.logger.Error("Import request validation failed", zap.Error(err))
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"error":   err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(
+			models.ErrCodeValidationFailed,
+			err.Error(),
+		))
 		return
 	}
 
@@ -97,8 +97,8 @@ func (h *Handler) HandleImport(c *gin.Context) {
 	if !response.Success {
 		statusCode = http.StatusPartialContent
 	}
-
-	c.JSON(statusCode, response)
+	
+	c.JSON(statusCode, models.SuccessResponse(response))
 }
 
 // performImport performs the actual import operation
@@ -323,10 +323,10 @@ func (h *Handler) HandleExport(c *gin.Context) {
 	// Validate request
 	if err := req.Validate(); err != nil {
 		h.logger.Error("Export request validation failed", zap.Error(err))
-		c.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"error":   err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(
+			models.ErrCodeValidationFailed,
+			err.Error(),
+		))
 		return
 	}
 
@@ -340,17 +340,17 @@ func (h *Handler) HandleExport(c *gin.Context) {
 	response, err := h.performExport(ctx, &req)
 	if err != nil {
 		h.logger.Error("Export failed", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-		})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+			models.ErrCodeInternalError,
+			err.Error(),
+		))
 		return
 	}
 
 	// Return based on format
 	switch format {
 	case "json":
-		c.JSON(http.StatusOK, response)
+		c.JSON(http.StatusOK, models.SuccessResponse(response))
 	case "csv":
 		// Return CSV data directly
 		c.Header("Content-Type", "text/csv")

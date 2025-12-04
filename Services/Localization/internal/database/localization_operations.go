@@ -45,7 +45,8 @@ func (d *PostgresDatabase) CreateLocalization(ctx context.Context, loc *models.L
 // GetLocalizationByID retrieves a localization by ID
 func (d *PostgresDatabase) GetLocalizationByID(ctx context.Context, id string) (*models.Localization, error) {
 	query := `
-		SELECT id, key_id, language_id, value, plural_forms, variables,
+		SELECT id, key_id, language_id, value, 
+		       COALESCE(plural_forms, '{}')::jsonb, COALESCE(variables, '{}')::jsonb,
 		       version, approved, approved_by, approved_at, created_at, modified_at, deleted
 		FROM localizations
 		WHERE id = $1 AND deleted = FALSE
@@ -72,7 +73,8 @@ func (d *PostgresDatabase) GetLocalizationByID(ctx context.Context, id string) (
 // GetLocalizationByKeyAndLanguage retrieves a localization by key ID and language ID
 func (d *PostgresDatabase) GetLocalizationByKeyAndLanguage(ctx context.Context, keyID, languageID string) (*models.Localization, error) {
 	query := `
-		SELECT id, key_id, language_id, value, plural_forms, variables,
+		SELECT id, key_id, language_id, value, 
+		       COALESCE(plural_forms, '{}')::jsonb, COALESCE(variables, '{}')::jsonb,
 		       version, approved, approved_by, approved_at, created_at, modified_at, deleted
 		FROM localizations
 		WHERE key_id = $1 AND language_id = $2 AND deleted = FALSE
@@ -99,7 +101,8 @@ func (d *PostgresDatabase) GetLocalizationByKeyAndLanguage(ctx context.Context, 
 // GetLocalizationsByLanguage retrieves all localizations for a language
 func (d *PostgresDatabase) GetLocalizationsByLanguage(ctx context.Context, languageID string) ([]*models.Localization, error) {
 	query := `
-		SELECT id, key_id, language_id, value, plural_forms, variables,
+		SELECT id, key_id, language_id, value, 
+		       COALESCE(plural_forms, '{}')::jsonb, COALESCE(variables, '{}')::jsonb,
 		       version, approved, approved_by, approved_at, created_at, modified_at, deleted
 		FROM localizations
 		WHERE language_id = $1 AND deleted = FALSE

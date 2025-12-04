@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/helixtrack/localization-service/internal/models"
 	"go.uber.org/zap"
@@ -156,13 +157,15 @@ func (d *PostgresDatabase) UpdateLanguage(ctx context.Context, lang *models.Lang
 
 // DeleteLanguage soft-deletes a language
 func (d *PostgresDatabase) DeleteLanguage(ctx context.Context, id string) error {
+	now := time.Now().Unix()
+	
 	query := `
 		UPDATE languages
 		SET deleted = TRUE, modified_at = $1
 		WHERE id = $2 AND deleted = FALSE
 	`
 
-	result, err := d.execContext(ctx, query, models.GenerateUUID(), id)
+	result, err := d.execContext(ctx, query, now, id)
 	if err != nil {
 		d.logger.Error("failed to delete language", zap.Error(err))
 		return models.ErrDatabase(err)

@@ -20,11 +20,11 @@ type Handler struct {
 	db        database.Database
 	cache     cache.Cache
 	logger    *zap.Logger
-	wsManager *websocket.Manager
+	wsManager websocket.ManagerInterface
 }
 
 // NewHandler creates a new handler instance
-func NewHandler(db database.Database, cache cache.Cache, logger *zap.Logger, wsManager *websocket.Manager) *Handler {
+func NewHandler(db database.Database, cache cache.Cache, logger *zap.Logger, wsManager websocket.ManagerInterface) *Handler {
 	return &Handler{
 		db:        db,
 		cache:     cache,

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,9 +24,10 @@ func (h *Handler) GetCurrentVersion(c *gin.Context) {
 	version, err := h.db.GetCurrentVersion(ctx)
 	if err != nil {
 		h.logger.Error("Failed to get current version", zap.Error(err))
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "No version found",
-		})
+		c.JSON(http.StatusNotFound, models.ErrorResponse(
+			models.ErrCodeNotFound,
+			"No version found",
+		))
 		return
 	}
 
@@ -37,7 +39,7 @@ func (h *Handler) GetCurrentVersion(c *gin.Context) {
 		LastUpdated:    version.CreatedAt,
 	}
 
-	c.JSON(http.StatusOK, versionInfo)
+	c.JSON(http.StatusOK, models.SuccessResponse(versionInfo))
 }
 
 // GetVersionHistory returns version history with pagination
@@ -57,9 +59,10 @@ func (h *Handler) GetVersionHistory(c *gin.Context) {
 	versions, err := h.db.ListVersions(ctx, limit, offset)
 	if err != nil {
 		h.logger.Error("Failed to list versions", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to retrieve version history",
-		})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+			models.ErrCodeInternalError,
+			"Failed to retrieve version history",
+		))
 		return
 	}
 
@@ -87,7 +90,7 @@ func (h *Handler) GetVersionHistory(c *gin.Context) {
 		response.Versions[i] = *v
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, models.SuccessResponse(response))
 }
 
 // GetVersionByNumber returns a specific version by number
@@ -99,13 +102,14 @@ func (h *Handler) GetVersionByNumber(c *gin.Context) {
 	version, err := h.db.GetVersionByNumber(ctx, versionNumber)
 	if err != nil {
 		h.logger.Error("Failed to get version", zap.Error(err), zap.String("version", versionNumber))
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Version not found",
-		})
+		c.JSON(http.StatusNotFound, models.ErrorResponse(
+			models.ErrCodeNotFound,
+			"Version not found",
+		))
 		return
 	}
 
-	c.JSON(http.StatusOK, version)
+	c.JSON(http.StatusOK, models.SuccessResponse(version))
 }
 
 // GetCatalogByVersion returns a catalog for a specific version
@@ -125,10 +129,20 @@ func (h *Handler) GetCatalogByVersion(c *gin.Context) {
 
 		var catalogMap map[string]string
 		if err := json.Unmarshal([]byte(cached), &catalogMap); err == nil {
-			c.JSON(http.StatusOK, gin.H{
-				"catalog": catalogMap,
-				"version": versionNumber,
-			})
+			// Parse version number to get int
+			verNum := 1 // Default version
+			if parts := strings.Split(versionNumber, "."); len(parts) >= 3 {
+				if major, err := strconv.Atoi(parts[0]); err == nil {
+					verNum = major
+				}
+			}
+
+			response := models.CatalogResponse{
+				Language: languageCode,
+				Version:  verNum,
+				Catalog:  catalogMap,
+			}
+			c.JSON(http.StatusOK, models.SuccessResponse(response))
 			return
 		}
 	}
@@ -141,9 +155,10 @@ func (h *Handler) GetCatalogByVersion(c *gin.Context) {
 			zap.String("version", versionNumber),
 			zap.String("language", languageCode),
 		)
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Catalog not found for this version and language",
-		})
+		c.JSON(http.StatusNotFound, models.ErrorResponse(
+			models.ErrCodeNotFound,
+			"Catalog not found for this version and language",
+		))
 		return
 	}
 
@@ -151,9 +166,10 @@ func (h *Handler) GetCatalogByVersion(c *gin.Context) {
 	catalogMap, err := catalog.GetCatalogMap()
 	if err != nil {
 		h.logger.Error("Failed to parse catalog data", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to parse catalog data",
-		})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+			models.ErrCodeInternalError,
+			"Failed to parse catalog data",
+		))
 		return
 	}
 
@@ -162,10 +178,21 @@ func (h *Handler) GetCatalogByVersion(c *gin.Context) {
 		h.cache.Set(ctx, cacheKey, string(catalogJSON), 24*time.Hour) // 24 hours for versioned catalogs
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"catalog": catalogMap,
-		"version": versionNumber,
-	})
+	// Parse version number to get int
+	verNum := 1 // Default version
+	if parts := strings.Split(versionNumber, "."); len(parts) >= 3 {
+		if major, err := strconv.Atoi(parts[0]); err == nil {
+			verNum = major
+		}
+	}
+
+	response := models.CatalogResponse{
+		Language: languageCode,
+		Version:  verNum,
+		Catalog:  catalogMap,
+	}
+
+	c.JSON(http.StatusOK, models.SuccessResponse(response))
 }
 
 // CreateVersion creates a new version (admin only)
@@ -177,18 +204,20 @@ func (h *Handler) CreateVersion(c *gin.Context) {
 	var req models.CreateVersionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.logger.Error("Failed to parse create version request", zap.Error(err))
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request format: " + err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(
+			models.ErrCodeInvalidRequest,
+			"Invalid request format: "+err.Error(),
+		))
 		return
 	}
 
 	// Validate request
 	if err := req.Validate(); err != nil {
 		h.logger.Error("Create version request validation failed", zap.Error(err))
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(
+			models.ErrCodeInvalidRequest,
+			err.Error(),
+		))
 		return
 	}
 
@@ -204,9 +233,10 @@ func (h *Handler) CreateVersion(c *gin.Context) {
 		newVersionNumber, err = models.IncrementVersion(currentVersion.VersionNumber, req.VersionType)
 		if err != nil {
 			h.logger.Error("Failed to increment version", zap.Error(err))
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to generate new version number",
-			})
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+				models.ErrCodeInternalError,
+				"Failed to generate new version number",
+			))
 			return
 		}
 	}
@@ -245,9 +275,10 @@ func (h *Handler) CreateVersion(c *gin.Context) {
 	// Save to database
 	if err := h.db.CreateVersion(ctx, version); err != nil {
 		h.logger.Error("Failed to create version", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to create version",
-		})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+			models.ErrCodeInternalError,
+			"Failed to create version",
+		))
 		return
 	}
 
@@ -281,7 +312,7 @@ func (h *Handler) CreateVersion(c *gin.Context) {
 		)
 	}
 
-	c.JSON(http.StatusCreated, version)
+	c.JSON(http.StatusCreated, models.SuccessResponse(version))
 }
 
 // DeleteVersion deletes a version (admin only)
@@ -294,27 +325,30 @@ func (h *Handler) DeleteVersion(c *gin.Context) {
 	version, err := h.db.GetVersionByNumber(ctx, versionNumber)
 	if err != nil {
 		h.logger.Error("Failed to get version", zap.Error(err))
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Version not found",
-		})
+		c.JSON(http.StatusNotFound, models.ErrorResponse(
+			models.ErrCodeNotFound,
+			"Version not found",
+		))
 		return
 	}
 
 	// Don't allow deleting the current version
 	currentVersion, err := h.db.GetCurrentVersion(ctx)
 	if err == nil && currentVersion.ID == version.ID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Cannot delete the current version",
-		})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(
+			models.ErrCodeInvalidRequest,
+			"Cannot delete the current version",
+		))
 		return
 	}
 
 	// Delete version
 	if err := h.db.DeleteVersion(ctx, version.ID); err != nil {
 		h.logger.Error("Failed to delete version", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to delete version",
-		})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(
+			models.ErrCodeInternalError,
+			"Failed to delete version",
+		))
 		return
 	}
 
@@ -344,8 +378,8 @@ func (h *Handler) DeleteVersion(c *gin.Context) {
 		)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "Version deleted successfully",
 		"version": versionNumber,
-	})
+	}))
 }

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	baseURL = "http://localhost:8085"
+	baseURL = "http://localhost:8086"
 	timeout = 30 * time.Second
 )
 
@@ -99,16 +99,18 @@ func TestHealthCheck(t *testing.T) {
 		t.Fatalf("Expected status 200, got %d", resp.StatusCode)
 	}
 
-	// Health endpoint returns a simple {"status": true}
+	// Health endpoint returns {"status": "healthy", "version": "...", "checks": {...}}
 	var health struct {
-		Status bool `json:"status"`
+		Status  string                 `json:"status"`
+		Version string                 `json:"version"`
+		Checks  map[string]interface{} `json:"checks"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&health); err != nil {
 		t.Fatalf("Failed to decode health response: %v", err)
 	}
 
-	if !health.Status {
-		t.Errorf("Expected status true, got %v", health.Status)
+	if health.Status != "healthy" {
+		t.Errorf("Expected status 'healthy', got %v", health.Status)
 	}
 
 	t.Log("✓ Health check passed")
@@ -174,7 +176,7 @@ func TestGetSingleLocalization(t *testing.T) {
 
 	t.Log("Testing single localization retrieval...")
 
-	req, err := http.NewRequest("GET", suite.config.ServiceURL+"/v1/localize/app.welcome?language=en", nil)
+	req, err := http.NewRequest("GET", suite.config.ServiceURL+"/v1/localize/ui.button.cancel?language=en", nil)
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}

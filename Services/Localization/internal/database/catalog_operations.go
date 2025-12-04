@@ -21,6 +21,10 @@ func (d *PostgresDatabase) CreateCatalog(ctx context.Context, catalog *models.Lo
 	query := `
 		INSERT INTO localization_catalogs (id, language_id, category, catalog_data, version, checksum, created_at, modified_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		ON CONFLICT (language_id, category, version) DO UPDATE
+		SET catalog_data = EXCLUDED.catalog_data, 
+		    checksum = EXCLUDED.checksum,
+		    modified_at = EXCLUDED.modified_at
 	`
 
 	_, err := d.execContext(ctx, query,

@@ -164,15 +164,19 @@ func (m *MockDatabase) GetLanguages(ctx context.Context, activeOnly bool) ([]*mo
 }
 
 func (m *MockDatabase) GetLocalizationKeyByKey(ctx context.Context, key string) (*models.LocalizationKey, error) {
-	if locKey, ok := m.localizationKeys[key]; ok {
-		return locKey, nil
+	for _, locKey := range m.localizationKeys {
+		if locKey.Key == key {
+			return locKey, nil
+		}
 	}
 	return nil, models.ErrNotFound
 }
 
 func (m *MockDatabase) GetLocalizationByKeyAndLanguage(ctx context.Context, keyID, languageID string) (*models.Localization, error) {
-	if loc, ok := m.localizations[keyID+":"+languageID]; ok {
-		return loc, nil
+	for _, loc := range m.localizations {
+		if loc.KeyID == keyID && loc.LanguageID == languageID {
+			return loc, nil
+		}
 	}
 	return nil, models.ErrNotFound
 }
@@ -186,43 +190,49 @@ func (m *MockDatabase) GetLatestCatalog(ctx context.Context, languageID, categor
 
 // Stub implementations for unused methods
 func (m *MockDatabase) CreateLanguage(ctx context.Context, lang *models.Language) error {
-	m.languages[lang.Code] = lang
+	m.languages[lang.ID] = lang
 	return nil
 }
 
 func (m *MockDatabase) UpdateLanguage(ctx context.Context, lang *models.Language) error {
-	m.languages[lang.Code] = lang
+	m.languages[lang.ID] = lang
 	return nil
 }
 
 func (m *MockDatabase) DeleteLanguage(ctx context.Context, id string) error {
-	for code, lang := range m.languages {
-		if lang.ID == id {
-			delete(m.languages, code)
-			return nil
-		}
-	}
-	return models.ErrNotFound
+	delete(m.languages, id)
+	return nil
 }
 
 func (m *MockDatabase) CreateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error {
+	m.localizationKeys[key.ID] = key
 	return nil
 }
 
 func (m *MockDatabase) CreateLocalization(ctx context.Context, loc *models.Localization) error {
+	m.localizations[loc.ID] = loc
 	return nil
 }
 
 func (m *MockDatabase) UpdateLocalization(ctx context.Context, loc *models.Localization) error {
+	m.localizations[loc.ID] = loc
 	return nil
 }
 
 func (m *MockDatabase) DeleteLocalization(ctx context.Context, id string) error {
+	delete(m.localizations, id)
 	return nil
 }
 
 func (m *MockDatabase) ApproveLocalization(ctx context.Context, id, username string) error {
-	return nil
+	if loc, ok := m.localizations[id]; ok {
+		loc.Approved = true
+		loc.ApprovedBy = username
+		loc.ApprovedAt = time.Now().Unix()
+		m.localizations[id] = loc
+		return nil
+	}
+	return models.ErrNotFound
 }
 
 func (m *MockDatabase) CreateCatalog(ctx context.Context, catalog *models.LocalizationCatalog) error {
@@ -261,6 +271,9 @@ func (m *MockDatabase) BuildCatalog(ctx context.Context, languageID string, cate
 
 // Localization Key stubs
 func (m *MockDatabase) GetLocalizationKeyByID(ctx context.Context, id string) (*models.LocalizationKey, error) {
+	if key, ok := m.localizationKeys[id]; ok {
+		return key, nil
+	}
 	return nil, models.ErrNotFound
 }
 
@@ -278,11 +291,17 @@ func (m *MockDatabase) DeleteLocalizationKey(ctx context.Context, id string) err
 
 // Language stubs
 func (m *MockDatabase) GetLanguageByID(ctx context.Context, id string) (*models.Language, error) {
+	if lang, ok := m.languages[id]; ok {
+		return lang, nil
+	}
 	return nil, models.ErrNotFound
 }
 
 // Localization stubs
 func (m *MockDatabase) GetLocalizationByID(ctx context.Context, id string) (*models.Localization, error) {
+	if loc, ok := m.localizations[id]; ok {
+		return loc, nil
+	}
 	return nil, models.ErrNotFound
 }
 
@@ -327,11 +346,17 @@ func (m *MockDatabase) DeleteVersion(ctx context.Context, id string) error {
 
 // GetCatalogByVersion gets a catalog by version number and language code (mock implementation)
 func (m *MockDatabase) GetCatalogByVersion(ctx context.Context, versionNumber, languageCode string) (*models.LocalizationCatalog, error) {
-	// Mock implementation - return a sample catalog
+	// Mock implementation - return a sample catalog with JSON data
+	catalogData := `{"ui.button.save": "Save", "ui.button.cancel": "Cancel", "ui.message.welcome": "Welcome"}`
 	return &models.LocalizationCatalog{
-		ID:         "test-catalog-1",
-		LanguageID: "en",
-		Category:   "general",
+		ID:          "test-catalog-1",
+		LanguageID:  "en",
+		Category:    "general",
+		CatalogData: []byte(catalogData),
+		Version:     1,
+		Checksum:    "abc123",
+		CreatedAt:   time.Now().Unix(),
+		ModifiedAt:  time.Now().Unix(),
 	}, nil
 }
 
