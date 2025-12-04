@@ -49,21 +49,23 @@ func (h *Handler) CreateLanguage(c *gin.Context) {
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "CREATE", "LANGUAGE", lang.ID, claims.Username, lang, c.ClientIP(), c.Request.UserAgent())
 
-	// Broadcast WebSocket event
-	h.wsManager.BroadcastEvent(
-		websocket.EventLanguageAdded,
-		&websocket.LanguageEventData{
-			ID:         lang.ID,
-			Code:       lang.Code,
-			Name:       lang.Name,
-			NativeName: lang.NativeName,
-			IsRTL:      lang.IsRTL,
-			IsActive:   lang.IsActive,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventLanguageAdded,
+			&websocket.LanguageEventData{
+				ID:         lang.ID,
+				Code:       lang.Code,
+				Name:       lang.Name,
+				NativeName: lang.NativeName,
+				IsRTL:      lang.IsRTL,
+				IsActive:   lang.IsActive,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusCreated, models.SuccessResponse(lang))
 }
@@ -115,21 +117,23 @@ func (h *Handler) UpdateLanguage(c *gin.Context) {
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "UPDATE", "LANGUAGE", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
 
-	// Broadcast WebSocket event
-	h.wsManager.BroadcastEvent(
-		websocket.EventLanguageUpdated,
-		&websocket.LanguageEventData{
-			ID:         existing.ID,
-			Code:       existing.Code,
-			Name:       existing.Name,
-			NativeName: existing.NativeName,
-			IsRTL:      existing.IsRTL,
-			IsActive:   existing.IsActive,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventLanguageUpdated,
+			&websocket.LanguageEventData{
+				ID:         existing.ID,
+				Code:       existing.Code,
+				Name:       existing.Name,
+				NativeName: existing.NativeName,
+				IsRTL:      existing.IsRTL,
+				IsActive:   existing.IsActive,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse(existing))
 }
@@ -164,21 +168,23 @@ func (h *Handler) DeleteLanguage(c *gin.Context) {
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "DELETE", "LANGUAGE", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
 
-	// Broadcast WebSocket event
-	h.wsManager.BroadcastEvent(
-		websocket.EventLanguageDeleted,
-		&websocket.LanguageEventData{
-			ID:         lang.ID,
-			Code:       lang.Code,
-			Name:       lang.Name,
-			NativeName: lang.NativeName,
-			IsRTL:      lang.IsRTL,
-			IsActive:   lang.IsActive,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventLanguageDeleted,
+			&websocket.LanguageEventData{
+				ID:         lang.ID,
+				Code:       lang.Code,
+				Name:       lang.Name,
+				NativeName: lang.NativeName,
+				IsRTL:      lang.IsRTL,
+				IsActive:   lang.IsActive,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "language deleted successfully",
@@ -263,22 +269,24 @@ func (h *Handler) CreateLocalization(c *gin.Context) {
 		claims := middleware.GetClaims(c)
 		h.db.CreateAuditLog(ctx, "UPDATE", "LOCALIZATION", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
 
-		// Broadcast WebSocket event
-		h.wsManager.BroadcastEvent(
-			websocket.EventLocalizationUpdated,
-			&websocket.LocalizationEventData{
-				ID:         existing.ID,
-				KeyID:      existing.KeyID,
-				Key:        locKey.Key,
-				LanguageID: existing.LanguageID,
-				LanguageCode: lang.Code,
-				Value:      existing.Value,
-				IsApproved: existing.Approved,
-			},
-			&websocket.EventMetadata{
-				Username: claims.Username,
-			},
-		)
+		// Broadcast WebSocket event (if WebSocket is enabled)
+		if h.wsManager != nil {
+			h.wsManager.BroadcastEvent(
+				websocket.EventLocalizationUpdated,
+				&websocket.LocalizationEventData{
+					ID:           existing.ID,
+					KeyID:        existing.KeyID,
+					Key:          locKey.Key,
+					LanguageID:   existing.LanguageID,
+					LanguageCode: lang.Code,
+					Value:        existing.Value,
+					IsApproved:   existing.Approved,
+				},
+				&websocket.EventMetadata{
+					Username: claims.Username,
+				},
+			)
+		}
 
 		c.JSON(http.StatusOK, models.SuccessResponse(existing))
 		return
@@ -310,22 +318,24 @@ func (h *Handler) CreateLocalization(c *gin.Context) {
 	claims := middleware.GetClaims(c)
 	h.db.CreateAuditLog(ctx, "CREATE", "LOCALIZATION", loc.ID, claims.Username, loc, c.ClientIP(), c.Request.UserAgent())
 
-	// Broadcast WebSocket event
-	h.wsManager.BroadcastEvent(
-		websocket.EventLocalizationAdded,
-		&websocket.LocalizationEventData{
-			ID:         loc.ID,
-			KeyID:      loc.KeyID,
-			Key:        locKey.Key,
-			LanguageID: loc.LanguageID,
-			LanguageCode: lang.Code,
-			Value:      loc.Value,
-			IsApproved: loc.Approved,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventLocalizationAdded,
+			&websocket.LocalizationEventData{
+				ID:           loc.ID,
+				KeyID:        loc.KeyID,
+				Key:          locKey.Key,
+				LanguageID:   loc.LanguageID,
+				LanguageCode: lang.Code,
+				Value:        loc.Value,
+				IsApproved:   loc.Approved,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusCreated, models.SuccessResponse(loc))
 }
@@ -400,21 +410,24 @@ func (h *Handler) UpdateLocalization(c *gin.Context) {
 	if lang != nil {
 		langCode = lang.Code
 	}
-	h.wsManager.BroadcastEvent(
-		websocket.EventLocalizationUpdated,
-		&websocket.LocalizationEventData{
-			ID:         existing.ID,
-			KeyID:      existing.KeyID,
-			Key:        keyName,
-			LanguageID: existing.LanguageID,
-			LanguageCode: langCode,
-			Value:      existing.Value,
-			IsApproved: existing.Approved,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventLocalizationUpdated,
+			&websocket.LocalizationEventData{
+				ID:           existing.ID,
+				KeyID:        existing.KeyID,
+				Key:          keyName,
+				LanguageID:   existing.LanguageID,
+				LanguageCode: langCode,
+				Value:        existing.Value,
+				IsApproved:   existing.Approved,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse(existing))
 }
@@ -467,21 +480,27 @@ func (h *Handler) DeleteLocalization(c *gin.Context) {
 	if lang != nil {
 		langCode = lang.Code
 	}
-	h.wsManager.BroadcastEvent(
-		websocket.EventLocalizationDeleted,
-		&websocket.LocalizationEventData{
-			ID:         loc.ID,
-			KeyID:      loc.KeyID,
-			Key:        keyName,
-			LanguageID: loc.LanguageID,
-			LanguageCode: langCode,
-			Value:      loc.Value,
-			IsApproved: loc.Approved,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		// Broadcast WebSocket event (if WebSocket is enabled)
+		if h.wsManager != nil {
+			h.wsManager.BroadcastEvent(
+				websocket.EventLocalizationApproved,
+				&websocket.LocalizationEventData{
+					ID:           loc.ID,
+					KeyID:        loc.KeyID,
+					Key:          keyName,
+					LanguageID:   loc.LanguageID,
+					LanguageCode: langCode,
+					Value:        loc.Value,
+					IsApproved:   loc.Approved,
+				},
+				&websocket.EventMetadata{
+					Username: claims.Username,
+				},
+			)
+		}
+	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "localization deleted successfully",
@@ -534,13 +553,13 @@ func (h *Handler) ApproveLocalization(c *gin.Context) {
 	h.wsManager.BroadcastEvent(
 		websocket.EventLocalizationApproved,
 		&websocket.LocalizationEventData{
-			ID:         loc.ID,
-			KeyID:      loc.KeyID,
-			Key:        keyName,
-			LanguageID: loc.LanguageID,
+			ID:           loc.ID,
+			KeyID:        loc.KeyID,
+			Key:          keyName,
+			LanguageID:   loc.LanguageID,
 			LanguageCode: langCode,
-			Value:      loc.Value,
-			IsApproved: true,
+			Value:        loc.Value,
+			IsApproved:   true,
 		},
 		&websocket.EventMetadata{
 			Username: claims.Username,
@@ -576,17 +595,19 @@ func (h *Handler) InvalidateCache(c *gin.Context) {
 	// Create audit log
 	h.db.CreateAuditLog(ctx, "INVALIDATE", "CACHE", "", claims.Username, req, c.ClientIP(), c.Request.UserAgent())
 
-	// Broadcast WebSocket event
-	h.wsManager.BroadcastEvent(
-		websocket.EventCacheInvalidated,
-		&websocket.CacheInvalidatedEventData{
-			Language: req.Language,
-			Reason:   "manual invalidation",
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventCacheInvalidated,
+			&websocket.CacheInvalidatedEventData{
+				Language: req.Language,
+				Reason:   "manual invalidation",
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
 		"message": "cache invalidated successfully",

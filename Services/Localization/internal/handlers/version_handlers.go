@@ -212,8 +212,8 @@ func (h *Handler) CreateVersion(c *gin.Context) {
 	}
 
 	// Get current counts
-	keysCount, _ := h.db.CountVersions(ctx) // Placeholder - should count actual keys
-	languagesCount, _ := h.db.CountVersions(ctx) // Placeholder - should count actual languages
+	keysCount, _ := h.db.CountVersions(ctx)          // Placeholder - should count actual keys
+	languagesCount, _ := h.db.CountVersions(ctx)     // Placeholder - should count actual languages
 	totalLocalizations, _ := h.db.CountVersions(ctx) // Placeholder - should count actual localizations
 
 	// Get username from JWT claims
@@ -263,21 +263,23 @@ func (h *Handler) CreateVersion(c *gin.Context) {
 	// Create audit log
 	h.db.CreateAuditLog(ctx, "CREATE", "VERSION", "", claims.Username, version, c.ClientIP(), c.Request.UserAgent())
 
-	// Broadcast WebSocket event
-	h.wsManager.BroadcastEvent(
-		websocket.EventVersionCreated,
-		&websocket.VersionEventData{
-			ID:                version.ID,
-			Version:           version.VersionNumber,
-			Description:       version.Description,
-			KeysCount:         version.KeysCount,
-			LanguagesCount:    version.LanguagesCount,
-			TranslationsCount: version.TotalLocalizations,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventVersionCreated,
+			&websocket.VersionEventData{
+				ID:                version.ID,
+				Version:           version.VersionNumber,
+				Description:       version.Description,
+				KeysCount:         version.KeysCount,
+				LanguagesCount:    version.LanguagesCount,
+				TranslationsCount: version.TotalLocalizations,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusCreated, version)
 }
@@ -324,21 +326,23 @@ func (h *Handler) DeleteVersion(c *gin.Context) {
 	// Create audit log
 	h.db.CreateAuditLog(ctx, "DELETE", "VERSION", "", claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
 
-	// Broadcast WebSocket event
-	h.wsManager.BroadcastEvent(
-		websocket.EventVersionDeleted,
-		&websocket.VersionEventData{
-			ID:                version.ID,
-			Version:           version.VersionNumber,
-			Description:       version.Description,
-			KeysCount:         version.KeysCount,
-			LanguagesCount:    version.LanguagesCount,
-			TranslationsCount: version.TotalLocalizations,
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventVersionDeleted,
+			&websocket.VersionEventData{
+				ID:                version.ID,
+				Version:           version.VersionNumber,
+				Description:       version.Description,
+				KeysCount:         version.KeysCount,
+				LanguagesCount:    version.LanguagesCount,
+				TranslationsCount: version.TotalLocalizations,
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Version deleted successfully",

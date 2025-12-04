@@ -25,10 +25,10 @@ func init() {
 
 // MockDatabase implements the Database interface for testing
 type MockDatabase struct {
-	languages       map[string]*models.Language
+	languages        map[string]*models.Language
 	localizationKeys map[string]*models.LocalizationKey
-	localizations   map[string]*models.Localization
-	catalogs        map[string]*models.LocalizationCatalog
+	localizations    map[string]*models.Localization
+	catalogs         map[string]*models.LocalizationCatalog
 }
 
 func NewMockDatabase() *MockDatabase {
@@ -88,26 +88,26 @@ func (m *MockDatabase) seedTestData() {
 
 	// Add localizations
 	loc1 := &models.Localization{
-		ID:          "loc-1",
-		KeyID:       "key-1",
-		LanguageID:  "lang-en",
-		Value:       "Welcome!",
-		Approved:    true,
-		ApprovedAt:  time.Now().Unix(),
-		CreatedAt:   time.Now().Unix(),
-		ModifiedAt:  time.Now().Unix(),
+		ID:         "loc-1",
+		KeyID:      "key-1",
+		LanguageID: "lang-en",
+		Value:      "Welcome!",
+		Approved:   true,
+		ApprovedAt: time.Now().Unix(),
+		CreatedAt:  time.Now().Unix(),
+		ModifiedAt: time.Now().Unix(),
 	}
 	m.localizations["key-1:lang-en"] = loc1
 
 	loc2 := &models.Localization{
-		ID:          "loc-2",
-		KeyID:       "key-2",
-		LanguageID:  "lang-en",
-		Value:       "An error occurred",
-		Approved:    true,
-		ApprovedAt:  time.Now().Unix(),
-		CreatedAt:   time.Now().Unix(),
-		ModifiedAt:  time.Now().Unix(),
+		ID:         "loc-2",
+		KeyID:      "key-2",
+		LanguageID: "lang-en",
+		Value:      "An error occurred",
+		Approved:   true,
+		ApprovedAt: time.Now().Unix(),
+		CreatedAt:  time.Now().Unix(),
+		ModifiedAt: time.Now().Unix(),
 	}
 	m.localizations["key-2:lang-en"] = loc2
 
@@ -333,6 +333,77 @@ func (m *MockDatabase) GetCatalogByVersion(ctx context.Context, versionNumber, l
 		LanguageID: "en",
 		Category:   "general",
 	}, nil
+}
+
+// GetCurrentVersion retrieves the latest version (mock implementation)
+func (m *MockDatabase) GetCurrentVersion(ctx context.Context) (*models.LocalizationVersion, error) {
+	// Mock implementation - return a sample version
+	return &models.LocalizationVersion{
+		ID:                 "test-version-1",
+		VersionNumber:      "1.0.0",
+		VersionType:        "major",
+		Description:        "Test version",
+		KeysCount:          10,
+		LanguagesCount:     3,
+		TotalLocalizations: 30,
+		CreatedBy:          "test-user",
+		CreatedAt:          time.Now().Unix(),
+		Metadata:           "{}",
+	}, nil
+}
+
+// GetVersionByID retrieves a version by its ID (mock implementation)
+func (m *MockDatabase) GetVersionByID(ctx context.Context, id string) (*models.LocalizationVersion, error) {
+	// Mock implementation - return a sample version
+	return &models.LocalizationVersion{
+		ID:                 id,
+		VersionNumber:      "1.0.0",
+		VersionType:        "major",
+		Description:        "Test version",
+		KeysCount:          10,
+		LanguagesCount:     3,
+		TotalLocalizations: 30,
+		CreatedBy:          "test-user",
+		CreatedAt:          time.Now().Unix(),
+		Metadata:           "{}",
+	}, nil
+}
+
+// GetVersionByNumber retrieves a version by its version number (mock implementation)
+func (m *MockDatabase) GetVersionByNumber(ctx context.Context, versionNumber string) (*models.LocalizationVersion, error) {
+	// Mock implementation - return a sample version
+	return &models.LocalizationVersion{
+		ID:                 "test-version-" + versionNumber,
+		VersionNumber:      versionNumber,
+		VersionType:        "major",
+		Description:        "Test version " + versionNumber,
+		KeysCount:          10,
+		LanguagesCount:     3,
+		TotalLocalizations: 30,
+		CreatedBy:          "test-user",
+		CreatedAt:          time.Now().Unix(),
+		Metadata:           "{}",
+	}, nil
+}
+
+// ListVersions retrieves all versions with pagination (mock implementation)
+func (m *MockDatabase) ListVersions(ctx context.Context, limit, offset int) ([]*models.LocalizationVersion, error) {
+	// Mock implementation - return sample versions
+	versions := []*models.LocalizationVersion{
+		{
+			ID:                 "test-version-1",
+			VersionNumber:      "1.0.0",
+			VersionType:        "major",
+			Description:        "Test version 1",
+			KeysCount:          10,
+			LanguagesCount:     3,
+			TotalLocalizations: 30,
+			CreatedBy:          "test-user",
+			CreatedAt:          time.Now().Unix(),
+			Metadata:           "{}",
+		},
+	}
+	return versions, nil
 }
 
 var _ database.Database = (*MockDatabase)(nil)

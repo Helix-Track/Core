@@ -77,18 +77,21 @@ func (h *Handler) HandleImport(c *gin.Context) {
 
 	// Broadcast WebSocket event for import completion
 	failedCount := response.Summary.LanguagesSkipped + response.Summary.KeysSkipped + response.Summary.LocalizationsSkipped
-	h.wsManager.BroadcastEvent(
-		websocket.EventBatchOperationCompleted,
-		&websocket.BatchOperationEventData{
-			Operation: "import",
-			Processed: response.Summary.TotalProcessed,
-			Failed:    failedCount,
-			Duration:  fmt.Sprintf("%dms", response.Summary.DurationMs),
-		},
-		&websocket.EventMetadata{
-			Username: claims.Username,
-		},
-	)
+	// Broadcast WebSocket event (if WebSocket is enabled)
+	if h.wsManager != nil {
+		h.wsManager.BroadcastEvent(
+			websocket.EventBatchOperationCompleted,
+			&websocket.BatchOperationEventData{
+				Operation: "import",
+				Processed: response.Summary.TotalProcessed,
+				Failed:    failedCount,
+				Duration:  fmt.Sprintf("%dms", response.Summary.DurationMs),
+			},
+			&websocket.EventMetadata{
+				Username: claims.Username,
+			},
+		)
+	}
 
 	statusCode := http.StatusOK
 	if !response.Success {
