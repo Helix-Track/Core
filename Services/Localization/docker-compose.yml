@@ -28,7 +28,7 @@ services:
     environment:
       - POSTGRES_DB=${LOCALIZATION_DB_NAME:-helixtrack_localization}
       - POSTGRES_USER=${LOCALIZATION_DB_USER:-localization_user}
-      - POSTGRES_PASSWORD=${LOCALIZATION_DB_PASSWORD:-localization_secure_password_change_me}
+      - POSTGRES_PASSWORD=${LOCALIZATION_DB_PASSWORD:-helixtrack_password}
       - POSTGRES_INITDB_ARGS=--encoding=UTF8 --lc-collate=C --lc-ctype=C
       - PGDATA=/var/lib/postgresql/data/pgdata
 
@@ -37,7 +37,7 @@ services:
       - ../../Database/DDL/Services/Localization/Definition.V1.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
 
     ports:
-      - "${LOCALIZATION_DB_PORT:-5434}:5432"
+      - "${LOCALIZATION_DB_PORT:-5436}:5432"
 
     networks:
       - localization-network
@@ -123,7 +123,7 @@ services:
       - DB_PORT=5432
       - DB_NAME=${LOCALIZATION_DB_NAME:-helixtrack_localization}
       - DB_USER=${LOCALIZATION_DB_USER:-localization_user}
-      - DB_PASSWORD=${LOCALIZATION_DB_PASSWORD:-localization_secure_password_change_me}
+      - DB_PASSWORD=${LOCALIZATION_DB_PASSWORD:-helixtrack_password}
       - REDIS_ENABLED=false
       - REDIS_HOST=localization-redis
       - REDIS_PORT=6379
@@ -133,7 +133,7 @@ services:
       - LOG_LEVEL=info
 
     ports:
-      - "${LOCALIZATION_PORT:-8085}:8085"
+      - "${LOCALIZATION_PORT:-8087}:8085"
 
     volumes:
       - ./configs:/app/configs:ro

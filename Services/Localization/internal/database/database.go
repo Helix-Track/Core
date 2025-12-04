@@ -72,25 +72,26 @@ type Database interface {
 
 // PostgresDatabase implements the Database interface for PostgreSQL
 type PostgresDatabase struct {
-	db     *sql.DB
-	config *config.DatabaseConfig
-	logger *zap.Logger
+	db        *sql.DB
+	config    *config.DatabaseConfig
+	encConfig *config.EncryptionConfig
+	logger    *zap.Logger
 }
 
 // New creates a new database connection
-func New(cfg *config.DatabaseConfig, logger *zap.Logger) (Database, error) {
-	dsn := cfg.GetDSN()
+func New(dbConfig *config.DatabaseConfig, encConfig *config.EncryptionConfig, logger *zap.Logger) (Database, error) {
+	dsn := dbConfig.GetDSN()
 
-	db, err := sql.Open(cfg.Driver, dsn)
+	db, err := sql.Open(dbConfig.Driver, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	// Set connection pool settings
-	db.SetMaxOpenConns(cfg.MaxConnections)
-	db.SetMaxIdleConns(cfg.IdleConnections)
-	db.SetConnMaxLifetime(time.Duration(cfg.ConnectionLifetime) * time.Second)
-	db.SetConnMaxIdleTime(time.Duration(cfg.ConnectionTimeout) * time.Second)
+	db.SetMaxOpenConns(dbConfig.MaxConnections)
+	db.SetMaxIdleConns(dbConfig.IdleConnections)
+	db.SetConnMaxLifetime(time.Duration(dbConfig.ConnectionLifetime) * time.Second)
+	db.SetConnMaxIdleTime(time.Duration(dbConfig.ConnectionTimeout) * time.Second)
 
 	// Ping to verify connection
 	if err := db.Ping(); err != nil {
@@ -98,16 +99,17 @@ func New(cfg *config.DatabaseConfig, logger *zap.Logger) (Database, error) {
 	}
 
 	logger.Info("database connection established",
-		zap.String("driver", cfg.Driver),
-		zap.String("host", cfg.Host),
-		zap.Int("port", cfg.Port),
-		zap.String("database", cfg.Database),
+		zap.String("driver", dbConfig.Driver),
+		zap.String("host", dbConfig.Host),
+		zap.Int("port", dbConfig.Port),
+		zap.String("database", dbConfig.Database),
 	)
 
 	return &PostgresDatabase{
-		db:     db,
-		config: cfg,
-		logger: logger,
+		db:          db,
+		config:      dbConfig,
+		encConfig:   encConfig,
+		logger:      logger,
 	}, nil
 }
 
@@ -156,6 +158,10 @@ func (d *PostgresDatabase) queryContext(ctx context.Context, query string, args 
 func (d *PostgresDatabase) encrypt(value string) string {
 	// PostgreSQL pgcrypto encryption
 	// This is a simplified version - actual implementation should use pgcrypto functions
+	if d.encConfig != nil && d.encConfig.Key != "" {
+		// TODO: Implement proper encryption using the encryption key
+		// For now, return the value as-is (encryption will be handled at PostgreSQL level)
+	}
 	return value // Placeholder - will be encrypted by PostgreSQL
 }
 
@@ -163,5 +169,9 @@ func (d *PostgresDatabase) encrypt(value string) string {
 func (d *PostgresDatabase) decrypt(value string) string {
 	// PostgreSQL pgcrypto decryption
 	// This is a simplified version - actual implementation should use pgcrypto functions
+	if d.encConfig != nil && d.encConfig.Key != "" {
+		// TODO: Implement proper decryption using the encryption key
+		// For now, return the value as-is (decryption will be handled at PostgreSQL level)
+	}
 	return value // Placeholder - will be decrypted by PostgreSQL
 }

@@ -27,8 +27,10 @@ func TestLoad_Success(t *testing.T) {
 			"port": 5432,
 			"database": "testdb",
 			"user": "testuser",
-			"password": "testpass",
-			"encryption_key": "test-encryption-key"
+			"password": "testpass"
+		},
+		"encryption": {
+			"key": "test-encryption-key"
 		},
 		"cache": {
 			"in_memory": {
@@ -113,6 +115,9 @@ func TestApplyEnvOverrides(t *testing.T) {
 			Host:     "original-host",
 			Password: "original-pass",
 		},
+		Encryption: EncryptionConfig{
+			Key: "original-key",
+		},
 		Security: SecurityConfig{
 			JWTSecret: "original-secret",
 		},
@@ -142,7 +147,7 @@ func TestApplyEnvOverrides(t *testing.T) {
 	assert.Equal(t, "env-host", cfg.Database.Host)
 	assert.Equal(t, "env-pass", cfg.Database.Password)
 	assert.Equal(t, "env-secret", cfg.Security.JWTSecret)
-	assert.Equal(t, "env-key", cfg.Database.EncryptionKey)
+	assert.Equal(t, "env-key", cfg.Encryption.Key)
 	assert.Equal(t, "env-redis-pass", cfg.Cache.Redis.Password)
 }
 
@@ -153,10 +158,12 @@ func TestValidate_Success(t *testing.T) {
 			PortRange: []int{8085, 8095},
 		},
 		Database: DatabaseConfig{
-			Driver:        "postgres",
-			Host:          "localhost",
-			Database:      "testdb",
-			EncryptionKey: "test-key",
+			Driver:   "postgres",
+			Host:     "localhost",
+			Database: "testdb",
+		},
+		Encryption: EncryptionConfig{
+			Key: "test-key",
 		},
 		Security: SecurityConfig{
 			JWTSecret: "test-secret",
@@ -273,10 +280,12 @@ func TestValidate_PostgresMissingEncryptionKey(t *testing.T) {
 			Port: 8085,
 		},
 		Database: DatabaseConfig{
-			Driver:        "postgres",
-			Host:          "localhost",
-			Database:      "testdb",
-			EncryptionKey: "", // Missing
+			Driver:   "postgres",
+			Host:     "localhost",
+			Database: "testdb",
+		},
+		Encryption: EncryptionConfig{
+			Key: "", // Missing
 		},
 		Security: SecurityConfig{
 			JWTSecret: "test-secret",
@@ -285,7 +294,7 @@ func TestValidate_PostgresMissingEncryptionKey(t *testing.T) {
 
 	err := cfg.Validate()
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "database encryption key is required")
+	assert.Contains(t, err.Error(), "encryption key is required")
 }
 
 func TestValidate_MissingJWTSecret(t *testing.T) {
@@ -398,7 +407,6 @@ func TestGetDSN_Postgres(t *testing.T) {
 		Database:          "testdb",
 		SSLMode:           "disable",
 		ConnectionTimeout: 30,
-		EncryptionKey:     "test-key",
 	}
 
 	dsn := cfg.GetDSN()
@@ -410,7 +418,7 @@ func TestGetDSN_Postgres(t *testing.T) {
 	assert.Contains(t, dsn, "dbname=testdb")
 	assert.Contains(t, dsn, "sslmode=disable")
 	assert.Contains(t, dsn, "connect_timeout=30")
-	assert.Contains(t, dsn, "encryption_key=test-key")
+	assert.NotContains(t, dsn, "encryption_key")
 }
 
 func TestGetDSN_Postgres_NoEncryptionKey(t *testing.T) {
@@ -423,7 +431,6 @@ func TestGetDSN_Postgres_NoEncryptionKey(t *testing.T) {
 		Database:          "testdb",
 		SSLMode:           "disable",
 		ConnectionTimeout: 30,
-		EncryptionKey:     "",
 	}
 
 	dsn := cfg.GetDSN()

@@ -33,6 +33,7 @@ type Client struct {
 // Manager manages all WebSocket connections
 type Manager struct {
 	clients    map[*Client]bool
+	Clients    map[string]*Client // Exposed for testing
 	broadcast  chan *Event
 	register   chan *Client
 	unregister chan *Client
@@ -44,6 +45,7 @@ type Manager struct {
 func NewManager(logger *zap.Logger) *Manager {
 	return &Manager{
 		clients:    make(map[*Client]bool),
+		Clients:    make(map[string]*Client), // Exposed for testing
 		broadcast:  make(chan *Event, 256),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
@@ -64,6 +66,7 @@ func (m *Manager) Start(ctx context.Context) {
 		case client := <-m.register:
 			m.mu.Lock()
 			m.clients[client] = true
+			m.Clients[client.ID] = client // Add to exposed map
 			m.mu.Unlock()
 			m.logger.Info("Client registered", zap.String("clientId", client.ID))
 
@@ -71,6 +74,7 @@ func (m *Manager) Start(ctx context.Context) {
 			m.mu.Lock()
 			if _, ok := m.clients[client]; ok {
 				delete(m.clients, client)
+				delete(m.Clients, client.ID) // Remove from exposed map
 				close(client.Send)
 			}
 			m.mu.Unlock()
@@ -305,4 +309,156 @@ func randomString(length int) string {
 		b[i] = charset[time.Now().UnixNano()%int64(len(charset))]
 	}
 	return string(b)
+}
+
+// Broadcast broadcasts a generic message to all clients
+func (m *Manager) Broadcast(message map[string]interface{}) {
+	// Create a generic event for broadcasting
+	event := &Event{
+		Type:      EventType(message["type"].(string)),
+		Timestamp: time.Now().UTC(),
+		Data:      toJSONBytes(message),
+	}
+	
+	m.broadcast <- event
+}
+
+// SendToClient sends a message to a specific client
+func (m *Manager) SendToClient(clientID string, message map[string]interface{}) {
+	m.mu.RLock()
+	client, exists := m.Clients[clientID]
+	m.mu.RUnlock()
+	
+	if !exists {
+		m.logger.Warn("Client not found", zap.String("clientId", clientID))
+		return
+	}
+	
+	event := &Event{
+		Type:      EventType(message["type"].(string)),
+		Timestamp: time.Now().UTC(),
+		Data:      toJSONBytes(message),
+	}
+	
+	eventJSON, _ := event.ToJSON()
+	
+	select {
+	case client.Send <- eventJSON:
+	default:
+		m.logger.Warn("Client send buffer full, dropping message",
+			zap.String("clientId", clientID))
+	}
+}
+
+// handleEvent handles WebSocket events from clients
+func (m *Manager) handleEvent(message map[string]interface{}) map[string]interface{} {
+	// Check if message has a type
+	eventType, ok := message["type"].(string)
+	if !ok {
+		return map[string]interface{}{
+			"type":    "error",
+			"message": "Event type is required",
+		}
+	}
+	
+	// Check if message has valid data
+	data, ok := message["data"]
+	if !ok {
+		return map[string]interface{}{
+			"type":    "error",
+			"message": "Event data is required",
+		}
+	}
+	
+	// Ensure data is a map for known events
+	if eventType != "ping" && eventType != "pong" {
+		if _, isMap := data.(map[string]interface{}); !isMap {
+			return map[string]interface{}{
+				"type":    "error",
+				"message": "Invalid event data format",
+			}
+		}
+	}
+	
+	// Handle different event types
+	switch eventType {
+	case "ping":
+		return map[string]interface{}{
+			"type":      "pong",
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+		}
+	case "subscribe":
+		dataMap := data.(map[string]interface{})
+		channel := dataMap["channel"].(string)
+		return map[string]interface{}{
+			"type":    "subscription_confirmed",
+			"channel": channel,
+		}
+	case "unsubscribe":
+		dataMap := data.(map[string]interface{})
+		channel := dataMap["channel"].(string)
+		return map[string]interface{}{
+			"type":    "unsubscription_confirmed",
+			"channel": channel,
+		}
+	default:
+		return map[string]interface{}{
+			"type":    "error",
+			"message": "Unknown event type: " + eventType,
+		}
+	}
+}
+
+// BroadcastLocalizationUpdate broadcasts a localization update event
+func (m *Manager) BroadcastLocalizationUpdate(languageCode, key, value, updatedBy string) {
+	data := LocalizationEventData{
+		LanguageCode: languageCode,
+		Key:          key,
+		Value:        value,
+	}
+	
+	metadata := &EventMetadata{
+		Username: updatedBy,
+	}
+	
+	m.BroadcastEvent(EventLocalizationUpdated, data, metadata)
+}
+
+// BroadcastLanguageCreated broadcasts a language created event
+func (m *Manager) BroadcastLanguageCreated(language map[string]interface{}) {
+	data := LanguageEventData{
+		ID:         language["id"].(string),
+		Code:       language["code"].(string),
+		Name:       language["name"].(string),
+		NativeName: language["native_name"].(string),
+		IsRTL:      language["is_rtl"].(bool),
+		IsActive:   language["is_active"].(bool),
+	}
+	
+	m.BroadcastEvent(EventLanguageAdded, data, nil)
+}
+
+// BroadcastVersionCreated broadcasts a version created event
+func (m *Manager) BroadcastVersionCreated(version map[string]interface{}) {
+	data := VersionEventData{
+		ID:                 version["id"].(string),
+		Version:            version["version_number"].(string),
+		Description:        version["description"].(string),
+		KeysCount:          version["keys_count"].(int),
+		LanguagesCount:     version["languages_count"].(int),
+		TranslationsCount:  version["translations_count"].(int),
+	}
+	
+	m.BroadcastEvent(EventVersionCreated, data, nil)
+}
+
+// serializeEvent serializes an event to JSON
+func (m *Manager) serializeEvent(event map[string]interface{}) ([]byte, error) {
+	return json.Marshal(event)
+}
+
+// toJSONBytes converts interface to JSON bytes
+func toJSONBytes(data interface{}) json.RawMessage {
+	bytes, _ := json.Marshal(data)
+	return json.RawMessage(bytes)
 }

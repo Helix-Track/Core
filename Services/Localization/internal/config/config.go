@@ -8,11 +8,12 @@ import (
 
 // Config represents the complete service configuration
 type Config struct {
-	Service  ServiceConfig  `json:"service"`
-	Database DatabaseConfig `json:"database"`
-	Cache    CacheConfig    `json:"cache"`
-	Security SecurityConfig `json:"security"`
-	Logging  LoggingConfig  `json:"logging"`
+	Service    ServiceConfig    `json:"service"`
+	Database   DatabaseConfig   `json:"database"`
+	Encryption EncryptionConfig `json:"encryption"`
+	Cache      CacheConfig      `json:"cache"`
+	Security   SecurityConfig   `json:"security"`
+	Logging    LoggingConfig    `json:"logging"`
 }
 
 // ServiceConfig holds service-level configuration
@@ -50,7 +51,11 @@ type DatabaseConfig struct {
 	IdleConnections    int    `json:"idle_connections"`
 	ConnectionTimeout  int    `json:"connection_timeout"`  // seconds
 	ConnectionLifetime int    `json:"connection_lifetime"` // seconds
-	EncryptionKey      string `json:"encryption_key"`      // SQL Cipher key
+}
+
+// EncryptionConfig holds encryption configuration
+type EncryptionConfig struct {
+	Key string `json:"key"` // 32-byte encryption key for SQL Cipher
 }
 
 // CacheConfig holds caching configuration
@@ -138,7 +143,7 @@ func (c *Config) applyEnvOverrides() {
 		c.Security.JWTSecret = jwtSecret
 	}
 	if encryptionKey := os.Getenv("DB_ENCRYPTION_KEY"); encryptionKey != "" {
-		c.Database.EncryptionKey = encryptionKey
+		c.Encryption.Key = encryptionKey
 	}
 	if redisPassword := os.Getenv("REDIS_PASSWORD"); redisPassword != "" {
 		c.Cache.Redis.Password = redisPassword
@@ -170,7 +175,7 @@ func (c *Config) Validate() error {
 		if c.Database.Database == "" {
 			return fmt.Errorf("database name is required")
 		}
-		if c.Database.EncryptionKey == "" {
+		if c.Encryption.Key == "" {
 			return fmt.Errorf("database encryption key is required for postgres")
 		}
 	}
@@ -300,10 +305,6 @@ func (c *DatabaseConfig) GetDSN() string {
 			c.SSLMode,
 			c.ConnectionTimeout,
 		)
-		// Add encryption key parameter if provided
-		if c.EncryptionKey != "" {
-			dsn += fmt.Sprintf(" options='-c session_preload_libraries=pgcrypto -c encryption_key=%s'", c.EncryptionKey)
-		}
 		return dsn
 	case "sqlite3":
 		return c.Database // file path

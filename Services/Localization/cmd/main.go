@@ -70,7 +70,7 @@ func main() {
 	logger.Info("Port selected", zap.Int("port", port))
 
 	// Initialize database connection
-	db, err := database.New(&cfg.Database, logger)
+	db, err := database.New(&cfg.Database, &cfg.Encryption, logger)
 	if err != nil {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}

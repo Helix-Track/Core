@@ -21,14 +21,16 @@
     "host": "localhost",
     "port": 5432,
     "database": "helixtrack_localization",
-    "user": "helixtrack",
-    "password": "helixtrack",
+    "user": "localization_user",
+    "password": "helixtrack_password",
     "ssl_mode": "disable",
     "max_connections": 50,
     "idle_connections": 10,
     "connection_timeout": 30,
-    "connection_lifetime": 3600,
-    "encryption_key": "your-32-byte-encryption-key-here!"
+    "connection_lifetime": 3600
+  },
+  "encryption": {
+    "key": "your-32-byte-encryption-key-here!"
   },
   "cache": {
     "in_memory": {
