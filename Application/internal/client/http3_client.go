@@ -159,6 +159,10 @@ func (c *HTTP3Client) PostRaw(ctx context.Context, url string, body io.Reader, c
 
 // Do performs a custom HTTP/3 request
 func (c *HTTP3Client) Do(req *http.Request) (*http.Response, error) {
+	if req == nil {
+		return nil, fmt.Errorf("request cannot be nil")
+	}
+
 	c.logger.Debug("HTTP/3 custom request",
 		zap.String("method", req.Method),
 		zap.String("url", req.URL.String()),
