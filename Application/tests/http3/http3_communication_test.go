@@ -2,17 +2,29 @@ package http3_test
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/json"
+	"encoding/pem"
 	"io"
+	"math/big"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/quic-go/quic-go/http3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"helixtrack.ru/core/internal/server"
 )
 
 const (
@@ -20,8 +32,156 @@ const (
 	testTimeout   = 10 * time.Second
 )
 
+var (
+	http3Server *server.HTTP3Server
+	testRouter  *gin.Engine
+)
+
+// setupHTTP3Server starts the HTTP/3 test server
+func setupHTTP3Server(t *testing.T) {
+	// Create test router
+	gin.SetMode(gin.TestMode)
+	testRouter = gin.New()
+
+	// Add test endpoints
+	testRouter.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "healthy", "protocol": "HTTP/3"})
+	})
+
+	testRouter.GET("/do", func(c *gin.Context) {
+		c.JSON(200, gin.H{"success": true, "data": "test response"})
+	})
+
+	testRouter.POST("/do", func(c *gin.Context) {
+		var data map[string]interface{}
+		if err := c.ShouldBindJSON(&data); err != nil {
+			c.JSON(400, gin.H{"error": "Invalid JSON"})
+			return
+		}
+		c.JSON(200, gin.H{"success": true, "data": data})
+	})
+
+	// Create self-signed certificate for testing
+	certFile := filepath.Join(t.TempDir(), "cert.pem")
+	keyFile := filepath.Join(t.TempDir(), "key.pem")
+
+	// Generate self-signed certificate
+	cert, key, err := generateSelfSignedCert()
+	if err != nil {
+		t.Fatalf("Failed to generate test certificate: %v", err)
+	}
+
+	// Write cert and key to files
+	err = os.WriteFile(certFile, []byte(cert), 0644)
+	if err != nil {
+		t.Fatalf("Failed to write cert file: %v", err)
+	}
+
+	err = os.WriteFile(keyFile, []byte(key), 0600)
+	if err != nil {
+		t.Fatalf("Failed to write key file: %v", err)
+	}
+
+	// Debug: Check if files exist and log their paths
+	t.Logf("Certificate file: %s", certFile)
+	t.Logf("Key file: %s", keyFile)
+	if _, err := os.Stat(certFile); os.IsNotExist(err) {
+		t.Fatalf("Certificate file does not exist: %s", certFile)
+	}
+	if _, err := os.Stat(keyFile); os.IsNotExist(err) {
+		t.Fatalf("Key file does not exist: %s", keyFile)
+	}
+
+	// Create logger for testing
+	logger, _ := zap.NewDevelopment()
+
+	// Create HTTP/3 server
+	http3Server, err = server.NewHTTP3Server(testRouter, certFile, keyFile, logger)
+	require.NoError(t, err, "Failed to create HTTP/3 server")
+
+	// Start server in goroutine
+	go func() {
+		err := http3Server.Start("127.0.0.1:8080")
+		if err != nil {
+			t.Logf("HTTP/3 server start error: %v", err)
+		}
+	}()
+
+	// Give server time to start
+	time.Sleep(200 * time.Millisecond)
+}
+
+// teardownHTTP3Server stops the HTTP/3 test server
+func teardownHTTP3Server() {
+	if http3Server != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		http3Server.Shutdown(ctx)
+		http3Server = nil
+	}
+	testRouter = nil
+}
+
+// generateSelfSignedCert creates a simple self-signed certificate for testing
+func generateSelfSignedCert() (string, string, error) {
+	// Generate private key
+	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Generate serial number
+	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	if err != nil {
+		return "", "", err
+	}
+
+	// Create certificate template
+	template := x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization: []string{"HelixTrack Test"},
+			CommonName:   "localhost",
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(365 * 24 * time.Hour),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		DNSNames:              []string{"localhost"},
+	}
+
+	// Create certificate
+	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Encode certificate to PEM
+	certPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: derBytes,
+	})
+
+	// Encode private key to PEM
+	privBytes, err := x509.MarshalECPrivateKey(priv)
+	if err != nil {
+		return "", "", err
+	}
+
+	keyPEM := pem.EncodeToMemory(&pem.Block{
+		Type:  "EC PRIVATE KEY",
+		Bytes: privBytes,
+	})
+
+	return string(certPEM), string(keyPEM), nil
+}
+
 // TestHTTP3Connectivity tests basic HTTP/3 connectivity
 func TestHTTP3Connectivity(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -43,6 +203,9 @@ func TestHTTP3Connectivity(t *testing.T) {
 
 // TestQUICProtocolNegotiation tests QUIC protocol negotiation
 func TestQUICProtocolNegotiation(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -61,6 +224,9 @@ func TestQUICProtocolNegotiation(t *testing.T) {
 
 // TestTLS13Verification verifies TLS 1.3 is used
 func TestTLS13Verification(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -83,6 +249,9 @@ func TestTLS13Verification(t *testing.T) {
 
 // TestConnectionMultiplexing tests multiple concurrent requests over same QUIC connection
 func TestConnectionMultiplexing(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -133,6 +302,9 @@ func TestConnectionMultiplexing(t *testing.T) {
 
 // TestLatencyMeasurement measures HTTP/3 latency
 func TestLatencyMeasurement(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -192,6 +364,9 @@ func TestLatencyMeasurement(t *testing.T) {
 
 // TestThroughput tests HTTP/3 throughput
 func TestThroughput(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -239,6 +414,9 @@ func TestThroughput(t *testing.T) {
 
 // TestErrorHandling tests error handling for invalid requests
 func TestErrorHandling(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -278,6 +456,9 @@ func TestErrorHandling(t *testing.T) {
 
 // TestJSONPayload tests HTTP/3 with JSON payload
 func TestJSONPayload(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -312,6 +493,9 @@ func TestJSONPayload(t *testing.T) {
 
 // TestConnectionReuse tests that connections are reused
 func TestConnectionReuse(t *testing.T) {
+	setupHTTP3Server(t)
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(t)
 	defer closeClient(client)
 
@@ -366,6 +550,9 @@ func doGet(client *http.Client, ctx context.Context, url string) (*http.Response
 
 // BenchmarkHTTP3Latency benchmarks HTTP/3 request latency
 func BenchmarkHTTP3Latency(b *testing.B) {
+	setupHTTP3Server(&testing.T{})
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(&testing.T{})
 	defer closeClient(client)
 
@@ -384,6 +571,9 @@ func BenchmarkHTTP3Latency(b *testing.B) {
 
 // BenchmarkHTTP3Throughput benchmarks HTTP/3 throughput
 func BenchmarkHTTP3Throughput(b *testing.B) {
+	setupHTTP3Server(&testing.T{})
+	defer teardownHTTP3Server()
+
 	client := createHTTP3TestClient(&testing.T{})
 	defer closeClient(client)
 
