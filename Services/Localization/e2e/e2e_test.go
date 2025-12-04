@@ -2,7 +2,6 @@ package e2e
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,10 +11,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/helixtrack/localization-service/internal/models"
 )
 
 const (
-	baseURL = "https://localhost:8085"
+	baseURL = "http://localhost:8085"
 	timeout = 30 * time.Second
 )
 
@@ -42,14 +42,9 @@ type JWTClaims struct {
 
 // NewE2ETestSuite creates a new E2E test suite
 func NewE2ETestSuite(t *testing.T) *E2ETestSuite {
-	// Create HTTP client that accepts self-signed certificates
-	// Note: In production, use proper certificate validation
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
+	// Create HTTP client
 	client := &http.Client{
-		Transport: tr,
-		Timeout:   timeout,
+		Timeout: timeout,
 	}
 
 	jwtSecret := getEnv("JWT_SECRET", "test-secret-key-for-e2e-testing")
@@ -101,16 +96,19 @@ func TestHealthCheck(t *testing.T) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		t.Errorf("Expected status 200, got %d", resp.StatusCode)
+		t.Fatalf("Expected status 200, got %d", resp.StatusCode)
 	}
 
-	var health map[string]interface{}
+	// Health endpoint returns a simple {"status": true}
+	var health struct {
+		Status bool `json:"status"`
+	}
 	if err := json.NewDecoder(resp.Body).Decode(&health); err != nil {
 		t.Fatalf("Failed to decode health response: %v", err)
 	}
 
-	if status, ok := health["status"].(string); !ok || status != "healthy" {
-		t.Errorf("Expected status 'healthy', got %v", health["status"])
+	if !health.Status {
+		t.Errorf("Expected status true, got %v", health.Status)
 	}
 
 	t.Log("✓ Health check passed")
@@ -144,19 +142,20 @@ func TestGetCatalog(t *testing.T) {
 		t.Fatalf("Expected status 200, got %d. Body: %s", resp.StatusCode, string(body))
 	}
 
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		t.Fatalf("Failed to decode response: %v", err)
+	// First parse the API response wrapper
+	var apiResp models.APIResponse
+	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
+		t.Fatalf("Failed to decode API response: %v", err)
 	}
 
-	if success, ok := result["success"].(bool); !ok || !success {
-		t.Errorf("Expected success=true, got %v", result["success"])
+	if !apiResp.Success {
+		t.Errorf("Expected success=true, got %v", apiResp.Success)
 	}
 
-	data, ok := result["data"].(map[string]interface{})
-	if !ok {
-		t.Fatal("Response data is not an object")
-	}
+	// Extract data from wrapped response
+	dataBytes, _ := json.Marshal(apiResp.Data)
+	var data map[string]interface{}
+	json.Unmarshal(dataBytes, &data)
 
 	if language, ok := data["language"].(string); !ok || language != "en" {
 		t.Errorf("Expected language 'en', got %v", data["language"])
