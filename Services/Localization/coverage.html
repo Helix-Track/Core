@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>handlers: Go Coverage Report</title>
+		<title>database: Go Coverage Report</title>
 		<style>
 			body {
 				background: black;
@@ -55,13 +55,19 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/helixtrack/localization-service/internal/handlers/admin_handlers.go (7.7%)</option>
+				<option value="file0">github.com/helixtrack/localization-service/internal/database/catalog_operations.go (67.7%)</option>
 				
-				<option value="file1">github.com/helixtrack/localization-service/internal/handlers/handlers.go (79.6%)</option>
+				<option value="file1">github.com/helixtrack/localization-service/internal/database/database.go (82.8%)</option>
 				
-				<option value="file2">github.com/helixtrack/localization-service/internal/handlers/import_export_handlers.go (0.0%)</option>
+				<option value="file2">github.com/helixtrack/localization-service/internal/database/key_operations.go (12.5%)</option>
 				
-				<option value="file3">github.com/helixtrack/localization-service/internal/handlers/version_handlers.go (32.3%)</option>
+				<option value="file3">github.com/helixtrack/localization-service/internal/database/language_operations.go (62.3%)</option>
+				
+				<option value="file4">github.com/helixtrack/localization-service/internal/database/localization_operations.go (48.3%)</option>
+				
+				<option value="file5">github.com/helixtrack/localization-service/internal/database/mock_database.go (99.7%)</option>
+				
+				<option value="file6">github.com/helixtrack/localization-service/internal/database/version_operations.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -75,2118 +81,2255 @@
 		</div>
 		<div id="content">
 		
-		<pre class="file" id="file0" style="display: none">package handlers
+		<pre class="file" id="file0" style="display: none">package database
 
 import (
         "context"
+        "database/sql"
         "encoding/json"
-        "net/http"
-        "time"
+        "errors"
 
-        "github.com/gin-gonic/gin"
-        "github.com/helixtrack/localization-service/internal/middleware"
         "github.com/helixtrack/localization-service/internal/models"
-        "github.com/helixtrack/localization-service/internal/websocket"
         "go.uber.org/zap"
 )
 
-// CreateLanguage creates a new language (admin only)
-func (h *Handler) CreateLanguage(c *gin.Context) <span class="cov8" title="1">{
-        var req models.CreateLanguageRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov8" title="1">{
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeValidationFailed,
-                        "invalid request body",
-                ))
-                return
+// CreateCatalog creates a new catalog
+func (d *PostgresDatabase) CreateCatalog(ctx context.Context, catalog *models.LocalizationCatalog) error <span class="cov8" title="1">{
+        catalog.BeforeCreate()
+
+        if err := catalog.Validate(); err != nil </span><span class="cov0" title="0">{
+                return err
         }</span>
 
-        <span class="cov8" title="1">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        lang := &amp;models.Language{
-                Code:       req.Code,
-                Name:       req.Name,
-                NativeName: req.NativeName,
-                IsRTL:      req.IsRTL,
-                IsActive:   req.IsActive,
-                IsDefault:  req.IsDefault,
-        }
-
-        if err := h.db.CreateLanguage(ctx, lang); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to create language", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeDatabaseError,
-                        "failed to create language",
-                ))
-                return
-        }</span>
-
-        // Audit log
-        <span class="cov8" title="1">claims := middleware.GetClaims(c)
-        h.db.CreateAuditLog(ctx, "CREATE", "LANGUAGE", lang.ID, claims.Username, lang, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventLanguageAdded,
-                        &amp;websocket.LanguageEventData{
-                                ID:         lang.ID,
-                                Code:       lang.Code,
-                                Name:       lang.Name,
-                                NativeName: lang.NativeName,
-                                IsRTL:      lang.IsRTL,
-                                IsActive:   lang.IsActive,
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
-                )
-        }</span>
-
-        <span class="cov8" title="1">c.JSON(http.StatusCreated, models.SuccessResponse(lang))</span>
-}
-
-// UpdateLanguage updates an existing language (admin only)
-func (h *Handler) UpdateLanguage(c *gin.Context) <span class="cov0" title="0">{
-        id := c.Param("id")
-
-        var req models.CreateLanguageRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeValidationFailed,
-                        "invalid request body",
-                ))
-                return
-        }</span>
-
-        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        // Get existing language
-        existing, err := h.db.GetLanguageByID(ctx, id)
-        if err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "language not found",
-                ))
-                return
-        }</span>
-
-        // Update fields
-        <span class="cov0" title="0">existing.Code = req.Code
-        existing.Name = req.Name
-        existing.NativeName = req.NativeName
-        existing.IsRTL = req.IsRTL
-        existing.IsActive = req.IsActive
-        existing.IsDefault = req.IsDefault
-
-        if err := h.db.UpdateLanguage(ctx, existing); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to update language", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeDatabaseError,
-                        "failed to update language",
-                ))
-                return
-        }</span>
-
-        // Audit log
-        <span class="cov0" title="0">claims := middleware.GetClaims(c)
-        h.db.CreateAuditLog(ctx, "UPDATE", "LANGUAGE", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventLanguageUpdated,
-                        &amp;websocket.LanguageEventData{
-                                ID:         existing.ID,
-                                Code:       existing.Code,
-                                Name:       existing.Name,
-                                NativeName: existing.NativeName,
-                                IsRTL:      existing.IsRTL,
-                                IsActive:   existing.IsActive,
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
-                )
-        }</span>
-
-        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(existing))</span>
-}
-
-// DeleteLanguage deletes a language (admin only)
-func (h *Handler) DeleteLanguage(c *gin.Context) <span class="cov0" title="0">{
-        id := c.Param("id")
-
-        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        // Get language before deleting for WebSocket event
-        lang, err := h.db.GetLanguageByID(ctx, id)
-        if err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "language not found",
-                ))
-                return
-        }</span>
-
-        <span class="cov0" title="0">if err := h.db.DeleteLanguage(ctx, id); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to delete language", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeDatabaseError,
-                        "failed to delete language",
-                ))
-                return
-        }</span>
-
-        // Audit log
-        <span class="cov0" title="0">claims := middleware.GetClaims(c)
-        h.db.CreateAuditLog(ctx, "DELETE", "LANGUAGE", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventLanguageDeleted,
-                        &amp;websocket.LanguageEventData{
-                                ID:         lang.ID,
-                                Code:       lang.Code,
-                                Name:       lang.Name,
-                                NativeName: lang.NativeName,
-                                IsRTL:      lang.IsRTL,
-                                IsActive:   lang.IsActive,
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
-                )
-        }</span>
-
-        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
-                "message": "language deleted successfully",
-        }))</span>
-}
-
-// CreateLocalization creates or updates a localization (admin only)
-func (h *Handler) CreateLocalization(c *gin.Context) <span class="cov0" title="0">{
-        var req models.CreateLocalizationRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeValidationFailed,
-                        "invalid request body",
-                ))
-                return
-        }</span>
-
-        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        // Get or create localization key
-        locKey, err := h.db.GetLocalizationKeyByKey(ctx, req.Key)
-        if err != nil </span><span class="cov0" title="0">{
-                // Create new key
-                locKey = &amp;models.LocalizationKey{
-                        Key:         req.Key,
-                        Category:    req.Category,
-                        Description: req.Description,
-                        Context:     req.Context,
-                }
-                if err := h.db.CreateLocalizationKey(ctx, locKey); err != nil </span><span class="cov0" title="0">{
-                        h.logger.Error("failed to create localization key", zap.Error(err))
-                        c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                                models.ErrCodeDatabaseError,
-                                "failed to create localization key",
-                        ))
-                        return
-                }</span>
-        }
-
-        // Get language
-        <span class="cov0" title="0">lang, err := h.db.GetLanguageByCode(ctx, req.Language)
-        if err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "language not found",
-                ))
-                return
-        }</span>
-
-        // Prepare JSON fields
-        <span class="cov0" title="0">var pluralFormsJSON, variablesJSON json.RawMessage
-        if req.PluralForms != nil </span><span class="cov0" title="0">{
-                pluralFormsJSON, _ = json.Marshal(req.PluralForms)
-        }</span>
-        <span class="cov0" title="0">if req.Variables != nil </span><span class="cov0" title="0">{
-                variablesJSON, _ = json.Marshal(req.Variables)
-        }</span>
-
-        // Check if localization already exists
-        <span class="cov0" title="0">existing, err := h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, lang.ID)
-        if err == nil </span><span class="cov0" title="0">{
-                // Update existing
-                existing.Value = req.Value
-                existing.PluralForms = pluralFormsJSON
-                existing.Variables = variablesJSON
-                existing.Approved = req.Approved
-
-                if err := h.db.UpdateLocalization(ctx, existing); err != nil </span><span class="cov0" title="0">{
-                        h.logger.Error("failed to update localization", zap.Error(err))
-                        c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                                models.ErrCodeDatabaseError,
-                                "failed to update localization",
-                        ))
-                        return
-                }</span>
-
-                // Invalidate cache
-                <span class="cov0" title="0">h.invalidateCacheForLanguage(ctx, lang.Code)
-
-                // Audit log
-                claims := middleware.GetClaims(c)
-                h.db.CreateAuditLog(ctx, "UPDATE", "LOCALIZATION", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
-
-                // Broadcast WebSocket event (if WebSocket is enabled)
-                if h.wsManager != nil </span><span class="cov0" title="0">{
-                        h.wsManager.BroadcastEvent(
-                                websocket.EventLocalizationUpdated,
-                                &amp;websocket.LocalizationEventData{
-                                        ID:           existing.ID,
-                                        KeyID:        existing.KeyID,
-                                        Key:          locKey.Key,
-                                        LanguageID:   existing.LanguageID,
-                                        LanguageCode: lang.Code,
-                                        Value:        existing.Value,
-                                        IsApproved:   existing.Approved,
-                                },
-                                &amp;websocket.EventMetadata{
-                                        Username: claims.Username,
-                                },
-                        )
-                }</span>
-
-                <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(existing))
-                return</span>
-        }
-
-        // Create new localization
-        <span class="cov0" title="0">loc := &amp;models.Localization{
-                KeyID:       locKey.ID,
-                LanguageID:  lang.ID,
-                Value:       req.Value,
-                PluralForms: pluralFormsJSON,
-                Variables:   variablesJSON,
-                Approved:    req.Approved,
-        }
-
-        if err := h.db.CreateLocalization(ctx, loc); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to create localization", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeDatabaseError,
-                        "failed to create localization",
-                ))
-                return
-        }</span>
-
-        // Invalidate cache
-        <span class="cov0" title="0">h.invalidateCacheForLanguage(ctx, lang.Code)
-
-        // Audit log
-        claims := middleware.GetClaims(c)
-        h.db.CreateAuditLog(ctx, "CREATE", "LOCALIZATION", loc.ID, claims.Username, loc, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventLocalizationAdded,
-                        &amp;websocket.LocalizationEventData{
-                                ID:           loc.ID,
-                                KeyID:        loc.KeyID,
-                                Key:          locKey.Key,
-                                LanguageID:   loc.LanguageID,
-                                LanguageCode: lang.Code,
-                                Value:        loc.Value,
-                                IsApproved:   loc.Approved,
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
-                )
-        }</span>
-
-        <span class="cov0" title="0">c.JSON(http.StatusCreated, models.SuccessResponse(loc))</span>
-}
-
-// UpdateLocalization updates an existing localization (admin only)
-func (h *Handler) UpdateLocalization(c *gin.Context) <span class="cov0" title="0">{
-        id := c.Param("id")
-
-        var req models.CreateLocalizationRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeValidationFailed,
-                        "invalid request body",
-                ))
-                return
-        }</span>
-
-        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        // Get existing localization
-        existing, err := h.db.GetLocalizationByID(ctx, id)
-        if err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "localization not found",
-                ))
-                return
-        }</span>
-
-        // Update fields
-        <span class="cov0" title="0">existing.Value = req.Value
-
-        var pluralFormsJSON, variablesJSON json.RawMessage
-        if req.PluralForms != nil </span><span class="cov0" title="0">{
-                pluralFormsJSON, _ = json.Marshal(req.PluralForms)
-                existing.PluralForms = pluralFormsJSON
-        }</span>
-        <span class="cov0" title="0">if req.Variables != nil </span><span class="cov0" title="0">{
-                variablesJSON, _ = json.Marshal(req.Variables)
-                existing.Variables = variablesJSON
-        }</span>
-
-        <span class="cov0" title="0">if err := h.db.UpdateLocalization(ctx, existing); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to update localization", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeDatabaseError,
-                        "failed to update localization",
-                ))
-                return
-        }</span>
-
-        // Invalidate cache
-        <span class="cov0" title="0">lang, _ := h.db.GetLanguageByID(ctx, existing.LanguageID)
-        if lang != nil </span><span class="cov0" title="0">{
-                h.invalidateCacheForLanguage(ctx, lang.Code)
-        }</span>
-
-        // Get key for WebSocket event
-        <span class="cov0" title="0">locKey, _ := h.db.GetLocalizationKeyByID(ctx, existing.KeyID)
-
-        // Audit log
-        claims := middleware.GetClaims(c)
-        h.db.CreateAuditLog(ctx, "UPDATE", "LOCALIZATION", existing.ID, claims.Username, existing, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event
-        keyName := ""
-        langCode := ""
-        if locKey != nil </span><span class="cov0" title="0">{
-                keyName = locKey.Key
-        }</span>
-        <span class="cov0" title="0">if lang != nil </span><span class="cov0" title="0">{
-                langCode = lang.Code
-        }</span>
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        <span class="cov0" title="0">if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventLocalizationUpdated,
-                        &amp;websocket.LocalizationEventData{
-                                ID:           existing.ID,
-                                KeyID:        existing.KeyID,
-                                Key:          keyName,
-                                LanguageID:   existing.LanguageID,
-                                LanguageCode: langCode,
-                                Value:        existing.Value,
-                                IsApproved:   existing.Approved,
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
-                )
-        }</span>
-
-        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(existing))</span>
-}
-
-// DeleteLocalization deletes a localization (admin only)
-func (h *Handler) DeleteLocalization(c *gin.Context) <span class="cov0" title="0">{
-        id := c.Param("id")
-
-        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        // Get localization before deleting for WebSocket event
-        loc, err := h.db.GetLocalizationByID(ctx, id)
-        if err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "localization not found",
-                ))
-                return
-        }</span>
-
-        // Get related data for event
-        <span class="cov0" title="0">lang, _ := h.db.GetLanguageByID(ctx, loc.LanguageID)
-        locKey, _ := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
-
-        // Invalidate cache
-        if lang != nil </span><span class="cov0" title="0">{
-                h.invalidateCacheForLanguage(ctx, lang.Code)
-        }</span>
-
-        <span class="cov0" title="0">if err := h.db.DeleteLocalization(ctx, id); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to delete localization", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeDatabaseError,
-                        "failed to delete localization",
-                ))
-                return
-        }</span>
-
-        // Audit log
-        <span class="cov0" title="0">claims := middleware.GetClaims(c)
-        h.db.CreateAuditLog(ctx, "DELETE", "LOCALIZATION", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event
-        keyName := ""
-        langCode := ""
-        if locKey != nil </span><span class="cov0" title="0">{
-                keyName = locKey.Key
-        }</span>
-        <span class="cov0" title="0">if lang != nil </span><span class="cov0" title="0">{
-                langCode = lang.Code
-        }</span>
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        <span class="cov0" title="0">if h.wsManager != nil </span><span class="cov0" title="0">{
-                // Broadcast WebSocket event (if WebSocket is enabled)
-                if h.wsManager != nil </span><span class="cov0" title="0">{
-                        h.wsManager.BroadcastEvent(
-                                websocket.EventLocalizationApproved,
-                                &amp;websocket.LocalizationEventData{
-                                        ID:           loc.ID,
-                                        KeyID:        loc.KeyID,
-                                        Key:          keyName,
-                                        LanguageID:   loc.LanguageID,
-                                        LanguageCode: langCode,
-                                        Value:        loc.Value,
-                                        IsApproved:   loc.Approved,
-                                },
-                                &amp;websocket.EventMetadata{
-                                        Username: claims.Username,
-                                },
-                        )
-                }</span>
-        }
-
-        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
-                "message": "localization deleted successfully",
-        }))</span>
-}
-
-// ApproveLocalization approves a localization (admin only)
-func (h *Handler) ApproveLocalization(c *gin.Context) <span class="cov0" title="0">{
-        id := c.Param("id")
-
-        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        // Get localization before approving for WebSocket event
-        loc, err := h.db.GetLocalizationByID(ctx, id)
-        if err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "localization not found",
-                ))
-                return
-        }</span>
-
-        <span class="cov0" title="0">claims := middleware.GetClaims(c)
-        if err := h.db.ApproveLocalization(ctx, id, claims.Username); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to approve localization", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeDatabaseError,
-                        "failed to approve localization",
-                ))
-                return
-        }</span>
-
-        // Get related data for event
-        <span class="cov0" title="0">lang, _ := h.db.GetLanguageByID(ctx, loc.LanguageID)
-        locKey, _ := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
-
-        // Audit log
-        h.db.CreateAuditLog(ctx, "APPROVE", "LOCALIZATION", id, claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event
-        keyName := ""
-        langCode := ""
-        if locKey != nil </span><span class="cov0" title="0">{
-                keyName = locKey.Key
-        }</span>
-        <span class="cov0" title="0">if lang != nil </span><span class="cov0" title="0">{
-                langCode = lang.Code
-        }</span>
-        <span class="cov0" title="0">h.wsManager.BroadcastEvent(
-                websocket.EventLocalizationApproved,
-                &amp;websocket.LocalizationEventData{
-                        ID:           loc.ID,
-                        KeyID:        loc.KeyID,
-                        Key:          keyName,
-                        LanguageID:   loc.LanguageID,
-                        LanguageCode: langCode,
-                        Value:        loc.Value,
-                        IsApproved:   true,
-                },
-                &amp;websocket.EventMetadata{
-                        Username: claims.Username,
-                },
+        <span class="cov8" title="1">query := `
+                INSERT INTO localization_catalogs (id, language_id, category, catalog_data, version, checksum, created_at, modified_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                ON CONFLICT (language_id, category, version) DO UPDATE
+                SET catalog_data = EXCLUDED.catalog_data, 
+                    checksum = EXCLUDED.checksum,
+                    modified_at = EXCLUDED.modified_at
+        `
+
+        _, err := d.execContext(ctx, query,
+                catalog.ID, catalog.LanguageID, catalog.Category, catalog.CatalogData,
+                catalog.Version, catalog.Checksum, catalog.CreatedAt, catalog.ModifiedAt,
         )
 
-        c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
-                "message": "localization approved successfully",
-        }))</span>
-}
-
-// InvalidateCache invalidates cache (admin only)
-func (h *Handler) InvalidateCache(c *gin.Context) <span class="cov0" title="0">{
-        var req models.CacheInvalidationRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
-                // If no body, invalidate all
-                req = models.CacheInvalidationRequest{}
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to create catalog", zap.Error(err))
+                return models.ErrDatabase(err)
         }</span>
 
-        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
+        <span class="cov8" title="1">d.logger.Info("catalog created",
+                zap.String("id", catalog.ID),
+                zap.String("language_id", catalog.LanguageID),
+                zap.String("category", catalog.Category),
+        )
+        return nil</span>
+}
 
-        if req.Language != "" </span><span class="cov0" title="0">{
-                h.invalidateCacheForLanguage(ctx, req.Language)
+// GetCatalogByLanguage retrieves a catalog by language ID and optional category
+func (d *PostgresDatabase) GetCatalogByLanguage(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error) <span class="cov8" title="1">{
+        var query string
+        var args []interface{}
+
+        if category != "" </span><span class="cov8" title="1">{
+                query = `
+                        SELECT id, language_id, category, catalog_data, version, checksum, created_at, modified_at
+                        FROM localization_catalogs
+                        WHERE language_id = $1 AND category = $2
+                        ORDER BY version DESC
+                        LIMIT 1
+                `
+                args = []interface{}{languageID, category}
         }</span> else<span class="cov0" title="0"> {
-                // Invalidate all
-                h.cache.DeletePattern(ctx, "l10n:*")
+                query = `
+                        SELECT id, language_id, category, catalog_data, version, checksum, created_at, modified_at
+                        FROM localization_catalogs
+                        WHERE language_id = $1 AND category IS NULL
+                        ORDER BY version DESC
+                        LIMIT 1
+                `
+                args = []interface{}{languageID}
         }</span>
 
-        // Get JWT claims for audit and WebSocket event
-        <span class="cov0" title="0">claims := middleware.GetClaims(c)
+        <span class="cov8" title="1">catalog := &amp;models.LocalizationCatalog{}
+        var categoryNullable sql.NullString
 
-        // Create audit log
-        h.db.CreateAuditLog(ctx, "INVALIDATE", "CACHE", "", claims.Username, req, c.ClientIP(), c.Request.UserAgent())
+        err := d.queryRowContext(ctx, query, args...).Scan(
+                &amp;catalog.ID, &amp;catalog.LanguageID, &amp;categoryNullable, &amp;catalog.CatalogData,
+                &amp;catalog.Version, &amp;catalog.Checksum, &amp;catalog.CreatedAt, &amp;catalog.ModifiedAt,
+        )
 
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventCacheInvalidated,
-                        &amp;websocket.CacheInvalidatedEventData{
-                                Language: req.Language,
-                                Reason:   "manual invalidation",
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
-                )
+        if categoryNullable.Valid </span><span class="cov8" title="1">{
+                catalog.Category = categoryNullable.String
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
-                "message": "cache invalidated successfully",
-        }))</span>
-}
-
-// GetStats retrieves database statistics (admin only)
-func (h *Handler) GetStats(c *gin.Context) <span class="cov8" title="1">{
-        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        stats, err := h.db.GetStats(ctx)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to get stats", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "failed to retrieve statistics",
-                ))
-                return
-        }</span>
-
-        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(stats))</span>
-}
-
-// invalidateCacheForLanguage invalidates all cache entries for a language
-func (h *Handler) invalidateCacheForLanguage(ctx context.Context, languageCode string) <span class="cov0" title="0">{
-        pattern := "l10n:catalog:" + languageCode + ":*"
-        h.cache.DeletePattern(ctx, pattern)
-        h.logger.Info("cache invalidated", zap.String("language", languageCode))
-}</span>
-</pre>
-		
-		<pre class="file" id="file1" style="display: none">package handlers
-
-import (
-        "context"
-        "encoding/json"
-        "net/http"
-        "time"
-
-        "github.com/gin-gonic/gin"
-        "github.com/helixtrack/localization-service/internal/cache"
-        "github.com/helixtrack/localization-service/internal/database"
-        "github.com/helixtrack/localization-service/internal/middleware"
-        "github.com/helixtrack/localization-service/internal/models"
-        "github.com/helixtrack/localization-service/internal/websocket"
-        "go.uber.org/zap"
-)
-
-// Handler dependencies
-type Handler struct {
-        db        database.Database
-        cache     cache.Cache
-        logger    *zap.Logger
-        wsManager *websocket.Manager
-}
-
-// NewHandler creates a new handler instance
-func NewHandler(db database.Database, cache cache.Cache, logger *zap.Logger, wsManager *websocket.Manager) *Handler <span class="cov8" title="1">{
-        return &amp;Handler{
-                db:        db,
-                cache:     cache,
-                logger:    logger,
-                wsManager: wsManager,
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        // Build catalog if it doesn't exist
+                        d.logger.Info("catalog not found, building new one",
+                                zap.String("language_id", languageID),
+                                zap.String("category", category),
+                        )
+                        return d.BuildCatalog(ctx, languageID, category)
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get catalog by language", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
         }
+
+        <span class="cov8" title="1">return catalog, nil</span>
+}
+
+// GetLatestCatalog retrieves the latest catalog version
+func (d *PostgresDatabase) GetLatestCatalog(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error) <span class="cov0" title="0">{
+        return d.GetCatalogByLanguage(ctx, languageID, category)
 }</span>
 
-// RegisterRoutes registers all API routes
-func (h *Handler) RegisterRoutes(router *gin.Engine, jwtSecret string, adminRoles []string) <span class="cov8" title="1">{
-        // Public routes
-        router.GET("/health", h.HealthCheck)
+// UpdateCatalog updates an existing catalog
+func (d *PostgresDatabase) UpdateCatalog(ctx context.Context, catalog *models.LocalizationCatalog) error <span class="cov8" title="1">{
+        catalog.BeforeUpdate()
 
-        // API v1 routes
-        v1 := router.Group("/v1")
-        </span><span class="cov8" title="1">{
-                // Authentication required
-                v1.Use(middleware.JWTAuth(jwtSecret, h.logger))
+        if err := catalog.Validate(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
 
-                // Catalog routes
-                v1.GET("/catalog/:language", h.GetCatalog)
+        <span class="cov8" title="1">query := `
+                UPDATE localization_catalogs
+                SET catalog_data = $1, version = $2, checksum = $3, modified_at = $4
+                WHERE id = $5
+        `
 
-                // Localization routes
-                v1.GET("/localize/:key", h.GetLocalization)
-                v1.POST("/localize/batch", h.BatchLocalize)
+        result, err := d.execContext(ctx, query,
+                catalog.CatalogData, catalog.Version, catalog.Checksum, catalog.ModifiedAt, catalog.ID,
+        )
 
-                // Language routes
-                v1.GET("/languages", h.ListLanguages)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to update catalog", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
 
-                // Version routes (public)
-                v1.GET("/version/current", h.GetCurrentVersion)
-                v1.GET("/version/history", h.GetVersionHistory)
-                v1.GET("/version/:version", h.GetVersionByNumber)
-                v1.GET("/version/:version/catalog/:language", h.GetCatalogByVersion)
+        <span class="cov8" title="1">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("catalog")
+        }</span>
 
-                // Admin routes
-                admin := v1.Group("/admin")
-                admin.Use(middleware.AdminOnly(adminRoles))
-                </span><span class="cov8" title="1">{
-                        // Language admin
-                        admin.POST("/languages", h.CreateLanguage)
-                        admin.PUT("/languages/:id", h.UpdateLanguage)
-                        admin.DELETE("/languages/:id", h.DeleteLanguage)
-
-                        // Localization admin
-                        admin.POST("/localizations", h.CreateLocalization)
-                        admin.PUT("/localizations/:id", h.UpdateLocalization)
-                        admin.DELETE("/localizations/:id", h.DeleteLocalization)
-                        admin.POST("/localizations/:id/approve", h.ApproveLocalization)
-                        admin.POST("/localizations/batch", h.HandleBatchLocalizations)
-
-                        // Import/Export
-                        admin.POST("/import", h.HandleImport)
-                        admin.GET("/export", h.HandleExport)
-
-                        // Version admin
-                        admin.POST("/version/create", h.CreateVersion)
-                        admin.DELETE("/version/:version", h.DeleteVersion)
-
-                        // Cache admin
-                        admin.POST("/cache/invalidate", h.InvalidateCache)
-
-                        // Stats
-                        admin.GET("/stats", h.GetStats)
-                }</span>
-        }
+        <span class="cov8" title="1">d.logger.Info("catalog updated", zap.String("id", catalog.ID))
+        return nil</span>
 }
 
-// HealthCheck handles health check requests
-func (h *Handler) HealthCheck(c *gin.Context) <span class="cov8" title="1">{
-        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
+// DeleteCatalog deletes a catalog
+func (d *PostgresDatabase) DeleteCatalog(ctx context.Context, id string) error <span class="cov8" title="1">{
+        query := `DELETE FROM localization_catalogs WHERE id = $1`
 
-        checks := make(map[string]interface{})
-
-        // Check database
-        dbStart := time.Now()
-        if err := h.db.Ping(); err != nil </span><span class="cov0" title="0">{
-                checks["database"] = map[string]interface{}{
-                        "status": "unhealthy",
-                        "error":  err.Error(),
-                }
-                c.JSON(http.StatusServiceUnavailable, models.HealthResponse{
-                        Status:  "unhealthy",
-                        Version: "1.0.0",
-                        Checks:  checks,
-                })
-                return
+        result, err := d.execContext(ctx, query, id)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to delete catalog", zap.Error(err))
+                return models.ErrDatabase(err)
         }</span>
 
-        <span class="cov8" title="1">checks["database"] = map[string]interface{}{
-                "status":     "healthy",
-                "latency_ms": time.Since(dbStart).Milliseconds(),
-        }
-
-        // Check cache
-        if _, err := h.cache.Exists(ctx, "health_check"); err != nil </span><span class="cov0" title="0">{
-                checks["cache"] = map[string]interface{}{
-                        "status": "degraded",
-                        "error":  err.Error(),
-                }
-        }</span> else<span class="cov8" title="1"> {
-                checks["cache"] = map[string]interface{}{
-                        "status": "healthy",
-                }
+        <span class="cov8" title="1">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("catalog")
         }</span>
 
-        <span class="cov8" title="1">c.JSON(http.StatusOK, models.HealthResponse{
-                Status:  "healthy",
-                Version: "1.0.0",
-                Checks:  checks,
-        })</span>
+        <span class="cov8" title="1">d.logger.Info("catalog deleted", zap.String("id", id))
+        return nil</span>
 }
 
-// GetCatalog retrieves a complete localization catalog
-func (h *Handler) GetCatalog(c *gin.Context) <span class="cov8" title="1">{
-        languageCode := c.Param("language")
-        category := c.Query("category")
-
-        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-        defer cancel()
-
-        // Generate cache key
-        cacheKey := cache.CacheKey("catalog", languageCode, category)
-
-        // Try cache first
-        if cached, err := h.cache.Get(ctx, cacheKey); err == nil </span><span class="cov8" title="1">{
-                var response models.CatalogResponse
-                if err := json.Unmarshal([]byte(cached), &amp;response); err == nil </span><span class="cov8" title="1">{
-                        h.logger.Debug("catalog cache hit", zap.String("language", languageCode))
-                        c.JSON(http.StatusOK, models.SuccessResponse(response))
-                        return
-                }</span>
-        }
-
-        // Get language
-        <span class="cov8" title="1">lang, err := h.db.GetLanguageByCode(ctx, languageCode)
-        if err != nil </span><span class="cov8" title="1">{
-                h.logger.Error("failed to get language", zap.Error(err))
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "language not found",
-                ))
-                return
-        }</span>
-
-        // Get or build catalog
-        <span class="cov8" title="1">catalog, err := h.db.GetLatestCatalog(ctx, lang.ID, category)
+// BuildCatalog builds a complete localization catalog for a language
+func (d *PostgresDatabase) BuildCatalog(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error) <span class="cov8" title="1">{
+        // Get language to verify it exists
+        lang, err := d.GetLanguageByID(ctx, languageID)
         if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to get catalog", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "failed to retrieve catalog",
-                ))
-                return
+                return nil, err
         }</span>
 
-        // Parse catalog data
-        <span class="cov8" title="1">catalogMap, err := catalog.GetCatalogMap()
+        // Build query based on category filter
+        <span class="cov8" title="1">var query string
+        var args []interface{}
+
+        if category != "" </span><span class="cov8" title="1">{
+                query = `
+                        SELECT lk.key, l.value
+                        FROM localizations l
+                        JOIN localization_keys lk ON l.key_id = lk.id
+                        WHERE l.language_id = $1 AND lk.category = $2 AND l.deleted = FALSE AND lk.deleted = FALSE
+                        ORDER BY lk.key ASC
+                `
+                args = []interface{}{languageID, category}
+        }</span> else<span class="cov0" title="0"> {
+                query = `
+                        SELECT lk.key, l.value
+                        FROM localizations l
+                        JOIN localization_keys lk ON l.key_id = lk.id
+                        WHERE l.language_id = $1 AND l.deleted = FALSE AND lk.deleted = FALSE
+                        ORDER BY lk.key ASC
+                `
+                args = []interface{}{languageID}
+        }</span>
+
+        <span class="cov8" title="1">rows, err := d.queryContext(ctx, query, args...)
         if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to parse catalog", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "failed to parse catalog",
-                ))
-                return
+                return nil, err
         }</span>
+        <span class="cov8" title="1">defer rows.Close()
 
-        <span class="cov8" title="1">response := models.CatalogResponse{
-                Language: languageCode,
-                Version:  catalog.Version,
-                Checksum: catalog.Checksum,
-                Catalog:  catalogMap,
-        }
-
-        // Cache the response
-        if responseJSON, err := json.Marshal(response); err == nil </span><span class="cov8" title="1">{
-                h.cache.Set(ctx, cacheKey, string(responseJSON), 1*time.Hour)
-        }</span>
-
-        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
-}
-
-// GetLocalization retrieves a single localization
-func (h *Handler) GetLocalization(c *gin.Context) <span class="cov8" title="1">{
-        key := c.Param("key")
-        languageCode := c.Query("language")
-        fallback := c.DefaultQuery("fallback", "true") == "true"
-
-        if languageCode == "" </span><span class="cov8" title="1">{
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeValidationFailed,
-                        "language parameter is required",
-                ))
-                return
-        }</span>
-
-        <span class="cov8" title="1">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        // Get language
-        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
-        if err != nil </span><span class="cov8" title="1">{
-                if fallback </span><span class="cov0" title="0">{
-                        // Try default language
-                        defaultLang, err := h.db.GetDefaultLanguage(ctx)
-                        if err != nil </span><span class="cov0" title="0">{
-                                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                                        models.ErrCodeNotFound,
-                                        "language not found",
-                                ))
-                                return
-                        }</span>
-                        <span class="cov0" title="0">lang = defaultLang</span>
-                } else<span class="cov8" title="1"> {
-                        c.JSON(http.StatusNotFound, models.ErrorResponse(
-                                models.ErrCodeNotFound,
-                                "language not found",
-                        ))
-                        return
+        // Build catalog map
+        catalogMap := make(map[string]string)
+        for rows.Next() </span><span class="cov0" title="0">{
+                var key, value string
+                if err := rows.Scan(&amp;key, &amp;value); err != nil </span><span class="cov0" title="0">{
+                        d.logger.Error("failed to scan catalog entry", zap.Error(err))
+                        return nil, models.ErrDatabase(err)
                 }</span>
+                <span class="cov0" title="0">catalogMap[key] = value</span>
         }
 
-        // Get localization key
-        <span class="cov8" title="1">locKey, err := h.db.GetLocalizationKeyByKey(ctx, key)
-        if err != nil </span><span class="cov8" title="1">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "localization key not found",
-                ))
-                return
-        }</span>
-
-        // Get localization
-        <span class="cov8" title="1">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, lang.ID)
+        // Marshal to JSON
+        <span class="cov8" title="1">catalogJSON, err := json.Marshal(catalogMap)
         if err != nil </span><span class="cov0" title="0">{
-                if fallback </span><span class="cov0" title="0">{
-                        // Try default language
-                        defaultLang, err := h.db.GetDefaultLanguage(ctx)
-                        if err == nil </span><span class="cov0" title="0">{
-                                loc, err = h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, defaultLang.ID)
-                        }</span>
-                }
+                d.logger.Error("failed to marshal catalog", zap.Error(err))
+                return nil, err
+        }</span>
 
-                <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
-                        c.JSON(http.StatusNotFound, models.ErrorResponse(
-                                models.ErrCodeNotFound,
-                                "localization not found",
-                        ))
-                        return
-                }</span>
+        // Get latest version number or start at 1
+        <span class="cov8" title="1">var latestVersion int
+        versionQuery := `
+                SELECT COALESCE(MAX(version), 0) FROM localization_catalogs
+                WHERE language_id = $1 AND category IS NULL
+        `
+        if category != "" </span><span class="cov8" title="1">{
+                versionQuery = `
+                        SELECT COALESCE(MAX(version), 0) FROM localization_catalogs
+                        WHERE language_id = $1 AND category = $2
+                `
+                err = d.queryRowContext(ctx, versionQuery, languageID, category).Scan(&amp;latestVersion)
+        }</span> else<span class="cov0" title="0"> {
+                err = d.queryRowContext(ctx, versionQuery, languageID).Scan(&amp;latestVersion)
+        }</span>
+        <span class="cov8" title="1">if err != nil &amp;&amp; !errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                d.logger.Error("failed to get latest version", zap.Error(err))
+                return nil, models.ErrDatabase(err)
+        }</span>
+
+        // Create new catalog
+        <span class="cov8" title="1">catalog := &amp;models.LocalizationCatalog{
+                LanguageID:  languageID,
+                Category:    category,
+                CatalogData: catalogJSON,
+                Version:     latestVersion + 1,
         }
 
-        // Parse variables
-        <span class="cov8" title="1">var variables []string
-        if loc.Variables != nil </span><span class="cov0" title="0">{
-                json.Unmarshal(loc.Variables, &amp;variables)
+        catalog.BeforeCreate()
+
+        // Save catalog
+        if err := d.CreateCatalog(ctx, catalog); err != nil </span><span class="cov0" title="0">{
+                return nil, err
         }</span>
 
-        <span class="cov8" title="1">response := models.LocalizationResponse{
-                Key:      key,
-                Language: lang.Code,
-                Value:    loc.Value,
-                Variables: variables,
-                Approved: loc.Approved,
-        }
+        <span class="cov8" title="1">d.logger.Info("catalog built",
+                zap.String("language", lang.Code),
+                zap.String("category", category),
+                zap.Int("version", catalog.Version),
+                zap.Int("entries", len(catalogMap)),
+        )
 
-        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
-}
-
-// BatchLocalize retrieves multiple localizations at once
-func (h *Handler) BatchLocalize(c *gin.Context) <span class="cov8" title="1">{
-        var req models.GetBatchLocalizationRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov8" title="1">{
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeValidationFailed,
-                        "invalid request body",
-                ))
-                return
-        }</span>
-
-        <span class="cov8" title="1">ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-        defer cancel()
-
-        // Get language
-        lang, err := h.db.GetLanguageByCode(ctx, req.Language)
-        if err != nil </span><span class="cov0" title="0">{
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "language not found",
-                ))
-                return
-        }</span>
-
-        // Get default language for fallback
-        <span class="cov8" title="1">var defaultLang *models.Language
-        if req.Fallback </span><span class="cov8" title="1">{
-                defaultLang, _ = h.db.GetDefaultLanguage(ctx)
-        }</span>
-
-        // Retrieve each localization
-        <span class="cov8" title="1">localizations := make(map[string]string)
-        for _, key := range req.Keys </span><span class="cov8" title="1">{
-                // Get localization key
-                locKey, err := h.db.GetLocalizationKeyByKey(ctx, key)
-                if err != nil </span><span class="cov0" title="0">{
-                        continue</span> // Skip missing keys
-                }
-
-                // Get localization
-                <span class="cov8" title="1">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, lang.ID)
-                if err != nil &amp;&amp; req.Fallback &amp;&amp; defaultLang != nil </span><span class="cov0" title="0">{
-                        // Try fallback
-                        loc, err = h.db.GetLocalizationByKeyAndLanguage(ctx, locKey.ID, defaultLang.ID)
-                }</span>
-
-                <span class="cov8" title="1">if err == nil </span><span class="cov8" title="1">{
-                        localizations[key] = loc.Value
-                }</span>
-        }
-
-        <span class="cov8" title="1">response := models.GetBatchLocalizationResponse{
-                Language:      req.Language,
-                Localizations: localizations,
-        }
-
-        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
-}
-
-// ListLanguages retrieves all active languages
-func (h *Handler) ListLanguages(c *gin.Context) <span class="cov8" title="1">{
-        activeOnly := c.DefaultQuery("active_only", "true") == "true"
-
-        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-        defer cancel()
-
-        languages, err := h.db.GetLanguages(ctx, activeOnly)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("failed to get languages", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "failed to retrieve languages",
-                ))
-                return
-        }</span>
-
-        // Convert to response format
-        <span class="cov8" title="1">var langList []models.Language
-        for _, lang := range languages </span><span class="cov8" title="1">{
-                langList = append(langList, *lang)
-        }</span>
-
-        <span class="cov8" title="1">response := models.LanguageListResponse{
-                Languages: langList,
-        }
-
-        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
+        return catalog, nil</span>
 }
 </pre>
 		
-		<pre class="file" id="file2" style="display: none">package handlers
+		<pre class="file" id="file1" style="display: none">package database
 
 import (
         "context"
-        "encoding/csv"
+        "database/sql"
         "fmt"
-        "net/http"
-        "strings"
         "time"
 
-        "github.com/gin-gonic/gin"
-        "github.com/google/uuid"
-        "github.com/helixtrack/localization-service/internal/middleware"
+        "github.com/helixtrack/localization-service/internal/config"
         "github.com/helixtrack/localization-service/internal/models"
-        "github.com/helixtrack/localization-service/internal/websocket"
+        _ "github.com/lib/pq"
         "go.uber.org/zap"
 )
 
-// HandleImport handles bulk import of localization data
-// POST /v1/admin/import
-func (h *Handler) HandleImport(c *gin.Context) <span class="cov0" title="0">{
-        ctx := context.Background()
-        startTime := time.Now()
+// Database interface defines all database operations
+type Database interface {
+        // Connection management
+        Ping() error
+        Close() error
 
-        // Parse request
-        var req models.ImportRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to parse import request", zap.Error(err))
-                c.JSON(http.StatusBadRequest, gin.H{
-                        "success": false,
-                        "error":   "Invalid request format: " + err.Error(),
-                })
-                return
+        // Language operations
+        CreateLanguage(ctx context.Context, lang *models.Language) error
+        GetLanguageByID(ctx context.Context, id string) (*models.Language, error)
+        GetLanguageByCode(ctx context.Context, code string) (*models.Language, error)
+        GetLanguages(ctx context.Context, activeOnly bool) ([]*models.Language, error)
+        UpdateLanguage(ctx context.Context, lang *models.Language) error
+        DeleteLanguage(ctx context.Context, id string) error
+        GetDefaultLanguage(ctx context.Context) (*models.Language, error)
+
+        // Localization Key operations
+        CreateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error
+        GetLocalizationKeyByID(ctx context.Context, id string) (*models.LocalizationKey, error)
+        GetLocalizationKeyByKey(ctx context.Context, key string) (*models.LocalizationKey, error)
+        GetLocalizationKeysByCategory(ctx context.Context, category string) ([]*models.LocalizationKey, error)
+        UpdateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error
+        DeleteLocalizationKey(ctx context.Context, id string) error
+
+        // Localization operations
+        CreateLocalization(ctx context.Context, loc *models.Localization) error
+        GetLocalizationByID(ctx context.Context, id string) (*models.Localization, error)
+        GetLocalizationByKeyAndLanguage(ctx context.Context, keyID, languageID string) (*models.Localization, error)
+        GetLocalizationsByLanguage(ctx context.Context, languageID string) ([]*models.Localization, error)
+        GetLocalizationsByKeyID(ctx context.Context, keyID string) ([]*models.Localization, error)
+        UpdateLocalization(ctx context.Context, loc *models.Localization) error
+        DeleteLocalization(ctx context.Context, id string) error
+        ApproveLocalization(ctx context.Context, id, username string) error
+
+        // Catalog operations
+        CreateCatalog(ctx context.Context, catalog *models.LocalizationCatalog) error
+        GetCatalogByLanguage(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error)
+        GetLatestCatalog(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error)
+        UpdateCatalog(ctx context.Context, catalog *models.LocalizationCatalog) error
+        DeleteCatalog(ctx context.Context, id string) error
+        BuildCatalog(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error)
+
+        // Version operations
+        CreateVersion(ctx context.Context, version *models.LocalizationVersion) error
+        GetVersionByNumber(ctx context.Context, versionNumber string) (*models.LocalizationVersion, error)
+        GetVersionByID(ctx context.Context, id string) (*models.LocalizationVersion, error)
+        GetCurrentVersion(ctx context.Context) (*models.LocalizationVersion, error)
+        ListVersions(ctx context.Context, limit, offset int) ([]*models.LocalizationVersion, error)
+        CountVersions(ctx context.Context) (int, error)
+        DeleteVersion(ctx context.Context, id string) error
+        GetCatalogByVersion(ctx context.Context, versionNumber, languageCode string) (*models.LocalizationCatalog, error)
+
+        // Audit operations
+        CreateAuditLog(ctx context.Context, action, entityType, entityID, username string, changes interface{}, ipAddress, userAgent string) error
+
+        // Utility operations
+        GetStats(ctx context.Context) (map[string]interface{}, error)
+}
+
+// PostgresDatabase implements the Database interface for PostgreSQL
+type PostgresDatabase struct {
+        db        *sql.DB
+        config    *config.DatabaseConfig
+        encConfig *config.EncryptionConfig
+        logger    *zap.Logger
+}
+
+// New creates a new database connection
+func New(dbConfig *config.DatabaseConfig, encConfig *config.EncryptionConfig, logger *zap.Logger) (Database, error) <span class="cov8" title="1">{
+        dsn := dbConfig.GetDSN()
+
+        db, err := sql.Open(dbConfig.Driver, dsn)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to open database: %w", err)
         }</span>
 
-        // Validate request
-        <span class="cov0" title="0">if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Import request validation failed", zap.Error(err))
-                c.JSON(http.StatusBadRequest, gin.H{
-                        "success": false,
-                        "error":   err.Error(),
-                })
-                return
+        // Set connection pool settings
+        <span class="cov8" title="1">db.SetMaxOpenConns(dbConfig.MaxConnections)
+        db.SetMaxIdleConns(dbConfig.IdleConnections)
+        db.SetConnMaxLifetime(time.Duration(dbConfig.ConnectionLifetime) * time.Second)
+        db.SetConnMaxIdleTime(time.Duration(dbConfig.ConnectionTimeout) * time.Second)
+
+        // Ping to verify connection
+        if err := db.Ping(); err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to ping database: %w", err)
         }</span>
 
-        <span class="cov0" title="0">h.logger.Info("Starting import",
-                zap.String("type", req.ImportType),
-                zap.Bool("overwrite", req.OverwriteExisting),
-                zap.Int("languages", len(req.Data.Languages)),
-                zap.Int("keys", len(req.Data.Keys)),
+        <span class="cov8" title="1">logger.Info("database connection established",
+                zap.String("driver", dbConfig.Driver),
+                zap.String("host", dbConfig.Host),
+                zap.Int("port", dbConfig.Port),
+                zap.String("database", dbConfig.Database),
         )
 
-        // Perform import
-        response := h.performImport(ctx, &amp;req)
-        response.Summary.DurationMs = time.Since(startTime).Milliseconds()
+        return &amp;PostgresDatabase{
+                db:          db,
+                config:      dbConfig,
+                encConfig:   encConfig,
+                logger:      logger,
+        }, nil</span>
+}
 
-        // Log results
-        h.logger.Info("Import completed",
-                zap.Bool("success", response.Success),
-                zap.Int("languages_imported", response.Summary.LanguagesImported),
-                zap.Int("keys_imported", response.Summary.KeysImported),
-                zap.Int("localizations_imported", response.Summary.LocalizationsImported),
-                zap.Int("errors", len(response.Errors)),
-                zap.Int64("duration_ms", response.Summary.DurationMs),
-        )
+// Ping checks database connectivity
+func (d *PostgresDatabase) Ping() error <span class="cov8" title="1">{
+        return d.db.Ping()
+}</span>
 
-        // Invalidate cache after successful import
-        if response.Success </span><span class="cov0" title="0">{
-                h.cache.DeletePattern(ctx, "l10n:*")
-        }</span>
+// Close closes the database connection
+func (d *PostgresDatabase) Close() error <span class="cov8" title="1">{
+        return d.db.Close()
+}</span>
 
-        // Get JWT claims for audit and WebSocket event
-        <span class="cov0" title="0">claims := middleware.GetClaims(c)
-
-        // Create audit log
-        h.db.CreateAuditLog(ctx, "IMPORT", "BATCH", "", claims.Username, req, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event for import completion
-        failedCount := response.Summary.LanguagesSkipped + response.Summary.KeysSkipped + response.Summary.LocalizationsSkipped
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventBatchOperationCompleted,
-                        &amp;websocket.BatchOperationEventData{
-                                Operation: "import",
-                                Processed: response.Summary.TotalProcessed,
-                                Failed:    failedCount,
-                                Duration:  fmt.Sprintf("%dms", response.Summary.DurationMs),
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
+// execContext executes a query with context
+func (d *PostgresDatabase) execContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) <span class="cov8" title="1">{
+        result, err := d.db.ExecContext(ctx, query, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("database exec error",
+                        zap.Error(err),
+                        zap.String("query", query),
                 )
+                return nil, models.ErrDatabase(err)
         }</span>
-
-        <span class="cov0" title="0">statusCode := http.StatusOK
-        if !response.Success </span><span class="cov0" title="0">{
-                statusCode = http.StatusPartialContent
-        }</span>
-
-        <span class="cov0" title="0">c.JSON(statusCode, response)</span>
+        <span class="cov8" title="1">return result, nil</span>
 }
 
-// performImport performs the actual import operation
-func (h *Handler) performImport(ctx context.Context, req *models.ImportRequest) *models.ImportResponse <span class="cov0" title="0">{
-        response := &amp;models.ImportResponse{
-                Success: true,
-                Summary: models.ImportSummary{},
-                Errors:  []models.ImportError{},
-        }
+// queryRowContext executes a query that returns a single row
+func (d *PostgresDatabase) queryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row <span class="cov8" title="1">{
+        return d.db.QueryRowContext(ctx, query, args...)
+}</span>
 
-        // Import languages
-        for _, langData := range req.Data.Languages </span><span class="cov0" title="0">{
-                err := h.importLanguage(ctx, langData, req.OverwriteExisting)
-                if err != nil </span><span class="cov0" title="0">{
-                        response.Errors = append(response.Errors, models.ImportError{
-                                Type:    "language",
-                                ID:      langData.Code,
-                                Message: err.Error(),
-                        })
-                        response.Summary.LanguagesSkipped++
-                        response.Success = false
-                }</span> else<span class="cov0" title="0"> {
-                        // Check if it was update or create
-                        existing, _ := h.db.GetLanguageByCode(ctx, langData.Code)
-                        if existing != nil &amp;&amp; req.OverwriteExisting </span><span class="cov0" title="0">{
-                                response.Summary.LanguagesUpdated++
-                        }</span> else<span class="cov0" title="0"> {
-                                response.Summary.LanguagesImported++
-                        }</span>
-                }
-        }
-
-        // Import localization keys
-        <span class="cov0" title="0">for _, keyData := range req.Data.Keys </span><span class="cov0" title="0">{
-                err := h.importLocalizationKey(ctx, keyData, req.OverwriteExisting)
-                if err != nil </span><span class="cov0" title="0">{
-                        response.Errors = append(response.Errors, models.ImportError{
-                                Type:    "key",
-                                ID:      keyData.Key,
-                                Message: err.Error(),
-                        })
-                        response.Summary.KeysSkipped++
-                        response.Success = false
-                }</span> else<span class="cov0" title="0"> {
-                        // Check if it was update or create
-                        existing, _ := h.db.GetLocalizationKeyByKey(ctx, keyData.Key)
-                        if existing != nil &amp;&amp; req.OverwriteExisting </span><span class="cov0" title="0">{
-                                response.Summary.KeysUpdated++
-                        }</span> else<span class="cov0" title="0"> {
-                                response.Summary.KeysImported++
-                        }</span>
-                }
-        }
-
-        // Import localizations
-        <span class="cov0" title="0">for languageCode, translations := range req.Data.Localizations </span><span class="cov0" title="0">{
-                for key, value := range translations </span><span class="cov0" title="0">{
-                        err := h.importLocalization(ctx, languageCode, key, value, req.OverwriteExisting)
-                        if err != nil </span><span class="cov0" title="0">{
-                                response.Errors = append(response.Errors, models.ImportError{
-                                        Type:    "localization",
-                                        ID:      fmt.Sprintf("%s:%s", languageCode, key),
-                                        Message: err.Error(),
-                                })
-                                response.Summary.LocalizationsSkipped++
-                                response.Success = false
-                        }</span> else<span class="cov0" title="0"> {
-                                response.Summary.LocalizationsImported++
-                        }</span>
-                }
-        }
-
-        <span class="cov0" title="0">response.Summary.TotalProcessed = response.Summary.LanguagesImported +
-                response.Summary.LanguagesUpdated +
-                response.Summary.KeysImported +
-                response.Summary.KeysUpdated +
-                response.Summary.LocalizationsImported +
-                response.Summary.LocalizationsUpdated
-
-        return response</span>
-}
-
-// importLanguage imports a single language
-func (h *Handler) importLanguage(ctx context.Context, data models.ImportLanguage, overwrite bool) error <span class="cov0" title="0">{
-        // Check if language exists
-        existing, _ := h.db.GetLanguageByCode(ctx, data.Code)
-
-        if existing != nil </span><span class="cov0" title="0">{
-                if !overwrite </span><span class="cov0" title="0">{
-                        return fmt.Errorf("language already exists and overwrite is disabled")
-                }</span>
-
-                // Update existing language
-                <span class="cov0" title="0">existing.Name = data.Name
-                existing.NativeName = data.NativeName
-                existing.IsRTL = data.IsRTL
-                existing.IsActive = data.IsActive
-                existing.IsDefault = data.IsDefault
-                existing.ModifiedAt = time.Now().Unix()
-
-                return h.db.UpdateLanguage(ctx, existing)</span>
-        }
-
-        // Create new language
-        <span class="cov0" title="0">lang := &amp;models.Language{
-                ID:         uuid.New().String(),
-                Code:       data.Code,
-                Name:       data.Name,
-                NativeName: data.NativeName,
-                IsRTL:      data.IsRTL,
-                IsActive:   data.IsActive,
-                IsDefault:  data.IsDefault,
-                CreatedAt:  time.Now().Unix(),
-                ModifiedAt: time.Now().Unix(),
-                Deleted:    false,
-        }
-
-        return h.db.CreateLanguage(ctx, lang)</span>
-}
-
-// importLocalizationKey imports a single localization key
-func (h *Handler) importLocalizationKey(ctx context.Context, data models.ImportLocalizationKey, overwrite bool) error <span class="cov0" title="0">{
-        // Check if key exists
-        existing, _ := h.db.GetLocalizationKeyByKey(ctx, data.Key)
-
-        if existing != nil </span><span class="cov0" title="0">{
-                if !overwrite </span><span class="cov0" title="0">{
-                        return fmt.Errorf("key already exists and overwrite is disabled")
-                }</span>
-
-                // Update existing key
-                <span class="cov0" title="0">existing.Category = data.Category
-                existing.Description = data.Description
-                existing.Context = data.Context
-                existing.ModifiedAt = time.Now().Unix()
-
-                return h.db.UpdateLocalizationKey(ctx, existing)</span>
-        }
-
-        // Create new key
-        <span class="cov0" title="0">key := &amp;models.LocalizationKey{
-                ID:          uuid.New().String(),
-                Key:         data.Key,
-                Category:    data.Category,
-                Description: data.Description,
-                Context:     data.Context,
-                CreatedAt:   time.Now().Unix(),
-                ModifiedAt:  time.Now().Unix(),
-                Deleted:     false,
-        }
-
-        return h.db.CreateLocalizationKey(ctx, key)</span>
-}
-
-// importLocalization imports a single localization
-func (h *Handler) importLocalization(ctx context.Context, languageCode, key, value string, overwrite bool) error <span class="cov0" title="0">{
-        // Get language
-        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
+// queryContext executes a query that returns multiple rows
+func (d *PostgresDatabase) queryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) <span class="cov8" title="1">{
+        rows, err := d.db.QueryContext(ctx, query, args...)
         if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("language not found: %s", languageCode)
+                d.logger.Error("database query error",
+                        zap.Error(err),
+                        zap.String("query", query),
+                )
+                return nil, models.ErrDatabase(err)
         }</span>
-
-        // Get key
-        <span class="cov0" title="0">keyObj, err := h.db.GetLocalizationKeyByKey(ctx, key)
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("localization key not found: %s", key)
-        }</span>
-
-        // Check if localization exists
-        <span class="cov0" title="0">existing, _ := h.db.GetLocalizationByKeyAndLanguage(ctx, keyObj.ID, lang.ID)
-
-        if existing != nil </span><span class="cov0" title="0">{
-                if !overwrite </span><span class="cov0" title="0">{
-                        return fmt.Errorf("localization already exists and overwrite is disabled")
-                }</span>
-
-                // Update existing localization
-                <span class="cov0" title="0">existing.Value = value
-                existing.Version++
-                existing.ModifiedAt = time.Now().Unix()
-
-                return h.db.UpdateLocalization(ctx, existing)</span>
-        }
-
-        // Create new localization
-        <span class="cov0" title="0">localization := &amp;models.Localization{
-                ID:         uuid.New().String(),
-                KeyID:      keyObj.ID,
-                LanguageID: lang.ID,
-                Value:      value,
-                Version:    1,
-                Approved:   false, // New imports require approval
-                CreatedAt:  time.Now().Unix(),
-                ModifiedAt: time.Now().Unix(),
-                Deleted:    false,
-        }
-
-        return h.db.CreateLocalization(ctx, localization)</span>
+        <span class="cov8" title="1">return rows, nil</span>
 }
 
-// HandleExport handles export of localization data
-// GET /v1/admin/export
-func (h *Handler) HandleExport(c *gin.Context) <span class="cov0" title="0">{
-        ctx := context.Background()
-
-        // Parse query parameters
-        format := c.DefaultQuery("format", "json")
-        languages := c.QueryArray("languages")
-        categories := c.QueryArray("categories")
-        includeMetadata := c.DefaultQuery("include_metadata", "true") == "true"
-        onlyApproved := c.DefaultQuery("only_approved", "true") == "true"
-
-        req := models.ExportRequest{
-                Format:          format,
-                Languages:       languages,
-                Categories:      categories,
-                IncludeMetadata: includeMetadata,
-                OnlyApproved:    onlyApproved,
-                Compress:        false,
-        }
-
-        // Validate request
-        if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Export request validation failed", zap.Error(err))
-                c.JSON(http.StatusBadRequest, gin.H{
-                        "success": false,
-                        "error":   err.Error(),
-                })
-                return
+// encrypt encrypts a value using the configured encryption key
+func (d *PostgresDatabase) encrypt(value string) string <span class="cov8" title="1">{
+        // PostgreSQL pgcrypto encryption
+        // This is a simplified version - actual implementation should use pgcrypto functions
+        if d.encConfig != nil &amp;&amp; d.encConfig.Key != "" </span>{<span class="cov8" title="1">
+                // TODO: Implement proper encryption using the encryption key
+                // For now, return the value as-is (encryption will be handled at PostgreSQL level)
         }</span>
-
-        <span class="cov0" title="0">h.logger.Info("Starting export",
-                zap.String("format", format),
-                zap.Strings("languages", languages),
-                zap.Strings("categories", categories),
-        )
-
-        // Perform export
-        response, err := h.performExport(ctx, &amp;req)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Export failed", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, gin.H{
-                        "success": false,
-                        "error":   err.Error(),
-                })
-                return
-        }</span>
-
-        // Return based on format
-        <span class="cov0" title="0">switch format </span>{
-        case "json":<span class="cov0" title="0">
-                c.JSON(http.StatusOK, response)</span>
-        case "csv":<span class="cov0" title="0">
-                // Return CSV data directly
-                c.Header("Content-Type", "text/csv")
-                c.Header("Content-Disposition", "attachment; filename=localization-export.csv")
-                c.String(http.StatusOK, response.Data.(string))</span>
-        case "xliff":<span class="cov0" title="0">
-                // Return XLIFF data directly
-                c.Header("Content-Type", "application/xml")
-                c.Header("Content-Disposition", "attachment; filename=localization-export.xlf")
-                c.String(http.StatusOK, response.Data.(string))</span>
-        }
+        <span class="cov8" title="1">return value</span> // Placeholder - will be encrypted by PostgreSQL
 }
 
-// performExport performs the actual export operation
-func (h *Handler) performExport(ctx context.Context, req *models.ExportRequest) (*models.ExportResponse, error) <span class="cov0" title="0">{
-        // Get all languages or filter by requested languages
-        allLanguages, err := h.db.GetLanguages(ctx, true)
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, fmt.Errorf("failed to get languages: %w", err)
+// decrypt decrypts a value using the configured encryption key
+func (d *PostgresDatabase) decrypt(value string) string <span class="cov8" title="1">{
+        // PostgreSQL pgcrypto decryption
+        // This is a simplified version - actual implementation should use pgcrypto functions
+        if d.encConfig != nil &amp;&amp; d.encConfig.Key != "" </span>{<span class="cov8" title="1">
+                // TODO: Implement proper decryption using the encryption key
+                // For now, return the value as-is (decryption will be handled at PostgreSQL level)
         }</span>
-
-        <span class="cov0" title="0">languages := allLanguages
-        if len(req.Languages) &gt; 0 </span><span class="cov0" title="0">{
-                languages = []*models.Language{}
-                for _, code := range req.Languages </span><span class="cov0" title="0">{
-                        lang, err := h.db.GetLanguageByCode(ctx, code)
-                        if err != nil </span><span class="cov0" title="0">{
-                                continue</span>
-                        }
-                        <span class="cov0" title="0">languages = append(languages, lang)</span>
-                }
-        }
-
-        // Get all localization keys or filter by categories
-        <span class="cov0" title="0">var keys []*models.LocalizationKey
-        if len(req.Categories) &gt; 0 </span><span class="cov0" title="0">{
-                for _, category := range req.Categories </span><span class="cov0" title="0">{
-                        categoryKeys, err := h.db.GetLocalizationKeysByCategory(ctx, category)
-                        if err != nil </span><span class="cov0" title="0">{
-                                continue</span>
-                        }
-                        <span class="cov0" title="0">keys = append(keys, categoryKeys...)</span>
-                }
-        } else<span class="cov0" title="0"> {
-                // Get all keys (there's no GetAllKeys method, so we'll need to get by language)
-                // For now, we'll collect keys as we process localizations
-                keys = []*models.LocalizationKey{}
-        }</span>
-
-        // Build export data
-        <span class="cov0" title="0">exportData := models.ImportData{
-                Languages:     []models.ImportLanguage{},
-                Keys:          []models.ImportLocalizationKey{},
-                Localizations: make(map[string]map[string]string),
-        }
-
-        // Add languages
-        for _, lang := range languages </span><span class="cov0" title="0">{
-                exportData.Languages = append(exportData.Languages, models.ImportLanguage{
-                        Code:       lang.Code,
-                        Name:       lang.Name,
-                        NativeName: lang.NativeName,
-                        IsRTL:      lang.IsRTL,
-                        IsActive:   lang.IsActive,
-                        IsDefault:  lang.IsDefault,
-                })
-        }</span>
-
-        // Get localizations for each language
-        <span class="cov0" title="0">keysSeen := make(map[string]*models.LocalizationKey)
-        totalLocalizations := 0
-
-        for _, lang := range languages </span><span class="cov0" title="0">{
-                localizations, err := h.db.GetLocalizationsByLanguage(ctx, lang.ID)
-                if err != nil </span><span class="cov0" title="0">{
-                        continue</span>
-                }
-
-                <span class="cov0" title="0">exportData.Localizations[lang.Code] = make(map[string]string)
-
-                for _, loc := range localizations </span><span class="cov0" title="0">{
-                        if req.OnlyApproved &amp;&amp; !loc.Approved </span><span class="cov0" title="0">{
-                                continue</span>
-                        }
-
-                        // Get the key
-                        <span class="cov0" title="0">key, err := h.db.GetLocalizationKeyByID(ctx, loc.KeyID)
-                        if err != nil </span><span class="cov0" title="0">{
-                                continue</span>
-                        }
-
-                        // Add to translations
-                        <span class="cov0" title="0">exportData.Localizations[lang.Code][key.Key] = loc.Value
-                        totalLocalizations++
-
-                        // Track key
-                        if _, exists := keysSeen[key.ID]; !exists </span><span class="cov0" title="0">{
-                                keysSeen[key.ID] = key
-
-                                exportData.Keys = append(exportData.Keys, models.ImportLocalizationKey{
-                                        Key:         key.Key,
-                                        Category:    key.Category,
-                                        Description: key.Description,
-                                        Context:     key.Context,
-                                        Variables:   []string{}, // Variables not stored in current model
-                                })
-                        }</span>
-                }
-        }
-
-        // Create response based on format
-        <span class="cov0" title="0">response := &amp;models.ExportResponse{
-                Success: true,
-                Format:  req.Format,
-                Metadata: models.ExportMetadata{
-                        ExportedAt:    time.Now().Unix(),
-                        Languages:     len(languages),
-                        Keys:          len(exportData.Keys),
-                        Localizations: totalLocalizations,
-                        Format:        req.Format,
-                        Compressed:    req.Compress,
-                        Version:       "1.0.0",
-                },
-        }
-
-        switch req.Format </span>{
-        case "json":<span class="cov0" title="0">
-                response.Data = exportData</span>
-        case "csv":<span class="cov0" title="0">
-                csvData, err := h.exportToCSV(exportData)
-                if err != nil </span><span class="cov0" title="0">{
-                        return nil, err
-                }</span>
-                <span class="cov0" title="0">response.Data = csvData</span>
-        case "xliff":<span class="cov0" title="0">
-                xliffData, err := h.exportToXLIFF(exportData)
-                if err != nil </span><span class="cov0" title="0">{
-                        return nil, err
-                }</span>
-                <span class="cov0" title="0">response.Data = xliffData</span>
-        }
-
-        <span class="cov0" title="0">return response, nil</span>
-}
-
-// exportToCSV converts export data to CSV format
-func (h *Handler) exportToCSV(data models.ImportData) (string, error) <span class="cov0" title="0">{
-        var builder strings.Builder
-        writer := csv.NewWriter(&amp;builder)
-
-        // Write header
-        header := []string{"Key", "Category", "Description", "Context"}
-        for _, lang := range data.Languages </span><span class="cov0" title="0">{
-                header = append(header, lang.Code)
-        }</span>
-        <span class="cov0" title="0">writer.Write(header)
-
-        // Write rows
-        for _, key := range data.Keys </span><span class="cov0" title="0">{
-                row := []string{key.Key, key.Category, key.Description, key.Context}
-
-                for _, lang := range data.Languages </span><span class="cov0" title="0">{
-                        value := ""
-                        if translations, exists := data.Localizations[lang.Code]; exists </span><span class="cov0" title="0">{
-                                if v, ok := translations[key.Key]; ok </span><span class="cov0" title="0">{
-                                        value = v
-                                }</span>
-                        }
-                        <span class="cov0" title="0">row = append(row, value)</span>
-                }
-
-                <span class="cov0" title="0">writer.Write(row)</span>
-        }
-
-        <span class="cov0" title="0">writer.Flush()
-        return builder.String(), writer.Error()</span>
-}
-
-// exportToXLIFF converts export data to XLIFF format
-func (h *Handler) exportToXLIFF(data models.ImportData) (string, error) <span class="cov0" title="0">{
-        // Simplified XLIFF 1.2 format
-        var builder strings.Builder
-        builder.WriteString(`&lt;?xml version="1.0" encoding="UTF-8"?&gt;` + "\n")
-        builder.WriteString(`&lt;xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"&gt;` + "\n")
-
-        for _, lang := range data.Languages </span><span class="cov0" title="0">{
-                if len(data.Localizations[lang.Code]) == 0 </span><span class="cov0" title="0">{
-                        continue</span>
-                }
-
-                <span class="cov0" title="0">builder.WriteString(fmt.Sprintf(`  &lt;file source-language="en" target-language="%s" datatype="plaintext"&gt;`, lang.Code) + "\n")
-                builder.WriteString(`    &lt;body&gt;` + "\n")
-
-                for key, value := range data.Localizations[lang.Code] </span><span class="cov0" title="0">{
-                        builder.WriteString(fmt.Sprintf(`      &lt;trans-unit id="%s"&gt;`, key) + "\n")
-                        builder.WriteString(fmt.Sprintf(`        &lt;source&gt;%s&lt;/source&gt;`, key) + "\n")
-                        builder.WriteString(fmt.Sprintf(`        &lt;target&gt;%s&lt;/target&gt;`, value) + "\n")
-                        builder.WriteString(`      &lt;/trans-unit&gt;` + "\n")
-                }</span>
-
-                <span class="cov0" title="0">builder.WriteString(`    &lt;/body&gt;` + "\n")
-                builder.WriteString(`  &lt;/file&gt;` + "\n")</span>
-        }
-
-        <span class="cov0" title="0">builder.WriteString(`&lt;/xliff&gt;` + "\n")
-        return builder.String(), nil</span>
-}
-
-// HandleBatchLocalizations handles batch localization operations
-// POST /v1/admin/localizations/batch
-func (h *Handler) HandleBatchLocalizations(c *gin.Context) <span class="cov0" title="0">{
-        ctx := context.Background()
-        startTime := time.Now()
-
-        // Parse request
-        var req models.BatchLocalizationRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to parse batch request", zap.Error(err))
-                c.JSON(http.StatusBadRequest, gin.H{
-                        "success": false,
-                        "error":   "Invalid request format: " + err.Error(),
-                })
-                return
-        }</span>
-
-        // Validate request
-        <span class="cov0" title="0">if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Batch request validation failed", zap.Error(err))
-                c.JSON(http.StatusBadRequest, gin.H{
-                        "success": false,
-                        "error":   err.Error(),
-                })
-                return
-        }</span>
-
-        <span class="cov0" title="0">h.logger.Info("Starting batch operation",
-                zap.String("operation", req.Operation),
-                zap.Int("count", len(req.Localizations)),
-        )
-
-        // Perform batch operation
-        response := h.performBatchOperation(ctx, &amp;req)
-        response.Summary.DurationMs = time.Since(startTime).Milliseconds()
-
-        h.logger.Info("Batch operation completed",
-                zap.Bool("success", response.Success),
-                zap.Int("successful", response.Summary.Successful),
-                zap.Int("failed", response.Summary.Failed),
-                zap.Int64("duration_ms", response.Summary.DurationMs),
-        )
-
-        // Invalidate cache after successful operation
-        if response.Success </span><span class="cov0" title="0">{
-                h.cache.DeletePattern(ctx, "l10n:*")
-        }</span>
-
-        <span class="cov0" title="0">c.JSON(http.StatusOK, response)</span>
-}
-
-// performBatchOperation performs a batch localization operation
-func (h *Handler) performBatchOperation(ctx context.Context, req *models.BatchLocalizationRequest) *models.BatchLocalizationResponse <span class="cov0" title="0">{
-        response := &amp;models.BatchLocalizationResponse{
-                Success: true,
-                Summary: models.BatchSummary{
-                        TotalRequested: len(req.Localizations),
-                },
-                Errors: []models.BatchError{},
-        }
-
-        for i, item := range req.Localizations </span><span class="cov0" title="0">{
-                var err error
-
-                switch req.Operation </span>{
-                case "create", "update":<span class="cov0" title="0">
-                        err = h.importLocalization(ctx, item.LanguageCode, item.Key, item.Value, req.Operation == "update")</span>
-                case "approve":<span class="cov0" title="0">
-                        err = h.approveLocalization(ctx, item.LanguageCode, item.Key)</span>
-                case "delete":<span class="cov0" title="0">
-                        err = h.deleteLocalization(ctx, item.LanguageCode, item.Key)</span>
-                }
-
-                <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
-                        response.Errors = append(response.Errors, models.BatchError{
-                                Index:   i,
-                                Key:     item.Key,
-                                Message: err.Error(),
-                        })
-                        response.Summary.Failed++
-                        response.Success = false
-                }</span> else<span class="cov0" title="0"> {
-                        response.Summary.Successful++
-                }</span>
-        }
-
-        <span class="cov0" title="0">return response</span>
-}
-
-// approveLocalization approves a localization
-func (h *Handler) approveLocalization(ctx context.Context, languageCode, key string) error <span class="cov0" title="0">{
-        // Get language
-        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("language not found: %s", languageCode)
-        }</span>
-
-        // Get key
-        <span class="cov0" title="0">keyObj, err := h.db.GetLocalizationKeyByKey(ctx, key)
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("localization key not found: %s", key)
-        }</span>
-
-        // Get localization
-        <span class="cov0" title="0">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, keyObj.ID, lang.ID)
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("localization not found")
-        }</span>
-
-        // Approve
-        <span class="cov0" title="0">return h.db.ApproveLocalization(ctx, loc.ID, "admin")</span>
-}
-
-// deleteLocalization deletes a localization
-func (h *Handler) deleteLocalization(ctx context.Context, languageCode, key string) error <span class="cov0" title="0">{
-        // Get language
-        lang, err := h.db.GetLanguageByCode(ctx, languageCode)
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("language not found: %s", languageCode)
-        }</span>
-
-        // Get key
-        <span class="cov0" title="0">keyObj, err := h.db.GetLocalizationKeyByKey(ctx, key)
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("localization key not found: %s", key)
-        }</span>
-
-        // Get localization
-        <span class="cov0" title="0">loc, err := h.db.GetLocalizationByKeyAndLanguage(ctx, keyObj.ID, lang.ID)
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("localization not found")
-        }</span>
-
-        // Delete
-        <span class="cov0" title="0">return h.db.DeleteLocalization(ctx, loc.ID)</span>
+        <span class="cov8" title="1">return value</span> // Placeholder - will be decrypted by PostgreSQL
 }
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package handlers
+		<pre class="file" id="file2" style="display: none">package database
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+
+        "github.com/helixtrack/localization-service/internal/models"
+        "go.uber.org/zap"
+)
+
+// CreateLocalizationKey creates a new localization key
+func (d *PostgresDatabase) CreateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error <span class="cov8" title="1">{
+        key.BeforeCreate()
+
+        if err := key.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">query := `
+                INSERT INTO localization_keys (id, key, category, description, context, created_at, modified_at, deleted)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `
+
+        _, err := d.execContext(ctx, query,
+                key.ID, key.Key, key.Category, key.Description, key.Context,
+                key.CreatedAt, key.ModifiedAt, key.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to create localization key", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov8" title="1">d.logger.Info("localization key created", zap.String("id", key.ID), zap.String("key", key.Key))
+        return nil</span>
+}
+
+// GetLocalizationKeyByID retrieves a localization key by ID
+func (d *PostgresDatabase) GetLocalizationKeyByID(ctx context.Context, id string) (*models.LocalizationKey, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, key, category, description, context, created_at, modified_at, deleted
+                FROM localization_keys
+                WHERE id = $1 AND deleted = FALSE
+        `
+
+        key := &amp;models.LocalizationKey{}
+        err := d.queryRowContext(ctx, query, id).Scan(
+                &amp;key.ID, &amp;key.Key, &amp;key.Category, &amp;key.Description, &amp;key.Context,
+                &amp;key.CreatedAt, &amp;key.ModifiedAt, &amp;key.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                        return nil, models.ErrResourceNotFound("localization key")
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get localization key by ID", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
+        }
+
+        <span class="cov0" title="0">return key, nil</span>
+}
+
+// GetLocalizationKeyByKey retrieves a localization key by key string
+func (d *PostgresDatabase) GetLocalizationKeyByKey(ctx context.Context, keyStr string) (*models.LocalizationKey, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, key, category, description, context, created_at, modified_at, deleted
+                FROM localization_keys
+                WHERE key = $1 AND deleted = FALSE
+        `
+
+        key := &amp;models.LocalizationKey{}
+        err := d.queryRowContext(ctx, query, keyStr).Scan(
+                &amp;key.ID, &amp;key.Key, &amp;key.Category, &amp;key.Description, &amp;key.Context,
+                &amp;key.CreatedAt, &amp;key.ModifiedAt, &amp;key.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                        return nil, models.ErrResourceNotFound("localization key")
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get localization key by key", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
+        }
+
+        <span class="cov0" title="0">return key, nil</span>
+}
+
+// GetLocalizationKeysByCategory retrieves localization keys by category
+func (d *PostgresDatabase) GetLocalizationKeysByCategory(ctx context.Context, category string) ([]*models.LocalizationKey, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, key, category, description, context, created_at, modified_at, deleted
+                FROM localization_keys
+                WHERE category = $1 AND deleted = FALSE
+                ORDER BY key ASC
+        `
+
+        rows, err := d.queryContext(ctx, query, category)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer rows.Close()
+
+        var keys []*models.LocalizationKey
+        for rows.Next() </span><span class="cov0" title="0">{
+                key := &amp;models.LocalizationKey{}
+                if err := rows.Scan(
+                        &amp;key.ID, &amp;key.Key, &amp;key.Category, &amp;key.Description, &amp;key.Context,
+                        &amp;key.CreatedAt, &amp;key.ModifiedAt, &amp;key.Deleted,
+                ); err != nil </span><span class="cov0" title="0">{
+                        d.logger.Error("failed to scan localization key", zap.Error(err))
+                        return nil, models.ErrDatabase(err)
+                }</span>
+                <span class="cov0" title="0">keys = append(keys, key)</span>
+        }
+
+        <span class="cov0" title="0">return keys, nil</span>
+}
+
+// UpdateLocalizationKey updates an existing localization key
+func (d *PostgresDatabase) UpdateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error <span class="cov0" title="0">{
+        key.BeforeUpdate()
+
+        if err := key.Validate(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">query := `
+                UPDATE localization_keys
+                SET key = $1, category = $2, description = $3, context = $4, modified_at = $5
+                WHERE id = $6 AND deleted = FALSE
+        `
+
+        result, err := d.execContext(ctx, query,
+                key.Key, key.Category, key.Description, key.Context, key.ModifiedAt, key.ID,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to update localization key", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov0" title="0">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("localization key")
+        }</span>
+
+        <span class="cov0" title="0">d.logger.Info("localization key updated", zap.String("id", key.ID))
+        return nil</span>
+}
+
+// DeleteLocalizationKey soft-deletes a localization key
+func (d *PostgresDatabase) DeleteLocalizationKey(ctx context.Context, id string) error <span class="cov0" title="0">{
+        query := `
+                UPDATE localization_keys
+                SET deleted = TRUE, modified_at = $1
+                WHERE id = $2 AND deleted = FALSE
+        `
+
+        result, err := d.execContext(ctx, query, models.GenerateUUID(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to delete localization key", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov0" title="0">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("localization key")
+        }</span>
+
+        <span class="cov0" title="0">d.logger.Info("localization key deleted", zap.String("id", id))
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package database
+
+import (
+        "context"
+        "database/sql"
+        "errors"
+        "time"
+
+        "github.com/helixtrack/localization-service/internal/models"
+        "go.uber.org/zap"
+)
+
+// CreateLanguage creates a new language
+func (d *PostgresDatabase) CreateLanguage(ctx context.Context, lang *models.Language) error <span class="cov8" title="1">{
+        lang.BeforeCreate()
+
+        if err := lang.Validate(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">query := `
+                INSERT INTO languages (id, code, name, native_name, is_rtl, is_active, is_default, created_at, modified_at, deleted)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `
+
+        _, err := d.execContext(ctx, query,
+                lang.ID, lang.Code, lang.Name, lang.NativeName, lang.IsRTL,
+                lang.IsActive, lang.IsDefault, lang.CreatedAt, lang.ModifiedAt, lang.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to create language", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov8" title="1">d.logger.Info("language created", zap.String("id", lang.ID), zap.String("code", lang.Code))
+        return nil</span>
+}
+
+// GetLanguageByID retrieves a language by ID
+func (d *PostgresDatabase) GetLanguageByID(ctx context.Context, id string) (*models.Language, error) <span class="cov8" title="1">{
+        query := `
+                SELECT id, code, name, native_name, is_rtl, is_active, is_default, created_at, modified_at, deleted
+                FROM languages
+                WHERE id = $1 AND deleted = FALSE
+        `
+
+        lang := &amp;models.Language{}
+        err := d.queryRowContext(ctx, query, id).Scan(
+                &amp;lang.ID, &amp;lang.Code, &amp;lang.Name, &amp;lang.NativeName, &amp;lang.IsRTL,
+                &amp;lang.IsActive, &amp;lang.IsDefault, &amp;lang.CreatedAt, &amp;lang.ModifiedAt, &amp;lang.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                        return nil, models.ErrResourceNotFound("language")
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get language by ID", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
+        }
+
+        <span class="cov8" title="1">return lang, nil</span>
+}
+
+// GetLanguageByCode retrieves a language by code
+func (d *PostgresDatabase) GetLanguageByCode(ctx context.Context, code string) (*models.Language, error) <span class="cov8" title="1">{
+        query := `
+                SELECT id, code, name, native_name, is_rtl, is_active, is_default, created_at, modified_at, deleted
+                FROM languages
+                WHERE code = $1 AND deleted = FALSE
+        `
+
+        lang := &amp;models.Language{}
+        err := d.queryRowContext(ctx, query, code).Scan(
+                &amp;lang.ID, &amp;lang.Code, &amp;lang.Name, &amp;lang.NativeName, &amp;lang.IsRTL,
+                &amp;lang.IsActive, &amp;lang.IsDefault, &amp;lang.CreatedAt, &amp;lang.ModifiedAt, &amp;lang.Deleted,
+        )
+
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        return nil, models.ErrResourceNotFound("language")
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get language by code", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
+        }
+
+        <span class="cov8" title="1">return lang, nil</span>
+}
+
+// GetLanguages retrieves all languages
+func (d *PostgresDatabase) GetLanguages(ctx context.Context, activeOnly bool) ([]*models.Language, error) <span class="cov8" title="1">{
+        query := `
+                SELECT id, code, name, native_name, is_rtl, is_active, is_default, created_at, modified_at, deleted
+                FROM languages
+                WHERE deleted = FALSE
+        `
+
+        if activeOnly </span><span class="cov0" title="0">{
+                query += " AND is_active = TRUE"
+        }</span>
+
+        <span class="cov8" title="1">query += " ORDER BY name ASC"
+
+        rows, err := d.queryContext(ctx, query)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        var languages []*models.Language
+        for rows.Next() </span><span class="cov8" title="1">{
+                lang := &amp;models.Language{}
+                if err := rows.Scan(
+                        &amp;lang.ID, &amp;lang.Code, &amp;lang.Name, &amp;lang.NativeName, &amp;lang.IsRTL,
+                        &amp;lang.IsActive, &amp;lang.IsDefault, &amp;lang.CreatedAt, &amp;lang.ModifiedAt, &amp;lang.Deleted,
+                ); err != nil </span><span class="cov0" title="0">{
+                        d.logger.Error("failed to scan language", zap.Error(err))
+                        return nil, models.ErrDatabase(err)
+                }</span>
+                <span class="cov8" title="1">languages = append(languages, lang)</span>
+        }
+
+        <span class="cov8" title="1">return languages, nil</span>
+}
+
+// UpdateLanguage updates an existing language
+func (d *PostgresDatabase) UpdateLanguage(ctx context.Context, lang *models.Language) error <span class="cov8" title="1">{
+        lang.BeforeUpdate()
+
+        if err := lang.Validate(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">query := `
+                UPDATE languages
+                SET code = $1, name = $2, native_name = $3, is_rtl = $4, is_active = $5, is_default = $6, modified_at = $7
+                WHERE id = $8 AND deleted = FALSE
+        `
+
+        result, err := d.execContext(ctx, query,
+                lang.Code, lang.Name, lang.NativeName, lang.IsRTL, lang.IsActive, lang.IsDefault, lang.ModifiedAt, lang.ID,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to update language", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov8" title="1">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("language")
+        }</span>
+
+        <span class="cov8" title="1">d.logger.Info("language updated", zap.String("id", lang.ID))
+        return nil</span>
+}
+
+// DeleteLanguage soft-deletes a language
+func (d *PostgresDatabase) DeleteLanguage(ctx context.Context, id string) error <span class="cov8" title="1">{
+        now := time.Now().Unix()
+        
+        query := `
+                UPDATE languages
+                SET deleted = TRUE, modified_at = $1
+                WHERE id = $2 AND deleted = FALSE
+        `
+
+        result, err := d.execContext(ctx, query, now, id)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to delete language", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov8" title="1">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("language")
+        }</span>
+
+        <span class="cov8" title="1">d.logger.Info("language deleted", zap.String("id", id))
+        return nil</span>
+}
+
+// GetDefaultLanguage retrieves the default language
+func (d *PostgresDatabase) GetDefaultLanguage(ctx context.Context) (*models.Language, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, code, name, native_name, is_rtl, is_active, is_default, created_at, modified_at, deleted
+                FROM languages
+                WHERE is_default = TRUE AND deleted = FALSE
+                LIMIT 1
+        `
+
+        lang := &amp;models.Language{}
+        err := d.queryRowContext(ctx, query).Scan(
+                &amp;lang.ID, &amp;lang.Code, &amp;lang.Name, &amp;lang.NativeName, &amp;lang.IsRTL,
+                &amp;lang.IsActive, &amp;lang.IsDefault, &amp;lang.CreatedAt, &amp;lang.ModifiedAt, &amp;lang.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                        return nil, models.ErrResourceNotFound("default language")
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get default language", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
+        }
+
+        <span class="cov0" title="0">return lang, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package database
+
+import (
+        "context"
+        "database/sql"
+        "encoding/json"
+        "errors"
+        "time"
+
+        "github.com/helixtrack/localization-service/internal/models"
+        "go.uber.org/zap"
+)
+
+// CreateLocalization creates a new localization
+func (d *PostgresDatabase) CreateLocalization(ctx context.Context, loc *models.Localization) error <span class="cov8" title="1">{
+        loc.BeforeCreate()
+
+        if err := loc.Validate(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">query := `
+                INSERT INTO localizations (
+                        id, key_id, language_id, value, plural_forms, variables,
+                        version, approved, approved_by, approved_at, created_at, modified_at, deleted
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        `
+
+        _, err := d.execContext(ctx, query,
+                loc.ID, loc.KeyID, loc.LanguageID, loc.Value, loc.PluralForms, loc.Variables,
+                loc.Version, loc.Approved, loc.ApprovedBy, loc.ApprovedAt,
+                loc.CreatedAt, loc.ModifiedAt, loc.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to create localization", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov8" title="1">d.logger.Info("localization created", zap.String("id", loc.ID))
+        return nil</span>
+}
+
+// GetLocalizationByID retrieves a localization by ID
+func (d *PostgresDatabase) GetLocalizationByID(ctx context.Context, id string) (*models.Localization, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, key_id, language_id, value, 
+                       COALESCE(plural_forms, '{}')::jsonb, COALESCE(variables, '{}')::jsonb,
+                       version, approved, approved_by, approved_at, created_at, modified_at, deleted
+                FROM localizations
+                WHERE id = $1 AND deleted = FALSE
+        `
+
+        loc := &amp;models.Localization{}
+        err := d.queryRowContext(ctx, query, id).Scan(
+                &amp;loc.ID, &amp;loc.KeyID, &amp;loc.LanguageID, &amp;loc.Value, &amp;loc.PluralForms, &amp;loc.Variables,
+                &amp;loc.Version, &amp;loc.Approved, &amp;loc.ApprovedBy, &amp;loc.ApprovedAt,
+                &amp;loc.CreatedAt, &amp;loc.ModifiedAt, &amp;loc.Deleted,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov0" title="0">{
+                        return nil, models.ErrResourceNotFound("localization")
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get localization by ID", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
+        }
+
+        <span class="cov0" title="0">return loc, nil</span>
+}
+
+// GetLocalizationByKeyAndLanguage retrieves a localization by key ID and language ID
+func (d *PostgresDatabase) GetLocalizationByKeyAndLanguage(ctx context.Context, keyID, languageID string) (*models.Localization, error) <span class="cov8" title="1">{
+        query := `
+                SELECT id, key_id, language_id, value, 
+                       COALESCE(plural_forms, '{}')::jsonb, COALESCE(variables, '{}')::jsonb,
+                       version, approved, approved_by, approved_at, created_at, modified_at, deleted
+                FROM localizations
+                WHERE key_id = $1 AND language_id = $2 AND deleted = FALSE
+        `
+
+        loc := &amp;models.Localization{}
+        err := d.queryRowContext(ctx, query, keyID, languageID).Scan(
+                &amp;loc.ID, &amp;loc.KeyID, &amp;loc.LanguageID, &amp;loc.Value, &amp;loc.PluralForms, &amp;loc.Variables,
+                &amp;loc.Version, &amp;loc.Approved, &amp;loc.ApprovedBy, &amp;loc.ApprovedAt,
+                &amp;loc.CreatedAt, &amp;loc.ModifiedAt, &amp;loc.Deleted,
+        )
+
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, sql.ErrNoRows) </span><span class="cov8" title="1">{
+                        return nil, models.ErrResourceNotFound("localization")
+                }</span>
+                <span class="cov0" title="0">d.logger.Error("failed to get localization by key and language", zap.Error(err))
+                return nil, models.ErrDatabase(err)</span>
+        }
+
+        <span class="cov8" title="1">return loc, nil</span>
+}
+
+// GetLocalizationsByLanguage retrieves all localizations for a language
+func (d *PostgresDatabase) GetLocalizationsByLanguage(ctx context.Context, languageID string) ([]*models.Localization, error) <span class="cov8" title="1">{
+        query := `
+                SELECT id, key_id, language_id, value, 
+                       COALESCE(plural_forms, '{}')::jsonb, COALESCE(variables, '{}')::jsonb,
+                       version, approved, approved_by, approved_at, created_at, modified_at, deleted
+                FROM localizations
+                WHERE language_id = $1 AND deleted = FALSE
+                ORDER BY key_id ASC
+        `
+
+        rows, err := d.queryContext(ctx, query, languageID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        var localizations []*models.Localization
+        for rows.Next() </span><span class="cov8" title="1">{
+                loc := &amp;models.Localization{}
+                if err := rows.Scan(
+                        &amp;loc.ID, &amp;loc.KeyID, &amp;loc.LanguageID, &amp;loc.Value, &amp;loc.PluralForms, &amp;loc.Variables,
+                        &amp;loc.Version, &amp;loc.Approved, &amp;loc.ApprovedBy, &amp;loc.ApprovedAt,
+                        &amp;loc.CreatedAt, &amp;loc.ModifiedAt, &amp;loc.Deleted,
+                ); err != nil </span><span class="cov0" title="0">{
+                        d.logger.Error("failed to scan localization", zap.Error(err))
+                        return nil, models.ErrDatabase(err)
+                }</span>
+                <span class="cov8" title="1">localizations = append(localizations, loc)</span>
+        }
+
+        <span class="cov8" title="1">return localizations, nil</span>
+}
+
+// GetLocalizationsByKeyID retrieves all localizations for a key across all languages
+func (d *PostgresDatabase) GetLocalizationsByKeyID(ctx context.Context, keyID string) ([]*models.Localization, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, key_id, language_id, value, plural_forms, variables,
+                       version, approved, approved_by, approved_at, created_at, modified_at, deleted
+                FROM localizations
+                WHERE key_id = $1 AND deleted = FALSE
+                ORDER BY language_id ASC
+        `
+
+        rows, err := d.queryContext(ctx, query, keyID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer rows.Close()
+
+        var localizations []*models.Localization
+        for rows.Next() </span><span class="cov0" title="0">{
+                loc := &amp;models.Localization{}
+                if err := rows.Scan(
+                        &amp;loc.ID, &amp;loc.KeyID, &amp;loc.LanguageID, &amp;loc.Value, &amp;loc.PluralForms, &amp;loc.Variables,
+                        &amp;loc.Version, &amp;loc.Approved, &amp;loc.ApprovedBy, &amp;loc.ApprovedAt,
+                        &amp;loc.CreatedAt, &amp;loc.ModifiedAt, &amp;loc.Deleted,
+                ); err != nil </span><span class="cov0" title="0">{
+                        d.logger.Error("failed to scan localization", zap.Error(err))
+                        return nil, models.ErrDatabase(err)
+                }</span>
+                <span class="cov0" title="0">localizations = append(localizations, loc)</span>
+        }
+
+        <span class="cov0" title="0">return localizations, nil</span>
+}
+
+// UpdateLocalization updates an existing localization
+func (d *PostgresDatabase) UpdateLocalization(ctx context.Context, loc *models.Localization) error <span class="cov8" title="1">{
+        loc.BeforeUpdate()
+
+        if err := loc.Validate(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">query := `
+                UPDATE localizations
+                SET value = $1, plural_forms = $2, variables = $3, version = $4,
+                    approved = $5, approved_by = $6, approved_at = $7, modified_at = $8
+                WHERE id = $9 AND deleted = FALSE
+        `
+
+        result, err := d.execContext(ctx, query,
+                loc.Value, loc.PluralForms, loc.Variables, loc.Version,
+                loc.Approved, loc.ApprovedBy, loc.ApprovedAt, loc.ModifiedAt, loc.ID,
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to update localization", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov8" title="1">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("localization")
+        }</span>
+
+        <span class="cov8" title="1">d.logger.Info("localization updated", zap.String("id", loc.ID))
+        return nil</span>
+}
+
+// DeleteLocalization soft-deletes a localization
+func (d *PostgresDatabase) DeleteLocalization(ctx context.Context, id string) error <span class="cov8" title="1">{
+        query := `
+                UPDATE localizations
+                SET deleted = TRUE, modified_at = $1
+                WHERE id = $2 AND deleted = FALSE
+        `
+
+        result, err := d.execContext(ctx, query, time.Now().Unix(), id)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to delete localization", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov8" title="1">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("localization")
+        }</span>
+
+        <span class="cov8" title="1">d.logger.Info("localization deleted", zap.String("id", id))
+        return nil</span>
+}
+
+// ApproveLocalization approves a localization
+func (d *PostgresDatabase) ApproveLocalization(ctx context.Context, id, username string) error <span class="cov0" title="0">{
+        query := `
+                UPDATE localizations
+                SET approved = TRUE, approved_by = $1, approved_at = $2, modified_at = $3
+                WHERE id = $4 AND deleted = FALSE
+        `
+
+        now := time.Now().Unix()
+        result, err := d.execContext(ctx, query, username, now, now, id)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to approve localization", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov0" title="0">rows, _ := result.RowsAffected()
+        if rows == 0 </span><span class="cov0" title="0">{
+                return models.ErrResourceNotFound("localization")
+        }</span>
+
+        <span class="cov0" title="0">d.logger.Info("localization approved", zap.String("id", id), zap.String("approved_by", username))
+        return nil</span>
+}
+
+// CreateAuditLog creates an audit log entry
+func (d *PostgresDatabase) CreateAuditLog(ctx context.Context, action, entityType, entityID, username string, changes interface{}, ipAddress, userAgent string) error <span class="cov0" title="0">{
+        query := `
+                INSERT INTO localization_audit_log (id, action, entity_type, entity_id, username, changes, ip_address, user_agent, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `
+
+        changesJSON, err := json.Marshal(changes)
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to marshal audit changes", zap.Error(err))
+                return err
+        }</span>
+
+        <span class="cov0" title="0">_, err = d.execContext(ctx, query,
+                models.GenerateUUID(), action, entityType, entityID, username,
+                changesJSON, ipAddress, userAgent, time.Now().Unix(),
+        )
+
+        if err != nil </span><span class="cov0" title="0">{
+                d.logger.Error("failed to create audit log", zap.Error(err))
+                return models.ErrDatabase(err)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// GetStats retrieves database statistics
+func (d *PostgresDatabase) GetStats(ctx context.Context) (map[string]interface{}, error) <span class="cov8" title="1">{
+        stats := make(map[string]interface{})
+
+        // Count languages
+        var langCount int
+        err := d.queryRowContext(ctx, "SELECT COUNT(*) FROM languages WHERE deleted = FALSE").Scan(&amp;langCount)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, models.ErrDatabase(err)
+        }</span>
+        <span class="cov8" title="1">stats["languages_count"] = langCount
+
+        // Count localization keys
+        var keyCount int
+        err = d.queryRowContext(ctx, "SELECT COUNT(*) FROM localization_keys WHERE deleted = FALSE").Scan(&amp;keyCount)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, models.ErrDatabase(err)
+        }</span>
+        <span class="cov8" title="1">stats["keys_count"] = keyCount
+
+        // Count localizations
+        var locCount int
+        err = d.queryRowContext(ctx, "SELECT COUNT(*) FROM localizations WHERE deleted = FALSE").Scan(&amp;locCount)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, models.ErrDatabase(err)
+        }</span>
+        <span class="cov8" title="1">stats["localizations_count"] = locCount
+
+        // Count approved localizations
+        var approvedCount int
+        err = d.queryRowContext(ctx, "SELECT COUNT(*) FROM localizations WHERE deleted = FALSE AND approved = TRUE").Scan(&amp;approvedCount)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, models.ErrDatabase(err)
+        }</span>
+        <span class="cov8" title="1">stats["approved_count"] = approvedCount
+
+        return stats, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package database
 
 import (
         "context"
         "encoding/json"
-        "net/http"
-        "strconv"
-        "strings"
-        "time"
+        "fmt"
+        "sync"
 
-        "github.com/gin-gonic/gin"
-        "github.com/google/uuid"
-        "github.com/helixtrack/localization-service/internal/middleware"
         "github.com/helixtrack/localization-service/internal/models"
-        "github.com/helixtrack/localization-service/internal/websocket"
+)
+
+// MockDatabase implements Database interface for testing
+type MockDatabase struct {
+        mu                     sync.RWMutex
+        languages              map[string]*models.Language
+        localizationKeys       map[string]*models.LocalizationKey
+        localizations          map[string]*models.Localization
+        catalogs               map[string]*models.LocalizationCatalog
+        versions               map[string]*models.LocalizationVersion
+        shouldReturnError      bool
+        errorToReturn          error
+        // Separate error flag for CreateCatalog to test BuildCatalog error path
+        shouldFailCreateCatalog bool
+}
+
+// NewMockDatabase creates a new mock database for testing
+func NewMockDatabase() *MockDatabase <span class="cov8" title="1">{
+        return &amp;MockDatabase{
+                languages:        make(map[string]*models.Language),
+                localizationKeys: make(map[string]*models.LocalizationKey),
+                localizations:    make(map[string]*models.Localization),
+                catalogs:         make(map[string]*models.LocalizationCatalog),
+                versions:         make(map[string]*models.LocalizationVersion),
+        }
+}</span>
+
+// SetError configures the mock to return an error
+func (m *MockDatabase) SetError(err error) <span class="cov8" title="1">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        m.shouldReturnError = true
+        m.errorToReturn = err
+}</span>
+
+// ClearError clears the error state
+func (m *MockDatabase) ClearError() <span class="cov8" title="1">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        m.shouldReturnError = false
+        m.errorToReturn = nil
+}</span>
+
+// SetCreateCatalogError configures the mock to return an error specifically for CreateCatalog
+func (m *MockDatabase) SetCreateCatalogError(err error) <span class="cov8" title="1">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        m.shouldFailCreateCatalog = true
+}</span>
+
+// ClearCreateCatalogError clears the CreateCatalog error condition
+func (m *MockDatabase) ClearCreateCatalogError() <span class="cov8" title="1">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        m.shouldFailCreateCatalog = false
+}</span>
+
+// SetVersionsNil sets the versions map to nil (for testing purposes)
+func (m *MockDatabase) SetVersionsNil() <span class="cov8" title="1">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        m.versions = nil
+}</span>
+
+// Ping implementation
+func (m *MockDatabase) Ping() error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+// Close implementation
+func (m *MockDatabase) Close() error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+// Language operations
+func (m *MockDatabase) CreateLanguage(ctx context.Context, lang *models.Language) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        lang.BeforeCreate()
+        if err := lang.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">m.languages[lang.ID] = lang
+        return nil</span>
+}
+
+func (m *MockDatabase) GetLanguageByID(ctx context.Context, id string) (*models.Language, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        lang, exists := m.languages[id]
+        if !exists </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("language")
+        }</span>
+        <span class="cov8" title="1">return lang, nil</span>
+}
+
+func (m *MockDatabase) GetLanguageByCode(ctx context.Context, code string) (*models.Language, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        for _, lang := range m.languages </span><span class="cov8" title="1">{
+                if lang.Code == code </span><span class="cov8" title="1">{
+                        return lang, nil
+                }</span>
+        }
+        <span class="cov8" title="1">return nil, models.ErrResourceNotFound("language")</span>
+}
+
+func (m *MockDatabase) GetLanguages(ctx context.Context, activeOnly bool) ([]*models.Language, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        var languages []*models.Language
+        for _, lang := range m.languages </span><span class="cov8" title="1">{
+                if !activeOnly || lang.IsActive </span><span class="cov8" title="1">{
+                        languages = append(languages, lang)
+                }</span>
+        }
+        <span class="cov8" title="1">return languages, nil</span>
+}
+
+func (m *MockDatabase) UpdateLanguage(ctx context.Context, lang *models.Language) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        lang.BeforeUpdate()
+        if err := lang.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">if _, exists := m.languages[lang.ID]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("language")
+        }</span>
+        
+        <span class="cov8" title="1">m.languages[lang.ID] = lang
+        return nil</span>
+}
+
+func (m *MockDatabase) DeleteLanguage(ctx context.Context, id string) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        if _, exists := m.languages[id]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("language")
+        }</span>
+        
+        <span class="cov8" title="1">delete(m.languages, id)
+        return nil</span>
+}
+
+func (m *MockDatabase) GetDefaultLanguage(ctx context.Context) (*models.Language, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        for _, lang := range m.languages </span><span class="cov8" title="1">{
+                if lang.IsDefault </span><span class="cov8" title="1">{
+                        return lang, nil
+                }</span>
+        }
+        <span class="cov8" title="1">return nil, models.ErrResourceNotFound("default language")</span>
+}
+
+// Localization Key operations
+func (m *MockDatabase) CreateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        key.BeforeCreate()
+        if err := key.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">m.localizationKeys[key.ID] = key
+        return nil</span>
+}
+
+func (m *MockDatabase) GetLocalizationKeyByID(ctx context.Context, id string) (*models.LocalizationKey, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        key, exists := m.localizationKeys[id]
+        if !exists </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("localization key")
+        }</span>
+        <span class="cov8" title="1">return key, nil</span>
+}
+
+func (m *MockDatabase) GetLocalizationKeyByKey(ctx context.Context, keyStr string) (*models.LocalizationKey, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        for _, key := range m.localizationKeys </span><span class="cov8" title="1">{
+                if key.Key == keyStr </span><span class="cov8" title="1">{
+                        return key, nil
+                }</span>
+        }
+        <span class="cov8" title="1">return nil, models.ErrResourceNotFound("localization key")</span>
+}
+
+func (m *MockDatabase) GetLocalizationKeysByCategory(ctx context.Context, category string) ([]*models.LocalizationKey, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        var keys []*models.LocalizationKey
+        for _, key := range m.localizationKeys </span><span class="cov8" title="1">{
+                if key.Category == category </span><span class="cov8" title="1">{
+                        keys = append(keys, key)
+                }</span>
+        }
+        <span class="cov8" title="1">return keys, nil</span>
+}
+
+func (m *MockDatabase) UpdateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        key.BeforeUpdate()
+        if err := key.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">if _, exists := m.localizationKeys[key.ID]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("localization key")
+        }</span>
+        
+        <span class="cov8" title="1">m.localizationKeys[key.ID] = key
+        return nil</span>
+}
+
+func (m *MockDatabase) DeleteLocalizationKey(ctx context.Context, id string) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        if _, exists := m.localizationKeys[id]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("localization key")
+        }</span>
+        
+        <span class="cov8" title="1">delete(m.localizationKeys, id)
+        return nil</span>
+}
+
+// Localization operations
+func (m *MockDatabase) CreateLocalization(ctx context.Context, loc *models.Localization) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        loc.BeforeCreate()
+        if err := loc.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">m.localizations[loc.ID] = loc
+        return nil</span>
+}
+
+func (m *MockDatabase) GetLocalizationByID(ctx context.Context, id string) (*models.Localization, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        loc, exists := m.localizations[id]
+        if !exists </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("localization")
+        }</span>
+        <span class="cov8" title="1">return loc, nil</span>
+}
+
+func (m *MockDatabase) GetLocalizationByKeyAndLanguage(ctx context.Context, keyID, languageID string) (*models.Localization, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        // Find the key first
+        var key *models.LocalizationKey
+        for _, k := range m.localizationKeys </span><span class="cov8" title="1">{
+                if k.ID == keyID </span><span class="cov8" title="1">{
+                        key = k
+                        break</span>
+                }
+        }
+        <span class="cov8" title="1">if key == nil </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("localization key")
+        }</span>
+        
+        // Find localization
+        <span class="cov8" title="1">for _, loc := range m.localizations </span><span class="cov8" title="1">{
+                if loc.KeyID == keyID &amp;&amp; loc.LanguageID == languageID </span><span class="cov8" title="1">{
+                        return loc, nil
+                }</span>
+        }
+        <span class="cov8" title="1">return nil, models.ErrResourceNotFound("localization")</span>
+}
+
+func (m *MockDatabase) GetLocalizationsByLanguage(ctx context.Context, languageID string) ([]*models.Localization, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        var localizations []*models.Localization
+        for _, loc := range m.localizations </span><span class="cov8" title="1">{
+                if loc.LanguageID == languageID </span><span class="cov8" title="1">{
+                        localizations = append(localizations, loc)
+                }</span>
+        }
+        <span class="cov8" title="1">return localizations, nil</span>
+}
+
+func (m *MockDatabase) GetLocalizationsByKeyID(ctx context.Context, keyID string) ([]*models.Localization, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        var localizations []*models.Localization
+        for _, loc := range m.localizations </span><span class="cov8" title="1">{
+                if loc.KeyID == keyID </span><span class="cov8" title="1">{
+                        localizations = append(localizations, loc)
+                }</span>
+        }
+        <span class="cov8" title="1">return localizations, nil</span>
+}
+
+func (m *MockDatabase) UpdateLocalization(ctx context.Context, loc *models.Localization) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        loc.BeforeUpdate()
+        if err := loc.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">if _, exists := m.localizations[loc.ID]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("localization")
+        }</span>
+        
+        <span class="cov8" title="1">m.localizations[loc.ID] = loc
+        return nil</span>
+}
+
+func (m *MockDatabase) DeleteLocalization(ctx context.Context, id string) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        if _, exists := m.localizations[id]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("localization")
+        }</span>
+        
+        <span class="cov8" title="1">delete(m.localizations, id)
+        return nil</span>
+}
+
+func (m *MockDatabase) ApproveLocalization(ctx context.Context, id, username string) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        loc, exists := m.localizations[id]
+        if !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("localization")
+        }</span>
+        
+        <span class="cov8" title="1">loc.Approve(username)
+        m.localizations[id] = loc
+        return nil</span>
+}
+
+// Catalog operations
+func (m *MockDatabase) CreateCatalog(ctx context.Context, catalog *models.LocalizationCatalog) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        <span class="cov8" title="1">if m.shouldFailCreateCatalog </span><span class="cov8" title="1">{
+                return fmt.Errorf("mock create catalog error")
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        catalog.BeforeCreate()
+        if err := catalog.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">m.catalogs[catalog.ID] = catalog
+        return nil</span>
+}
+
+func (m *MockDatabase) GetCatalogByLanguage(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        for _, catalog := range m.catalogs </span><span class="cov8" title="1">{
+                if catalog.LanguageID == languageID &amp;&amp; catalog.Category == category </span><span class="cov8" title="1">{
+                        // Found catalog, return it
+                        m.mu.RUnlock()
+                        return catalog, nil
+                }</span>
+        }
+        <span class="cov8" title="1">m.mu.RUnlock()
+        
+        // If not found, build a new one
+        return m.BuildCatalog(ctx, languageID, category)</span>
+}
+
+func (m *MockDatabase) GetLatestCatalog(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error) <span class="cov8" title="1">{
+        return m.GetCatalogByLanguage(ctx, languageID, category)
+}</span>
+
+func (m *MockDatabase) UpdateCatalog(ctx context.Context, catalog *models.LocalizationCatalog) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        catalog.BeforeUpdate()
+        if err := catalog.Validate(); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">if _, exists := m.catalogs[catalog.ID]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("catalog")
+        }</span>
+        
+        <span class="cov8" title="1">m.catalogs[catalog.ID] = catalog
+        return nil</span>
+}
+
+func (m *MockDatabase) DeleteCatalog(ctx context.Context, id string) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        if _, exists := m.catalogs[id]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("catalog")
+        }</span>
+        
+        <span class="cov8" title="1">delete(m.catalogs, id)
+        return nil</span>
+}
+
+func (m *MockDatabase) BuildCatalog(ctx context.Context, languageID string, category string) (*models.LocalizationCatalog, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        
+        // Check if language exists
+        _, exists := m.languages[languageID]
+        if !exists </span><span class="cov8" title="1">{
+                m.mu.RUnlock()
+                return nil, models.ErrResourceNotFound("language")
+        }</span>
+        
+        // Build catalog map
+        <span class="cov8" title="1">catalogMap := make(map[string]string)
+        for _, loc := range m.localizations </span><span class="cov8" title="1">{
+                if loc.LanguageID == languageID </span><span class="cov8" title="1">{
+                        // Find the key
+                        if key, exists := m.localizationKeys[loc.KeyID]; exists </span><span class="cov8" title="1">{
+                                if category == "" || key.Category == category </span><span class="cov8" title="1">{
+                                        catalogMap[key.Key] = loc.Value
+                                }</span>
+                        }
+                }
+        }
+        <span class="cov8" title="1">m.mu.RUnlock()
+        
+        // Marshal to JSON
+        catalogJSON, err := json.Marshal(catalogMap)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        
+        // Create new catalog with proper data
+        <span class="cov8" title="1">catalog := &amp;models.LocalizationCatalog{
+                LanguageID:  languageID,
+                Category:    category,
+                CatalogData: catalogJSON,
+                Version:     1,
+        }
+        catalog.BeforeCreate()
+        
+        // Save catalog
+        if err := m.CreateCatalog(ctx, catalog); err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        
+        <span class="cov8" title="1">return catalog, nil</span>
+}
+
+// Version operations
+func (m *MockDatabase) CreateVersion(ctx context.Context, version *models.LocalizationVersion) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">if version == nil </span><span class="cov8" title="1">{
+                return fmt.Errorf("version cannot be nil")
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        if m.versions == nil </span><span class="cov8" title="1">{
+                m.versions = make(map[string]*models.LocalizationVersion)
+        }</span>
+        
+        // Set ID and timestamps
+        <span class="cov8" title="1">version.BeforeCreate()
+        
+        m.versions[version.ID] = version
+        return nil</span>
+}
+
+func (m *MockDatabase) GetVersionByNumber(ctx context.Context, versionNumber string) (*models.LocalizationVersion, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        for _, version := range m.versions </span><span class="cov8" title="1">{
+                if version.VersionNumber == versionNumber </span><span class="cov8" title="1">{
+                        return version, nil
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return nil, models.ErrResourceNotFound("version")</span>
+}
+
+func (m *MockDatabase) GetVersionByID(ctx context.Context, id string) (*models.LocalizationVersion, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        version, exists := m.versions[id]
+        if !exists </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("version")
+        }</span>
+        
+        <span class="cov8" title="1">return version, nil</span>
+}
+
+func (m *MockDatabase) GetCurrentVersion(ctx context.Context) (*models.LocalizationVersion, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        if len(m.versions) == 0 </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("version")
+        }</span>
+        
+        // Return the most recently created version
+        <span class="cov8" title="1">var latestVersion *models.LocalizationVersion
+        for _, version := range m.versions </span><span class="cov8" title="1">{
+                if latestVersion == nil || version.CreatedAt &gt; latestVersion.CreatedAt </span><span class="cov8" title="1">{
+                        latestVersion = version
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return latestVersion, nil</span>
+}
+
+func (m *MockDatabase) ListVersions(ctx context.Context, limit, offset int) ([]*models.LocalizationVersion, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        var versions []*models.LocalizationVersion
+        for _, version := range m.versions </span><span class="cov8" title="1">{
+                versions = append(versions, version)
+        }</span>
+        
+        // Sort versions by CreatedAt to ensure consistent ordering
+        <span class="cov8" title="1">for i := 0; i &lt; len(versions); i++ </span><span class="cov8" title="1">{
+                for j := i + 1; j &lt; len(versions); j++ </span><span class="cov8" title="1">{
+                        if versions[i].CreatedAt &gt; versions[j].CreatedAt </span><span class="cov8" title="1">{
+                                versions[i], versions[j] = versions[j], versions[i]
+                        }</span>
+                }
+        }
+        
+        // Apply pagination
+        <span class="cov8" title="1">if offset &gt;= len(versions) </span><span class="cov8" title="1">{
+                return []*models.LocalizationVersion{}, nil
+        }</span>
+        
+        <span class="cov8" title="1">end := offset + limit
+        if end &gt; len(versions) </span><span class="cov8" title="1">{
+                end = len(versions)
+        }</span>
+        
+        <span class="cov8" title="1">return versions[offset:end], nil</span>
+}
+
+func (m *MockDatabase) CountVersions(ctx context.Context) (int, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return 0, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        return len(m.versions), nil</span>
+}
+
+func (m *MockDatabase) DeleteVersion(ctx context.Context, id string) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.Lock()
+        defer m.mu.Unlock()
+        
+        if _, exists := m.versions[id]; !exists </span><span class="cov8" title="1">{
+                return models.ErrResourceNotFound("version")
+        }</span>
+        
+        <span class="cov8" title="1">delete(m.versions, id)
+        return nil</span>
+}
+
+func (m *MockDatabase) GetCatalogByVersion(ctx context.Context, versionNumber, languageCode string) (*models.LocalizationCatalog, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        // Find version
+        var targetVersion *models.LocalizationVersion
+        for _, version := range m.versions </span><span class="cov8" title="1">{
+                if version.VersionNumber == versionNumber </span><span class="cov8" title="1">{
+                        targetVersion = version
+                        break</span>
+                }
+        }
+        
+        <span class="cov8" title="1">if targetVersion == nil </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("version")
+        }</span>
+        
+        // Find language
+        <span class="cov8" title="1">var targetLang *models.Language
+        for _, lang := range m.languages </span><span class="cov8" title="1">{
+                if lang.Code == languageCode </span><span class="cov8" title="1">{
+                        targetLang = lang
+                        break</span>
+                }
+        }
+        
+        <span class="cov8" title="1">if targetLang == nil </span><span class="cov8" title="1">{
+                return nil, models.ErrResourceNotFound("language")
+        }</span>
+        
+        // Return a mock catalog
+        <span class="cov8" title="1">catalogData, _ := json.Marshal(map[string]interface{}{
+                "version": targetVersion.VersionNumber,
+                "language": languageCode,
+        })
+        
+        catalog := &amp;models.LocalizationCatalog{
+                ID:         "catalog-" + targetVersion.ID + "-" + targetLang.ID,
+                LanguageID: targetLang.ID,
+                Version:    int(targetVersion.TotalLocalizations),
+                CatalogData: catalogData,
+        }
+        
+        return catalog, nil</span>
+}
+
+// Audit operations
+func (m *MockDatabase) CreateAuditLog(ctx context.Context, action, entityType, entityID, username string, changes interface{}, ipAddress, userAgent string) error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        
+        // For mock implementation, just return success since we don't need to store audit logs
+        <span class="cov8" title="1">return nil</span>
+}
+
+// GetStats retrieves database statistics
+func (m *MockDatabase) GetStats(ctx context.Context) (map[string]interface{}, error) <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return nil, m.errorToReturn
+        }</span>
+        
+        <span class="cov8" title="1">m.mu.RLock()
+        defer m.mu.RUnlock()
+        
+        stats := make(map[string]interface{})
+        stats["total_languages"] = len(m.languages)
+        stats["total_keys"] = len(m.localizationKeys)
+        stats["total_localizations"] = len(m.localizations)
+        stats["total_catalogs"] = len(m.catalogs)
+        stats["total_versions"] = len(m.versions)
+        
+        return stats, nil</span>
+}
+
+// Health check implementation
+func (m *MockDatabase) Health() error <span class="cov8" title="1">{
+        if m.shouldReturnError </span><span class="cov8" title="1">{
+                return m.errorToReturn
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}</pre>
+		
+		<pre class="file" id="file6" style="display: none">package database
+
+import (
+        "context"
+        "database/sql"
+        "fmt"
+
+        "github.com/helixtrack/localization-service/internal/models"
         "go.uber.org/zap"
 )
 
-// GetCurrentVersion returns the current localization version
-// GET /v1/version/current
-func (h *Handler) GetCurrentVersion(c *gin.Context) <span class="cov8" title="1">{
-        ctx := context.Background()
+// CreateVersion creates a new localization version
+func (d *PostgresDatabase) CreateVersion(ctx context.Context, version *models.LocalizationVersion) error <span class="cov0" title="0">{
+        version.BeforeCreate()
 
-        version, err := h.db.GetCurrentVersion(ctx)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to get current version", zap.Error(err))
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "No version found",
-                ))
-                return
-        }</span>
+        query := `
+                INSERT INTO localization_versions (
+                        id, version_number, version_type, description,
+                        keys_count, languages_count, total_localizations,
+                        created_by, created_at, metadata
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `
 
-        // Build version info response
-        <span class="cov8" title="1">versionInfo := models.VersionInfo{
-                Version:        version.VersionNumber,
-                KeysCount:      version.KeysCount,
-                LanguagesCount: version.LanguagesCount,
-                LastUpdated:    version.CreatedAt,
-        }
-
-        c.JSON(http.StatusOK, models.SuccessResponse(versionInfo))</span>
-}
-
-// GetVersionHistory returns version history with pagination
-// GET /v1/version/history
-func (h *Handler) GetVersionHistory(c *gin.Context) <span class="cov8" title="1">{
-        ctx := context.Background()
-
-        // Parse pagination parameters
-        limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-        offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
-
-        if limit &gt; 100 </span><span class="cov0" title="0">{
-                limit = 100
-        }</span>
-
-        // Get versions
-        <span class="cov8" title="1">versions, err := h.db.ListVersions(ctx, limit, offset)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to list versions", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "Failed to retrieve version history",
-                ))
-                return
-        }</span>
-
-        // Get total count
-        <span class="cov8" title="1">totalCount, err := h.db.CountVersions(ctx)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to count versions", zap.Error(err))
-                totalCount = len(versions)
-        }</span>
-
-        // Get current version
-        <span class="cov8" title="1">currentVersion := ""
-        if len(versions) &gt; 0 </span><span class="cov8" title="1">{
-                currentVersion = versions[0].VersionNumber
-        }</span>
-
-        <span class="cov8" title="1">response := models.VersionHistoryResponse{
-                Versions:       make([]models.LocalizationVersion, len(versions)),
-                TotalVersions:  totalCount,
-                CurrentVersion: currentVersion,
-        }
-
-        // Convert pointers to values
-        for i, v := range versions </span><span class="cov8" title="1">{
-                response.Versions[i] = *v
-        }</span>
-
-        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
-}
-
-// GetVersionByNumber returns a specific version by number
-// GET /v1/version/:version
-func (h *Handler) GetVersionByNumber(c *gin.Context) <span class="cov8" title="1">{
-        ctx := context.Background()
-        versionNumber := c.Param("version")
-
-        version, err := h.db.GetVersionByNumber(ctx, versionNumber)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to get version", zap.Error(err), zap.String("version", versionNumber))
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "Version not found",
-                ))
-                return
-        }</span>
-
-        <span class="cov8" title="1">c.JSON(http.StatusOK, models.SuccessResponse(version))</span>
-}
-
-// GetCatalogByVersion returns a catalog for a specific version
-// GET /v1/version/:version/catalog/:language
-func (h *Handler) GetCatalogByVersion(c *gin.Context) <span class="cov8" title="1">{
-        ctx := context.Background()
-        versionNumber := c.Param("version")
-        languageCode := c.Param("language")
-
-        // Check cache first
-        cacheKey := "l10n:catalog:" + languageCode + ":version:" + versionNumber
-        if cached, err := h.cache.Get(ctx, cacheKey); err == nil &amp;&amp; cached != "" </span><span class="cov0" title="0">{
-                h.logger.Info("Cache hit for versioned catalog",
-                        zap.String("version", versionNumber),
-                        zap.String("language", languageCode),
-                )
-
-                var catalogMap map[string]string
-                if err := json.Unmarshal([]byte(cached), &amp;catalogMap); err == nil </span><span class="cov0" title="0">{
-                        // Parse version number to get int
-                        verNum := 1 // Default version
-                        if parts := strings.Split(versionNumber, "."); len(parts) &gt;= 3 </span><span class="cov0" title="0">{
-                                if major, err := strconv.Atoi(parts[0]); err == nil </span><span class="cov0" title="0">{
-                                        verNum = major
-                                }</span>
-                        }
-
-                        <span class="cov0" title="0">response := models.CatalogResponse{
-                                Language: languageCode,
-                                Version:  verNum,
-                                Catalog:  catalogMap,
-                        }
-                        c.JSON(http.StatusOK, models.SuccessResponse(response))
-                        return</span>
-                }
-        }
-
-        // Get from database
-        <span class="cov8" title="1">catalog, err := h.db.GetCatalogByVersion(ctx, versionNumber, languageCode)
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to get catalog by version",
-                        zap.Error(err),
-                        zap.String("version", versionNumber),
-                        zap.String("language", languageCode),
-                )
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "Catalog not found for this version and language",
-                ))
-                return
-        }</span>
-
-        // Parse catalog data
-        <span class="cov8" title="1">catalogMap, err := catalog.GetCatalogMap()
-        if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to parse catalog data", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "Failed to parse catalog data",
-                ))
-                return
-        }</span>
-
-        // Cache the result (versioned catalogs can be cached longer)
-        <span class="cov8" title="1">if catalogJSON, err := json.Marshal(catalogMap); err == nil </span><span class="cov8" title="1">{
-                h.cache.Set(ctx, cacheKey, string(catalogJSON), 24*time.Hour) // 24 hours for versioned catalogs
-        }</span>
-
-        // Parse version number to get int
-        <span class="cov8" title="1">verNum := 1 // Default version
-        if parts := strings.Split(versionNumber, "."); len(parts) &gt;= 3 </span><span class="cov8" title="1">{
-                if major, err := strconv.Atoi(parts[0]); err == nil </span><span class="cov8" title="1">{
-                        verNum = major
-                }</span>
-        }
-
-        <span class="cov8" title="1">response := models.CatalogResponse{
-                Language: languageCode,
-                Version:  verNum,
-                Catalog:  catalogMap,
-        }
-
-        c.JSON(http.StatusOK, models.SuccessResponse(response))</span>
-}
-
-// CreateVersion creates a new version (admin only)
-// POST /v1/admin/version/create
-func (h *Handler) CreateVersion(c *gin.Context) <span class="cov0" title="0">{
-        ctx := context.Background()
-
-        // Parse request
-        var req models.CreateVersionRequest
-        if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to parse create version request", zap.Error(err))
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeInvalidRequest,
-                        "Invalid request format: "+err.Error(),
-                ))
-                return
-        }</span>
-
-        // Validate request
-        <span class="cov0" title="0">if err := req.Validate(); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Create version request validation failed", zap.Error(err))
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeInvalidRequest,
-                        err.Error(),
-                ))
-                return
-        }</span>
-
-        // Get current version
-        <span class="cov0" title="0">currentVersion, err := h.db.GetCurrentVersion(ctx)
-        var newVersionNumber string
-
-        if err != nil </span><span class="cov0" title="0">{
-                // No current version, start with 1.0.0
-                newVersionNumber = "1.0.0"
-        }</span> else<span class="cov0" title="0"> {
-                // Increment based on type
-                newVersionNumber, err = models.IncrementVersion(currentVersion.VersionNumber, req.VersionType)
-                if err != nil </span><span class="cov0" title="0">{
-                        h.logger.Error("Failed to increment version", zap.Error(err))
-                        c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                                models.ErrCodeInternalError,
-                                "Failed to generate new version number",
-                        ))
-                        return
-                }</span>
-        }
-
-        // Get current counts
-        <span class="cov0" title="0">keysCount, _ := h.db.CountVersions(ctx)          // Placeholder - should count actual keys
-        languagesCount, _ := h.db.CountVersions(ctx)     // Placeholder - should count actual languages
-        totalLocalizations, _ := h.db.CountVersions(ctx) // Placeholder - should count actual localizations
-
-        // Get username from JWT claims
-        username, exists := c.Get("username")
-        if !exists </span><span class="cov0" title="0">{
-                username = "admin"
-        }</span>
-
-        // Create version
-        <span class="cov0" title="0">version := &amp;models.LocalizationVersion{
-                ID:                 uuid.New().String(),
-                VersionNumber:      newVersionNumber,
-                VersionType:        req.VersionType,
-                Description:        req.Description,
-                KeysCount:          keysCount,
-                LanguagesCount:     languagesCount,
-                TotalLocalizations: totalLocalizations,
-                CreatedBy:          username.(string),
-                CreatedAt:          time.Now().Unix(),
-        }
-
-        // Set metadata
-        if req.Metadata != nil </span><span class="cov0" title="0">{
-                if err := version.SetMetadataMap(req.Metadata); err != nil </span><span class="cov0" title="0">{
-                        h.logger.Error("Failed to set metadata", zap.Error(err))
-                }</span>
-        }
-
-        // Save to database
-        <span class="cov0" title="0">if err := h.db.CreateVersion(ctx, version); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to create version", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "Failed to create version",
-                ))
-                return
-        }</span>
-
-        <span class="cov0" title="0">h.logger.Info("Version created",
-                zap.String("version", version.VersionNumber),
-                zap.String("type", version.VersionType),
-                zap.String("created_by", version.CreatedBy),
+        _, err := d.db.ExecContext(ctx, query,
+                version.ID,
+                version.VersionNumber,
+                version.VersionType,
+                version.Description,
+                version.KeysCount,
+                version.LanguagesCount,
+                version.TotalLocalizations,
+                version.CreatedBy,
+                version.CreatedAt,
+                version.Metadata,
         )
 
-        // Get JWT claims for audit and WebSocket event
-        claims := middleware.GetClaims(c)
-
-        // Create audit log
-        h.db.CreateAuditLog(ctx, "CREATE", "VERSION", "", claims.Username, version, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventVersionCreated,
-                        &amp;websocket.VersionEventData{
-                                ID:                version.ID,
-                                Version:           version.VersionNumber,
-                                Description:       version.Description,
-                                KeysCount:         version.KeysCount,
-                                LanguagesCount:    version.LanguagesCount,
-                                TranslationsCount: version.TotalLocalizations,
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
-                )
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to create version: %w", err)
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusCreated, models.SuccessResponse(version))</span>
+        <span class="cov0" title="0">d.logger.Info("version created",
+                zap.String("version_number", version.VersionNumber),
+                zap.String("type", version.VersionType),
+        )
+
+        return nil</span>
 }
 
-// DeleteVersion deletes a version (admin only)
-// DELETE /v1/admin/version/:version
-func (h *Handler) DeleteVersion(c *gin.Context) <span class="cov0" title="0">{
-        ctx := context.Background()
-        versionNumber := c.Param("version")
+// GetVersionByNumber retrieves a version by its version number
+func (d *PostgresDatabase) GetVersionByNumber(ctx context.Context, versionNumber string) (*models.LocalizationVersion, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, version_number, version_type, description,
+                       keys_count, languages_count, total_localizations,
+                       created_by, created_at, COALESCE(metadata::TEXT, '') as metadata
+                FROM localization_versions
+                WHERE version_number = $1
+        `
 
-        // Get version first to get ID
-        version, err := h.db.GetVersionByNumber(ctx, versionNumber)
+        var version models.LocalizationVersion
+        err := d.db.QueryRowContext(ctx, query, versionNumber).Scan(
+                &amp;version.ID,
+                &amp;version.VersionNumber,
+                &amp;version.VersionType,
+                &amp;version.Description,
+                &amp;version.KeysCount,
+                &amp;version.LanguagesCount,
+                &amp;version.TotalLocalizations,
+                &amp;version.CreatedBy,
+                &amp;version.CreatedAt,
+                &amp;version.Metadata,
+        )
+
+        if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("version not found")
+        }</span>
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get version: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;version, nil</span>
+}
+
+// GetVersionByID retrieves a version by its ID
+func (d *PostgresDatabase) GetVersionByID(ctx context.Context, id string) (*models.LocalizationVersion, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, version_number, version_type, description,
+                       keys_count, languages_count, total_localizations,
+                       created_by, created_at, COALESCE(metadata::TEXT, '') as metadata
+                FROM localization_versions
+                WHERE id = $1
+        `
+
+        var version models.LocalizationVersion
+        err := d.db.QueryRowContext(ctx, query, id).Scan(
+                &amp;version.ID,
+                &amp;version.VersionNumber,
+                &amp;version.VersionType,
+                &amp;version.Description,
+                &amp;version.KeysCount,
+                &amp;version.LanguagesCount,
+                &amp;version.TotalLocalizations,
+                &amp;version.CreatedBy,
+                &amp;version.CreatedAt,
+                &amp;version.Metadata,
+        )
+
+        if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("version not found")
+        }</span>
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get version: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;version, nil</span>
+}
+
+// GetCurrentVersion retrieves the latest version
+func (d *PostgresDatabase) GetCurrentVersion(ctx context.Context) (*models.LocalizationVersion, error) <span class="cov0" title="0">{
+        query := `
+                SELECT id, version_number, version_type, description,
+                       keys_count, languages_count, total_localizations,
+                       created_by, created_at, COALESCE(metadata::TEXT, '') as metadata
+                FROM localization_versions
+                ORDER BY created_at DESC
+                LIMIT 1
+        `
+
+        var version models.LocalizationVersion
+        err := d.db.QueryRowContext(ctx, query).Scan(
+                &amp;version.ID,
+                &amp;version.VersionNumber,
+                &amp;version.VersionType,
+                &amp;version.Description,
+                &amp;version.KeysCount,
+                &amp;version.LanguagesCount,
+                &amp;version.TotalLocalizations,
+                &amp;version.CreatedBy,
+                &amp;version.CreatedAt,
+                &amp;version.Metadata,
+        )
+
+        if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("no versions found")
+        }</span>
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get current version: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;version, nil</span>
+}
+
+// ListVersions retrieves all versions with pagination
+func (d *PostgresDatabase) ListVersions(ctx context.Context, limit, offset int) ([]*models.LocalizationVersion, error) <span class="cov0" title="0">{
+        if limit &lt;= 0 </span><span class="cov0" title="0">{
+                limit = 10
+        }</span>
+
+        <span class="cov0" title="0">if offset &lt; 0 </span><span class="cov0" title="0">{
+                offset = 0
+        }</span>
+
+        <span class="cov0" title="0">query := `
+                SELECT id, version_number, version_type, description,
+                       keys_count, languages_count, total_localizations,
+                       created_by, created_at, COALESCE(metadata::TEXT, '') as metadata
+                FROM localization_versions
+                ORDER BY created_at DESC
+                LIMIT $1 OFFSET $2
+        `
+
+        rows, err := d.db.QueryContext(ctx, query, limit, offset)
         if err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to get version", zap.Error(err))
-                c.JSON(http.StatusNotFound, models.ErrorResponse(
-                        models.ErrCodeNotFound,
-                        "Version not found",
-                ))
-                return
+                return nil, fmt.Errorf("failed to list versions: %w", err)
         }</span>
+        <span class="cov0" title="0">defer rows.Close()
 
-        // Don't allow deleting the current version
-        <span class="cov0" title="0">currentVersion, err := h.db.GetCurrentVersion(ctx)
-        if err == nil &amp;&amp; currentVersion.ID == version.ID </span><span class="cov0" title="0">{
-                c.JSON(http.StatusBadRequest, models.ErrorResponse(
-                        models.ErrCodeInvalidRequest,
-                        "Cannot delete the current version",
-                ))
-                return
-        }</span>
+        versions := []*models.LocalizationVersion{}
 
-        // Delete version
-        <span class="cov0" title="0">if err := h.db.DeleteVersion(ctx, version.ID); err != nil </span><span class="cov0" title="0">{
-                h.logger.Error("Failed to delete version", zap.Error(err))
-                c.JSON(http.StatusInternalServerError, models.ErrorResponse(
-                        models.ErrCodeInternalError,
-                        "Failed to delete version",
-                ))
-                return
-        }</span>
-
-        <span class="cov0" title="0">h.logger.Info("Version deleted", zap.String("version", versionNumber))
-
-        // Get JWT claims for audit and WebSocket event
-        claims := middleware.GetClaims(c)
-
-        // Create audit log
-        h.db.CreateAuditLog(ctx, "DELETE", "VERSION", "", claims.Username, nil, c.ClientIP(), c.Request.UserAgent())
-
-        // Broadcast WebSocket event (if WebSocket is enabled)
-        if h.wsManager != nil </span><span class="cov0" title="0">{
-                h.wsManager.BroadcastEvent(
-                        websocket.EventVersionDeleted,
-                        &amp;websocket.VersionEventData{
-                                ID:                version.ID,
-                                Version:           version.VersionNumber,
-                                Description:       version.Description,
-                                KeysCount:         version.KeysCount,
-                                LanguagesCount:    version.LanguagesCount,
-                                TranslationsCount: version.TotalLocalizations,
-                        },
-                        &amp;websocket.EventMetadata{
-                                Username: claims.Username,
-                        },
+        for rows.Next() </span><span class="cov0" title="0">{
+                var version models.LocalizationVersion
+                err := rows.Scan(
+                        &amp;version.ID,
+                        &amp;version.VersionNumber,
+                        &amp;version.VersionType,
+                        &amp;version.Description,
+                        &amp;version.KeysCount,
+                        &amp;version.LanguagesCount,
+                        &amp;version.TotalLocalizations,
+                        &amp;version.CreatedBy,
+                        &amp;version.CreatedAt,
+                        &amp;version.Metadata,
                 )
+
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to scan version: %w", err)
+                }</span>
+
+                <span class="cov0" title="0">versions = append(versions, &amp;version)</span>
+        }
+
+        <span class="cov0" title="0">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("error iterating versions: %w", err)
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, models.SuccessResponse(map[string]string{
-                "message": "Version deleted successfully",
-                "version": versionNumber,
-        }))</span>
+        <span class="cov0" title="0">return versions, nil</span>
+}
+
+// CountVersions counts total number of versions
+func (d *PostgresDatabase) CountVersions(ctx context.Context) (int, error) <span class="cov0" title="0">{
+        query := `SELECT COUNT(*) FROM localization_versions`
+
+        var count int
+        err := d.db.QueryRowContext(ctx, query).Scan(&amp;count)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, fmt.Errorf("failed to count versions: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return count, nil</span>
+}
+
+// DeleteVersion deletes a version
+func (d *PostgresDatabase) DeleteVersion(ctx context.Context, id string) error <span class="cov0" title="0">{
+        query := `DELETE FROM localization_versions WHERE id = $1`
+
+        result, err := d.db.ExecContext(ctx, query, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to delete version: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">rowsAffected, err := result.RowsAffected()
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to get rows affected: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">if rowsAffected == 0 </span><span class="cov0" title="0">{
+                return fmt.Errorf("version not found")
+        }</span>
+
+        <span class="cov0" title="0">d.logger.Info("version deleted", zap.String("id", id))
+
+        return nil</span>
+}
+
+// GetCatalogByVersion retrieves a catalog for a specific version and language
+func (d *PostgresDatabase) GetCatalogByVersion(ctx context.Context, versionNumber, languageCode string) (*models.LocalizationCatalog, error) <span class="cov0" title="0">{
+        // First get the version
+        version, err := d.GetVersionByNumber(ctx, versionNumber)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Then get the language
+        <span class="cov0" title="0">lang, err := d.GetLanguageByCode(ctx, languageCode)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        // Get the catalog for this version and language
+        <span class="cov0" title="0">query := `
+                SELECT id, language_id, category, catalog_data::TEXT, version, checksum,
+                       created_at, modified_at
+                FROM localization_catalogs
+                WHERE language_id = $1 AND version_id = $2
+                ORDER BY version DESC
+                LIMIT 1
+        `
+
+        var catalog models.LocalizationCatalog
+        err = d.db.QueryRowContext(ctx, query, lang.ID, version.ID).Scan(
+                &amp;catalog.ID,
+                &amp;catalog.LanguageID,
+                &amp;catalog.Category,
+                &amp;catalog.CatalogData,
+                &amp;catalog.Version,
+                &amp;catalog.Checksum,
+                &amp;catalog.CreatedAt,
+                &amp;catalog.ModifiedAt,
+        )
+
+        if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("catalog not found for version %s and language %s", versionNumber, languageCode)
+        }</span>
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get catalog by version: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return &amp;catalog, nil</span>
 }
 </pre>
 		

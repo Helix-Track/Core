@@ -29,6 +29,8 @@ type MockDatabase struct {
 	localizationKeys map[string]*models.LocalizationKey
 	localizations    map[string]*models.Localization
 	catalogs         map[string]*models.LocalizationCatalog
+	shouldReturnError bool
+	errorToReturn    error
 }
 
 func NewMockDatabase() *MockDatabase {
@@ -164,6 +166,9 @@ func (m *MockDatabase) GetLanguages(ctx context.Context, activeOnly bool) ([]*mo
 }
 
 func (m *MockDatabase) GetLocalizationKeyByKey(ctx context.Context, key string) (*models.LocalizationKey, error) {
+	if m.shouldReturnError {
+		return nil, m.errorToReturn
+	}
 	for _, locKey := range m.localizationKeys {
 		if locKey.Key == key {
 			return locKey, nil
@@ -205,6 +210,9 @@ func (m *MockDatabase) DeleteLanguage(ctx context.Context, id string) error {
 }
 
 func (m *MockDatabase) CreateLocalizationKey(ctx context.Context, key *models.LocalizationKey) error {
+	if m.shouldReturnError {
+		return m.errorToReturn
+	}
 	m.localizationKeys[key.ID] = key
 	return nil
 }
@@ -334,12 +342,18 @@ func (m *MockDatabase) CountVersions(ctx context.Context) (int, error) {
 
 // CreateVersion creates a new version (mock implementation)
 func (m *MockDatabase) CreateVersion(ctx context.Context, version *models.LocalizationVersion) error {
+	if m.shouldReturnError {
+		return m.errorToReturn
+	}
 	// Mock implementation - just return success for testing
 	return nil
 }
 
 // DeleteVersion deletes a version (mock implementation)
 func (m *MockDatabase) DeleteVersion(ctx context.Context, id string) error {
+	if m.shouldReturnError {
+		return m.errorToReturn
+	}
 	// Mock implementation - just return success for testing
 	return nil
 }
@@ -429,6 +443,18 @@ func (m *MockDatabase) ListVersions(ctx context.Context, limit, offset int) ([]*
 		},
 	}
 	return versions, nil
+}
+
+// SetError sets the mock database to return an error
+func (m *MockDatabase) SetError(err error) {
+	m.shouldReturnError = true
+	m.errorToReturn = err
+}
+
+// ClearError clears the mock database error state
+func (m *MockDatabase) ClearError() {
+	m.shouldReturnError = false
+	m.errorToReturn = nil
 }
 
 var _ database.Database = (*MockDatabase)(nil)

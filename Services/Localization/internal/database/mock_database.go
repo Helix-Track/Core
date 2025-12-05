@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/helixtrack/localization-service/internal/models"
@@ -11,13 +11,18 @@ import (
 
 // MockDatabase implements Database interface for testing
 type MockDatabase struct {
-	mu                sync.RWMutex
-	languages         map[string]*models.Language
-	localizationKeys  map[string]*models.LocalizationKey
-	localizations     map[string]*models.Localization
-	catalogs          map[string]*models.LocalizationCatalog
-	shouldReturnError bool
-	errorToReturn     error
+	mu                     sync.RWMutex
+	languages              map[string]*models.Language
+	localizationKeys       map[string]*models.LocalizationKey
+	localizations          map[string]*models.Localization
+	catalogs               map[string]*models.LocalizationCatalog
+	versions               map[string]*models.LocalizationVersion
+	shouldReturnError      bool
+	errorToReturn          error
+	// Separate error flag for CreateCatalog to test BuildCatalog error path
+	shouldFailCreateCatalog bool
+	// Flag to simulate json.Marshal error in BuildCatalog
+	shouldFailMarshalCatalog bool
 }
 
 // NewMockDatabase creates a new mock database for testing
@@ -27,6 +32,7 @@ func NewMockDatabase() *MockDatabase {
 		localizationKeys: make(map[string]*models.LocalizationKey),
 		localizations:    make(map[string]*models.Localization),
 		catalogs:         make(map[string]*models.LocalizationCatalog),
+		versions:         make(map[string]*models.LocalizationVersion),
 	}
 }
 
@@ -44,6 +50,41 @@ func (m *MockDatabase) ClearError() {
 	defer m.mu.Unlock()
 	m.shouldReturnError = false
 	m.errorToReturn = nil
+}
+
+// SetCreateCatalogError configures the mock to return an error specifically for CreateCatalog
+func (m *MockDatabase) SetCreateCatalogError(err error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.shouldFailCreateCatalog = true
+}
+
+// ClearCreateCatalogError clears the CreateCatalog error condition
+func (m *MockDatabase) ClearCreateCatalogError() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.shouldFailCreateCatalog = false
+}
+
+// SetMarshalCatalogError configures the mock to simulate a json.Marshal error in BuildCatalog
+func (m *MockDatabase) SetMarshalCatalogError() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.shouldFailMarshalCatalog = true
+}
+
+// ClearMarshalCatalogError clears the marshal catalog error condition
+func (m *MockDatabase) ClearMarshalCatalogError() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.shouldFailMarshalCatalog = false
+}
+
+// SetVersionsNil sets the versions map to nil (for testing purposes)
+func (m *MockDatabase) SetVersionsNil() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.versions = nil
 }
 
 // Ping implementation
@@ -440,6 +481,9 @@ func (m *MockDatabase) CreateCatalog(ctx context.Context, catalog *models.Locali
 	if m.shouldReturnError {
 		return m.errorToReturn
 	}
+	if m.shouldFailCreateCatalog {
+		return fmt.Errorf("mock create catalog error")
+	}
 	
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -541,6 +585,11 @@ func (m *MockDatabase) BuildCatalog(ctx context.Context, languageID string, cate
 	}
 	m.mu.RUnlock()
 	
+	// Check if we should simulate a marshal error
+	if m.shouldFailMarshalCatalog {
+		return nil, fmt.Errorf("simulated json.Marshal error")
+	}
+	
 	// Marshal to JSON
 	catalogJSON, err := json.Marshal(catalogMap)
 	if err != nil {
@@ -564,21 +613,225 @@ func (m *MockDatabase) BuildCatalog(ctx context.Context, languageID string, cate
 	return catalog, nil
 }
 
-// Version operations (not implemented in mock)
-func (m *MockDatabase) CreateLocalizationVersion(ctx context.Context, version *models.LocalizationVersion) error {
-	return errors.New("not implemented in mock")
+// Version operations
+func (m *MockDatabase) CreateVersion(ctx context.Context, version *models.LocalizationVersion) error {
+	if m.shouldReturnError {
+		return m.errorToReturn
+	}
+	
+	if version == nil {
+		return fmt.Errorf("version cannot be nil")
+	}
+	
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	
+	if m.versions == nil {
+		m.versions = make(map[string]*models.LocalizationVersion)
+	}
+	
+	// Set ID and timestamps
+	version.BeforeCreate()
+	
+	m.versions[version.ID] = version
+	return nil
 }
 
-func (m *MockDatabase) GetLocalizationVersions(ctx context.Context, languageID, keyID string) ([]*models.LocalizationVersion, error) {
-	return nil, errors.New("not implemented in mock")
+func (m *MockDatabase) GetVersionByNumber(ctx context.Context, versionNumber string) (*models.LocalizationVersion, error) {
+	if m.shouldReturnError {
+		return nil, m.errorToReturn
+	}
+	
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	
+	for _, version := range m.versions {
+		if version.VersionNumber == versionNumber {
+			return version, nil
+		}
+	}
+	
+	return nil, models.ErrResourceNotFound("version")
 }
 
-func (m *MockDatabase) GetLocalizationVersion(ctx context.Context, id string) (*models.LocalizationVersion, error) {
-	return nil, errors.New("not implemented in mock")
+func (m *MockDatabase) GetVersionByID(ctx context.Context, id string) (*models.LocalizationVersion, error) {
+	if m.shouldReturnError {
+		return nil, m.errorToReturn
+	}
+	
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	
+	version, exists := m.versions[id]
+	if !exists {
+		return nil, models.ErrResourceNotFound("version")
+	}
+	
+	return version, nil
 }
 
-func (m *MockDatabase) DeleteLocalizationVersion(ctx context.Context, id string) error {
-	return errors.New("not implemented in mock")
+func (m *MockDatabase) GetCurrentVersion(ctx context.Context) (*models.LocalizationVersion, error) {
+	if m.shouldReturnError {
+		return nil, m.errorToReturn
+	}
+	
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	
+	if len(m.versions) == 0 {
+		return nil, models.ErrResourceNotFound("version")
+	}
+	
+	// Return the most recently created version
+	var latestVersion *models.LocalizationVersion
+	for _, version := range m.versions {
+		if latestVersion == nil || version.CreatedAt > latestVersion.CreatedAt {
+			latestVersion = version
+		}
+	}
+	
+	return latestVersion, nil
+}
+
+func (m *MockDatabase) ListVersions(ctx context.Context, limit, offset int) ([]*models.LocalizationVersion, error) {
+	if m.shouldReturnError {
+		return nil, m.errorToReturn
+	}
+	
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	
+	var versions []*models.LocalizationVersion
+	for _, version := range m.versions {
+		versions = append(versions, version)
+	}
+	
+	// Sort versions by CreatedAt to ensure consistent ordering
+	for i := 0; i < len(versions); i++ {
+		for j := i + 1; j < len(versions); j++ {
+			if versions[i].CreatedAt > versions[j].CreatedAt {
+				versions[i], versions[j] = versions[j], versions[i]
+			}
+		}
+	}
+	
+	// Apply pagination
+	if offset >= len(versions) {
+		return []*models.LocalizationVersion{}, nil
+	}
+	
+	end := offset + limit
+	if end > len(versions) {
+		end = len(versions)
+	}
+	
+	return versions[offset:end], nil
+}
+
+func (m *MockDatabase) CountVersions(ctx context.Context) (int, error) {
+	if m.shouldReturnError {
+		return 0, m.errorToReturn
+	}
+	
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	
+	return len(m.versions), nil
+}
+
+func (m *MockDatabase) DeleteVersion(ctx context.Context, id string) error {
+	if m.shouldReturnError {
+		return m.errorToReturn
+	}
+	
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	
+	if _, exists := m.versions[id]; !exists {
+		return models.ErrResourceNotFound("version")
+	}
+	
+	delete(m.versions, id)
+	return nil
+}
+
+func (m *MockDatabase) GetCatalogByVersion(ctx context.Context, versionNumber, languageCode string) (*models.LocalizationCatalog, error) {
+	if m.shouldReturnError {
+		return nil, m.errorToReturn
+	}
+	
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	
+	// Find version
+	var targetVersion *models.LocalizationVersion
+	for _, version := range m.versions {
+		if version.VersionNumber == versionNumber {
+			targetVersion = version
+			break
+		}
+	}
+	
+	if targetVersion == nil {
+		return nil, models.ErrResourceNotFound("version")
+	}
+	
+	// Find language
+	var targetLang *models.Language
+	for _, lang := range m.languages {
+		if lang.Code == languageCode {
+			targetLang = lang
+			break
+		}
+	}
+	
+	if targetLang == nil {
+		return nil, models.ErrResourceNotFound("language")
+	}
+	
+	// Return a mock catalog
+	catalogData, _ := json.Marshal(map[string]interface{}{
+		"version": targetVersion.VersionNumber,
+		"language": languageCode,
+	})
+	
+	catalog := &models.LocalizationCatalog{
+		ID:         "catalog-" + targetVersion.ID + "-" + targetLang.ID,
+		LanguageID: targetLang.ID,
+		Version:    int(targetVersion.TotalLocalizations),
+		CatalogData: catalogData,
+	}
+	
+	return catalog, nil
+}
+
+// Audit operations
+func (m *MockDatabase) CreateAuditLog(ctx context.Context, action, entityType, entityID, username string, changes interface{}, ipAddress, userAgent string) error {
+	if m.shouldReturnError {
+		return m.errorToReturn
+	}
+	
+	// For mock implementation, just return success since we don't need to store audit logs
+	return nil
+}
+
+// GetStats retrieves database statistics
+func (m *MockDatabase) GetStats(ctx context.Context) (map[string]interface{}, error) {
+	if m.shouldReturnError {
+		return nil, m.errorToReturn
+	}
+	
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	
+	stats := make(map[string]interface{})
+	stats["total_languages"] = len(m.languages)
+	stats["total_keys"] = len(m.localizationKeys)
+	stats["total_localizations"] = len(m.localizations)
+	stats["total_catalogs"] = len(m.catalogs)
+	stats["total_versions"] = len(m.versions)
+	
+	return stats, nil
 }
 
 // Health check implementation

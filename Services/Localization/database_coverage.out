@@ -377,7 +377,7 @@ github.com/helixtrack/localization-service/internal/database/mock_database.go:57
 github.com/helixtrack/localization-service/internal/database/mock_database.go:579.60,580.51 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:580.51,582.6 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:586.2,589.32 2 1
-github.com/helixtrack/localization-service/internal/database/mock_database.go:589.32,591.3 1 0
+github.com/helixtrack/localization-service/internal/database/mock_database.go:589.32,591.3 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:594.2,595.16 2 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:595.16,597.3 1 0
 github.com/helixtrack/localization-service/internal/database/mock_database.go:600.2,609.54 3 1
@@ -416,7 +416,7 @@ github.com/helixtrack/localization-service/internal/database/mock_database.go:70
 github.com/helixtrack/localization-service/internal/database/mock_database.go:710.2,710.37 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:710.37,711.42 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:711.42,712.53 1 1
-github.com/helixtrack/localization-service/internal/database/mock_database.go:712.53,714.5 1 0
+github.com/helixtrack/localization-service/internal/database/mock_database.go:712.53,714.5 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:719.2,719.29 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:719.29,721.3 1 1
 github.com/helixtrack/localization-service/internal/database/mock_database.go:723.2,724.25 2 1

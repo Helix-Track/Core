@@ -50,6 +50,9 @@ func (v *LocalizationVersion) BeforeCreate() {
 	if v.CreatedAt == 0 {
 		v.CreatedAt = now
 	}
+	if v.ID == "" {
+		v.ID = GenerateUUID()
+	}
 }
 
 // Validate validates a LocalizationVersion

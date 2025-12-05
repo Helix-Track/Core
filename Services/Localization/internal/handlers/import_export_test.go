@@ -169,6 +169,26 @@ func TestHandleExport_Unit(t *testing.T) {
 
 		assert.Equal(t, http.StatusForbidden, w.Code)
 	})
+
+	t.Run("export with XLIFF format", func(t *testing.T) {
+		c, w := setupTestContext()
+		c.Request = httptest.NewRequest("GET", "/admin/export?languages=en&format=xliff", nil)
+		c.Set("user_role", "admin")
+		claims := &models.JWTClaims{Username: "adminuser", Role: "admin"}
+		c.Set("claims", claims)
+
+		handler.HandleExport(c)
+
+		// Should return 200 (success)
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		// Should have content-type header
+		assert.Contains(t, w.Header().Get("Content-Type"), "application/xml")
+		
+		// Check response contains XLIFF content
+		assert.Contains(t, w.Body.String(), `<?xml version="1.0" encoding="UTF-8"?>`)
+		assert.Contains(t, w.Body.String(), `<xliff version="1.2"`)
+	})
 }
 
 // TestHandleBatchLocalizations_Unit tests batch localizations handler
@@ -338,5 +358,55 @@ func TestHandleBatchLocalizations_Unit(t *testing.T) {
 
 		// Should return 400 for invalid JSON
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("batch delete localizations", func(t *testing.T) {
+		// Set up a localization to delete
+		locKey := &models.LocalizationKey{
+			ID:       "key-1",
+			Key:      "ui.button.save",
+			Category: "ui",
+		}
+		db.localizationKeys["key-1"] = locKey
+
+		loc := &models.Localization{
+			ID:         "test-loc-id",
+			KeyID:      "key-1",
+			LanguageID: "lang-en",
+			Value:      "Save",
+		}
+		// Store with key format "keyID:languageID" as expected by mock
+		db.localizations["key-1:lang-en"] = loc
+
+		batchReq := models.BatchLocalizationRequest{
+			Operation: "delete",
+			Localizations: []models.BatchLocalizationItem{
+				{
+					Key:          "ui.button.save",
+					LanguageCode: "en",
+				},
+			},
+		}
+		body, _ := json.Marshal(batchReq)
+
+		c, w := setupTestContext()
+		c.Request = httptest.NewRequest("POST", "/admin/localizations/batch", bytes.NewBuffer(body))
+		c.Request.Header.Set("Content-Type", "application/json")
+		c.Set("user_role", "admin")
+		claims := &models.JWTClaims{Username: "adminuser", Role: "admin"}
+		c.Set("claims", claims)
+
+		handler.HandleBatchLocalizations(c)
+
+		// Should return 200 (success)
+		assert.Equal(t, http.StatusOK, w.Code)
+		
+		// Check response structure
+		var response models.BatchLocalizationResponse
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, 1, response.Summary.Successful)
+		assert.Equal(t, 0, response.Summary.Failed)
 	})
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -195,6 +196,41 @@ func TestCreateLocalization_Unit(t *testing.T) {
 		handler.CreateLocalization(c)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("create localization with database error when creating key", func(t *testing.T) {
+		// Create test language
+		lang := &models.Language{
+			ID:   "test-lang-id",
+			Code:  "en",
+			Name:  "English",
+		}
+		db.languages["en"] = lang
+
+		// Set database to return error when creating localization key
+		db.SetError(fmt.Errorf("database error"))
+		defer db.ClearError()
+
+		locData := models.CreateLocalizationRequest{
+			Key:       "ui.button.save",
+			Language:  "en",
+			Value:     "Save",
+			Category:  "ui",
+			Approved:  true,
+		}
+		body, _ := json.Marshal(locData)
+
+		c, w := setupTestContext()
+		c.Request = httptest.NewRequest("POST", "/localizations", bytes.NewBuffer(body))
+		c.Request.Header.Set("Content-Type", "application/json")
+		c.Set("user_role", "admin")
+		// Set claims with the correct key that middleware expects
+		claims := &models.JWTClaims{Username: "adminuser", Role: "admin"}
+		c.Set("claims", claims)
+
+		handler.CreateLocalization(c)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
 }
 
