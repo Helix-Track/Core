@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -244,12 +245,22 @@ func (h *Handler) handleModifyComment(c *gin.Context, req *models.Request) {
 	}
 	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
 
+	// Marshal oldData and newData to JSON for database storage
+	oldDataJSON, err := json.Marshal(oldData)
+	if err != nil {
+		logger.Error("Failed to marshal comment old data", zap.Error(err))
+	}
+	newDataJSON, err := json.Marshal(newData)
+	if err != nil {
+		logger.Error("Failed to marshal comment new data", zap.Error(err))
+	}
+
 	historyID := uuid.New().String()
 	_, err = h.db.Exec(context.Background(), `
 		INSERT INTO comment_history (id, comment_id, version, action, user_id, timestamp, old_data, new_data, change_summary)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`, historyID, commentID, newVersion, models.ActionModify, username, time.Now().Unix(),
-		oldData, newData, changeSummary)
+		oldDataJSON, newDataJSON, changeSummary)
 
 	if err != nil {
 		logger.Error("Failed to record comment history", zap.Error(err))

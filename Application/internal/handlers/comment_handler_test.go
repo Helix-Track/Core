@@ -236,7 +236,13 @@ func TestCommentHandler_Modify_Success(t *testing.T) {
 
 	var createResp models.Response
 	json.NewDecoder(wCreate.Body).Decode(&createResp)
-	commentID := createResp.Data["comment"].(map[string]interface{})["id"].(string)
+	t.Logf("Create response: %+v", createResp)
+	assert.Equal(t, models.ErrorCodeNoError, createResp.ErrorCode, "Comment creation should succeed")
+	commentData := createResp.Data["comment"]
+	assert.NotNil(t, commentData, "Comment data should not be nil")
+	commentMap := commentData.(map[string]interface{})
+	commentID := commentMap["id"].(string)
+	t.Logf("Created comment ID: %s", commentID)
 
 	// Modify comment
 	modifyReq := models.Request{
@@ -259,12 +265,17 @@ func TestCommentHandler_Modify_Success(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, wModify.Code)
 
+	var err error
 	var modifyResp models.Response
-	err := json.NewDecoder(wModify.Body).Decode(&modifyResp)
+	err = json.NewDecoder(wModify.Body).Decode(&modifyResp)
+	t.Logf("Modify response: %+v", modifyResp)
+	t.Logf("Modify response data: %+v", modifyResp.Data)
 	require.NoError(t, err)
-	assert.Equal(t, models.ErrorCodeNoError, modifyResp.ErrorCode)
+	assert.Equal(t, models.ErrorCodeNoError, modifyResp.ErrorCode, "Modify should succeed")
 
-	modifiedComment := modifyResp.Data["comment"].(map[string]interface{})
+	commentData = modifyResp.Data["comment"]
+	assert.NotNil(t, commentData, "Comment data should not be nil")
+	modifiedComment := commentData.(map[string]interface{})
 	assert.Equal(t, commentID, modifiedComment["id"])
 	assert.True(t, modifiedComment["updated"].(bool))
 

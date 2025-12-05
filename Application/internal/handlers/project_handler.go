@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -258,12 +259,22 @@ func (h *Handler) handleModifyProject(c *gin.Context, req *models.Request) {
 	}
 	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
 
+	// Marshal oldData and newData to JSON for database storage
+	oldDataJSON, err := json.Marshal(oldData)
+	if err != nil {
+		logger.Error("Failed to marshal project old data", zap.Error(err))
+	}
+	newDataJSON, err := json.Marshal(newData)
+	if err != nil {
+		logger.Error("Failed to marshal project new data", zap.Error(err))
+	}
+
 	historyID := uuid.New().String()
 	_, err = h.db.Exec(context.Background(), `
 		INSERT INTO project_history (id, project_id, version, action, user_id, timestamp, old_data, new_data, change_summary)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`, historyID, projectID, newVersion, models.ActionModify, username, time.Now().Unix(),
-		oldData, newData, changeSummary)
+		oldDataJSON, newDataJSON, changeSummary)
 
 	if err != nil {
 		logger.Error("Failed to record project history", zap.Error(err))

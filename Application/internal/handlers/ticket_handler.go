@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -149,10 +150,16 @@ func (h *Handler) handleCreateTicket(c *gin.Context, req *models.Request) {
 		"version":       1,
 	}
 
+	// Marshal newData to JSON for database storage
+	newDataJSON, err := json.Marshal(newData)
+	if err != nil {
+		logger.Error("Failed to marshal ticket history data", zap.Error(err))
+	}
+
 	_, err = h.db.Exec(context.Background(), `
 		INSERT INTO ticket_history (id, ticket_id, version, action, user_id, timestamp, new_data, change_summary)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-	`, historyID, ticketID, 1, models.ActionCreate, username, now, newData, "Ticket created")
+	`, historyID, ticketID, 1, models.ActionCreate, username, now, newDataJSON, "Ticket created")
 
 	if err != nil {
 		logger.Error("Failed to record ticket creation history", zap.Error(err))
