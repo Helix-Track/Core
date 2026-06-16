@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -238,6 +239,9 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 	// Get current ticket data for history
 	var currentTicket models.Ticket
 	var currentStatusTitle string
+	// user_id is nullable (an unassigned ticket has NULL), so scan into a
+	// NullString to avoid "converting NULL to string is unsupported" errors.
+	var currentUserID sql.NullString
 	err := h.db.QueryRow(context.Background(), `
 		SELECT t.id, t.ticket_number, t.title, t.description, t.ticket_type_id, t.ticket_status_id,
 		       t.project_id, t.user_id, t.creator, t.estimation, t.story_points, t.created,
@@ -248,10 +252,11 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 	`, ticketID).Scan(
 		&currentTicket.ID, &currentTicket.TicketNumber, &currentTicket.Title,
 		&currentTicket.Description, &currentTicket.TicketTypeID, &currentTicket.TicketStatusID,
-		&currentTicket.ProjectID, &currentTicket.UserID, &currentTicket.Creator,
+		&currentTicket.ProjectID, &currentUserID, &currentTicket.Creator,
 		&currentTicket.Estimation, &currentTicket.StoryPoints, &currentTicket.Created,
 		&currentTicket.Modified, &currentTicket.Deleted, &currentTicket.Version, &currentStatusTitle,
 	)
+	currentTicket.UserID = currentUserID.String
 	if err != nil {
 		c.JSON(http.StatusNotFound, models.NewErrorResponse(
 			models.ErrorCodeEntityNotFound,
@@ -378,28 +383,47 @@ func (h *Handler) handleModifyTicket(c *gin.Context, req *models.Request) {
 	historyID := uuid.New().String()
 	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
 
+	// old_data / new_data are TEXT columns, so the snapshots must be serialised
+	// to JSON before being passed as query arguments (a raw map is not a valid
+	// SQL argument and would otherwise be silently dropped).
+	oldDataJSON, err := json.Marshal(oldData)
+	if err != nil {
+		logger.Error("Failed to marshal ticket history old data", zap.Error(err))
+	}
+	newDataJSON, err := json.Marshal(newData)
+	if err != nil {
+		logger.Error("Failed to marshal ticket history new data", zap.Error(err))
+	}
+
 	_, err = h.db.Exec(context.Background(), `
 		INSERT INTO ticket_history (id, ticket_id, version, action, user_id, timestamp, old_data, new_data, change_summary)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`, historyID, ticketID, newVersion, models.ActionModify, username, time.Now().Unix(),
-		oldData, newData, changeSummary)
+		oldDataJSON, newDataJSON, changeSummary)
 
 	if err != nil {
 		logger.Error("Failed to record ticket history", zap.Error(err))
 		// Don't fail the request for history recording errors
 	}
 
-	// Publish ticket updated event
+	// Publish ticket updated event. Use a flat payload (matching the create
+	// event shape) so consumers can read fields like id/title/status directly.
+	eventData := map[string]interface{}{
+		"id":          ticketID,
+		"new_version": newVersion,
+		"old_version": currentTicket.Version,
+	}
+	for _, field := range []string{"title", "description", "status"} {
+		if v, ok := ticketData[field]; ok {
+			eventData[field] = v
+		}
+	}
 	h.publisher.PublishEntityEvent(
 		models.ActionModify,
 		"ticket",
 		ticketID,
 		username,
-		map[string]interface{}{
-			"ticket_data": ticketData,
-			"new_version": newVersion,
-			"old_version": currentTicket.Version,
-		},
+		eventData,
 		websocket.NewProjectContext(currentTicket.ProjectID, []string{"READ"}),
 	)
 

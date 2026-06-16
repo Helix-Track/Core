@@ -9,7 +9,7 @@ import (
 
 // TestNewRoleEvaluator tests role evaluator creation
 func TestNewRoleEvaluator(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	evaluator := NewRoleEvaluator(mockDB)
 
 	assert.NotNil(t, evaluator)
@@ -18,7 +18,7 @@ func TestNewRoleEvaluator(t *testing.T) {
 
 // TestActionToPermission tests action to permission level mapping
 func TestRoleActionToPermission(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	evaluator := NewRoleEvaluator(mockDB)
 
 	// Test that evaluator exists and can be used
@@ -28,7 +28,7 @@ func TestRoleActionToPermission(t *testing.T) {
 
 // TestRolePermissionLevel tests role permission level mapping
 func TestRolePermissionLevel(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	evaluator := NewRoleEvaluator(mockDB)
 
 	// Test that evaluator exists
@@ -38,7 +38,7 @@ func TestRolePermissionLevel(t *testing.T) {
 
 // TestGetRolePermissions tests getting permissions for a role
 func TestGetRolePermissions(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	evaluator := NewRoleEvaluator(mockDB)
 
 	// Test that evaluator exists
@@ -48,7 +48,7 @@ func TestGetRolePermissions(t *testing.T) {
 
 // Benchmark tests
 func BenchmarkRoleEvaluatorCheckProjectAccess(b *testing.B) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	evaluator := NewRoleEvaluator(mockDB)
 	ctx := context.Background()
 

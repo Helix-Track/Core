@@ -10,7 +10,7 @@ import (
 
 // TestNewPermissionResolver tests resolver creation
 func TestNewPermissionResolver(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	assert.NotNil(t, resolver)
@@ -19,7 +19,7 @@ func TestNewPermissionResolver(t *testing.T) {
 
 // TestActionToPermission tests action to permission level mapping
 func TestActionToPermission(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	tests := []struct {
@@ -45,7 +45,7 @@ func TestActionToPermission(t *testing.T) {
 
 // TestHasPermission_DirectGrant tests direct permission grants
 func TestHasPermission_DirectGrant(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	ctx := context.Background()
@@ -59,7 +59,14 @@ func TestHasPermission_DirectGrant(t *testing.T) {
 
 // TestHasPermission_CreatePermission tests CREATE permission requirement
 func TestHasPermission_CreatePermission(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
+
+	// CREATE is not granted directly, so the resolver falls through to the
+	// team- and role-based checks, both of which query the database. Return
+	// empty result sets so those paths resolve to "no grant" cleanly.
+	mockRows := &MockRows{rows: [][]interface{}{}}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
 	resolver := NewPermissionResolver(mockDB)
 
 	ctx := context.Background()
@@ -74,7 +81,7 @@ func TestHasPermission_CreatePermission(t *testing.T) {
 
 // TestGetUserTeams tests retrieving user's teams
 func TestGetUserTeams_NoTeams(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock empty result
 	mockRows := &MockRows{rows: [][]interface{}{}}
@@ -91,7 +98,7 @@ func TestGetUserTeams_NoTeams(t *testing.T) {
 
 // TestGetUserTeams_WithTeams tests retrieving user's teams with data
 func TestGetUserTeams_WithTeams(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock result with teams
 	mockRows := &MockRows{
@@ -117,7 +124,14 @@ func TestGetUserTeams_WithTeams(t *testing.T) {
 
 // TestGetEffectivePermissions tests getting all permissions for a user
 func TestGetEffectivePermissions(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
+
+	// GetEffectivePermissions probes every action; the non-READ ones fall
+	// through to team/role checks that query the database. Return empty
+	// result sets so those checks resolve to "no grant" cleanly.
+	mockRows := &MockRows{rows: [][]interface{}{}}
+	mockDB.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
 	resolver := NewPermissionResolver(mockDB)
 
 	ctx := context.Background()
@@ -133,7 +147,7 @@ func TestGetEffectivePermissions(t *testing.T) {
 
 // TestRoleGrantsPermission tests role permission mapping
 func TestRoleGrantsPermission(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	tests := []struct {
@@ -163,7 +177,7 @@ func TestRoleGrantsPermission(t *testing.T) {
 
 // TestCheckDirectPermission tests direct permission checking
 func TestCheckDirectPermission_ReadPermission(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	ctx := context.Background()
@@ -177,7 +191,7 @@ func TestCheckDirectPermission_ReadPermission(t *testing.T) {
 
 // TestCheckDirectPermission_WritePermission tests write permission
 func TestCheckDirectPermission_WritePermission(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	ctx := context.Background()
@@ -191,7 +205,7 @@ func TestCheckDirectPermission_WritePermission(t *testing.T) {
 
 // TestCheckTeamPermission tests team-based permissions
 func TestCheckTeamPermission_NoTeams(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock no teams
 	mockRows := &MockRows{rows: [][]interface{}{}}
@@ -208,7 +222,7 @@ func TestCheckTeamPermission_NoTeams(t *testing.T) {
 
 // TestCheckTeamPermission_WithTeams tests team-based permissions with teams
 func TestCheckTeamPermission_WithTeams(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock user has teams
 	mockRows := &MockRows{
@@ -230,7 +244,7 @@ func TestCheckTeamPermission_WithTeams(t *testing.T) {
 
 // TestCheckTeamPermission_DeletePermission tests DELETE permission denial
 func TestCheckTeamPermission_DeletePermission(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock user has teams
 	mockRows := &MockRows{
@@ -252,7 +266,7 @@ func TestCheckTeamPermission_DeletePermission(t *testing.T) {
 
 // TestCheckRolePermission tests role-based permissions
 func TestCheckRolePermission_NoRoles(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock no roles
 	mockRows := &MockRows{rows: [][]interface{}{}}
@@ -269,7 +283,7 @@ func TestCheckRolePermission_NoRoles(t *testing.T) {
 
 // TestCheckRolePermission_WithDeveloperRole tests developer role permissions
 func TestCheckRolePermission_WithDeveloperRole(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock developer role
 	mockRows := &MockRows{
@@ -291,7 +305,7 @@ func TestCheckRolePermission_WithDeveloperRole(t *testing.T) {
 
 // TestCheckRolePermission_WithAdminRole tests admin role permissions
 func TestCheckRolePermission_WithAdminRole(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock admin role
 	mockRows := &MockRows{
@@ -313,7 +327,7 @@ func TestCheckRolePermission_WithAdminRole(t *testing.T) {
 
 // TestPermissionHierarchy tests permission level hierarchy
 func TestPermissionHierarchy(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	// Test that higher roles grant lower permissions
@@ -379,7 +393,7 @@ func TestPermissionHierarchy(t *testing.T) {
 
 // Benchmark tests
 func BenchmarkActionToPermission(b *testing.B) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	b.ResetTimer()
@@ -389,7 +403,7 @@ func BenchmarkActionToPermission(b *testing.B) {
 }
 
 func BenchmarkRoleGrantsPermission(b *testing.B) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	resolver := NewPermissionResolver(mockDB)
 
 	b.ResetTimer()

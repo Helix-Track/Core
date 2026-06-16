@@ -73,19 +73,9 @@ func (h *Handler) handleWorkLogAdd(c *gin.Context, req *models.Request) {
 		workDate = float64(time.Now().Unix())
 	}
 
-	// Get actual user ID from database using username
-	var userID string
-	userQuery := `SELECT id FROM users WHERE username = ? AND deleted = 0`
-	err = h.db.QueryRow(c.Request.Context(), userQuery, username).Scan(&userID)
-	if err != nil {
-		logger.Error("Failed to get user ID", zap.Error(err), zap.String("username", username))
-		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
-			models.ErrorCodeInternalError,
-			"Failed to resolve user ID",
-			"",
-		))
-		return
-	}
+	// Work logs are keyed by username (consistent with handleWorkLogByUser,
+	// which also treats user_id as the username).
+	userID := username
 
 	// Check if ticket exists
 	checkQuery := `SELECT COUNT(*) FROM ticket WHERE id = ? AND deleted = 0`

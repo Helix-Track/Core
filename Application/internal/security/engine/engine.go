@@ -79,17 +79,21 @@ func NewSecurityEngine(db database.Database, config Config) *SecurityEngine {
 		config: config,
 	}
 
+	// Adapt the concrete database into the engine's Querier abstraction so all
+	// row-consuming components depend on interfaces rather than *sql.Rows.
+	querier := newQuerier(db)
+
 	// Initialize components
-	engine.permissionResolver = NewPermissionResolver(db)
-	engine.roleEvaluator = NewRoleEvaluator(db)
-	engine.securityChecker = NewSecurityLevelChecker(db)
+	engine.permissionResolver = NewPermissionResolver(querier)
+	engine.roleEvaluator = NewRoleEvaluator(querier)
+	engine.securityChecker = NewSecurityLevelChecker(querier)
 
 	if config.EnableCaching {
 		engine.cache = NewPermissionCache(config.CacheMaxSize, config.CacheTTL)
 	}
 
 	if config.EnableAuditing {
-		engine.auditLogger = NewAuditLogger(db, config.AuditRetention)
+		engine.auditLogger = NewAuditLogger(querier, config.AuditRetention)
 	}
 
 	return engine

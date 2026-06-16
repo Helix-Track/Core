@@ -5,17 +5,16 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
-	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/logger"
 )
 
 // SecurityLevelChecker validates access based on security levels
 type SecurityLevelChecker struct {
-	db database.Database
+	db Querier
 }
 
 // NewSecurityLevelChecker creates a new security level checker
-func NewSecurityLevelChecker(db database.Database) *SecurityLevelChecker {
+func NewSecurityLevelChecker(db Querier) *SecurityLevelChecker {
 	return &SecurityLevelChecker{db: db}
 }
 

@@ -66,6 +66,42 @@ func (m *MockDatabase) GetType() string {
 	return mockArgs.String(0)
 }
 
+// MockQuerier is a mock implementation of the engine's Querier interface.
+// Unlike MockDatabase (which mirrors database.Database and returns concrete
+// *sql.Rows / *sql.Row), MockQuerier returns the Rows / Row interfaces, so
+// fake row iterators such as *MockRows / *MockRowScanner can be injected
+// without any concrete type assertion.
+type MockQuerier struct {
+	mock.Mock
+}
+
+func (m *MockQuerier) Query(ctx context.Context, query string, args ...interface{}) (Rows, error) {
+	mockArgs := m.Called(ctx, query, args)
+	result := mockArgs.Get(0)
+	if result == nil {
+		return nil, mockArgs.Error(1)
+	}
+	return result.(Rows), mockArgs.Error(1)
+}
+
+func (m *MockQuerier) QueryRow(ctx context.Context, query string, args ...interface{}) Row {
+	mockArgs := m.Called(ctx, query, args)
+	result := mockArgs.Get(0)
+	if result == nil {
+		return nil
+	}
+	return result.(Row)
+}
+
+func (m *MockQuerier) Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+	mockArgs := m.Called(ctx, query, args)
+	result := mockArgs.Get(0)
+	if result == nil {
+		return nil, mockArgs.Error(1)
+	}
+	return result.(sql.Result), mockArgs.Error(1)
+}
+
 // TestNewSecurityEngine tests the creation of a new security engine
 func TestNewSecurityEngine(t *testing.T) {
 	mockDB := new(MockDatabase)

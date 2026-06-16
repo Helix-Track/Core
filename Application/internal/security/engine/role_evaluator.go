@@ -5,17 +5,16 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
-	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/logger"
 )
 
 // RoleEvaluator evaluates role-based permissions
 type RoleEvaluator struct {
-	db database.Database
+	db Querier
 }
 
 // NewRoleEvaluator creates a new role evaluator
-func NewRoleEvaluator(db database.Database) *RoleEvaluator {
+func NewRoleEvaluator(db Querier) *RoleEvaluator {
 	return &RoleEvaluator{db: db}
 }
 

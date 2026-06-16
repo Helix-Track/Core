@@ -102,6 +102,10 @@ func (h *Handler) handleDocumentCreate(c *gin.Context, req *models.Request) {
 		doc.Position = int(position)
 	}
 
+	// Populate created/modified timestamps before persisting (the model's
+	// Validate() rejects zero timestamps).
+	doc.SetTimestamps()
+
 	// Insert into database using database interface
 	db, ok := h.db.(interface {
 		CreateDocument(*models.Document) error
@@ -139,6 +143,7 @@ func (h *Handler) handleDocumentCreate(c *gin.Context, req *models.Request) {
 		if contentType, ok := req.Data["content_type"].(string); ok && contentType != "" {
 			docContent.ContentType = contentType
 		}
+		docContent.SetTimestamps()
 
 		// Insert content
 		dbContent, ok := h.db.(interface {
@@ -1072,6 +1077,7 @@ func (h *Handler) handleDocumentContentUpdate(c *gin.Context, req *models.Reques
 	if contentType, ok := req.Data["content_type"].(string); ok && contentType != "" {
 		docContent.ContentType = contentType
 	}
+	docContent.SetTimestamps()
 
 	dbContent, ok := h.db.(interface {
 		CreateDocumentContent(*models.DocumentContent) error
@@ -1715,17 +1721,8 @@ func (h *Handler) handleDocumentSpaceList(c *gin.Context, req *models.Request) {
 		filters["is_public"] = isPublic
 	}
 
-	limit := 50
-	offset := 0
-	if l, ok := req.Data["limit"].(float64); ok {
-		limit = int(l)
-	}
-	if o, ok := req.Data["offset"].(float64); ok {
-		offset = int(o)
-	}
-
 	db, ok := h.db.(interface {
-		ListDocumentSpaces(filters map[string]interface{}, limit, offset int) ([]*models.DocumentSpace, error)
+		ListDocumentSpaces(filters map[string]interface{}) ([]*models.DocumentSpace, error)
 	})
 	if !ok {
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(
@@ -1736,7 +1733,7 @@ func (h *Handler) handleDocumentSpaceList(c *gin.Context, req *models.Request) {
 		return
 	}
 
-	spaces, err := db.ListDocumentSpaces(filters, limit, offset)
+	spaces, err := db.ListDocumentSpaces(filters)
 	if err != nil {
 		logger.Error("Failed to list document spaces", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, models.NewErrorResponse(

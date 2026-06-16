@@ -9,7 +9,7 @@ import (
 
 // TestNewSecurityLevelChecker tests checker creation
 func TestNewSecurityLevelChecker(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	checker := NewSecurityLevelChecker(mockDB)
 
 	assert.NotNil(t, checker)
@@ -18,7 +18,7 @@ func TestNewSecurityLevelChecker(t *testing.T) {
 
 // TestCheckAccess tests basic access checking
 func TestSecurityLevelCheckAccess(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	checker := NewSecurityLevelChecker(mockDB)
 	ctx := context.Background()
 
@@ -29,7 +29,7 @@ func TestSecurityLevelCheckAccess(t *testing.T) {
 
 // Benchmark tests
 func BenchmarkSecurityLevelCheckAccessSimple(b *testing.B) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	checker := NewSecurityLevelChecker(mockDB)
 	ctx := context.Background()
 

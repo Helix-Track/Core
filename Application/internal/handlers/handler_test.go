@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -31,9 +32,16 @@ func init() {
 	})
 }
 
-// generateTestID generates a unique test ID using current Unix nano timestamp
+// testIDCounter guarantees uniqueness of generated test IDs even when called in
+// rapid succession. time.Now().UnixNano() alone can return identical values for
+// back-to-back calls (clock resolution), which caused colliding primary keys and
+// UNIQUE constraint failures when tests ran in the fast full-package context.
+var testIDCounter uint64
+
+// generateTestID generates a unique test ID using the current Unix nano timestamp
+// combined with a monotonically increasing counter to avoid collisions.
 func generateTestID() string {
-	return fmt.Sprintf("test-%d", time.Now().UnixNano())
+	return fmt.Sprintf("test-%d-%d", time.Now().UnixNano(), atomic.AddUint64(&testIDCounter, 1))
 }
 
 // MockEventPublisher is a mock implementation of websocket.EventPublisher for testing

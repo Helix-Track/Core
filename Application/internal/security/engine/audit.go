@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -12,14 +13,68 @@ import (
 	"helixtrack.ru/core/internal/logger"
 )
 
+// Rows is the minimal row-iteration abstraction consumed by the security
+// engine when reading multiple rows. Both *sql.Rows (production) and test
+// doubles satisfy it, which keeps the row-consuming code testable with mocks
+// instead of forcing a concrete *sql.Rows type assertion.
+type Rows interface {
+	Next() bool
+	Scan(dest ...interface{}) error
+	Close() error
+}
+
+// Row is the minimal single-row abstraction consumed by the security engine.
+// Both *sql.Row (production) and test doubles satisfy it.
+type Row interface {
+	Scan(dest ...interface{}) error
+}
+
+// Querier is the database surface the security engine components depend on.
+// It returns the Rows / Row interfaces (rather than concrete *sql.Rows /
+// *sql.Row), so production code never type-asserts to a concrete driver type
+// and mocks can supply fake row iterators.
+type Querier interface {
+	Query(ctx context.Context, query string, args ...interface{}) (Rows, error)
+	QueryRow(ctx context.Context, query string, args ...interface{}) Row
+	Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
+}
+
+// databaseQuerier adapts a database.Database into a Querier. The concrete
+// *sql.Rows / *sql.Row returned by database.Database satisfy the Rows / Row
+// interfaces, so no information is lost.
+type databaseQuerier struct {
+	db database.Database
+}
+
+func (d databaseQuerier) Query(ctx context.Context, query string, args ...interface{}) (Rows, error) {
+	rows, err := d.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+func (d databaseQuerier) QueryRow(ctx context.Context, query string, args ...interface{}) Row {
+	return d.db.QueryRow(ctx, query, args...)
+}
+
+func (d databaseQuerier) Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+	return d.db.Exec(ctx, query, args...)
+}
+
+// newQuerier wraps a database.Database into a Querier.
+func newQuerier(db database.Database) Querier {
+	return databaseQuerier{db: db}
+}
+
 // AuditLogger logs security-related events to the database
 type AuditLogger struct {
-	db        database.Database
+	db        Querier
 	retention time.Duration
 }
 
 // NewAuditLogger creates a new audit logger
-func NewAuditLogger(db database.Database, retention time.Duration) *AuditLogger {
+func NewAuditLogger(db Querier, retention time.Duration) *AuditLogger {
 	auditor := &AuditLogger{
 		db:        db,
 		retention: retention,

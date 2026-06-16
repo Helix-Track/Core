@@ -437,13 +437,16 @@ func TestIntegration_RealWorldWorkflow(t *testing.T) {
 	assert.Greater(t, stats.EntryCount, 0)
 	assert.Equal(t, 1, stats.ContextCount)
 
-	// Step 4: Simulate cache hits
+	// Step 4: Simulate cache hits. The lookup request must match the request
+	// used in Step 2 exactly (including Context), because the cache key is
+	// derived from all request fields including Context.
 	for _, ticketID := range ticketIDs {
 		req := AccessRequest{
 			Username:   username,
 			Resource:   "ticket",
 			ResourceID: ticketID,
 			Action:     ActionRead,
+			Context:    map[string]string{"project_id": "proj-1"},
 		}
 
 		cached, found := engine.cache.Get(req)

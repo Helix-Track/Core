@@ -5,17 +5,16 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
-	"helixtrack.ru/core/internal/database"
 	"helixtrack.ru/core/internal/logger"
 )
 
 // PermissionResolver resolves user permissions from multiple sources
 type PermissionResolver struct {
-	db database.Database
+	db Querier
 }
 
 // NewPermissionResolver creates a new permission resolver
-func NewPermissionResolver(db database.Database) *PermissionResolver {
+func NewPermissionResolver(db Querier) *PermissionResolver {
 	return &PermissionResolver{db: db}
 }
 

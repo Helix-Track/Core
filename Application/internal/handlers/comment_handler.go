@@ -170,14 +170,19 @@ func (h *Handler) handleModifyComment(c *gin.Context, req *models.Request) {
 		}
 	}
 
-	// Get current comment data for history
+	// Get current comment data for history.
+	// The comment table schema (Definition.V1.sql) only has the columns
+	// id, comment, created, modified, deleted, version - so we must only
+	// select those. Selecting non-existent columns (title, description,
+	// user_id, parent_id) caused a "no such column" error that was being
+	// misreported as "Comment not found".
 	var currentComment models.Comment
+	var currentText string
 	err := h.db.QueryRow(context.Background(), `
-		SELECT id, title, description, user_id, parent_id, created, modified, deleted, version
+		SELECT id, comment, created, modified, deleted, version
 		FROM comment WHERE id = ? AND deleted = 0
 	`, commentID).Scan(
-		&currentComment.ID, &currentComment.Title, &currentComment.Description,
-		&currentComment.UserID, &currentComment.ParentID, &currentComment.Created,
+		&currentComment.ID, &currentText, &currentComment.Created,
 		&currentComment.Modified, &currentComment.Deleted, &currentComment.Version,
 	)
 	if err != nil {
@@ -228,20 +233,14 @@ func (h *Handler) handleModifyComment(c *gin.Context, req *models.Request) {
 
 	// Log comment history
 	oldData := map[string]interface{}{
-		"id":          currentComment.ID,
-		"title":       currentComment.Title,
-		"description": currentComment.Description,
-		"user_id":     currentComment.UserID,
-		"parent_id":   currentComment.ParentID,
-		"version":     currentComment.Version,
+		"id":      currentComment.ID,
+		"comment": currentText,
+		"version": currentComment.Version,
 	}
 	newData := map[string]interface{}{
-		"id":          currentComment.ID,
-		"title":       currentComment.Title,
-		"description": commentText,
-		"user_id":     currentComment.UserID,
-		"parent_id":   currentComment.ParentID,
-		"version":     newVersion,
+		"id":      currentComment.ID,
+		"comment": commentText,
+		"version": newVersion,
 	}
 	changeSummary := models.GenerateChangeSummary(models.ActionModify, oldData, newData)
 

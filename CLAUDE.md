@@ -608,8 +608,8 @@ The application uses JSON configuration files (located in `Configurations/`):
 - ✅ 394 comprehensive unit tests (131% of 300 target)
 - ✅ Complete API documentation (USER_MANUAL.md updated)
 - ✅ Deployment guide (DEPLOYMENT.md updated with 420+ lines)
-- ⚠️ Database implementation has field mismatches (see DOCUMENTS_V2_DATABASE_ISSUES.md)
-- ⏸️ Handler tests blocked by database layer issues
+- ✅ Database field mismatches FIXED (2026-06-17) — 3 latent SQL bugs resolved with regression tests (see DOCUMENTS_V2_DATABASE_ISSUES.md)
+- ✅ Handler tests passing (document/space/page handlers green; whole `internal/handlers` package green)
 - **46 features (102% Confluence parity), 90 actions, 394 model tests**
 
 **Documents Extension Quick Reference:**
@@ -650,9 +650,9 @@ The Documents V2 extension provides Confluence-style document management with 10
 - `Application/DOCUMENTS_V2_DATABASE_ISSUES.md` - Known issues (database field mismatches)
 
 *Known Issues:*
-- Database implementation requires field alignment (8-10 hours estimated)
+- Database field alignment COMPLETED (2026-06-17); 3 latent SQL bugs fixed with regression tests
 - Models are correct and fully tested
-- Handlers implemented but untested (blocked by database)
+- Handlers now tested and passing (document/space/page handler tests green)
 - See DOCUMENTS_V2_DATABASE_ISSUES.md for complete details
 
 *For Complete Information:*

@@ -317,7 +317,8 @@ func InitializeProjectTables(db database.Database) error {
 			layout TEXT,
 			created INTEGER NOT NULL,
 			modified INTEGER NOT NULL,
-			deleted BOOLEAN NOT NULL DEFAULT 0
+			deleted BOOLEAN NOT NULL DEFAULT 0,
+			version INTEGER NOT NULL DEFAULT 1
 		);
 		CREATE INDEX IF NOT EXISTS dashboard_by_owner_id ON dashboard (owner_id);
 		CREATE INDEX IF NOT EXISTS dashboard_by_is_public ON dashboard (is_public);

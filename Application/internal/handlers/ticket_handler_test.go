@@ -98,6 +98,23 @@ func setupTicketTestHandler(t *testing.T) (*Handler, string) {
 	`)
 	require.NoError(t, err)
 
+	// Create ticket_history table (audit trail written by create/modify/remove handlers)
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_history (
+			id             TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			ticket_id      TEXT    NOT NULL,
+			version        INTEGER NOT NULL,
+			action         TEXT    NOT NULL,
+			user_id        TEXT    NOT NULL,
+			timestamp      INTEGER NOT NULL,
+			old_data       TEXT,
+			new_data       TEXT,
+			change_summary TEXT,
+			conflict_data  TEXT
+		)
+	`)
+	require.NoError(t, err)
+
 	// Create comment table
 	_, err = handler.db.Exec(ctx, `
 		CREATE TABLE IF NOT EXISTS comment (
@@ -642,7 +659,7 @@ func TestTicketHandler_Modify_VersionConflict(t *testing.T) {
 	wModify1 := httptest.NewRecorder()
 	cModify1, _ := gin.CreateTestContext(wModify1)
 	cModify1.Request = modifyHttpReq1
-	cModify1.Set("username", "user1")
+	cModify1.Set("username", "testuser")
 	cModify1.Set("request", &modifyReq1)
 	handler.DoAction(cModify1)
 
@@ -664,7 +681,7 @@ func TestTicketHandler_Modify_VersionConflict(t *testing.T) {
 	wModify2 := httptest.NewRecorder()
 	cModify2, _ := gin.CreateTestContext(wModify2)
 	cModify2.Request = modifyHttpReq2
-	cModify2.Set("username", "user2")
+	cModify2.Set("username", "testuser")
 	cModify2.Set("request", &modifyReq2)
 	handler.DoAction(cModify2)
 
@@ -1430,6 +1447,23 @@ func setupTicketTestHandlerWithPublisher(t *testing.T) (*Handler, *MockEventPubl
 	`)
 	require.NoError(t, err)
 
+	// Create ticket_history table (audit trail written by create/modify/remove handlers)
+	_, err = handler.db.Exec(ctx, `
+		CREATE TABLE IF NOT EXISTS ticket_history (
+			id             TEXT    NOT NULL PRIMARY KEY UNIQUE,
+			ticket_id      TEXT    NOT NULL,
+			version        INTEGER NOT NULL,
+			action         TEXT    NOT NULL,
+			user_id        TEXT    NOT NULL,
+			timestamp      INTEGER NOT NULL,
+			old_data       TEXT,
+			new_data       TEXT,
+			change_summary TEXT,
+			conflict_data  TEXT
+		)
+	`)
+	require.NoError(t, err)
+
 	// Create comment table
 	_, err = handler.db.Exec(ctx, `
 		CREATE TABLE IF NOT EXISTS comment (
@@ -1746,7 +1780,9 @@ func TestTicketHandler_Modify_NoEventOnFailure(t *testing.T) {
 	c.Set("request", &reqBody)
 	handler.DoAction(c)
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	// Modifying a non-existent ticket is a not-found condition (matches the
+	// Remove handler's behaviour for the same scenario).
+	assert.Equal(t, http.StatusNotFound, w.Code)
 
 	// Verify no event was published
 	assert.Equal(t, 0, mockPublisher.GetEventCount())

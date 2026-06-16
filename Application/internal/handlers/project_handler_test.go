@@ -27,7 +27,8 @@ func setupProjectTable(t *testing.T, handler *Handler) {
 			workflow_id TEXT NOT NULL,
 			created INTEGER NOT NULL,
 			modified INTEGER NOT NULL,
-			deleted INTEGER NOT NULL DEFAULT 0
+			deleted INTEGER NOT NULL DEFAULT 0,
+			version INTEGER NOT NULL DEFAULT 1
 		)
 	`)
 	require.NoError(t, err)

@@ -428,7 +428,9 @@ func (h *Handler) TeamListOrganizations(c *gin.Context, req *models.Request) {
 	}
 	defer rows.Close()
 
-	var organizations []models.Organization
+	// Initialise to a non-nil slice so an empty result serialises as a JSON
+	// array ([]) rather than null (consistent with other list endpoints).
+	organizations := make([]models.Organization, 0)
 	for rows.Next() {
 		var organization models.Organization
 		err := rows.Scan(
@@ -752,7 +754,9 @@ func (h *Handler) UserListOrganizations(c *gin.Context, req *models.Request) {
 	}
 	defer rows.Close()
 
-	var organizations []models.Organization
+	// Initialise to a non-nil slice so an empty result serialises as a JSON
+	// array ([]) rather than null (consistent with other list endpoints).
+	organizations := make([]models.Organization, 0)
 	for rows.Next() {
 		var organization models.Organization
 		err := rows.Scan(

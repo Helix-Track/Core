@@ -249,14 +249,16 @@ func setupDocumentTestDB(t *testing.T) *db {
 			modified INTEGER NOT NULL,
 			deleted INTEGER DEFAULT 0
 		)`,
-		// document_blueprint table
+		// document_blueprint table (aligned to Migration.V1.2.sql)
 		`CREATE TABLE document_blueprint (
 			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
 			description TEXT,
+			space_id TEXT,
 			template_id TEXT NOT NULL,
-			wizard_steps TEXT,
-			is_enabled INTEGER DEFAULT 1,
+			wizard_steps_json TEXT,
+			creator_id TEXT NOT NULL,
+			is_public INTEGER NOT NULL DEFAULT 0,
 			created INTEGER NOT NULL,
 			modified INTEGER NOT NULL,
 			deleted INTEGER DEFAULT 0
@@ -1180,6 +1182,10 @@ func TestGetDocumentTemplate(t *testing.T) {
 	assert.NotNil(t, retrieved)
 	assert.Equal(t, "template-456", retrieved.ID)
 	assert.Equal(t, "Project Plan", retrieved.Name)
+	// Regression: TypeID (required field), ContentTemplate and IsPublic must round-trip
+	assert.Equal(t, "type-page", retrieved.TypeID)
+	assert.Equal(t, "# Project: {{project_name}}", retrieved.ContentTemplate)
+	assert.Equal(t, false, retrieved.IsPublic)
 }
 
 func TestIncrementTemplateUseCount(t *testing.T) {
@@ -1312,6 +1318,90 @@ func TestGetDocumentAnalytics(t *testing.T) {
 	assert.NotNil(t, retrieved)
 	assert.Equal(t, "doc-456", retrieved.DocumentID)
 	assert.Equal(t, 200, retrieved.TotalViews)
+}
+
+func TestUpdateDocumentAnalytics(t *testing.T) {
+	db := setupDocumentTestDB(t)
+	defer db.Close()
+
+	// Create analytics row
+	analytics := &models.DocumentAnalytics{
+		ID:              "analytics-update",
+		DocumentID:      "doc-update",
+		TotalViews:      10,
+		UniqueViewers:   5,
+		PopularityScore: 1.0,
+	}
+	analytics.SetTimestamps()
+	err := db.CreateDocumentAnalytics(analytics)
+	require.NoError(t, err)
+	createdUpdated := analytics.Updated
+
+	// Wait so the updated timestamp can differ, then update counters
+	time.Sleep(1100 * time.Millisecond)
+	analytics.TotalViews = 250
+	analytics.UniqueViewers = 120
+	analytics.PopularityScore = 73.5
+	err = db.UpdateDocumentAnalytics(analytics)
+	require.NoError(t, err)
+
+	// Retrieve and assert the changed counters AND Updated
+	retrieved, err := db.GetDocumentAnalytics("doc-update")
+	require.NoError(t, err)
+	require.NotNil(t, retrieved)
+	assert.Equal(t, 250, retrieved.TotalViews)
+	assert.Equal(t, 120, retrieved.UniqueViewers)
+	assert.Equal(t, 73.5, retrieved.PopularityScore)
+	assert.Greater(t, retrieved.Updated, createdUpdated)
+	assert.Equal(t, analytics.Updated, retrieved.Updated)
+}
+
+func TestCreateAndGetDocumentBlueprint(t *testing.T) {
+	db := setupDocumentTestDB(t)
+	defer db.Close()
+
+	spaceID := "space-bp"
+	wizard := `[{"step":1,"title":"Intro"}]`
+	blueprint := &models.DocumentBlueprint{
+		ID:              "blueprint-123",
+		Name:            "Onboarding Blueprint",
+		SpaceID:         &spaceID,
+		TemplateID:      "template-1",
+		WizardStepsJSON: &wizard,
+		CreatorID:       "user-bp",
+		IsPublic:        true,
+	}
+	blueprint.SetTimestamps()
+	err := db.CreateDocumentBlueprint(blueprint)
+	require.NoError(t, err)
+
+	// A second blueprint from a different creator, to prove the filter discriminates
+	other := &models.DocumentBlueprint{
+		ID:         "blueprint-456",
+		Name:       "Other Blueprint",
+		TemplateID: "template-2",
+		CreatorID:  "user-other",
+		IsPublic:   false,
+	}
+	other.SetTimestamps()
+	require.NoError(t, db.CreateDocumentBlueprint(other))
+
+	// Round-trip via GetDocumentBlueprint
+	retrieved, err := db.GetDocumentBlueprint("blueprint-123")
+	require.NoError(t, err)
+	require.NotNil(t, retrieved)
+	assert.Equal(t, "blueprint-123", retrieved.ID)
+	assert.Equal(t, "Onboarding Blueprint", retrieved.Name)
+	assert.Equal(t, "user-bp", retrieved.CreatorID)
+	assert.Equal(t, true, retrieved.IsPublic)
+
+	// Regression: filtering by creator_id must return ONLY the matching row (bug 3).
+	// On the buggy impl the filter (wrong column/key) is ignored and both rows return.
+	results, err := db.ListDocumentBlueprints(map[string]interface{}{"creator_id": "user-bp"})
+	require.NoError(t, err)
+	require.Len(t, results, 1)
+	assert.Equal(t, "blueprint-123", results[0].ID)
+	assert.Equal(t, "user-bp", results[0].CreatorID)
 }
 
 // ========================================================================

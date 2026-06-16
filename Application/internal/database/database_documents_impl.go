@@ -2075,7 +2075,7 @@ func (d *db) CreateDocumentTemplate(template *models.DocumentTemplate) error {
 // GetDocumentTemplate gets a template by ID
 func (d *db) GetDocumentTemplate(id string) (*models.DocumentTemplate, error) {
 	query := `
-		SELECT id, name, description, space_id, creator_id, content_template,
+		SELECT id, name, description, space_id, type_id, creator_id, content_template,
 			   variables_json, use_count, is_public, created, modified, deleted
 		FROM document_template
 		WHERE id = ? AND deleted = 0
@@ -2088,9 +2088,9 @@ func (d *db) GetDocumentTemplate(id string) (*models.DocumentTemplate, error) {
 
 	template := &models.DocumentTemplate{}
 	err := row.Scan(
-		&template.ID, &template.Name, &template.Description, &template.SpaceID, &template.CreatorID,
-		&template.ContentTemplate, &template.VariablesJSON, &template.UseCount, &template.IsPublic,
-		&template.Created, &template.Modified, &template.Deleted,
+		&template.ID, &template.Name, &template.Description, &template.SpaceID, &template.TypeID,
+		&template.CreatorID, &template.ContentTemplate, &template.VariablesJSON, &template.UseCount,
+		&template.IsPublic, &template.Created, &template.Modified, &template.Deleted,
 	)
 
 	if err == sql.ErrNoRows {
@@ -2321,15 +2321,15 @@ func (d *db) ListDocumentBlueprints(filters map[string]interface{}) ([]*models.D
 	args := []interface{}{}
 
 	// Apply filters if needed
-	if createdBy, ok := filters["created_by"].(string); ok && createdBy != "" {
+	if creatorID, ok := filters["creator_id"].(string); ok && creatorID != "" {
 		query = `
 			SELECT id, name, description, space_id, template_id, wizard_steps_json,
 				   creator_id, is_public, created, modified, deleted
 			FROM document_blueprint
-			WHERE deleted = 0 AND created_by = ?
+			WHERE deleted = 0 AND creator_id = ?
 			ORDER BY created DESC
 		`
-		args = append(args, createdBy)
+		args = append(args, creatorID)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -2515,7 +2515,7 @@ func (d *db) UpdateDocumentAnalytics(analytics *models.DocumentAnalytics) error 
 	query := `
 		UPDATE document_analytics
 		SET total_views = ?, unique_viewers = ?, avg_view_duration = ?,
-		    last_viewed = ?, popularity_score = ?, modified = ?
+		    last_viewed = ?, popularity_score = ?, updated = ?
 		WHERE id = ?
 	`
 

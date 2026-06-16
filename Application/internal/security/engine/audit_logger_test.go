@@ -39,12 +39,21 @@ func (m *MockRowScanner) Scan(dest ...interface{}) error {
 		if i < len(dest) {
 			switch d := dest[i].(type) {
 			case *int:
-				if val, ok := v.(int); ok {
+				// Real SQL drivers freely convert integer column values into
+				// *int destinations regardless of the underlying width, so the
+				// mock mirrors that for both int and int64 source values.
+				switch val := v.(type) {
+				case int:
 					*d = val
+				case int64:
+					*d = int(val)
 				}
 			case *int64:
-				if val, ok := v.(int64); ok {
+				switch val := v.(type) {
+				case int64:
 					*d = val
+				case int:
+					*d = int64(val)
 				}
 			case *string:
 				if val, ok := v.(string); ok {
@@ -136,7 +145,7 @@ func (m *MockRows) NextResultSet() bool {
 
 // TestNewAuditLogger tests audit logger creation
 func TestNewAuditLogger(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	logger := NewAuditLogger(mockDB, 90*24*time.Hour)
 
 	assert.NotNil(t, logger)
@@ -146,7 +155,7 @@ func TestNewAuditLogger(t *testing.T) {
 
 // TestLog tests basic audit logging
 func TestLog(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	mockResult := new(MockResult)
 	mockResult.On("RowsAffected").Return(int64(1), nil)
 	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)
@@ -176,7 +185,7 @@ func TestLog(t *testing.T) {
 
 // TestLog_DeniedAccess tests logging denied access attempts
 func TestLog_DeniedAccess(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	mockResult := new(MockResult)
 	mockResult.On("RowsAffected").Return(int64(1), nil)
 	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)
@@ -205,7 +214,7 @@ func TestLog_DeniedAccess(t *testing.T) {
 
 // TestLog_AutoGenerateID tests that logger auto-generates ID if not provided
 func TestLog_AutoGenerateID(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	mockResult := new(MockResult)
 	mockResult.On("RowsAffected").Return(int64(1), nil)
 	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)
@@ -227,7 +236,7 @@ func TestLog_AutoGenerateID(t *testing.T) {
 
 // TestLog_AutoGenerateTimestamp tests that logger auto-generates timestamp if not provided
 func TestLog_AutoGenerateTimestamp(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	mockResult := new(MockResult)
 	mockResult.On("RowsAffected").Return(int64(1), nil)
 	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)
@@ -250,7 +259,7 @@ func TestLog_AutoGenerateTimestamp(t *testing.T) {
 
 // TestGetRecentEntries tests retrieving recent audit log entries
 func TestGetRecentEntries(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Create mock rows
 	mockRows := &MockRows{
@@ -275,7 +284,7 @@ func TestGetRecentEntries(t *testing.T) {
 
 // TestGetEntriesByUsername tests retrieving entries for a specific user
 func TestGetEntriesByUsername(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	mockRows := &MockRows{
 		rows: [][]interface{}{
@@ -297,7 +306,7 @@ func TestGetEntriesByUsername(t *testing.T) {
 
 // TestGetDeniedAttempts tests retrieving denied access attempts
 func TestGetDeniedAttempts(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	mockRows := &MockRows{
 		rows: [][]interface{}{
@@ -320,7 +329,7 @@ func TestGetDeniedAttempts(t *testing.T) {
 
 // TestGetStats tests retrieving audit statistics
 func TestGetStats(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 
 	// Mock QueryRow responses for stats
 	mockRow1 := &MockRowScanner{values: []interface{}{int64(100)}}
@@ -347,7 +356,7 @@ func TestGetStats(t *testing.T) {
 
 // TestLog_WithContext tests logging with additional context
 func TestLog_WithContext(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	mockResult := new(MockResult)
 	mockResult.On("RowsAffected").Return(int64(1), nil)
 	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)
@@ -388,7 +397,7 @@ func TestLog_AllActions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockDB := new(MockDatabase)
+			mockDB := new(MockQuerier)
 			mockResult := new(MockResult)
 			mockResult.On("RowsAffected").Return(int64(1), nil)
 			mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)
@@ -411,7 +420,7 @@ func TestLog_AllActions(t *testing.T) {
 
 // TestRemoveOldEntries tests cleanup of old entries
 func TestRemoveOldEntries(t *testing.T) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	mockResult := new(MockResult)
 	mockResult.On("RowsAffected").Return(int64(5), nil)
 	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)
@@ -426,7 +435,7 @@ func TestRemoveOldEntries(t *testing.T) {
 
 // Benchmark tests
 func BenchmarkLog(b *testing.B) {
-	mockDB := new(MockDatabase)
+	mockDB := new(MockQuerier)
 	mockResult := new(MockResult)
 	mockResult.On("RowsAffected").Return(int64(1), nil)
 	mockDB.On("Exec", mock.Anything, mock.Anything, mock.Anything).Return(mockResult, nil)

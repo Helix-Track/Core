@@ -26,6 +26,20 @@ All previously documented database implementation issues have been **completely 
 
 ---
 
+## 2026-06-17 Re-Audit & Residual-Bug Fixes (corrects the "100% RESOLVED" claim above)
+
+A re-audit found the earlier "100% RESOLVED / 433/433 passing" badge was **partially false**: the model tests passed, but the *handler* tests were failing and three *latent* DB-layer bugs were never exercised by a round-trip test. All are now genuinely fixed, each with a permanent regression test (Constitution §11.4.135):
+
+- **Handler**: `handleDocumentCreate`/`handleDocumentContentUpdate` persisted without `SetTimestamps()` → `Validate()` rejected zero timestamps → HTTP 500. Fixed; document handler tests now pass.
+- **DB bug 1**: `UpdateDocumentAnalytics` wrote nonexistent column `modified` (DDL has `updated`). Fixed + `TestUpdateDocumentAnalytics`.
+- **DB bug 2**: `GetDocumentTemplate` SELECT/scan omitted `type_id` → fetched templates had empty `TypeID`. Fixed + strengthened `TestGetDocumentTemplate`.
+- **DB bug 3**: `ListDocumentBlueprints` filtered nonexistent column `created_by` (DDL has `creator_id`). Fixed + `TestCreateAndGetDocumentBlueprint`.
+- Stale `document_blueprint` test schema aligned to `Migration.V1.2.sql`.
+
+Verification: `go test ./internal/handlers/ -run 'Document|Space|Page'` → ok; `go test ./internal/database/` → ok; `go test ./internal/models/` → ok.
+
+---
+
 ## Historical Record: Original Issues (NOW RESOLVED)
 
 The following section documents the issues that were present on 2025-10-18. **All issues listed below have been fixed.**

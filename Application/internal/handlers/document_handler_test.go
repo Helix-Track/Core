@@ -296,7 +296,9 @@ func TestDocumentRead(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	docData := map[string]interface{}{
 		"title":    "Test Document",
@@ -304,18 +306,22 @@ func TestDocumentRead(t *testing.T) {
 		"type_id":  "type-page",
 	}
 	_, createResp := setupTestRequest(t, handler, models.ActionDocumentCreate, docData)
-	docID := createResp.Data["id"].(string)
+	document, ok := createResp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in response")
+	docID := document["id"].(string)
 
 	// Read document
 	readData := map[string]interface{}{
-		"document_id": docID,
+		"id": docID,
 	}
 	w, resp := setupTestRequest(t, handler, models.ActionDocumentRead, readData)
 
 	assert.True(t, w.Code == http.StatusOK || w.Code == http.StatusCreated, "Expected 200 or 201, got %d", w.Code)
 	assert.Equal(t, models.ErrorCodeNoError, resp.ErrorCode)
-	assert.Equal(t, docID, resp.Data["id"])
-	assert.Equal(t, "Test Document", resp.Data["title"])
+	readDoc, ok := resp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in read response")
+	assert.Equal(t, docID, readDoc["id"])
+	assert.Equal(t, "Test Document", readDoc["title"])
 }
 
 func TestDocumentUpdate(t *testing.T) {
@@ -328,7 +334,9 @@ func TestDocumentUpdate(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	docData := map[string]interface{}{
 		"title":    "Original Title",
@@ -336,19 +344,23 @@ func TestDocumentUpdate(t *testing.T) {
 		"type_id":  "type-page",
 	}
 	_, createResp := setupTestRequest(t, handler, models.ActionDocumentCreate, docData)
-	docID := createResp.Data["id"].(string)
+	document, ok := createResp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in response")
+	docID := document["id"].(string)
 
 	// Update document
 	updateData := map[string]interface{}{
-		"document_id": docID,
-		"title":       "Updated Title",
-		"version":     1,
+		"id":      docID,
+		"title":   "Updated Title",
+		"version": 1,
 	}
 	w, resp := setupTestRequest(t, handler, models.ActionDocumentUpdate, updateData)
 
 	assert.True(t, w.Code == http.StatusOK || w.Code == http.StatusCreated, "Expected 200 or 201, got %d", w.Code)
 	assert.Equal(t, models.ErrorCodeNoError, resp.ErrorCode)
-	assert.Equal(t, "Updated Title", resp.Data["title"])
+	updatedDoc, ok := resp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in update response")
+	assert.Equal(t, "Updated Title", updatedDoc["title"])
 }
 
 func TestDocumentDelete(t *testing.T) {
@@ -361,7 +373,9 @@ func TestDocumentDelete(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	docData := map[string]interface{}{
 		"title":    "Test Document",
@@ -369,11 +383,13 @@ func TestDocumentDelete(t *testing.T) {
 		"type_id":  "type-page",
 	}
 	_, createResp := setupTestRequest(t, handler, models.ActionDocumentCreate, docData)
-	docID := createResp.Data["id"].(string)
+	document, ok := createResp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in response")
+	docID := document["id"].(string)
 
 	// Delete document
 	deleteData := map[string]interface{}{
-		"document_id": docID,
+		"id": docID,
 	}
 	w, resp := setupTestRequest(t, handler, models.ActionDocumentDelete, deleteData)
 
@@ -382,7 +398,7 @@ func TestDocumentDelete(t *testing.T) {
 
 	// Verify deletion - read should fail
 	readData := map[string]interface{}{
-		"document_id": docID,
+		"id": docID,
 	}
 	_, readResp := setupTestRequest(t, handler, models.ActionDocumentRead, readData)
 	assert.NotEqual(t, models.ErrorCodeNoError, readResp.ErrorCode)
@@ -398,7 +414,9 @@ func TestDocumentList(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	// Create multiple documents
 	for i := 1; i <= 5; i++ {
@@ -438,7 +456,9 @@ func TestDocumentContentUpdate(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	docData := map[string]interface{}{
 		"title":    "Test Document",
@@ -446,7 +466,9 @@ func TestDocumentContentUpdate(t *testing.T) {
 		"type_id":  "type-page",
 	}
 	_, createResp := setupTestRequest(t, handler, models.ActionDocumentCreate, docData)
-	docID := createResp.Data["id"].(string)
+	document, ok := createResp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in response")
+	docID := document["id"].(string)
 
 	// Update content
 	contentData := map[string]interface{}{
@@ -470,7 +492,9 @@ func TestDocumentContentGet(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	docData := map[string]interface{}{
 		"title":    "Test Document",
@@ -478,7 +502,9 @@ func TestDocumentContentGet(t *testing.T) {
 		"type_id":  "type-page",
 	}
 	_, createResp := setupTestRequest(t, handler, models.ActionDocumentCreate, docData)
-	docID := createResp.Data["id"].(string)
+	document, ok := createResp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in response")
+	docID := document["id"].(string)
 
 	contentData := map[string]interface{}{
 		"document_id":  docID,
@@ -512,7 +538,9 @@ func TestDocumentArchive(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	docData := map[string]interface{}{
 		"title":    "Test Document",
@@ -520,11 +548,13 @@ func TestDocumentArchive(t *testing.T) {
 		"type_id":  "type-page",
 	}
 	_, createResp := setupTestRequest(t, handler, models.ActionDocumentCreate, docData)
-	docID := createResp.Data["id"].(string)
+	document, ok := createResp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in response")
+	docID := document["id"].(string)
 
 	// Archive document
 	archiveData := map[string]interface{}{
-		"document_id": docID,
+		"id": docID,
 	}
 	w, resp := setupTestRequest(t, handler, models.ActionDocumentArchive, archiveData)
 
@@ -542,7 +572,9 @@ func TestDocumentPublish(t *testing.T) {
 		"owner_id": "user-1",
 	}
 	_, spaceResp := setupTestRequest(t, handler, models.ActionDocumentSpaceCreate, spaceData)
-	spaceID := spaceResp.Data["id"].(string)
+	space, ok := spaceResp.Data["space"].(map[string]interface{})
+	require.True(t, ok, "Expected space in response")
+	spaceID := space["id"].(string)
 
 	docData := map[string]interface{}{
 		"title":    "Test Document",
@@ -550,11 +582,13 @@ func TestDocumentPublish(t *testing.T) {
 		"type_id":  "type-page",
 	}
 	_, createResp := setupTestRequest(t, handler, models.ActionDocumentCreate, docData)
-	docID := createResp.Data["id"].(string)
+	document, ok := createResp.Data["document"].(map[string]interface{})
+	require.True(t, ok, "Expected document in response")
+	docID := document["id"].(string)
 
 	// Publish document
 	publishData := map[string]interface{}{
-		"document_id": docID,
+		"id": docID,
 	}
 	w, resp := setupTestRequest(t, handler, models.ActionDocumentPublish, publishData)
 
