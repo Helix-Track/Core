@@ -1,0 +1,9 @@
+# helix-deps.yaml — core Submodule-Dependency Manifest (HelixConstitution §11.4.31)
+# Catalogue-Check (§11.4.74): inspected core/.gitmodules + Application/go.mod, Attachments-Service/go.mod, Services/Chat/go.mod, Services/Localization/go.mod, Tools/KeyManager/go.mod, Application/qa-ai/go.mod; own-org git/submodule deps: Website (.gitmodules entry → Helix-Track/Website.git). No own-org Go module appears in any require block (the helixtrack/* matches are the modules' own `module` declarations, not dependencies).
+schema_version: 1
+deps:
+  - {name: Website, ssh_url: git@github.com:Helix-Track/Website.git, ref: main, why: own-org submodule declared in core/.gitmodules (project marketing/website), layout: flat}
+transitive_handling:
+  recursive: true
+  conflict_resolution: operator-required
+language_specific_subtree: true
