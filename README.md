@@ -151,8 +151,6 @@ See [LICENSE](LICENSE) file for details.
 - **Documentation**: [Documentation Directory](Documentation/)
 - **Mirrors**:
   - [GitHub](https://github.com/Helix-Track/Core)
-  - [GitFlic](https://gitflic.ru/project/helix-track/core)
-  - [Gitee](https://gitee.com/Kvetch_Godspeed_b073/Core)
 
 ---
 
