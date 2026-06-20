@@ -38,5 +38,9 @@ RUN mkdir -p Database
 # Expose port
 EXPOSE 8080
 
+# Copy Database DDL directory for first-start auto-init
+COPY Database/ ./Database/
+
 # Run the application
+# --space-root overrides the default config for per-space data isolation
 CMD ["./htCore", "-config", "Configurations/default.json"]
