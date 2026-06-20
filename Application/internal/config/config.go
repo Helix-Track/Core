@@ -12,9 +12,11 @@ type Config struct {
 	Listeners []ListenerConfig `json:"listeners"`
 	Plugins   []PluginConfig   `json:"plugins"`
 	Database  DatabaseConfig   `json:"database"`
-	Services  ServicesConfig   `json:"services"`
-	WebSocket WebSocketConfig  `json:"websocket"`
-	Version   string           `json:"version,omitempty"`
+	Services    ServicesConfig   `json:"services"`
+	WebSocket   WebSocketConfig  `json:"websocket"`
+	Version     string           `json:"version,omitempty"`
+	SpaceRoot   string           `json:"space_root,omitempty"` // Path to space data root
+	SpaceConfig *SpaceConfig     `json:"-"`                    // Runtime-only: loaded from <space-root>/config.json
 }
 
 // LogConfig represents logging configuration
