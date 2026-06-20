@@ -21,8 +21,28 @@ func NewMigrator(ddlDir string) *Migrator {
 	return &Migrator{ddlDir: ddlDir}
 }
 
+// isGracefulFailure returns true if the statement may fail on a fresh DB
+// because it references tables/columns created later by Go code (handlers'
+// Initialize*Table functions). This covers DML (INSERT/UPDATE/DELETE) and
+// any "no such table" or "no such column" error from CREATE INDEX/ALTER.
+// The migration runner logs a warning and continues instead of fatally aborting.
+func isGracefulFailure(stmt, errMsg string) bool {
+	if strings.Contains(errMsg, "no such table") || strings.Contains(errMsg, "no such column") {
+		return true
+	}
+	upper := strings.TrimSpace(strings.ToUpper(stmt))
+	for _, prefix := range []string{"INSERT", "UPDATE", "DELETE"} {
+		if strings.HasPrefix(upper, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
 // RunMigrations reads all .sql files from the DDL directory (excluding
 // test-data files) and executes them in sorted order against a fresh database.
+// Statements referencing tables yet to be created by Go code are logged as
+// warnings and skipped.
 func (m *Migrator) RunMigrations(dbCfg config.DatabaseConfig) error {
 	entries, err := os.ReadDir(m.ddlDir)
 	if err != nil {
@@ -71,6 +91,12 @@ func (m *Migrator) RunMigrations(dbCfg config.DatabaseConfig) error {
 				continue
 			}
 			if _, execErr := db.Exec(ctx, trimmed); execErr != nil {
+				// References to tables/columns created later by Go code
+				// are gracefully skipped with a warning.
+				if isGracefulFailure(trimmed, execErr.Error()) {
+					fmt.Printf("WARN: migration %s skipped statement: %v\n", file, execErr)
+					continue
+				}
 				return fmt.Errorf("migration %s failed on statement: %w\nStatement: %s",
 					file, execErr, trimmed[:min(len(trimmed), 200)])
 			}
