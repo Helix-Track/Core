@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.22-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 # Install build dependencies for CGO and SQLite
 RUN apk add --no-cache gcc musl-dev sqlite-dev
@@ -19,7 +19,7 @@ RUN go mod tidy && go mod download
 RUN CGO_ENABLED=1 go build -o /app/htCore main.go
 
 # Runtime stage
-FROM golang:1.22-alpine
+FROM golang:1.24-alpine
 
 WORKDIR /app
 
