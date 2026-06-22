@@ -23,8 +23,10 @@ FROM golang:1.24-alpine
 
 WORKDIR /app
 
-# Install sqlite
-RUN apk add --no-cache sqlite-libs
+# Install sqlite + curl (curl is required by the compose healthcheck
+# `curl -f http://localhost:8080/health`; without it the container reports
+# (unhealthy) despite the app being healthy)
+RUN apk add --no-cache sqlite-libs curl
 
 # Copy binary from builder
 COPY --from=builder /app/htCore .
